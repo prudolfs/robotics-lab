@@ -10,10 +10,17 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"test": "vitest run",
+		"typecheck": "tsc --noEmit -p tsconfig.json"
 	},
 	"dependencies": {
 		"@fontsource-variable/geist": "^5.2.9",
+		"@react-three/drei": "^10.7.7",
+		"@react-three/fiber": "^9.6.1",
+		"@robotics-lab/core": "workspace:*",
+		"@robotics-lab/geometry": "workspace:*",
+		"@robotics-lab/rendering": "workspace:*",
 		"@tailwindcss/vite": "^4.3.2",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
@@ -24,11 +31,13 @@
 		"shadcn": "^4.12.0",
 		"tailwind-merge": "^3.6.0",
 		"tailwindcss": "^4.3.2",
+		"three": "^0.185.1",
 		"tw-animate-css": "^1.4.0"
 	},
 	"devDependencies": {
 		"@types/react": "^19.2.17",
 		"@types/react-dom": "^19.2.3",
+		"@types/three": "^0.185.0",
 		"@vitejs/plugin-react-swc": "^4.3.1",
 		"vite": "^8.1.2"
 	}

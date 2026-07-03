@@ -41,9 +41,9 @@
 
 ## Rendering
 
-- [ ] Three.js
-- [ ] React Three Fiber
-- [ ] Drei
+- [x] Three.js
+- [x] React Three Fiber
+- [x] Drei
 
 ## State
 
@@ -51,7 +51,7 @@
 
 ## Testing
 
-- [ ] Vitest
+- [x] Vitest
 
 ---
 
@@ -85,31 +85,31 @@ React is only responsible for visualization and user interaction.
 
 ## Repository
 
-- [ ] Create simulator application
+- [x] Create simulator application
 - [x] Configure TypeScript
 - [x] Configure Binome
-- [ ] Configure Vitest
+- [x] Configure Vitest
 - [x] Configure Vite
 
 ## Packages
 
-- [ ] Create core package
-- [ ] Create geometry package
-- [ ] Create robot package
-- [ ] Create rendering package
-- [ ] Create sensors package
-- [ ] Create occupancy-grid package
-- [ ] Create navigation package
-- [ ] Create maps package
+- [x] Create core package
+- [x] Create geometry package
+- [x] Create robot package
+- [x] Create rendering package
+- [x] Create sensors package
+- [x] Create occupancy-grid package
+- [x] Create navigation package
+- [x] Create maps package
 
 ## Rendering
 
-- [ ] React Three Fiber scene
-- [ ] Orbit controls
-- [ ] Camera
-- [ ] Lights
-- [ ] Infinite grid
-- [ ] FPS counter
+- [x] React Three Fiber scene
+- [x] Orbit controls
+- [x] Camera
+- [x] Lights
+- [x] Infinite grid
+- [x] FPS counter
 
 ---
 

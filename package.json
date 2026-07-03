@@ -11,11 +11,16 @@
 		"lint": "biome lint",
 		"format": "biome format --write",
 		"check": "biome check --write --unsafe",
-		"typecheck": "tsc -b"
+		"typecheck": "pnpm -r typecheck",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:ui": "vitest --ui"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.2",
-		"typescript": "^6.0.3"
+		"@vitest/ui": "^4.1.9",
+		"typescript": "^6.0.3",
+		"vitest": "^4.1.9"
 	},
 	"devEngines": {
 		"packageManager": {

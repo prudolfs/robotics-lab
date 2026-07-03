@@ -1,8 +1,4 @@
 {
-	"files": [],
-	"references": [
-		{
-			"path": "./apps/simulator"
-		}
-	]
+	"extends": "./tsconfig.base.json",
+	"include": []
 }
