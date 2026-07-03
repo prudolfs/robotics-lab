@@ -1,28 +1,27 @@
 {
-  "name": "robotics-lab",
-  "version": "1.0.0",
-  "description": "",
-  "keywords": [],
-  "license": "ISC",
-  "author": "",
-  "type": "module",
-  "main": "index.js",
-  "scripts": {
-    "lint": "oxlint . --fix",
-    "format": "oxfmt . --write",
-    "check": "oxlint . --fix && oxfmt . --write",
-    "typecheck": "tsc -b"
-  },
-  "devDependencies": {
-    "oxfmt": "^0.57.0",
-    "oxlint": "^1.72.0",
-    "typescript": "^6.0.3"
-  },
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.9.0",
-      "onFail": "download"
-    }
-  }
+	"name": "robotics-lab",
+	"version": "1.0.0",
+	"description": "",
+	"keywords": [],
+	"license": "ISC",
+	"author": "",
+	"type": "module",
+	"main": "index.js",
+	"scripts": {
+		"lint": "biome lint",
+		"format": "biome format --write",
+		"check": "biome check --write --unsafe",
+		"typecheck": "tsc -b"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.5.2",
+		"typescript": "^6.0.3"
+	},
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": "^11.9.0",
+			"onFail": "download"
+		}
+	}
 }

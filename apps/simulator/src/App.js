@@ -1,10 +1,10 @@
 import { jsx as _jsx } from 'react/jsx-runtime'
 export default function App() {
-  return _jsx('div', {
-    className: 'min-h-screen flex items-center justify-center',
-    children: _jsx('h1', {
-      className: 'text-4xl font-bold text-blue-600',
-      children: 'Simulator',
-    }),
-  })
+	return _jsx('div', {
+		className: 'min-h-screen flex items-center justify-center',
+		children: _jsx('h1', {
+			className: 'text-4xl font-bold text-blue-600',
+			children: 'Simulator',
+		}),
+	})
 }

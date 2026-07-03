@@ -256,6 +256,11 @@ Rendering
 - React Three Fiber
 - Drei
 
+Rendering UI and HUD's
+
+- Tailwind
+- Shadcn
+
 State
 
 - Zustand
@@ -266,11 +271,11 @@ Testing
 
 Linting
 
-- ESLint
+- Biome
 
 Formatting
 
-- Prettier
+- Biome
 
 Deployment
 
