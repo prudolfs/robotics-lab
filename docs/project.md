@@ -48,9 +48,9 @@ Example:
 
 ```ts
 type Pose = {
-    x: number
-    y: number
-    heading: number
+  x: number
+  y: number
+  heading: number
 }
 ```
 

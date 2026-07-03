@@ -2,24 +2,27 @@
   "name": "robotics-lab",
   "version": "1.0.0",
   "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "oxlint . --fix",
+    "format": "oxfmt . --write",
+    "check": "oxlint . --fix && oxfmt . --write",
+    "typecheck": "tsc -b"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "devDependencies": {
+    "oxfmt": "^0.57.0",
+    "oxlint": "^1.72.0",
+    "typescript": "^6.0.3"
+  },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
       "version": "^11.9.0",
       "onFail": "download"
     }
-  },
-  "type": "module",
-  "devDependencies": { 
-    "oxfmt": "^0.57.0",
-    "oxlint": "^1.72.0",
-    "typescript": "^6.0.3"
   }
 }
