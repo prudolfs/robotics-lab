@@ -379,6 +379,9 @@ importers:
       '@robotics-lab/core':
         specifier: workspace:*
         version: link:../core
+      '@robotics-lab/geometry':
+        specifier: workspace:*
+        version: link:../geometry
 
 packages:
 

@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import { FpsCounter, RobotView, SimulatorScene, WorldView } from '@robotics-lab/rendering'
 import { useCallback, useState } from 'react'
 import { DebugOverlay } from '@/components/debug-overlay'
+import { TeleopHud } from '@/components/teleop-hud'
 import { Button } from '@/components/ui/button'
 import { useSimulationLoop } from '@/sim/use-simulation-loop'
 import { useSimulatorStore } from '@/store'
@@ -55,6 +56,8 @@ export default function App() {
 			</div>
 
 			<DebugOverlay robot={robot} onReset={controls.reset} />
+
+			<TeleopHud controls={controls} />
 
 			<div className="absolute top-4 right-4 flex flex-col items-end gap-2">
 				<span className="font-medium text-muted-foreground text-xs uppercase">Map</span>

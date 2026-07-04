@@ -197,15 +197,15 @@ Drive the robot manually.
 
 ## Input
 
-- [ ] Keyboard controls
-- [ ] Speed adjustment
-- [ ] Emergency stop
+- [x] Keyboard controls
+- [x] Speed adjustment
+- [x] Emergency stop
 
 ## UI
 
-- [ ] HUD
-- [ ] Control hints
-- [ ] Robot status
+- [x] HUD
+- [x] Control hints
+- [x] Robot status
 
 ---
 

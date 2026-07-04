@@ -3,6 +3,7 @@ import { loadMap, mapNames } from '@robotics-lab/maps'
 import type { RobotState } from '@robotics-lab/robot'
 import { create } from 'zustand'
 import { createSimulation, robotSpeed, type SimState } from '@/sim/loop'
+import { DEFAULT_TELEOP_CONFIG, type TeleopConfig } from '@/sim/teleop'
 
 // Default spawn pose: center of the floor, facing +x.
 export const SPAWN_POSE = { x: 0, y: 0, heading: 0 }
@@ -20,10 +21,16 @@ export type SimulatorStore = {
 	simTime: number
 	/** Observed: linear robot speed in m/s. */
 	speed: number
+	/** Observed: the current commanded wheel speeds (m/s). */
+	input: { leftWheel: number; rightWheel: number }
 	/** Observed: whether the simulation loop is currently advancing. */
 	running: boolean
+	/** App state: teleop tuning exposed to the HUD slider / speed adjustment. */
+	teleop: TeleopConfig
 	/** App action: switch the active map (the loop resets the sim on change). */
 	selectMap: (name: string) => void
+	/** App action: tune the teleop throttle (base speed). */
+	setBaseSpeed: (value: number) => void
 	/** Observer: push the latest simulation snapshot for rendering / HUD. */
 	observe: (next: SimState) => void
 }
@@ -37,6 +44,7 @@ export function sampleState(next: SimState) {
 		robot: next.robot,
 		simTime: next.time,
 		speed: robotSpeed(next.robot),
+		input: next.input,
 		running: next.running,
 	}
 }
@@ -51,10 +59,20 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		// The loop is the authority; the store only mirrors its state so React
 		// can observe it. The hook calls `observe` every frame after stepping.
 		...sampleState(createSimulation({ spawnPose: SPAWN_POSE })),
+		teleop: DEFAULT_TELEOP_CONFIG,
 		selectMap: (name) => {
 			if (!names.includes(name)) return
 			set({ selectedMap: name, world: buildWorld(name) })
 		},
+		setBaseSpeed: (value) =>
+			set((s) => ({
+				teleop: { ...s.teleop, baseSpeed: clampPositive(value) },
+			})),
 		observe: (next) => set(sampleState(next)),
 	}
 })
+
+/** Teleop throttle must stay strictly positive; clamp UI slip to a small floor. */
+function clampPositive(value: number): number {
+	return Number.isFinite(value) && value > 0 ? value : DEFAULT_TELEOP_CONFIG.baseSpeed
+}
