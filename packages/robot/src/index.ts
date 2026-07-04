@@ -42,6 +42,9 @@ export function createRobot(
 /**
  * Advance a robot by `dt` seconds using the differential-drive model.
  * Wheel speeds are linear speeds (m/s) at the wheel contact point.
+ *
+ * Integration uses the heading midpoint for the position update, which keeps
+ * arc motion accurate over many steps (plain Euler drifts badly on circles).
  */
 export function stepDifferentialDrive(
 	robot: RobotState,
@@ -51,9 +54,10 @@ export function stepDifferentialDrive(
 	const { wheelBase } = robot.params
 	const v = (next.leftWheel + next.rightWheel) / 2
 	const omega = (next.rightWheel - next.leftWheel) / wheelBase
+	const midHeading = robot.pose.heading + (omega * dt) / 2
 	const heading = robot.pose.heading + omega * dt
-	const x = robot.pose.x + v * Math.cos(robot.pose.heading) * dt
-	const y = robot.pose.y + v * Math.sin(robot.pose.heading) * dt
+	const x = robot.pose.x + v * Math.cos(midHeading) * dt
+	const y = robot.pose.y + v * Math.sin(midHeading) * dt
 	return {
 		...robot,
 		pose: { x, y, heading },

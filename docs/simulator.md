@@ -146,29 +146,29 @@ Build a differential drive robot.
 
 ## Robot State
 
-- [ ] Pose
-- [ ] Velocity
-- [ ] Wheel speeds
+- [x] Pose
+- [x] Velocity
+- [x] Wheel speeds
 
 ## Kinematics
 
-- [ ] Differential drive equations
-- [ ] Forward motion
-- [ ] Reverse motion
-- [ ] Rotation
-- [ ] Arc movement
+- [x] Differential drive equations
+- [x] Forward motion
+- [x] Reverse motion
+- [x] Rotation
+- [x] Arc movement
 
 ## Rendering
 
-- [ ] Robot body
-- [ ] Wheels
-- [ ] Heading indicator
+- [x] Robot body
+- [x] Wheels
+- [x] Heading indicator
 
 ## Debug
 
-- [ ] Position overlay
-- [ ] Velocity overlay
-- [ ] Heading overlay
+- [x] Position overlay
+- [x] Velocity overlay
+- [x] Heading overlay
 
 ---
 

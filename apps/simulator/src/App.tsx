@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber'
-import { FpsCounter, SimulatorScene, WorldView } from '@robotics-lab/rendering'
+import { FpsCounter, RobotView, SimulatorScene, WorldView } from '@robotics-lab/rendering'
 import { useCallback, useState } from 'react'
+import { DebugOverlay } from '@/components/debug-overlay'
 import { Button } from '@/components/ui/button'
 import { useSimulatorStore } from '@/store'
 
@@ -13,7 +14,9 @@ export default function App() {
 	const mapNames = useSimulatorStore((s) => s.mapNames)
 	const selectedMap = useSimulatorStore((s) => s.selectedMap)
 	const world = useSimulatorStore((s) => s.world)
+	const robot = useSimulatorStore((s) => s.robot)
 	const selectMap = useSimulatorStore((s) => s.selectMap)
+	const resetRobot = useSimulatorStore((s) => s.resetRobot)
 
 	return (
 		<div className="relative h-screen w-screen overflow-hidden bg-background">
@@ -21,6 +24,7 @@ export default function App() {
 				<SimulatorScene>
 					<FpsCounter onUpdate={handleFps} />
 					<WorldView world={world} />
+					<RobotView pose={robot.pose} params={robot.params} />
 				</SimulatorScene>
 			</Canvas>
 
@@ -28,10 +32,9 @@ export default function App() {
 				<h1 className="font-semibold text-foreground text-lg">Robotics Lab — Simulator</h1>
 				<span className="font-mono text-muted-foreground text-sm">FPS: {fps}</span>
 				<span className="font-mono text-muted-foreground text-sm">Map: {world.name}</span>
-				<span className="font-mono text-muted-foreground text-sm">
-					Obstacles: {world.walls.length + world.boxes.length + world.cylinders.length}
-				</span>
 			</div>
+
+			<DebugOverlay robot={robot} onReset={resetRobot} />
 
 			<div className="absolute top-4 right-4 flex flex-col items-end gap-2">
 				<span className="font-medium text-muted-foreground text-xs uppercase">Map</span>
