@@ -11,5 +11,9 @@
 	"scripts": {
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit -p tsconfig.json"
+	},
+	"dependencies": {
+		"@robotics-lab/geometry": "workspace:*",
+		"@robotics-lab/maps": "workspace:*"
 	}
 }

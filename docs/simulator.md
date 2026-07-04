@@ -47,7 +47,7 @@
 
 ## State
 
-- [ ] Zustand (UI only)
+- [x] Zustand (UI only)
 
 ## Testing
 
@@ -121,20 +121,20 @@ Create a simple simulation environment.
 
 ## Tasks
 
-- [ ] World model
-- [ ] Floor
-- [ ] Walls
-- [ ] Boxes
-- [ ] Cylinders
-- [ ] Coordinate axes
-- [ ] Grid helper
+- [x] World model
+- [x] Floor
+- [x] Walls
+- [x] Boxes
+- [x] Cylinders
+- [x] Coordinate axes
+- [x] Grid helper
 
 ## Maps
 
-- [ ] JSON map format
-- [ ] Map loader
-- [ ] Map serializer
-- [ ] Multiple maps
+- [x] JSON map format
+- [x] Map loader
+- [x] Map serializer
+- [x] Multiple maps
 
 ---
 

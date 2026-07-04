@@ -237,6 +237,9 @@ importers:
       '@robotics-lab/geometry':
         specifier: workspace:*
         version: link:../../packages/geometry
+      '@robotics-lab/maps':
+        specifier: workspace:*
+        version: link:../../packages/maps
       '@robotics-lab/rendering':
         specifier: workspace:*
         version: link:../../packages/rendering
@@ -276,6 +279,9 @@ importers:
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
+      zustand:
+        specifier: ^5.0.14
+        version: 5.0.14(@types/react@19.2.17)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))
     devDependencies:
       '@types/react':
         specifier: ^19.2.17
@@ -293,7 +299,14 @@ importers:
         specifier: ^8.1.2
         version: 8.1.2(jiti@2.7.0)
 
-  packages/core: {}
+  packages/core:
+    dependencies:
+      '@robotics-lab/geometry':
+        specifier: workspace:*
+        version: link:../geometry
+      '@robotics-lab/maps':
+        specifier: workspace:*
+        version: link:../maps
 
   packages/geometry: {}
 
@@ -319,6 +332,10 @@ importers:
         version: link:../geometry
 
   packages/rendering:
+    dependencies:
+      '@robotics-lab/geometry':
+        specifier: workspace:*
+        version: link:../geometry
     devDependencies:
       '@react-three/drei':
         specifier: ^10.7.7
@@ -326,6 +343,12 @@ importers:
       '@react-three/fiber':
         specifier: ^9.6.1
         version: 9.6.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.185.1)
+      '@robotics-lab/core':
+        specifier: workspace:*
+        version: link:../core
+      '@robotics-lab/maps':
+        specifier: workspace:*
+        version: link:../maps
       '@types/react':
         specifier: ^19.2.17
         version: 19.2.17

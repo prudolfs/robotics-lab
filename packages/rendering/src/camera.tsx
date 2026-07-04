@@ -7,7 +7,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 export function SimulatorCamera() {
 	return (
 		<>
-			<PerspectiveCamera makeDefault position={[6, 6, 6]} fov={50} near={0.1} far={1000} />
+			<PerspectiveCamera makeDefault position={[6, 6, 6]} fov={50} near={0.2} far={1000} />
 			<OrbitControls makeDefault />
 		</>
 	)

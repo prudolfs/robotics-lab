@@ -50,3 +50,5 @@ export function normalizeAngle(angle: number): number {
 export function angularDelta(from: number, to: number): number {
 	return normalizeAngle(to - from)
 }
+
+export * from './world'
