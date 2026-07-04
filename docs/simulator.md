@@ -180,12 +180,12 @@ Separate rendering from simulation.
 
 ## Tasks
 
-- [ ] Fixed timestep simulation
-- [ ] Variable render rate
-- [ ] Simulation clock
-- [ ] Pause
-- [ ] Resume
-- [ ] Reset
+- [x] Fixed timestep simulation
+- [x] Variable render rate
+- [x] Simulation clock
+- [x] Pause
+- [x] Resume
+- [x] Reset
 
 ---
 
