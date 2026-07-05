@@ -1,5 +1,7 @@
 import { createWorld, type World } from '@robotics-lab/core'
 import { loadMap, mapNames } from '@robotics-lab/maps'
+import type { Goal, NavConfig, NavStatus } from '@robotics-lab/navigation'
+import { DEFAULT_NAV_CONFIG } from '@robotics-lab/navigation'
 import type { OccupancyGrid } from '@robotics-lab/occupancy-grid'
 import type { RobotState } from '@robotics-lab/robot'
 import { createLidarConfig, type LidarConfig, type LidarScan } from '@robotics-lab/sensors'
@@ -34,6 +36,14 @@ export type SimulatorStore = {
 	scan: LidarScan | null
 	/** Observed: the live occupancy grid built from lidar scans. */
 	grid: OccupancyGrid | null
+	/** Observed: the queued navigation goals (mirrors the sim). */
+	goals: Goal[]
+	/** Observed: whether the controller is currently driving the robot. */
+	autonomous: boolean
+	/** Observed: status reported by the controller on the last fixed step. */
+	navStatus: NavStatus
+	/** App state: navigation controller tuning exposed to the HUD. */
+	nav: NavConfig
 	/** App state: teleop tuning exposed to the HUD slider / speed adjustment. */
 	teleop: TeleopConfig
 	/** App state: lidar configuration (range / resolution / noise). */
@@ -64,6 +74,18 @@ export type SimulatorStore = {
 	toggleMinimap: () => void
 	/** App action: clear the learned occupancy map (without resetting the robot). */
 	clearMap: () => void
+	/** App action: set a single navigation goal at a world point (enables autonomy). */
+	setGoal: (goal: Goal) => void
+	/** App action: add a navigation goal to the back of the queue. */
+	addGoal: (goal: Goal) => void
+	/** App action: empty the goal queue (leaves autonomy as-is). */
+	clearGoals: () => void
+	/** App action: turn autonomous driving on/off. */
+	setAutonomous: (on: boolean) => void
+	/** App action: toggle the autonomous driving flag. */
+	toggleAutonomous: () => void
+	/** App action: replace the navigation controller tuning. */
+	setNav: (nav: NavConfig) => void
 	/** Observer: push the latest simulation snapshot for rendering / HUD. */
 	observe: (next: SimState) => void
 }
@@ -81,6 +103,9 @@ export function sampleState(next: SimState) {
 		running: next.running,
 		scan: next.scan,
 		grid: next.grid,
+		goals: next.goals,
+		autonomous: next.autonomous,
+		navStatus: next.navStatus,
 	}
 }
 
@@ -96,6 +121,10 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		...sampleState(createSimulation({ spawnPose: SPAWN_POSE })),
 		teleop: DEFAULT_TELEOP_CONFIG,
 		lidar: DEFAULT_LIDAR_CONFIG,
+		nav: DEFAULT_NAV_CONFIG,
+		goals: [],
+		autonomous: false,
+		navStatus: 'idle',
 		showLidar: true,
 		showCamera: false,
 		showOccupancy: true,
@@ -121,6 +150,12 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 			// watches and resets the grid on increment.
 			set((s) => ({ mapNonce: s.mapNonce + 1 }))
 		},
+		setGoal: (goal) => set({ goals: [goal], autonomous: true }),
+		addGoal: (goal) => set((s) => ({ goals: [...s.goals, goal] })),
+		clearGoals: () => set({ goals: [], autonomous: false }),
+		setAutonomous: (on) => set({ autonomous: on }),
+		toggleAutonomous: () => set((s) => ({ autonomous: !s.autonomous })),
+		setNav: (nav) => set({ nav }),
 		observe: (next) => set(sampleState(next)),
 	}
 })

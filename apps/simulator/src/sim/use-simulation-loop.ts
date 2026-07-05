@@ -14,6 +14,12 @@
 // Sensors: the world (from the selected map) and the lidar config are app
 // state in the store; the loop refects them onto the sim via `setSimWorld` /
 // `setLidarConfig` whenever they change so the scan stays in sync.
+//
+// Navigation (milestone 7): the goal queue, autonomy flag and nav config are
+// app-state in the store too. The loop reflects them onto the sim; on each
+// fixed step the controller then overrides the manual drive input while
+// autonomy is on. The manual keyboard takes precedence: touching a drive key
+// while autonomous drops autonomy back to manual teleop.
 
 import { useCallback, useEffect, useRef } from 'react'
 import {
@@ -27,6 +33,9 @@ import {
 	resume as resumeSim,
 	type SimState,
 	setLidarConfig,
+	setAutonomous as setSimAutonomous,
+	setGoals as setSimGoals,
+	setNavConfig as setSimNav,
 	setSimWorld,
 } from '@/sim/loop'
 import {
@@ -122,6 +131,32 @@ export function useSimulationLoop(): SimulationControls {
 		observe(cur())
 	}, [lidar, observe, cur])
 
+	// --- Navigation (milestone 7) ---------------------------------------------
+	// App-state goals / autonomy / nav config are pushed onto the sim whenever
+	// they change; the controller then drives the robot each fixed step. The
+	// store mirrors the sim's own goal queue + autonomous flag, so this effect
+	// runs both on user edits (clicking a goal) and on sim-driven changes
+	// (arrival popped a goal). Comparing the queue contents keeps it idempotent.
+	const goals = useSimulatorStore((s) => s.goals)
+	const autonomous = useSimulatorStore((s) => s.autonomous)
+	const navConfig = useSimulatorStore((s) => s.nav)
+	useEffect(() => {
+		const s = cur()
+		const sameGoals =
+			s.goals.length === goals.length &&
+			s.goals.every((g, i) => g.x === goals[i].x && g.y === goals[i].y)
+		if (!sameGoals) simRef.current = setSimGoals(cur(), goals)
+		observe(cur())
+	}, [goals, observe, cur])
+	useEffect(() => {
+		if (cur().autonomous !== autonomous) simRef.current = setSimAutonomous(cur(), autonomous)
+		observe(cur())
+	}, [autonomous, observe, cur])
+	useEffect(() => {
+		simRef.current = setSimNav(cur(), navConfig)
+		observe(cur())
+	}, [navConfig, observe, cur])
+
 	// The render-rate driver: measure wall clock, drain fixed steps, observe.
 	useEffect(() => {
 		let raf = 0
@@ -134,15 +169,30 @@ export function useSimulationLoop(): SimulationControls {
 			// Poll teleop config straight from the store (UI app state).
 			teleopRef.current = useSimulatorStore.getState().teleop
 
-			// Translate the live keyboard intents into a drive input and apply
-			// it before stepping. `setInput` is a no-op when nothing changes,
-			// so a steady keyboard state adds zero allocation pressure.
+			// Translate the live keyboard intents into a drive input. In manual
+			// mode this is the command applied each step; in autonomous mode it is
+			// only used to detect a takeover (see below).
 			const keyboard: KeyboardState = keyboardRef.current
 			const desired = driveInputFromKeyboard(keyboard, teleopRef.current)
-			if (!INPUT_EQ(lastInputRef.current, desired)) {
-				simRef.current = applyInput(cur(), desired)
-				lastInputRef.current = desired
+
+			// Manual teleop precedence: if the user touches a drive key while the
+			// controller is driving, drop autonomy so keyboard control takes over
+			// from the controller. The flag is mirrored into the store so the HUD
+			// reads the takeover instantly.
+			if (cur().autonomous && (desired.leftWheel !== 0 || desired.rightWheel !== 0)) {
+				simRef.current = setSimAutonomous(cur(), false)
+				useSimulatorStore.getState().setAutonomous(false)
 			}
+
+			// In manual mode apply the teleop mapping. Always write rather than
+			// deduping against `lastInputRef`, because a fresh takeover from
+			// autonomy may have left the sim's stored input at the controller's
+			// last (nonzero) commanded speeds — we must overwrite that. While
+			// autonomous, the controller owns the input each step and we skip.
+			if (!cur().autonomous && !INPUT_EQ(cur().input, desired)) {
+				simRef.current = applyInput(cur(), desired)
+			}
+			lastInputRef.current = desired
 
 			simRef.current = accumulate(cur(), dt).state
 			observe(cur())
@@ -168,9 +218,13 @@ export function useSimulationLoop(): SimulationControls {
 		},
 		reset: () => {
 			simRef.current = resetSimulation(cur())
-			// Force the input back to whatever the keyboard is asking for.
+			// Reset cleared the goal queue / autonomy in the sim; mirror that into
+			// the store so the HUD updates synchronously.
+			useSimulatorStore.getState().clearGoals()
+			// Re-derive the input from the keyboard so the robot doesn't keep
+			// rolling on the controller's last command.
 			const desired = driveInputFromKeyboard(keyboardRef.current, teleopRef.current)
-			simRef.current = applyInput(cur(), desired)
+			if (!INPUT_EQ(cur().input, desired)) simRef.current = applyInput(cur(), desired)
 			lastInputRef.current = desired
 			observe(cur())
 		},
@@ -180,6 +234,12 @@ export function useSimulationLoop(): SimulationControls {
 			// Space keydown already does this, but a button-triggered stop must
 			// stand on its own.
 			keyboardRef.current = { ...keyboardRef.current, stop: true }
+			// E-stop also drops autonomy: the controller would otherwise immediately
+			// re-command nonzero wheel speeds once Space is released.
+			if (cur().autonomous) {
+				simRef.current = setSimAutonomous(cur(), false)
+				useSimulatorStore.getState().setAutonomous(false)
+			}
 			simRef.current = applyInput(cur(), ZERO_INPUT)
 			lastInputRef.current = ZERO_INPUT
 			observe(cur())

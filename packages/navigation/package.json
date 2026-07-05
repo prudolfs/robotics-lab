@@ -9,7 +9,8 @@
 		}
 	},
 	"dependencies": {
-		"@robotics-lab/core": "workspace:*"
+		"@robotics-lab/core": "workspace:*",
+		"@robotics-lab/robot": "workspace:*"
 	},
 	"scripts": {
 		"test": "vitest run",

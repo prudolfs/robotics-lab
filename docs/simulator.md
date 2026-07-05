@@ -279,20 +279,20 @@ Drive to a target.
 
 ## Waypoints
 
-- [ ] Click destination
-- [ ] Goal marker
-- [ ] Queue goals
+- [x] Click destination
+- [x] Goal marker
+- [x] Queue goals
 
 ## Controller
 
-- [ ] Heading controller
-- [ ] Distance controller
-- [ ] Arrival detection
+- [x] Heading controller
+- [x] Distance controller
+- [x] Arrival detection
 
 ## Visualization
 
-- [ ] Goal marker
-- [ ] Planned trajectory
+- [x] Goal marker
+- [x] Planned trajectory
 
 ---
 

@@ -1,6 +1,8 @@
 import { Canvas } from '@react-three/fiber'
 import {
 	FpsCounter,
+	GoalPicker,
+	GoalView,
 	LidarView,
 	OccupancyGridView,
 	OccupancyMinimap,
@@ -12,6 +14,7 @@ import {
 import { useCallback, useState } from 'react'
 import { DebugOverlay } from '@/components/debug-overlay'
 import { MapHud } from '@/components/map-hud'
+import { NavigationHud } from '@/components/navigation-hud'
 import { SensorHud } from '@/components/sensor-hud'
 import { TeleopHud } from '@/components/teleop-hud'
 import { Button } from '@/components/ui/button'
@@ -37,8 +40,20 @@ export default function App() {
 	const showOccupancy = useSimulatorStore((s) => s.showOccupancy)
 	const showMinimap = useSimulatorStore((s) => s.showMinimap)
 	const selectMap = useSimulatorStore((s) => s.selectMap)
+	const goals = useSimulatorStore((s) => s.goals)
+	const setGoal = useSimulatorStore((s) => s.setGoal)
+	const addGoal = useSimulatorStore((s) => s.addGoal)
 
 	const controls = useSimulationLoop()
+
+	// Click destination on the floor: replace the goal queue, or append (Shift).
+	const handlePick = useCallback(
+		(point: { x: number; y: number }, event: { shiftKey?: boolean }) => {
+			if (event.shiftKey) addGoal(point)
+			else setGoal(point)
+		},
+		[setGoal, addGoal],
+	)
 
 	// Camera look tilt (radians); user-controlled via drag on the viewport.
 	const [pitch, setPitch] = useState(0)
@@ -52,6 +67,8 @@ export default function App() {
 					<RobotView pose={robot.pose} params={robot.params} />
 					{showOccupancy && <OccupancyGridView grid={grid} />}
 					{showLidar && <LidarView scan={scan} />}
+					<GoalView pose={robot.pose} goals={goals} />
+					<GoalPicker world={world} onPick={handlePick} />
 				</SimulatorScene>
 			</Canvas>
 
@@ -97,6 +114,7 @@ export default function App() {
 			<TeleopHud controls={controls} />
 			<SensorHud />
 			<MapHud />
+			<NavigationHud controls={controls} />
 
 			{showCamera && (
 				<RobotCameraViewport

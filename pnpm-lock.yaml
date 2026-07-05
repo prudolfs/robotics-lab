@@ -240,6 +240,9 @@ importers:
       '@robotics-lab/maps':
         specifier: workspace:*
         version: link:../../packages/maps
+      '@robotics-lab/navigation':
+        specifier: workspace:*
+        version: link:../../packages/navigation
       '@robotics-lab/occupancy-grid':
         specifier: workspace:*
         version: link:../../packages/occupancy-grid
@@ -330,6 +333,9 @@ importers:
       '@robotics-lab/core':
         specifier: workspace:*
         version: link:../core
+      '@robotics-lab/robot':
+        specifier: workspace:*
+        version: link:../robot
 
   packages/occupancy-grid:
     dependencies:
@@ -365,6 +371,9 @@ importers:
       '@robotics-lab/maps':
         specifier: workspace:*
         version: link:../maps
+      '@robotics-lab/navigation':
+        specifier: workspace:*
+        version: link:../navigation
       '@robotics-lab/occupancy-grid':
         specifier: workspace:*
         version: link:../occupancy-grid

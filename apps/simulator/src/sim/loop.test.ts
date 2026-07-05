@@ -273,3 +273,126 @@ function forwardDistance(scan: { samples: { angle: number; distance: number }[] 
 	if (sample === undefined) throw new Error('no forward sample in scan')
 	return sample.distance
 }
+
+// --- Navigation integration (milestone 7) -----------------------------------
+
+import { DEFAULT_NAV_CONFIG, type NavConfig } from '@robotics-lab/navigation'
+import { clearGoals, setAutonomous, setGoal, setGoals, setNavConfig } from './loop'
+
+test('createSimulation starts with an empty goal queue and autonomy off', () => {
+	const sim = createSimulation()
+	expect(sim.goals).toEqual([])
+	expect(sim.autonomous).toBe(false)
+	expect(sim.navStatus).toBe('idle')
+	expect(sim.nav).toBe(DEFAULT_NAV_CONFIG)
+})
+
+test('setGoal turns autonomy on and stores a single goal', () => {
+	const sim = createSimulation()
+	const out = setGoal(sim, { x: 1, y: 2 })
+	expect(out.goals).toEqual([{ x: 1, y: 2 }])
+	expect(out.autonomous).toBe(true)
+})
+
+test('setGoals stores a queue and enables autonomy', () => {
+	const sim = createSimulation()
+	const out = setGoals(sim, [
+		{ x: 1, y: 0 },
+		{ x: 2, y: 0 },
+	])
+	expect(out.goals).toHaveLength(2)
+	expect(out.autonomous).toBe(true)
+})
+
+test('clearGoals empties the queue', () => {
+	const sim = setGoals(createSimulation(), [
+		{ x: 1, y: 0 },
+		{ x: 2, y: 0 },
+	])
+	const out = clearGoals(sim)
+	expect(out.goals).toEqual([])
+})
+
+test('setAutonomous turns autonomy off and zeroes the input so the robot stops', () => {
+	const sim = setGoal(createSimulation(), { x: 1, y: 0 })
+	const off = setAutonomous(sim, false)
+	expect(off.autonomous).toBe(false)
+	expect(off.input).toEqual({ leftWheel: 0, rightWheel: 0 })
+})
+
+test('setAutonomous true on an already-true state is referentially stable', () => {
+	const sim = setGoal(createSimulation(), { x: 1, y: 0 })
+	expect(setAutonomous(sim, true)).toBe(sim)
+})
+
+test('autonomous step drives the robot towards the goal', () => {
+	const sim = setGoal(createSimulation(), { x: 2, y: 0 })
+	const after = runFor(sim, 0.2)
+	expect(after.robot.pose.x).toBeGreaterThan(0)
+	expect(after.autonomous).toBe(true)
+})
+
+test('autonomous step reports rotating status when misaligned', () => {
+	// Facing +x, goal in -y direction: robot must rotate first.
+	const sim = setGoal(createSimulation({ spawnPose: { x: 0, y: 0, heading: 0 } }), { x: 0, y: -2 })
+	const after = stepSimulation(sim, FIXED_DT)
+	expect(after.navStatus).toBe('rotating')
+})
+
+test('autonomous step pops the goal on arrival and drops autonomy when queue empties', () => {
+	const config: NavConfig = { ...DEFAULT_NAV_CONFIG, arrivalRadius: 0.3 }
+	const sim = setNavConfig(
+		setGoal(createSimulation({ spawnPose: { x: 0, y: 0, heading: 0 } }), { x: 1, y: 0 }),
+		config,
+	)
+	const after = runFor(sim, 8)
+	expect(after.goals).toEqual([])
+	expect(after.autonomous).toBe(false)
+	// Autonomy was dropped on arrival; subsequent steps report idle in manual mode.
+	expect(after.navStatus).toBe('idle')
+})
+
+test('queued goals advance sequentially: the second goal becomes the active one', () => {
+	const config: NavConfig = { ...DEFAULT_NAV_CONFIG, arrivalRadius: 0.3, maxSpeed: 0.4 }
+	const sim = setNavConfig(
+		setGoals(createSimulation({ spawnPose: { x: 0, y: 0, heading: 0 } }), [
+			{ x: 1, y: 0 },
+			{ x: 1, y: 4 },
+		]),
+		config,
+	)
+	// 3 s should reach the first goal but not the second (which is further away).
+	const after = runFor(sim, 3)
+	expect(after.goals).toEqual([{ x: 1, y: 4 }])
+	expect(after.autonomous).toBe(true)
+})
+
+test('paused override keeps teleop input ignored: autonomy step is a no-op while paused', () => {
+	const sim = pause(setGoal(createSimulation(), { x: 2, y: 0 }))
+	const after = stepSimulation(sim, FIXED_DT)
+	expect(after.time).toBe(0)
+	expect(after.robot.pose).toEqual({ x: 0, y: 0, heading: 0 })
+})
+
+test('resetSimulation clears the goal queue and turns autonomy off', () => {
+	const sim = runFor(setGoal(createSimulation(), { x: 2, y: 0 }), 0.5)
+	expect(sim.autonomous).toBe(true)
+	const reset = resetSimulation(sim)
+	expect(reset.goals).toEqual([])
+	expect(reset.autonomous).toBe(false)
+	expect(reset.navStatus).toBe('idle')
+})
+
+test('manual teleop input is ignored while autonomous drives the robot', () => {
+	// Both autonomous and a forward teleop input set: autonomy must win.
+	const sim = setGoal(createSimulation({ input: { leftWheel: 1, rightWheel: 1 } }), {
+		x: 0,
+		y: 2,
+	})
+	const after = stepSimulation(sim, FIXED_DT)
+	// Goal is straight ahead (+y) but robot faces +x => rotating, mostly turn-in-place.
+	// A pure-turn command would have driven the pose a tiny bit; the manual "drive
+	// forward straight on" path would have moved mostly +x. Assert the x-component
+	// stays near 0, meaning autonomy's rotate dominated (not manual forward).
+	expect(Math.abs(after.robot.pose.x)).toBeLessThan(0.02)
+})

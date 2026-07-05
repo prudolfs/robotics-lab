@@ -3,6 +3,9 @@
 import type { Pose } from '@robotics-lab/core'
 import { angularDelta } from '@robotics-lab/core'
 
+export * from './controller'
+export * from './goals'
+
 export type Goal = {
 	x: number
 	y: number

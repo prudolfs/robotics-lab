@@ -66,7 +66,7 @@ export function applyScan(
 		// When a ray hits an obstacle surface that lies exactly on a cell
 		// boundary (the common case for our border walls, which sit on the
 		// world floor edge), `floor` would place the endpoint in the *next*
-	// cell along the ray — making the occupancy overlay visibly overshoot the
+		// cell along the ray — making the occupancy overlay visibly overshoot the
 		// wall on the +x / +y (top/right) side. The hit cell should be the one
 		// the ray was *in* just before crossing the surface, so we nudge the
 		// endpoint a hair back toward the sensor before traversal. The nudge

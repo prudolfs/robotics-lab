@@ -17,6 +17,14 @@
 // breaking purity; passing `null` disables the sensor.
 
 import type { Pose, Velocity, World } from '@robotics-lab/core'
+import {
+	controlToGoal,
+	DEFAULT_NAV_CONFIG,
+	type Goal,
+	type NavConfig,
+	type NavStatus,
+	popGoal,
+} from '@robotics-lab/navigation'
 import { applyScan, createGrid, type OccupancyGrid, resetGrid } from '@robotics-lab/occupancy-grid'
 import {
 	createRobot,
@@ -68,6 +76,16 @@ export type SimState = {
 	scan: LidarScan | null
 	/** Occupancy grid built from the lidar scans; `null` while no world. */
 	grid: OccupancyGrid | null
+	/** Navigation controller tuning. */
+	nav: NavConfig
+	/** FIFO of pending navigation goals. The head is the active goal. */
+	goals: Goal[]
+	/** When true, the go-to-goal controller overrides the manual drive input
+	 *  each fixed step. Toggle off to drop back to keyboard teleop. */
+	autonomous: boolean
+	/** Status reported by the controller on the last fixed step. Mirrors the
+	 *  controller's own enum so the HUD can read it from the sim snapshot. */
+	navStatus: NavStatus
 }
 
 export type SimOptions = {
@@ -83,6 +101,10 @@ export type SimOptions = {
 	gridResolution?: number
 	/** Metres of margin around the world floor added to the occupancy grid. */
 	gridMargin?: number
+	/** Navigation controller tuning; defaults to `DEFAULT_NAV_CONFIG`. */
+	nav?: NavConfig
+	/** When true, the sim drives the robot towards its queued goals; default false. */
+	autonomous?: boolean
 }
 
 export const DEFAULT_LIDAR_CONFIG = createLidarConfig()
@@ -106,6 +128,10 @@ export function createSimulation(options: SimOptions = {}): SimState {
 		lidar,
 		grid,
 		scan: world ? createScan(lidar, robot.pose, world) : null,
+		nav: options.nav ?? DEFAULT_NAV_CONFIG,
+		goals: [],
+		autonomous: options.autonomous ?? false,
+		navStatus: 'idle',
 	}
 }
 
@@ -154,6 +180,48 @@ export function setInput(state: SimState, input: DriveInput): SimState {
 		: { ...state, input }
 }
 
+// --- Navigation ------------------------------------------------------------
+// The navigation controller lives in `@robotics-lab/navigation`. The sim
+// stores the goal queue, the controller tuning and the autonomous flag; each
+// fixed step it asks the controller for the wheel speeds towards the head
+// goal and applies them exactly like a manual `setInput`.
+
+/** Replace the navigation controller tuning. */
+export function setNavConfig(state: SimState, nav: NavConfig): SimState {
+	return state.nav === nav ? state : { ...state, nav }
+}
+
+/** Replace the goal queue with a single goal, turning autonomy on. */
+export function setGoal(state: SimState, goal: Goal): SimState {
+	return { ...state, goals: [goal], autonomous: true }
+}
+
+/** Replace the goal queue with a list of goals, turning autonomy on. */
+export function setGoals(state: SimState, goals: Goal[]): SimState {
+	return { ...state, goals, autonomous: true }
+}
+
+/** Append a goal to the back of the queue. Leaves the autonomous flag alone
+ *  so the user can pre-stage waypoints before enabling autonomy. */
+export function enqueueGoal(state: SimState, goal: Goal): SimState {
+	return { ...state, goals: [...state.goals, goal] }
+}
+
+/** Empty the goal queue but leave autonomy as-is so the robot stops. */
+export function clearGoals(state: SimState): SimState {
+	return state.goals.length === 0 ? state : { ...state, goals: [] }
+}
+
+/** Toggle autonomous driving on/off. When off, manual teleop input applies. */
+export function setAutonomous(state: SimState, autonomous: boolean): SimState {
+	// When autonomy is turned off the controller stops driving; zero the input
+	// so the robot doesn't keep coasting on the last commanded speeds until the
+	// keyboard hook refreshes it next frame.
+	if (state.autonomous === autonomous) return state
+	if (!autonomous) return { ...state, autonomous, input: { leftWheel: 0, rightWheel: 0 } }
+	return { ...state, autonomous }
+}
+
 /** Attach (or detach) the world the lidar raycasts against, recomputing the scan. */
 export function setSimWorld(state: SimState, world: World | null): SimState {
 	if (state.world === world) return state
@@ -184,6 +252,10 @@ function configsEqual(a: LidarConfig, b: LidarConfig): boolean {
  * preserved so a paused loop doesn't yank the robot back into motion on reset.
  * The latest scan is recomputed from the reset pose and the occupancy grid is
  * rebuilt blank (clearing any learned map).
+ *
+ * Navigation is reset to a clean slate: the goal queue is emptied and
+ * autonomy is turned off, since the spawn pose may be unrelated to the goals
+ * the user queued before the reset. The controller tuning (`nav`) is kept.
  */
 export function resetSimulation(state: SimState): SimState {
 	const robot = createRobot(state.spawnPose, state.robot.params)
@@ -197,6 +269,9 @@ export function resetSimulation(state: SimState): SimState {
 		robot,
 		scan,
 		grid,
+		goals: [],
+		autonomous: false,
+		navStatus: 'idle',
 	}
 }
 
@@ -209,13 +284,43 @@ export function robotSpeed(robot: { velocity: Velocity }): number {
  * Advance the simulation by exactly one fixed timestep.
  *
  * While paused the snapshot is returned unchanged so callers can always treat
- * the result as the current state. While running the robot is stepped via the
- * differential-drive model, then the lidar scan is recomputed against the new
- * pose (when a world is attached).
+ * the result as the current state. While running the navigation controller is
+ * polled for wheel speeds first (when autonomy is on and there is a goal
+ * queued); the resulting `DriveInput` overrides any manual teleop value for
+ * this step. The robot is then stepped via the differential-drive model and
+ * the lidar scan is recomputed against the new pose (when a world is
+ * attached). On arrival the head goal is popped from the queue.
  */
 export function stepSimulation(state: SimState, dt: number = FIXED_DT): SimState {
 	if (!state.running) return state
-	const robot = stepDifferentialDrive(state.robot, state.input, dt)
+
+	// Navigation controller overrides the manual input when autonomy is on.
+	let goals = state.goals
+	let autonomous = state.autonomous
+	let navStatus = state.navStatus
+	let input = state.input
+	if (state.autonomous) {
+		const head = goals.length > 0 ? goals[0] : null
+		if (head === null) {
+			// Autonomy on but nothing to chase: idle the controller and stop the robot.
+			navStatus = 'idle'
+			input = { leftWheel: 0, rightWheel: 0 }
+			autonomous = false
+		} else {
+			const out = controlToGoal(state.robot.pose, head, state.nav)
+			input = out.input
+			navStatus = out.status
+			if (out.status === 'arrived') {
+				goals = popGoal(goals)
+				if (goals.length === 0) autonomous = false // nothing left to chase
+			}
+		}
+	} else {
+		// Manual mode: the controller isn't running, so report idle.
+		navStatus = 'idle'
+	}
+
+	const robot = stepDifferentialDrive(state.robot, input, dt)
 	const scan = state.world ? createScan(state.lidar, robot.pose, state.world) : null
 	// Integrate the scan into the occupancy grid. The grid object is preserved
 	// across steps (mutated in place) so the map accumulates over time.
@@ -224,6 +329,10 @@ export function stepSimulation(state: SimState, dt: number = FIXED_DT): SimState
 		...state,
 		time: state.time + dt,
 		robot,
+		input,
+		goals,
+		autonomous,
+		navStatus,
 		stepCount: state.stepCount + 1,
 		scan,
 		grid: state.grid,
