@@ -114,15 +114,20 @@ export function driveInputFromKeyboard(
 
 	const scale = state.boost ? config.boostMultiplier : 1
 	const linear = (state.forward ? 1 : 0) - (state.reverse ? 1 : 0)
+	// `turn > 0` means the user asked to turn right. On screen that requires the
+	// robot's heading to *decrease* (the renderer mirrors the sim heading,
+	// `yaw = -heading`, so a smaller heading reads as clockwise on screen).
+	// Differential drive `omega = (rightWheel - leftWheel) / base` therefore
+	// demands the *left* wheel faster than the right when turning right.
 	const turn = (state.right ? 1 : 0) - (state.left ? 1 : 0)
 
 	const base = config.baseSpeed * scale * linear
 	const bias = config.turnSpeed * scale * turn
 
-	// Differential drive: wheel = base +/- bias. A positive bias speeds the
-	// left wheel and slows the right, turning right (clockwise, -heading).
-	const leftWheel = base + bias
-	const rightWheel = base - bias
+	// Right wheel gets `-bias`, left gets `+bias`, so press-right (turn>0)
+	// speeds the left wheel and yaws the robot clockwise on screen.
+	const leftWheel = base - bias
+	const rightWheel = base + bias
 	return { leftWheel, rightWheel }
 }
 

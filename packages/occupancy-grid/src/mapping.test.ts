@@ -53,20 +53,29 @@ test('traceSegment short-circuits a degenerate segment to one visit', () => {
 test('applyScan frees cells along a ray and marks the endpoint occupied', () => {
 	const grid = gridFor(21, 21, 0.5, { x: -5, y: -5 })
 	const origin = { x: 0, y: 0, heading: 0 }
-	// A ray straight along +x hitting something 3 m away.
+	// A ray straight along +x hitting something 3 m away. The surface sits at
+	// x = 3.0, which is exactly a cell boundary (cell side 0.5, origin -5), so
+	// the hit cell is the one the ray was *in* just before crossing it: the
+	// cell spanning [2.5, 3.0) centred at 2.75.
 	const scan = makeScan(origin, [{ angle: 0, distance: 3, hit: 'wall' }])
 	applyScan(grid, scan, null)
-	// Free cells along the path: every sampling point strictly inside the path
-	// should be classified `free`. The origin cell is included by the traversal
-	// and gets freed too (the robot confirms it's not an obstacle).
-	for (let x = 0; x < 3; x += 0.5) {
+	// Free cells along the path: every sampling point strictly *inside* the
+	// path (i.e. before the hit cell) should be classified `free`. The origin
+	// cell is included by the traversal and gets freed too (the robot confirms
+	// it's not an obstacle).
+	for (let x = 0; x < 2.5; x += 0.5) {
 		const idx = cellIndex(grid, { x, y: 0 })
 		if (idx >= 0) expect(classify(getCell(grid, idx))).toBe('free')
 	}
-	// Endpoint cell occupied.
-	const hitIdx = cellIndex(grid, { x: 3, y: 0 })
+	// Endpoint cell occupied: the cell containing the surface (centred 2.75).
+	const hitIdx = cellIndex(grid, { x: 2.75, y: 0 })
 	expect(hitIdx).toBeGreaterThanOrEqual(0)
 	expect(classify(getCell(grid, hitIdx))).toBe('occupied')
+	// The cell beyond the surface stays unknown (the lidar never saw past
+	// the wall, so there is no evidence either way).
+	const beyondIdx = cellIndex(grid, { x: 3.25, y: 0 })
+	expect(beyondIdx).toBeGreaterThanOrEqual(0)
+	expect(classify(getCell(grid, beyondIdx))).toBe('unknown')
 })
 
 test('applyScan on a miss marks the path free and writes no occupied cells', () => {

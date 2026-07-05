@@ -31,6 +31,14 @@ export const DEFAULT_UPDATE_PARAMS: UpdateParams = {
 }
 
 /**
+ * How far to pull a hit endpoint back along its ray before tracing, in world
+ * units. Tuned to a tiny fraction of a cell so it only changes the result when
+ * the surface lies exactly on a cell boundary (and the un-nudged endpoint
+ * would otherwise straddle into the next cell). See `applyScan`.
+ */
+const CELL_EPS = 1e-3
+
+/**
  * Integrate a single lidar scan into `grid`. For each sample:
  *   - trace every cell from the sensor origin to the sample endpoint
  *   - mark all traversed cells (everything but the endpoint) as `free`
@@ -54,7 +62,20 @@ export function applyScan(
 		const sin = Math.sin(worldAngle)
 		const endpointX = origin.x + cos * sample.distance
 		const endpointY = origin.y + sin * sample.distance
-		const visits = traceSegment(grid, origin.x, origin.y, endpointX, endpointY)
+
+		// When a ray hits an obstacle surface that lies exactly on a cell
+		// boundary (the common case for our border walls, which sit on the
+		// world floor edge), `floor` would place the endpoint in the *next*
+	// cell along the ray — making the occupancy overlay visibly overshoot the
+		// wall on the +x / +y (top/right) side. The hit cell should be the one
+		// the ray was *in* just before crossing the surface, so we nudge the
+		// endpoint a hair back toward the sensor before traversal. The nudge
+		// is far smaller than a cell, so hits that land strictly inside a
+		// cell (interior of a box) stay in the same cell.
+		const isHit = sample.hit !== null
+		const hitX = isHit ? endpointX - cos * CELL_EPS : endpointX
+		const hitY = isHit ? endpointY - sin * CELL_EPS : endpointY
+		const visits = traceSegment(grid, origin.x, origin.y, hitX, hitY)
 		const lastIndex = visits.length - 1
 		for (let i = 0; i < visits.length; i++) {
 			const visit = visits[i]

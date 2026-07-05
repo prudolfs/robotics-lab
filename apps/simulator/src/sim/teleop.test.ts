@@ -49,28 +49,28 @@ test('reverse drives both wheels negatively', () => {
 	expect(input.rightWheel).toBeCloseTo(-DEFAULT_TELEOP_CONFIG.baseSpeed, 12)
 })
 
-test('turning right speeds the left wheel and slows the right (cw heading)', () => {
+test('turning right speeds the right wheel and slows the left (cw on screen)', () => {
 	const state = applyKey(IDLE_KEYBOARD, 'right', true)
-	const input = driveInputFromKeyboard(state)
-	expect(input.leftWheel).toBeCloseTo(DEFAULT_TELEOP_CONFIG.turnSpeed, 12)
-	expect(input.rightWheel).toBeCloseTo(-DEFAULT_TELEOP_CONFIG.turnSpeed, 12)
-})
-
-test('turning left speeds the right wheel and slows the left (ccw heading)', () => {
-	const state = applyKey(IDLE_KEYBOARD, 'left', true)
 	const input = driveInputFromKeyboard(state)
 	expect(input.leftWheel).toBeCloseTo(-DEFAULT_TELEOP_CONFIG.turnSpeed, 12)
 	expect(input.rightWheel).toBeCloseTo(DEFAULT_TELEOP_CONFIG.turnSpeed, 12)
 })
 
-test('forward + right produces an arc (both wheels positive, left faster)', () => {
+test('turning left speeds the left wheel and slows the right (ccw on screen)', () => {
+	const state = applyKey(IDLE_KEYBOARD, 'left', true)
+	const input = driveInputFromKeyboard(state)
+	expect(input.leftWheel).toBeCloseTo(DEFAULT_TELEOP_CONFIG.turnSpeed, 12)
+	expect(input.rightWheel).toBeCloseTo(-DEFAULT_TELEOP_CONFIG.turnSpeed, 12)
+})
+
+test('forward + right produces an arc (both wheels positive, right faster)', () => {
 	const fwd = applyKey(IDLE_KEYBOARD, 'forward', true)
 	const right = applyKey(fwd, 'right', true)
 	const input = driveInputFromKeyboard(right)
 	const { baseSpeed, turnSpeed } = DEFAULT_TELEOP_CONFIG
-	expect(input.leftWheel).toBeCloseTo(baseSpeed + turnSpeed, 12)
-	expect(input.rightWheel).toBeCloseTo(baseSpeed - turnSpeed, 12)
-	expect(input.rightWheel).toBeGreaterThan(0) // still moving forward
+	expect(input.leftWheel).toBeCloseTo(baseSpeed - turnSpeed, 12)
+	expect(input.rightWheel).toBeCloseTo(baseSpeed + turnSpeed, 12)
+	expect(input.leftWheel).toBeGreaterThan(0) // still moving forward
 })
 
 test('forward and reverse cancel, leaving only the turn component', () => {
