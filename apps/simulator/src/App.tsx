@@ -1,7 +1,15 @@
 import { Canvas } from '@react-three/fiber'
-import { FpsCounter, RobotView, SimulatorScene, WorldView } from '@robotics-lab/rendering'
+import {
+	FpsCounter,
+	LidarView,
+	RobotCameraViewport,
+	RobotView,
+	SimulatorScene,
+	WorldView,
+} from '@robotics-lab/rendering'
 import { useCallback, useState } from 'react'
 import { DebugOverlay } from '@/components/debug-overlay'
+import { SensorHud } from '@/components/sensor-hud'
 import { TeleopHud } from '@/components/teleop-hud'
 import { Button } from '@/components/ui/button'
 import { useSimulationLoop } from '@/sim/use-simulation-loop'
@@ -19,9 +27,15 @@ export default function App() {
 	const robot = useSimulatorStore((s) => s.robot)
 	const simTime = useSimulatorStore((s) => s.simTime)
 	const running = useSimulatorStore((s) => s.running)
+	const scan = useSimulatorStore((s) => s.scan)
+	const showLidar = useSimulatorStore((s) => s.showLidar)
+	const showCamera = useSimulatorStore((s) => s.showCamera)
 	const selectMap = useSimulatorStore((s) => s.selectMap)
 
 	const controls = useSimulationLoop()
+
+	// Camera look tilt (radians); user-controlled via drag on the viewport.
+	const [pitch, setPitch] = useState(0)
 
 	return (
 		<div className="relative h-screen w-screen overflow-hidden bg-background">
@@ -30,6 +44,7 @@ export default function App() {
 					<FpsCounter onUpdate={handleFps} />
 					<WorldView world={world} />
 					<RobotView pose={robot.pose} params={robot.params} />
+					{showLidar && <LidarView scan={scan} />}
 				</SimulatorScene>
 			</Canvas>
 
@@ -42,31 +57,26 @@ export default function App() {
 				</span>
 			</div>
 
-			<div className="absolute top-4 left-1/2 flex -translate-x-1/2 items-center gap-2">
-				<Button
-					variant={running ? 'default' : 'outline'}
-					onClick={controls.togglePause}
-					className="pointer-events-auto"
-				>
-					{running ? 'Pause' : 'Resume'}
-				</Button>
-				<Button variant="outline" onClick={controls.reset} className="pointer-events-auto">
-					Reset
-				</Button>
-			</div>
-
-			<DebugOverlay robot={robot} onReset={controls.reset} />
-
-			<TeleopHud controls={controls} />
-
-			<div className="absolute top-4 right-4 flex flex-col items-end gap-2">
-				<span className="font-medium text-muted-foreground text-xs uppercase">Map</span>
-				<div className="flex flex-wrap justify-end gap-2">
+			<div className="pointer-events-none absolute top-4 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2">
+				<div className="flex items-center gap-2">
+					<Button
+						variant={running ? 'default' : 'outline'}
+						onClick={controls.togglePause}
+						className="pointer-events-auto"
+					>
+						{running ? 'Pause' : 'Resume'}
+					</Button>
+					<Button variant="outline" onClick={controls.reset} className="pointer-events-auto">
+						Reset
+					</Button>
+				</div>
+				<div className="flex flex-wrap justify-center gap-2">
 					{mapNames.map((name) => (
 						<Button
 							key={name}
 							variant={name === selectedMap ? 'default' : 'outline'}
 							onClick={() => selectMap(name)}
+							size="xs"
 							className="pointer-events-auto"
 						>
 							{name}
@@ -74,6 +84,23 @@ export default function App() {
 					))}
 				</div>
 			</div>
+
+			<DebugOverlay robot={robot} onReset={controls.reset} />
+
+			<TeleopHud controls={controls} />
+			<SensorHud />
+
+			{showCamera && (
+				<RobotCameraViewport
+					world={world}
+					pose={robot.pose}
+					robotParams={robot.params}
+					active={showCamera}
+					pitch={pitch}
+					onPitch={setPitch}
+					className="pointer-events-auto absolute bottom-4 left-1/2 h-48 w-64 -translate-x-1/2 overflow-hidden rounded-lg border border-border bg-black/80 backdrop-blur-sm"
+				/>
+			)}
 		</div>
 	)
 }

@@ -41,3 +41,8 @@ export function generateRays(config: LidarConfig, origin: Pose): LidarRay[] {
 	}
 	return rays
 }
+
+export type { ObstacleKind, RayHit } from './raycast'
+export { castRayAgainstWorld, castRaysAgainst } from './raycast'
+export type { LidarSample, LidarScan, Rng } from './scan'
+export { createScan } from './scan'

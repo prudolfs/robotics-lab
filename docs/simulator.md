@@ -219,27 +219,27 @@ Introduce virtual sensors.
 
 ## Lidar
 
-- [ ] Ray generation
-- [ ] Raycasting
-- [ ] Hit detection
-- [ ] Distance measurements
-- [ ] Configurable range
-- [ ] Configurable resolution
+- [x] Ray generation
+- [x] Raycasting
+- [x] Hit detection
+- [x] Distance measurements
+- [x] Configurable range
+- [x] Configurable resolution
 
 ### Visualization
 
-- [ ] Laser rays
-- [ ] Hit points
-- [ ] Scan animation
+- [x] Laser rays
+- [x] Hit points
+- [x] Scan animation
 
 ---
 
 ## Camera
 
-- [ ] Robot camera
-- [ ] Render target
-- [ ] Camera viewport
-- [ ] Camera controls
+- [x] Robot camera
+- [x] Render target
+- [x] Camera viewport
+- [x] Camera controls
 
 ---
 

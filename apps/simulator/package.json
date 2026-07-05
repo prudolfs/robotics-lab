@@ -23,6 +23,7 @@
 		"@robotics-lab/maps": "workspace:*",
 		"@robotics-lab/rendering": "workspace:*",
 		"@robotics-lab/robot": "workspace:*",
+		"@robotics-lab/sensors": "workspace:*",
 		"@tailwindcss/vite": "^4.3.2",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",

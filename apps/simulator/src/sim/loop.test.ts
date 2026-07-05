@@ -165,3 +165,111 @@ test('advance by exactly the same dt with runFor and accumulate over many frames
 	expect(frame.robot.pose.x).toBeCloseTo(oneShot.robot.pose.x, 9)
 	expect(frame.robot.pose.heading).toBeCloseTo(oneShot.robot.pose.heading, 9)
 })
+
+// --- Lidar integration -----------------------------------------------------
+
+import { createWorld } from '@robotics-lab/core'
+import { createLidarConfig } from '@robotics-lab/sensors'
+
+const SENSOR_WORLD = createWorld({
+	name: 'lidar-test',
+	width: 10,
+	depth: 10,
+	walls: [
+		{ start: { x: -5, y: -5 }, end: { x: 5, y: -5 } },
+		{ start: { x: 5, y: -5 }, end: { x: 5, y: 5 } },
+		{ start: { x: 5, y: 5 }, end: { x: -5, y: 5 } },
+		{ start: { x: -5, y: 5 }, end: { x: -5, y: -5 } },
+		{ start: { x: 2, y: -1 }, end: { x: 2, y: 1 } }, // wall ahead at x=2
+	],
+	boxes: [],
+	cylinders: [],
+} as never)
+
+test('a world-attached sim produces an initial scan from the spawn pose', () => {
+	const sim = createSimulation({
+		spawnPose: { x: 0, y: 0, heading: 0 },
+		world: SENSOR_WORLD,
+		lidar: createLidarConfig({ rayCount: 360, fieldOfView: Math.PI * 2, range: 10 }),
+	})
+	expect(sim.scan).not.toBeNull()
+	expect(sim.scan?.samples).toHaveLength(360)
+	// Find the sample nearest angle 0 (forward) and assert the wall at x=2.
+	const forward = sim.scan?.samples.find((s) => Math.abs(s.angle) < 1e-12)
+	expect(forward).toBeDefined()
+	expect(forward?.hit).toBe('wall')
+	expect(forward?.distance).toBeCloseTo(2, 6)
+})
+
+test('stepSimulation advances the robot and recomputes the scan for the new pose', () => {
+	const sim = createSimulation({
+		spawnPose: { x: 0, y: 0, heading: 0 },
+		world: SENSOR_WORLD,
+		lidar: createLidarConfig({ rayCount: 360, fieldOfView: Math.PI * 2, range: 10 }),
+		input: { leftWheel: 1, rightWheel: 1 },
+	})
+	const first = forwardDistance(sim.scan)
+	const after = stepSimulation(sim, FIXED_DT)
+	expect(after.robot.pose.x).toBeGreaterThan(0)
+	// Closer to the wall => forward distance must have shrunk.
+	const next = forwardDistance(after.scan)
+	expect(next).toBeLessThan(first)
+})
+
+test('setSimWorld reattaches a world and recomputes the scan immediately', () => {
+	const sim = createSimulation({ spawnPose: { x: 0, y: 0, heading: 0 } })
+	expect(sim.scan).toBeNull() // no world attached
+	const attached = setSimWorld(sim, SENSOR_WORLD)
+	expect(attached.scan).not.toBeNull()
+	expect(forwardDistance(attached.scan)).toBeCloseTo(2, 6)
+	// Detaching nulls the scan.
+	const detached = setSimWorld(attached, null)
+	expect(detached.scan).toBeNull()
+})
+
+test('resetSimulation recomputes the scan from the spawn pose', () => {
+	const sim = runFor(
+		createSimulation({
+			spawnPose: { x: 0, y: 0, heading: 0 },
+			world: SENSOR_WORLD,
+			input: { leftWheel: 1, rightWheel: 1 },
+		}),
+		0.5,
+	)
+	expect(sim.robot.pose.x).toBeGreaterThan(0)
+	// After reset the forward distance must return to the spawn's 2m hit.
+	const reset = resetSimulation(sim)
+	expect(forwardDistance(reset.scan)).toBeCloseTo(2, 6)
+})
+
+test('setLidarConfig recomputes the scan against the new config', () => {
+	const sim = createSimulation({
+		spawnPose: { x: 0, y: 0, heading: 0 },
+		world: SENSOR_WORLD,
+	})
+	// Range 1m => wall at x=2 unreachable => every sample a miss at distance 1.
+	const short = setLidarConfig(sim, createLidarConfig({ range: 1, rayCount: 8 }))
+	expect(short.scan?.samples.every((s) => s.hit === null && s.distance === 1)).toBe(true)
+})
+
+test('paused state carries the scan unchanged through a no-op step', () => {
+	const sim = pause(
+		createSimulation({
+			spawnPose: { x: 0, y: 0, heading: 0 },
+			world: SENSOR_WORLD,
+		}),
+	)
+	const before = sim.scan
+	const noop = stepSimulation(sim)
+	expect(noop.scan).toBe(before)
+})
+
+import { setLidarConfig, setSimWorld } from './loop'
+
+/** Forward sample distance of a scan (angle nearest 0), assuming 360 rays. */
+function forwardDistance(scan: { samples: { angle: number; distance: number }[] } | null): number {
+	if (scan === null) throw new Error('expected a scan')
+	const sample = scan.samples.find((s) => Math.abs(s.angle) < 1e-12)
+	if (sample === undefined) throw new Error('no forward sample in scan')
+	return sample.distance
+}

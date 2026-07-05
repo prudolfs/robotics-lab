@@ -13,13 +13,7 @@
 // All math is plain 2D and runs identically in the browser, in Node and in
 // tests — no React or Three.js here.
 
-import type {
-	BoxObstacle,
-	CircleObstacle,
-	Pose,
-	SegmentObstacle,
-	World,
-} from '@robotics-lab/core'
+import type { BoxObstacle, CircleObstacle, Pose, SegmentObstacle, World } from '@robotics-lab/core'
 import type { Vec2 } from '@robotics-lab/geometry'
 import type { LidarRay } from './index'
 
@@ -30,8 +24,8 @@ export type RayHit = {
 	touched: boolean
 	/** Distance to the intersection, or `range` when nothing was hit. */
 	distance: number
-	/** Obstacle kind that produced the hit (undefined when untouched). */
-	obstacleKind?: ObstacleKind
+	/** Obstacle kind that produced the hit; `null` when untouched. */
+	obstacleKind: ObstacleKind | null
 	/** Intersection point for visualization; capped to `range` on a miss. */
 	point: Vec2
 }
@@ -51,7 +45,7 @@ export function castRayAgainstWorld(world: World, ray: LidarRay, range: number):
 	const origin = ray.origin
 	// `best` starts at the configured range so misses flatten to that distance.
 	let best = range
-	let bestKind: ObstacleKind | undefined
+	let bestKind: ObstacleKind | null = null
 	for (const wall of world.walls) {
 		const t = intersectRaySegment(origin, dx, dy, wall)
 		if (t !== null && t < best) {
@@ -74,7 +68,7 @@ export function castRayAgainstWorld(world: World, ray: LidarRay, range: number):
 		}
 	}
 	return {
-		touched: bestKind !== undefined,
+		touched: bestKind !== null,
 		distance: best,
 		obstacleKind: bestKind,
 		point: { x: origin.x + dx * best, y: origin.y + dy * best },
@@ -90,11 +84,14 @@ function intersectRaySegment(
 ): number | null {
 	const sx = s.end.x - s.start.x
 	const sy = s.end.y - s.start.y
-	// Solve origin + dir*t = start + seg*u  for t,u.
+	// Solve origin + dir*t = start + seg*u  for t,u. The 2x2 system
+	//   [dx, -sx] [t]   [start.x - origin.x]
+	//   [dy, -sy] [u] = [start.y - origin.y]
+	// has determinant det = -(dx*sy - dy*sx); Cramer's rule gives t and u.
 	const denom = dx * sy - dy * sx
-	if (Math.abs(denom) < 1e-12) return null // parallel
+	if (Math.abs(denom) < 1e-12) return null // parallel / collinear
 	const t = ((s.start.x - origin.x) * sy - (s.start.y - origin.y) * sx) / denom
-	const u = ((s.start.x - origin.x) * dy - (s.start.y - origin.y) * dx) / -denom
+	const u = ((s.start.x - origin.x) * dy - (s.start.y - origin.y) * dx) / denom
 	if (t < 1e-9 || u < 0 || u > 1) return null // behind or off-segment
 	return t
 }
@@ -122,12 +119,7 @@ function intersectRayCircle(
 }
 
 /** Ray vs rotated rectangle (OBB). Into box-local space, axis-align, clamp. */
-function intersectRayBox(
-	origin: Pose,
-	dx: number,
-	dy: number,
-	b: BoxObstacle,
-): number | null {
+function intersectRayBox(origin: Pose, dx: number, dy: number, b: BoxObstacle): number | null {
 	const cos = Math.cos(-b.rotation)
 	const sin = Math.sin(-b.rotation)
 	const rx = origin.x - b.center.x

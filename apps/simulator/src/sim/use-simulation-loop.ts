@@ -10,8 +10,12 @@
 // `@/sim/teleop` to derive the `DriveInput` the sim applies. The teleop config
 // (base speed, turn speed, boost) is UI app-state kept in the store so the HUD
 // slider can tune the throttle without touching the loop.
+//
+// Sensors: the world (from the selected map) and the lidar config are app
+// state in the store; the loop refects them onto the sim via `setSimWorld` /
+// `setLidarConfig` whenever they change so the scan stays in sync.
 
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import {
 	accumulate,
 	setInput as applyInput,
@@ -21,6 +25,8 @@ import {
 	resetSimulation,
 	resume as resumeSim,
 	type SimState,
+	setLidarConfig,
+	setSimWorld,
 } from '@/sim/loop'
 import {
 	DEFAULT_TELEOP_CONFIG,
@@ -42,7 +48,11 @@ export type SimulationControls = {
 	clearEmergencyStop: () => void
 }
 
-const freshSim = () => createSimulation({ spawnPose: SPAWN_POSE })
+/** Build a fresh sim seeded with the current world + lidar config. */
+function freshSim(): SimState {
+	const { world, lidar } = useSimulatorStore.getState()
+	return createSimulation({ spawnPose: SPAWN_POSE, world, lidar })
+}
 
 const ZERO_INPUT: DriveInput = { leftWheel: 0, rightWheel: 0 }
 const INPUT_EQ = (a: DriveInput, b: DriveInput) =>
@@ -57,8 +67,15 @@ const INPUT_EQ = (a: DriveInput, b: DriveInput) =>
 export function useSimulationLoop(): SimulationControls {
 	const observe = useSimulatorStore((s) => s.observe)
 	const selectedMap = useSimulatorStore((s) => s.selectedMap)
+	const world = useSimulatorStore((s) => s.world)
+	const lidar = useSimulatorStore((s) => s.lidar)
 
-	const simRef = useRef<SimState>(freshSim())
+	const simRef = useRef<SimState | null>(null)
+	if (simRef.current === null) simRef.current = freshSim()
+	// After the guard above, `simRef.current` is never null for the lifetime of
+	// the hook; `cur` is the typed accessor closure used everywhere below. Wrapped
+	// in `useCallback` so it has a stable identity for effect deps.
+	const cur = useCallback((): SimState => simRef.current as SimState, [])
 	const keyboardRef = useKeyboard()
 	// A snapshot of teleop config read once per frame: avoids re-subscribing
 	// the rAF effect on every slider drag (the loop polls it off the store).
@@ -67,15 +84,29 @@ export function useSimulationLoop(): SimulationControls {
 	const lastMapRef = useRef<string>(selectedMap)
 	const lastInputRef = useRef<DriveInput>(ZERO_INPUT)
 
-	// Reset the sim when the active map changes.
+	// Reset the sim when the active map changes, seeding with the new world.
 	useEffect(() => {
 		if (lastMapRef.current === selectedMap) return
 		lastMapRef.current = selectedMap
 		simRef.current = freshSim()
 		lastFrameRef.current = null
 		lastInputRef.current = ZERO_INPUT
-		observe(simRef.current)
-	}, [selectedMap, observe])
+		observe(cur())
+	}, [selectedMap, observe, cur])
+
+	// Reflect world changes onto the sim without resetting the robot. The map
+	// change path above already rebuilds a fresh sim, so this effect handles
+	// the case where the world object identity changes for other reasons.
+	useEffect(() => {
+		simRef.current = setSimWorld(cur(), world)
+		observe(cur())
+	}, [world, observe, cur])
+
+	// Reflect lidar config changes onto the sim.
+	useEffect(() => {
+		simRef.current = setLidarConfig(cur(), lidar)
+		observe(cur())
+	}, [lidar, observe, cur])
 
 	// The render-rate driver: measure wall clock, drain fixed steps, observe.
 	useEffect(() => {
@@ -95,38 +126,39 @@ export function useSimulationLoop(): SimulationControls {
 			const keyboard: KeyboardState = keyboardRef.current
 			const desired = driveInputFromKeyboard(keyboard, teleopRef.current)
 			if (!INPUT_EQ(lastInputRef.current, desired)) {
-				simRef.current = applyInput(simRef.current, desired)
+				simRef.current = applyInput(cur(), desired)
 				lastInputRef.current = desired
 			}
 
-			simRef.current = accumulate(simRef.current, dt).state
-			observe(simRef.current)
+			simRef.current = accumulate(cur(), dt).state
+			observe(cur())
 		}
 		raf = requestAnimationFrame(tick)
 		return () => cancelAnimationFrame(raf)
-	}, [observe, keyboardRef])
+	}, [observe, keyboardRef, cur])
 
 	// Controls read from the ref (the authority) and are cheap to recreate.
 	return {
 		pause: () => {
-			simRef.current = pauseSim(simRef.current)
-			observe(simRef.current)
+			simRef.current = pauseSim(cur())
+			observe(cur())
 		},
 		resume: () => {
-			simRef.current = resumeSim(simRef.current)
-			observe(simRef.current)
+			simRef.current = resumeSim(cur())
+			observe(cur())
 		},
 		togglePause: () => {
-			simRef.current = simRef.current.running ? pauseSim(simRef.current) : resumeSim(simRef.current)
-			observe(simRef.current)
+			const s = cur()
+			simRef.current = s.running ? pauseSim(s) : resumeSim(s)
+			observe(cur())
 		},
 		reset: () => {
-			simRef.current = resetSimulation(simRef.current)
+			simRef.current = resetSimulation(cur())
 			// Force the input back to whatever the keyboard is asking for.
 			const desired = driveInputFromKeyboard(keyboardRef.current, teleopRef.current)
-			simRef.current = applyInput(simRef.current, desired)
+			simRef.current = applyInput(cur(), desired)
 			lastInputRef.current = desired
-			observe(simRef.current)
+			observe(cur())
 		},
 		emergencyStop: () => {
 			// Reflect the stop into the keyboard ref so the next frame doesn't
@@ -134,9 +166,9 @@ export function useSimulationLoop(): SimulationControls {
 			// Space keydown already does this, but a button-triggered stop must
 			// stand on its own.
 			keyboardRef.current = { ...keyboardRef.current, stop: true }
-			simRef.current = applyInput(simRef.current, ZERO_INPUT)
+			simRef.current = applyInput(cur(), ZERO_INPUT)
 			lastInputRef.current = ZERO_INPUT
-			observe(simRef.current)
+			observe(cur())
 		},
 		clearEmergencyStop: () => {
 			keyboardRef.current = { ...keyboardRef.current, stop: false }
