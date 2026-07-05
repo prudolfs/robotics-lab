@@ -10,7 +10,11 @@
 	},
 	"dependencies": {
 		"@robotics-lab/core": "workspace:*",
-		"@robotics-lab/geometry": "workspace:*"
+		"@robotics-lab/geometry": "workspace:*",
+		"@robotics-lab/sensors": "workspace:*"
+	},
+	"devDependencies": {
+		"@robotics-lab/maps": "workspace:*"
 	},
 	"scripts": {
 		"test": "vitest run",

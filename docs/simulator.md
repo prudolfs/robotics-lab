@@ -251,23 +251,23 @@ Build a map from lidar scans.
 
 ## Grid
 
-- [ ] Grid representation
-- [ ] Unknown cells
-- [ ] Free cells
-- [ ] Occupied cells
+- [x] Grid representation
+- [x] Unknown cells
+- [x] Free cells
+- [x] Occupied cells
 
 ## Mapping
 
-- [ ] Ray tracing
-- [ ] Cell updates
-- [ ] Probability updates
-- [ ] Map reset
+- [x] Ray tracing
+- [x] Cell updates
+- [x] Probability updates
+- [x] Map reset
 
 ## Visualization
 
-- [ ] 2D grid
-- [ ] Minimap
-- [ ] Live updates
+- [x] 2D grid
+- [x] Minimap
+- [x] Live updates
 
 ---
 

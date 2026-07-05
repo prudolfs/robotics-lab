@@ -1,49 +1,83 @@
-// Occupancy grid mapping.
-// Cell values are log-odds occupancy: 0 = unknown, >0 occupied, <0 free.
+// Occupancy grid public API.
+//
+// Cell values stored as log-odds: `0 = unknown`, `>0 = occupied`, `<0 = free`.
+// The modules re-exported below are the building blocks of stereo-with-noise
+// occupancy mapping:
+//
+//   grid.ts          — fixed-size plane over the world, coordinate conversions
+//   probability.ts   — log-odds <-> probability, classification, clamping
+//   raycast.ts       — DDA cell traversal of a world-space segment
+//   update.ts        — apply a lidar scan, mark cells, reset, snapshot/restore
+//   serialization.ts— JSON / ROS-style [0,255] / probability array export
+//
+// Consumers only need the helpers re-exported here (deep module: shallow API,
+// hidden internal complexity).
 
 import type { Vec2 } from '@robotics-lab/geometry'
+import type { GridParams, OccupancyGrid } from './grid'
 
-export type OccupancyGrid = {
-	width: number
-	height: number
-	/** World units per cell. */
-	resolution: number
-	/** World origin at the centre of cell (0,0). */
-	origin: Vec2
-	cells: Float32Array
-}
+export type { Cell2, GridParams, OccupancyGrid } from './grid'
+export {
+	cellCenterWorld,
+	createGridInternal,
+	indexToCell,
+	worldToCell,
+	worldToIndex,
+} from './grid'
+export type { OccupancyClass } from './probability'
+export {
+	clampLogOdds,
+	classify,
+	LOG_ODDS_CLAMP,
+	logOdds,
+	probability,
+	UNKNOWN_PROB,
+} from './probability'
+export type { Visit } from './raycast'
+export { traceSegment } from './raycast'
+export type { SerializedGrid } from './serialization'
+export {
+	deserializeGrid,
+	serializeGrid,
+	toOccupancyBytes,
+	toProbabilityGrid,
+} from './serialization'
+export type { UpdateParams } from './update'
+export {
+	applyScan,
+	cloneCells,
+	DEFAULT_UPDATE_PARAMS,
+	markFree,
+	markOccupied,
+	markPointOccupied,
+	resetGrid,
+	restoreCells,
+} from './update'
 
-export type GridParams = {
-	width: number
-	height: number
-	resolution: number
-	origin?: Vec2
-}
+// --- Convenience constructors / accessors -----------------------------------------
+// These wrap the lower-level helpers with the conventions the original API
+// promised: `cellIndex` for a world point, `getCell` / `setCell` flat access.
+
+import { createGridInternal, worldToIndex } from './grid'
 
 export function createGrid(params: GridParams): OccupancyGrid {
-	return {
-		width: params.width,
-		height: params.height,
-		resolution: params.resolution,
-		origin: params.origin ?? { x: 0, y: 0 },
-		cells: new Float32Array(params.width * params.height),
-	}
+	return createGridInternal(params, 0)
+}
+
+/** Index of the cell containing `world`, or `-1` if outside the grid. */
+export function cellIndex(grid: OccupancyGrid, world: Vec2): number {
+	return worldToIndex(grid, world)
 }
 
 export type CellIndex = { col: number; row: number }
 
-export function cellIndex(grid: OccupancyGrid, world: Vec2): number {
-	const col = Math.floor((world.x - grid.origin.x) / grid.resolution)
-	const row = Math.floor((world.y - grid.origin.y) / grid.resolution)
-	if (col < 0 || col >= grid.width || row < 0 || row >= grid.height) return -1
-	return row * grid.width + col
-}
-
+/** Read the log-odds value; out-of-range indices return `0` (unknown). */
 export function getCell(grid: OccupancyGrid, index: number): number {
 	if (index < 0 || index >= grid.cells.length) return 0
 	return grid.cells[index]
 }
 
+/** Write a raw log-odds value (caller responsible for clamping). */
 export function setCell(grid: OccupancyGrid, index: number, value: number): void {
 	if (index < 0 || index >= grid.cells.length) return
 	grid.cells[index] = value

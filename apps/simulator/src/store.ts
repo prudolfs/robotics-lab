@@ -1,5 +1,6 @@
 import { createWorld, type World } from '@robotics-lab/core'
 import { loadMap, mapNames } from '@robotics-lab/maps'
+import type { OccupancyGrid } from '@robotics-lab/occupancy-grid'
 import type { RobotState } from '@robotics-lab/robot'
 import { createLidarConfig, type LidarConfig, type LidarScan } from '@robotics-lab/sensors'
 import { create } from 'zustand'
@@ -31,6 +32,8 @@ export type SimulatorStore = {
 	running: boolean
 	/** Observed: the most recent lidar scan sampled from the simulation. */
 	scan: LidarScan | null
+	/** Observed: the live occupancy grid built from lidar scans. */
+	grid: OccupancyGrid | null
 	/** App state: teleop tuning exposed to the HUD slider / speed adjustment. */
 	teleop: TeleopConfig
 	/** App state: lidar configuration (range / resolution / noise). */
@@ -39,6 +42,12 @@ export type SimulatorStore = {
 	showLidar: boolean
 	/** App state: show the robot's onboard camera viewport. */
 	showCamera: boolean
+	/** App state: show the occupancy grid overlay on the floor. */
+	showOccupancy: boolean
+	/** App state: show the occupancy minimap in the corner. */
+	showMinimap: boolean
+	/** App action nonce: incremented to signal the loop to clear the grid. */
+	mapNonce: number
 	/** App action: switch the active map (the loop resets the sim on change). */
 	selectMap: (name: string) => void
 	/** App action: tune the teleop throttle (base speed). */
@@ -49,6 +58,12 @@ export type SimulatorStore = {
 	toggleLidar: () => void
 	/** App action: toggle the robot camera viewport. */
 	toggleCamera: () => void
+	/** App action: toggle the occupancy grid floor overlay. */
+	toggleOccupancy: () => void
+	/** App action: toggle the occupancy minimap. */
+	toggleMinimap: () => void
+	/** App action: clear the learned occupancy map (without resetting the robot). */
+	clearMap: () => void
 	/** Observer: push the latest simulation snapshot for rendering / HUD. */
 	observe: (next: SimState) => void
 }
@@ -65,6 +80,7 @@ export function sampleState(next: SimState) {
 		input: next.input,
 		running: next.running,
 		scan: next.scan,
+		grid: next.grid,
 	}
 }
 
@@ -82,6 +98,9 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		lidar: DEFAULT_LIDAR_CONFIG,
 		showLidar: true,
 		showCamera: false,
+		showOccupancy: true,
+		showMinimap: true,
+		mapNonce: 0,
 		selectMap: (name) => {
 			if (!names.includes(name)) return
 			set({ selectedMap: name, world: buildWorld(name) })
@@ -93,6 +112,15 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		setLidar: (config) => set({ lidar: config }),
 		toggleLidar: () => set((s) => ({ showLidar: !s.showLidar })),
 		toggleCamera: () => set((s) => ({ showCamera: !s.showCamera })),
+		toggleOccupancy: () => set((s) => ({ showOccupancy: !s.showOccupancy })),
+		toggleMinimap: () => set((s) => ({ showMinimap: !s.showMinimap })),
+		clearMap: () => {
+			// The loop owns the grid; we push the clear via the import below, but to
+			// keep store <-> loop circularity clean we expose the action as a flag
+			// the loop can read. Implementation note: a `mapNonce` that the loop
+			// watches and resets the grid on increment.
+			set((s) => ({ mapNonce: s.mapNonce + 1 }))
+		},
 		observe: (next) => set(sampleState(next)),
 	}
 })

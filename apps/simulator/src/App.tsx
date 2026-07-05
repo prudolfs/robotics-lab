@@ -2,6 +2,8 @@ import { Canvas } from '@react-three/fiber'
 import {
 	FpsCounter,
 	LidarView,
+	OccupancyGridView,
+	OccupancyMinimap,
 	RobotCameraViewport,
 	RobotView,
 	SimulatorScene,
@@ -9,6 +11,7 @@ import {
 } from '@robotics-lab/rendering'
 import { useCallback, useState } from 'react'
 import { DebugOverlay } from '@/components/debug-overlay'
+import { MapHud } from '@/components/map-hud'
 import { SensorHud } from '@/components/sensor-hud'
 import { TeleopHud } from '@/components/teleop-hud'
 import { Button } from '@/components/ui/button'
@@ -28,8 +31,11 @@ export default function App() {
 	const simTime = useSimulatorStore((s) => s.simTime)
 	const running = useSimulatorStore((s) => s.running)
 	const scan = useSimulatorStore((s) => s.scan)
+	const grid = useSimulatorStore((s) => s.grid)
 	const showLidar = useSimulatorStore((s) => s.showLidar)
 	const showCamera = useSimulatorStore((s) => s.showCamera)
+	const showOccupancy = useSimulatorStore((s) => s.showOccupancy)
+	const showMinimap = useSimulatorStore((s) => s.showMinimap)
 	const selectMap = useSimulatorStore((s) => s.selectMap)
 
 	const controls = useSimulationLoop()
@@ -44,6 +50,7 @@ export default function App() {
 					<FpsCounter onUpdate={handleFps} />
 					<WorldView world={world} />
 					<RobotView pose={robot.pose} params={robot.params} />
+					{showOccupancy && <OccupancyGridView grid={grid} />}
 					{showLidar && <LidarView scan={scan} />}
 				</SimulatorScene>
 			</Canvas>
@@ -89,6 +96,7 @@ export default function App() {
 
 			<TeleopHud controls={controls} />
 			<SensorHud />
+			<MapHud />
 
 			{showCamera && (
 				<RobotCameraViewport
@@ -100,6 +108,21 @@ export default function App() {
 					onPitch={setPitch}
 					className="pointer-events-auto absolute bottom-4 left-1/2 h-48 w-64 -translate-x-1/2 overflow-hidden rounded-lg border border-border bg-black/80 backdrop-blur-sm"
 				/>
+			)}
+
+			{showMinimap && (
+				<div className="pointer-events-none absolute top-1/2 left-4 flex -translate-y-1/2 flex-col gap-1">
+					<span className="font-mono text-[10px] text-muted-foreground">Minimap</span>
+					<div className="rounded-lg border border-border bg-card/80 p-1 backdrop-blur-sm">
+						<OccupancyMinimap
+							grid={grid}
+							world={world}
+							pose={robot.pose}
+							scan={scan}
+							className="block h-40 w-40 rounded"
+						/>
+					</div>
+				</div>
 			)}
 		</div>
 	)

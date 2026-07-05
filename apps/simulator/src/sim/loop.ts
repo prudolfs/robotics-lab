@@ -17,6 +17,7 @@
 // breaking purity; passing `null` disables the sensor.
 
 import type { Pose, Velocity, World } from '@robotics-lab/core'
+import { applyScan, createGrid, type OccupancyGrid, resetGrid } from '@robotics-lab/occupancy-grid'
 import {
 	createRobot,
 	type RobotParams,
@@ -29,6 +30,11 @@ import {
 	type LidarConfig,
 	type LidarScan,
 } from '@robotics-lab/sensors'
+
+/** Default occupancy grid resolution (metres per cell). */
+export const DEFAULT_GRID_RESOLUTION = 0.2
+/** Margin around the world floor built into the occupancy grid, in metres. */
+export const DEFAULT_GRID_MARGIN = 4
 
 /** Fixed simulation timestep in seconds. */
 export const FIXED_DT = 1 / 60
@@ -60,6 +66,8 @@ export type SimState = {
 	lidar: LidarConfig
 	/** The most recent lidar scan, recomputed each fixed step. `null` while no world. */
 	scan: LidarScan | null
+	/** Occupancy grid built from the lidar scans; `null` while no world. */
+	grid: OccupancyGrid | null
 }
 
 export type SimOptions = {
@@ -71,6 +79,10 @@ export type SimOptions = {
 	lidar?: LidarConfig
 	/** World the lidar raycasts against each step; null disables the sensor. */
 	world?: World | null
+	/** Occupancy grid resolution in metres per cell. */
+	gridResolution?: number
+	/** Metres of margin around the world floor added to the occupancy grid. */
+	gridMargin?: number
 }
 
 export const DEFAULT_LIDAR_CONFIG = createLidarConfig()
@@ -81,6 +93,7 @@ export function createSimulation(options: SimOptions = {}): SimState {
 	const robot = createRobot(spawnPose, options.robotParams ?? {})
 	const world = options.world ?? null
 	const lidar = options.lidar ?? DEFAULT_LIDAR_CONFIG
+	const grid = world ? buildGrid(world, options.gridResolution, options.gridMargin) : null
 	return {
 		time: 0,
 		accumulator: 0,
@@ -91,8 +104,32 @@ export function createSimulation(options: SimOptions = {}): SimState {
 		stepCount: 0,
 		world,
 		lidar,
+		grid,
 		scan: world ? createScan(lidar, robot.pose, world) : null,
 	}
+}
+
+/**
+ * Build an occupancy grid sized to cover the world floor plus a margin, at
+ * the default resolution. The grid origin is the world-space corner below and
+ * to the left of the floor (so cell (0,0) sits at minX/minY of the bounds).
+ */
+export function buildGrid(
+	world: World,
+	resolution: number = DEFAULT_GRID_RESOLUTION,
+	margin: number = DEFAULT_GRID_MARGIN,
+): OccupancyGrid {
+	const width = Math.ceil(world.width / resolution) + Math.ceil((margin * 2) / resolution)
+	const height = Math.ceil(world.depth / resolution) + Math.ceil((margin * 2) / resolution)
+	return createGrid({
+		width,
+		height,
+		resolution,
+		origin: {
+			x: -world.width / 2 - margin,
+			y: -world.depth / 2 - margin,
+		},
+	})
 }
 
 /** Pure: set the running flag without touching anything else. */
@@ -121,7 +158,8 @@ export function setInput(state: SimState, input: DriveInput): SimState {
 export function setSimWorld(state: SimState, world: World | null): SimState {
 	if (state.world === world) return state
 	const scan = world ? createScan(state.lidar, state.robot.pose, world) : null
-	return { ...state, world, scan }
+	const grid = world ? buildGrid(world) : null
+	return { ...state, world, scan, grid }
 }
 
 /** Replace the lidar configuration, recomputing the scan if a world is attached. */
@@ -144,11 +182,13 @@ function configsEqual(a: LidarConfig, b: LidarConfig): boolean {
  * Reset the simulation: robot back to its spawn pose, clock and counters
  * zeroed, accumulator cleared. Running flag, input, world and lidar config are
  * preserved so a paused loop doesn't yank the robot back into motion on reset.
- * The latest scan is recomputed from the reset pose.
+ * The latest scan is recomputed from the reset pose and the occupancy grid is
+ * rebuilt blank (clearing any learned map).
  */
 export function resetSimulation(state: SimState): SimState {
 	const robot = createRobot(state.spawnPose, state.robot.params)
 	const scan = state.world ? createScan(state.lidar, robot.pose, state.world) : null
+	const grid = state.world ? buildGrid(state.world) : null
 	return {
 		...state,
 		time: 0,
@@ -156,6 +196,7 @@ export function resetSimulation(state: SimState): SimState {
 		stepCount: 0,
 		robot,
 		scan,
+		grid,
 	}
 }
 
@@ -176,12 +217,16 @@ export function stepSimulation(state: SimState, dt: number = FIXED_DT): SimState
 	if (!state.running) return state
 	const robot = stepDifferentialDrive(state.robot, state.input, dt)
 	const scan = state.world ? createScan(state.lidar, robot.pose, state.world) : null
+	// Integrate the scan into the occupancy grid. The grid object is preserved
+	// across steps (mutated in place) so the map accumulates over time.
+	if (scan && state.grid && state.world) applyScan(state.grid, scan, state.world)
 	return {
 		...state,
 		time: state.time + dt,
 		robot,
 		stepCount: state.stepCount + 1,
 		scan,
+		grid: state.grid,
 	}
 }
 
@@ -223,4 +268,10 @@ export function runFor(state: SimState, seconds: number, dt: number = FIXED_DT):
 	let s = state
 	for (let i = 0; i < steps; i++) s = stepSimulation(s, dt)
 	return s
+}
+
+/** Clear every cell of the occupancy grid back to unknown. No-op if no grid. */
+export function clearOccupancyGrid(state: SimState): SimState {
+	if (state.grid) resetGrid(state.grid)
+	return state
 }

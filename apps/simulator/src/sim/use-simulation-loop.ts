@@ -19,6 +19,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import {
 	accumulate,
 	setInput as applyInput,
+	clearOccupancyGrid,
 	createSimulation,
 	type DriveInput,
 	pause as pauseSim,
@@ -93,6 +94,19 @@ export function useSimulationLoop(): SimulationControls {
 		lastInputRef.current = ZERO_INPUT
 		observe(cur())
 	}, [selectedMap, observe, cur])
+
+	// Manual "clear map" action: clear the occupancy grid without resetting the
+	// robot. Watched via a monotonic nonce so the grid is cleared exactly once
+	// per click. The initial nonce (0) is skipped with a guard ref.
+	const mapNonce = useSimulatorStore((s) => s.mapNonce)
+	const lastNonceRef = useRef<number>(mapNonce)
+	useEffect(() => {
+		if (lastNonceRef.current === mapNonce) return
+		lastNonceRef.current = mapNonce
+		if (mapNonce === 0) return
+		simRef.current = clearOccupancyGrid(cur())
+		observe(cur())
+	}, [mapNonce, observe, cur])
 
 	// Reflect world changes onto the sim without resetting the robot. The map
 	// change path above already rebuilds a fresh sim, so this effect handles

@@ -15,6 +15,7 @@
 	"peerDependencies": {
 		"@robotics-lab/core": ">=0",
 		"@robotics-lab/maps": ">=0",
+		"@robotics-lab/occupancy-grid": ">=0",
 		"@robotics-lab/robot": ">=0",
 		"@robotics-lab/sensors": ">=0",
 		"@react-three/drei": ">=10",
@@ -28,6 +29,7 @@
 	"devDependencies": {
 		"@robotics-lab/core": "workspace:*",
 		"@robotics-lab/maps": "workspace:*",
+		"@robotics-lab/occupancy-grid": "workspace:*",
 		"@robotics-lab/robot": "workspace:*",
 		"@robotics-lab/sensors": "workspace:*",
 		"@react-three/drei": "^10.7.7",
