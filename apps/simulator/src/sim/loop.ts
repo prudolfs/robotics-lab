@@ -443,7 +443,12 @@ export function stepSimulation(state: SimState, dt: number = FIXED_DT): SimState
 
 			// The controller chases the head planner waypoint if a plan exists;
 			// otherwise it drives straight at the destination (planner fallback).
-			const head: Goal = path[0] ?? destination
+			// When only one smoothed waypoint remains, the path ends at the goal
+			// cell centre (snapped), which can sit up to half a cell away from the
+			// exact `goals[0]` the user clicked. Drive the final segment straight at
+			// the true destination so the robot converges precisely on the clicked
+			// point instead of stopping short by the residual half-cell gap.
+			const head: Goal = path.length > 1 ? path[0] : destination
 			const out = controlToGoal(pose, head, state.nav)
 			input = out.input
 			navStatus = out.status
@@ -451,7 +456,8 @@ export function stepSimulation(state: SimState, dt: number = FIXED_DT): SimState
 				if (path.length > 0) {
 					// Arrived at a planner waypoint: drop it and keep driving the rest.
 					path = path.slice(1)
-				} else {
+				}
+				if (path.length === 0) {
 					// Arrived at the true destination: pop it, replan toward the next,
 					// and stop autonomy if the queue is now empty.
 					goals = popGoal(goals)

@@ -248,15 +248,15 @@ Verify the end-to-end navigation flow from user click to robot arrival.
 
 ## Tasks
 
-- [ ] Click destination → goal marker appears
-- [ ] Robot reaches the goal
-- [ ] Queued goals are processed in order
-- [ ] Cancel goal removes the marker
+- [x] Click destination → goal marker appears
+- [x] Robot reaches the goal
+- [x] Queued goals are processed in order
+- [x] Cancel goal removes the marker
 
 ## Selectors
 
-- [ ] `data-testid` for goal marker
-- [ ] `data-testid` for the clear goals button
+- [x] `data-testid` for goal marker
+- [x] `data-testid` for the clear goals button
 
 ---
 

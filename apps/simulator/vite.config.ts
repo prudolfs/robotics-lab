@@ -10,4 +10,10 @@ export default defineConfig({
 		tsconfigPaths: true,
 	},
 	plugins: [tailwindcss(), viteReact()],
+	// Vitest defaults to `**/*.spec.ts` includes; keep Playwright specs out of
+	// the Node unit suite. They run under `pnpm test:e2e` instead.
+	test: {
+		include: ['src/**/*.test.ts'],
+		exclude: ['e2e/**', 'node_modules/**'],
+	},
 })

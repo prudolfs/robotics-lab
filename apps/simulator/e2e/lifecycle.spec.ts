@@ -120,11 +120,20 @@ test.describe('Phase 1 — Simulation lifecycle', () => {
 			.poll(async () => Number(await getSimTime(page)), { timeout: 15_000 })
 			.toBeGreaterThan(0)
 
+		// Pause so the loop stops advancing the clock, then reset. While paused
+		// the reset zeroes the sim clock deterministically and the renderer mirrors
+		// it; we then assert the clock stays at ~0 rather than re-advancing.
+		await page.getByTestId('pause-resume-button').click()
+		await expect(page.getByTestId('pause-resume-button')).toHaveText('Resume')
+
 		await resetWorld(page)
 
-		// The renderer's sim clock drops back to ~0 after reset.
-		await expect
-			.poll(async () => Number(await getSimTime(page)), { timeout: 10_000 })
-			.toBeLessThan(0.5)
+		expect(await getSimTime(page)).toBeLessThan(0.5)
+		// Two paused samples must stay equal at ~0 — the renderer reflects reset
+		// and the clock doesn't creep.
+		const a = await getSimTime(page)
+		await page.waitForTimeout(500)
+		const b = await getSimTime(page)
+		expect(b).toBe(a)
 	})
 })

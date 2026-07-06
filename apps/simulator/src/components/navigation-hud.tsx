@@ -46,6 +46,7 @@ export function NavigationHud({ controls }: { controls: SimulationControls }) {
 
 			<div className="flex items-center gap-2">
 				<Button
+					data-testid="autonomous-toggle"
 					variant={autonomous ? 'default' : 'outline'}
 					size="xs"
 					onClick={() => setAutonomous(!autonomous)}
@@ -53,7 +54,13 @@ export function NavigationHud({ controls }: { controls: SimulationControls }) {
 				>
 					{autonomous ? 'Auto: ON' : 'Auto: OFF'}
 				</Button>
-				<Button variant="outline" size="xs" onClick={clearGoals} disabled={queueLen === 0}>
+				<Button
+					data-testid="clear-goals-button"
+					variant="outline"
+					size="xs"
+					onClick={clearGoals}
+					disabled={queueLen === 0}
+				>
 					Clear goals
 				</Button>
 				{autonomous && (
@@ -65,15 +72,17 @@ export function NavigationHud({ controls }: { controls: SimulationControls }) {
 
 			<div className="grid grid-cols-2 gap-x-3 gap-y-1">
 				<span className="text-muted-foreground text-xs">Active goal</span>
-				<span className="text-right font-mono text-foreground text-xs">
+				<span data-testid="active-goal" className="text-right font-mono text-foreground text-xs">
 					{active ? `(${fmt(active.x)}, ${fmt(active.y)})` : '—'}
 				</span>
 				<span className="text-muted-foreground text-xs">Distance</span>
-				<span className="text-right font-mono text-foreground text-xs">
+				<span data-testid="distance" className="text-right font-mono text-foreground text-xs">
 					{distance != null ? `${fmt(distance)} m` : '—'}
 				</span>
 				<span className="text-muted-foreground text-xs">Queued</span>
-				<span className="text-right font-mono text-foreground text-xs">{queueLen}</span>
+				<span data-testid="goal-count" className="text-right font-mono text-foreground text-xs">
+					{queueLen}
+				</span>
 			</div>
 
 			<span className="text-[10px] text-muted-foreground">
@@ -132,7 +141,7 @@ function StatusBadge({
 					: 'text-cyan-500'
 	const label = !autonomous ? 'manual' : status
 	return (
-		<span className={`flex items-center gap-1 font-mono text-xs ${tone}`}>
+		<span data-testid="nav-status" className={`flex items-center gap-1 font-mono text-xs ${tone}`}>
 			<span
 				className={`inline-block size-1.5 rounded-full bg-current ${
 					status === 'driving' || status === 'rotating' ? 'animate-pulse' : ''
