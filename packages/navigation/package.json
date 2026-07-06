@@ -10,6 +10,8 @@
 	},
 	"dependencies": {
 		"@robotics-lab/core": "workspace:*",
+		"@robotics-lab/geometry": "workspace:*",
+		"@robotics-lab/occupancy-grid": "workspace:*",
 		"@robotics-lab/robot": "workspace:*"
 	},
 	"scripts": {

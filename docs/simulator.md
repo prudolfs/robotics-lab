@@ -304,20 +304,20 @@ Navigate around obstacles.
 
 ## Algorithms
 
-- [ ] A*
-- [ ] Dijkstra (optional)
+- [x] A*
+- [x] Dijkstra (optional)
 
 ## Features
 
-- [ ] Grid search
-- [ ] Obstacle avoidance
-- [ ] Path smoothing
+- [x] Grid search
+- [x] Obstacle avoidance
+- [x] Path smoothing
 
 ## Visualization
 
-- [ ] Open nodes
-- [ ] Closed nodes
-- [ ] Final path
+- [x] Open nodes
+- [x] Closed nodes
+- [x] Final path
 
 ---
 

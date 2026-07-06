@@ -5,6 +5,9 @@ import { angularDelta } from '@robotics-lab/core'
 
 export * from './controller'
 export * from './goals'
+export * from './pathfinding'
+export * from './planner'
+export * from './smoothing'
 
 export type Goal = {
 	x: number

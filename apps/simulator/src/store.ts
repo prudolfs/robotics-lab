@@ -1,12 +1,13 @@
 import { createWorld, type World } from '@robotics-lab/core'
+import type { Vec2 } from '@robotics-lab/geometry'
 import { loadMap, mapNames } from '@robotics-lab/maps'
-import type { Goal, NavConfig, NavStatus } from '@robotics-lab/navigation'
+import type { Goal, NavConfig, NavStatus, PlannerOptions } from '@robotics-lab/navigation'
 import { DEFAULT_NAV_CONFIG } from '@robotics-lab/navigation'
 import type { OccupancyGrid } from '@robotics-lab/occupancy-grid'
 import type { RobotState } from '@robotics-lab/robot'
 import { createLidarConfig, type LidarConfig, type LidarScan } from '@robotics-lab/sensors'
 import { create } from 'zustand'
-import { createSimulation, robotSpeed, type SimState } from '@/sim/loop'
+import { createSimulation, DEFAULT_PLANNER_OPTIONS, robotSpeed, type SimState } from '@/sim/loop'
 import { DEFAULT_TELEOP_CONFIG, type TeleopConfig } from '@/sim/teleop'
 
 // Default spawn pose: center of the floor, facing +x.
@@ -42,6 +43,19 @@ export type SimulatorStore = {
 	autonomous: boolean
 	/** Observed: status reported by the controller on the last fixed step. */
 	navStatus: NavStatus
+	/** Observed: the smoothed planner waypoints the controller is following
+	 *  toward `goals[0]`. Distinct from `goals` so the HUD shows the true
+	 *  destinations while the path view draws the intermediate route. */
+	path: Goal[]
+	/** Observed: cells expanded into the closed set during the last plan,
+	 *  for the path-finder visualization (world centres). */
+	planClosed: Vec2[]
+	/** Observed: cells ever queued to the open frontier during the last plan. */
+	planOpen: Vec2[]
+	/** App state: planner tuning (algorithm / inflation / unknown handling). */
+	planner: PlannerOptions
+	/** App state: show the planned-path overlay (open / closed / final path). */
+	showPath: boolean
 	/** App state: navigation controller tuning exposed to the HUD. */
 	nav: NavConfig
 	/** App state: teleop tuning exposed to the HUD slider / speed adjustment. */
@@ -86,6 +100,10 @@ export type SimulatorStore = {
 	toggleAutonomous: () => void
 	/** App action: replace the navigation controller tuning. */
 	setNav: (nav: NavConfig) => void
+	/** App action: replace the planner tuning. */
+	setPlanner: (planner: PlannerOptions) => void
+	/** App action: toggle the planned-path overlay. */
+	togglePath: () => void
 	/** Observer: push the latest simulation snapshot for rendering / HUD. */
 	observe: (next: SimState) => void
 }
@@ -106,6 +124,9 @@ export function sampleState(next: SimState) {
 		goals: next.goals,
 		autonomous: next.autonomous,
 		navStatus: next.navStatus,
+		path: next.path,
+		planClosed: next.planClosed,
+		planOpen: next.planOpen,
 	}
 }
 
@@ -125,6 +146,11 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		goals: [],
 		autonomous: false,
 		navStatus: 'idle',
+		path: [],
+		planClosed: [],
+		planOpen: [],
+		planner: DEFAULT_PLANNER_OPTIONS,
+		showPath: true,
 		showLidar: true,
 		showCamera: false,
 		showOccupancy: true,
@@ -156,6 +182,8 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		setAutonomous: (on) => set({ autonomous: on }),
 		toggleAutonomous: () => set((s) => ({ autonomous: !s.autonomous })),
 		setNav: (nav) => set({ nav }),
+		setPlanner: (planner) => set({ planner }),
+		togglePath: () => set((s) => ({ showPath: !s.showPath })),
 		observe: (next) => set(sampleState(next)),
 	}
 })

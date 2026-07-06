@@ -6,6 +6,7 @@ import {
 	LidarView,
 	OccupancyGridView,
 	OccupancyMinimap,
+	PathView,
 	RobotCameraViewport,
 	RobotView,
 	SimulatorScene,
@@ -43,6 +44,10 @@ export default function App() {
 	const goals = useSimulatorStore((s) => s.goals)
 	const setGoal = useSimulatorStore((s) => s.setGoal)
 	const addGoal = useSimulatorStore((s) => s.addGoal)
+	const path = useSimulatorStore((s) => s.path)
+	const planOpen = useSimulatorStore((s) => s.planOpen)
+	const planClosed = useSimulatorStore((s) => s.planClosed)
+	const showPath = useSimulatorStore((s) => s.showPath)
 
 	const controls = useSimulationLoop()
 
@@ -68,6 +73,9 @@ export default function App() {
 					{showOccupancy && <OccupancyGridView grid={grid} />}
 					{showLidar && <LidarView scan={scan} />}
 					<GoalView pose={robot.pose} goals={goals} />
+					{showPath && (
+						<PathView closed={planClosed} open={planOpen} path={path} pose={robot.pose} />
+					)}
 					<GoalPicker world={world} onPick={handlePick} />
 				</SimulatorScene>
 			</Canvas>

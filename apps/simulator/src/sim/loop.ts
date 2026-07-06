@@ -17,12 +17,16 @@
 // breaking purity; passing `null` disables the sensor.
 
 import type { Pose, Velocity, World } from '@robotics-lab/core'
+import type { Vec2 } from '@robotics-lab/geometry'
 import {
 	controlToGoal,
 	DEFAULT_NAV_CONFIG,
 	type Goal,
 	type NavConfig,
 	type NavStatus,
+	type PlannerOptions,
+	type PlanResult,
+	planPath,
 	popGoal,
 } from '@robotics-lab/navigation'
 import { applyScan, createGrid, type OccupancyGrid, resetGrid } from '@robotics-lab/occupancy-grid'
@@ -43,6 +47,11 @@ import {
 export const DEFAULT_GRID_RESOLUTION = 0.2
 /** Margin around the world floor built into the occupancy grid, in metres. */
 export const DEFAULT_GRID_MARGIN = 4
+/** Fixed steps between autonomous replan cycles. The robot re-routes on the
+ *  live occupancy grid at this rate but also replans immediately on every
+ *  user-driven goal change, so the value is a safety cadence rather than a
+ *  correctness dial. */
+export const REPLAN_STEP_INTERVAL = 30
 
 /** Fixed simulation timestep in seconds. */
 export const FIXED_DT = 1 / 60
@@ -78,8 +87,24 @@ export type SimState = {
 	grid: OccupancyGrid | null
 	/** Navigation controller tuning. */
 	nav: NavConfig
-	/** FIFO of pending navigation goals. The head is the active goal. */
+	/** FIFO of pending navigation destinations. The head is the goal the robot
+	 *  is currently travelling to (the true target, not a transient planner
+	 *  waypoint). The HUD observes this so the user sees real destinations. */
 	goals: Goal[]
+	/** Smoothed world-space waypoints the controller is currently following
+	 *  toward `goals[0]`. Produced by the planner; consumed by the controller.
+	 *  Dropped to [] when there is nothing to chase or the plan is exhausted. */
+	path: Goal[]
+	/** Cells expanded into the closed set during the last plan — for the
+	 *  path-finder visualization. */
+	planClosed: Vec2[]
+	/** Cells ever queued to the open frontier during the last plan. */
+	planOpen: Vec2[]
+	/** The step the last successful plan was produced on. Used to throttle
+	 *  replanning to the `REPLAN_STEP_INTERVAL` cadence. */
+	lastPlanStep: number
+	/** Planner tuning (algorithm, inflation, etc.) exposed for the UI. */
+	planner: PlannerOptions
 	/** When true, the go-to-goal controller overrides the manual drive input
 	 *  each fixed step. Toggle off to drop back to keyboard teleop. */
 	autonomous: boolean
@@ -103,11 +128,23 @@ export type SimOptions = {
 	gridMargin?: number
 	/** Navigation controller tuning; defaults to `DEFAULT_NAV_CONFIG`. */
 	nav?: NavConfig
+	/** Planner tuning (algorithm / inflation / allow-unknown). Defaults to A*
+	 *  with a 1-cell safety inflation that routes through unexplored space. */
+	planner?: PlannerOptions
 	/** When true, the sim drives the robot towards its queued goals; default false. */
 	autonomous?: boolean
 }
 
 export const DEFAULT_LIDAR_CONFIG = createLidarConfig()
+
+/** Default planner tuning: A* search, 1-cell obstacle inflation, routes
+ *  through unknown cells so the robot can plan across unexplored space. */
+export const DEFAULT_PLANNER_OPTIONS: PlannerOptions = {
+	algorithm: 'astar',
+	diagonal: true,
+	inflationRadius: 1,
+	allowUnknown: true,
+}
 
 /** Create an initial simulation state. Defaults to running at the origin. */
 export function createSimulation(options: SimOptions = {}): SimState {
@@ -129,7 +166,12 @@ export function createSimulation(options: SimOptions = {}): SimState {
 		grid,
 		scan: world ? createScan(lidar, robot.pose, world) : null,
 		nav: options.nav ?? DEFAULT_NAV_CONFIG,
+		planner: options.planner ?? DEFAULT_PLANNER_OPTIONS,
 		goals: [],
+		path: [],
+		planClosed: [],
+		planOpen: [],
+		lastPlanStep: 0,
 		autonomous: options.autonomous ?? false,
 		navStatus: 'idle',
 	}
@@ -191,25 +233,91 @@ export function setNavConfig(state: SimState, nav: NavConfig): SimState {
 	return state.nav === nav ? state : { ...state, nav }
 }
 
-/** Replace the goal queue with a single goal, turning autonomy on. */
+/** Replace the goal queue with a single destination, turning autonomy on.
+ *  Plans a path on the live grid immediately so the robot starts following
+ *  the smoothed waypoints on the next fixed step. If the planner cannot find
+ *  a route the destination is queued directly so the go-to-goal controller
+ *  drives straight at it (graceful milestone-7 fallback). */
 export function setGoal(state: SimState, goal: Goal): SimState {
-	return { ...state, goals: [goal], autonomous: true }
+	const base: SimState = { ...state, goals: [goal], autonomous: true }
+	return replan(base)
 }
 
-/** Replace the goal queue with a list of goals, turning autonomy on. */
+/** Replace the goal queue with a list of destinations, turning autonomy on. */
 export function setGoals(state: SimState, goals: Goal[]): SimState {
-	return { ...state, goals, autonomous: true }
+	const base: SimState = { ...state, goals, autonomous: true }
+	return goals.length === 0 ? base : replan(base)
 }
 
-/** Append a goal to the back of the queue. Leaves the autonomous flag alone
- *  so the user can pre-stage waypoints before enabling autonomy. */
+/** Append a destination to the back of the queue. Leaves the autonomous
+ *  flag alone so the user can pre-stage destinations before enabling
+ *  autonomy. If there was no active plan the new tail is kept as-is; the
+ *  next replan (manual or cadence) extends the route to it. */
 export function enqueueGoal(state: SimState, goal: Goal): SimState {
-	return { ...state, goals: [...state.goals, goal] }
+	const goals = [...state.goals, goal]
+	// If the planner had no path queued (e.g. waiting on autonomy), refresh the
+	// plan toward the head goal now so the new destination is incorporated.
+	const base: SimState = { ...state, goals }
+	return state.path.length === 0 && state.autonomous ? replan(base) : base
 }
 
-/** Empty the goal queue but leave autonomy as-is so the robot stops. */
+/** Empty the destination queue. Also clears any in-flight planned path so
+ *  the controller stops driving intermediate waypoints toward a cancelled
+ *  destination. */
 export function clearGoals(state: SimState): SimState {
-	return state.goals.length === 0 ? state : { ...state, goals: [] }
+	if (state.goals.length === 0 && state.path.length === 0) return state
+	return {
+		...state,
+		goals: [],
+		path: [],
+		planClosed: [],
+		planOpen: [],
+		lastPlanStep: 0,
+	}
+}
+
+/** Replace the planner tuning (algorithm / inflation / unknown handling).
+ *  Schedules an immediate replan so the new knobs take effect at once. */
+export function setPlannerOptions(state: SimState, planner: PlannerOptions): SimState {
+	return { ...state, planner, lastPlanStep: state.stepCount - REPLAN_STEP_INTERVAL }
+}
+
+// --- Path planning integration (milestone 8) --------------------------------
+// The go-to-goal controller (milestone 7) drives straight at its head goal.
+// Milestone 8 sits a grid path planner between the user's *destination* and
+// the controller: `goals[0]` is the true destination the user clicked; the
+// planner produces `path`, a smoothed list of intermediate waypoints the
+// controller chases one at a time. As the occupancy grid fills up from lidar
+// scans the planner replans so the robot re-routes around obstacles it only
+// just discovered, finally arriving at the destination.
+
+/** Plan from the robot's current pose to `goals[0]` on the live grid, storing
+ *  the smoothed waypoints in `path` and the search artifacts for the
+ *  path-finder visualization. Returns the state unchanged when there is
+ *  nothing to plan (no grid, no grid, or no goal queued).
+ *
+ *  When the planner fails (no path / invalid endpoints) we fall back to a
+ *  single direct waypoint at the destination so the controller still drives
+ *  toward it (the milestone-7 behaviour) rather than freezing in place — the
+ *  robot may hit the obstacle, but that is a recoverable failure and far
+ *  better than silently giving up on autonomy.
+ */
+export function replan(state: SimState): SimState {
+	const target = state.goals[0]
+	if (!target || !state.grid) {
+		return { ...state, path: [], planClosed: [], planOpen: [], lastPlanStep: state.stepCount }
+	}
+	const start: Vec2 = { x: state.robot.pose.x, y: state.robot.pose.y }
+	const res: PlanResult = planPath(state.grid, start, target, state.planner)
+	// Convert the planner's Vec2 waypoints into the controller's Goal shape.
+	const path: Goal[] = res.waypoints.map((w) => ({ x: w.x, y: w.y }))
+	return {
+		...state,
+		path,
+		planClosed: res.closed,
+		planOpen: res.open,
+		lastPlanStep: state.stepCount,
+	}
 }
 
 /** Toggle autonomous driving on/off. When off, manual teleop input applies. */
@@ -270,6 +378,10 @@ export function resetSimulation(state: SimState): SimState {
 		scan,
 		grid,
 		goals: [],
+		path: [],
+		planClosed: [],
+		planOpen: [],
+		lastPlanStep: 0,
 		autonomous: false,
 		navStatus: 'idle',
 	}
@@ -295,29 +407,72 @@ export function stepSimulation(state: SimState, dt: number = FIXED_DT): SimState
 	if (!state.running) return state
 
 	// Navigation controller overrides the manual input when autonomy is on.
+	// The controller drives the head of `path` (a smoothed planner waypoint);
+	// `goals[0]` is the true destination the user is heading to. The planner
+	// replans on a fixed cadence (milestone 8) so the robot re-routes on the
+	// live grid as new obstacles are discovered.
 	let goals = state.goals
+	let path = state.path
+	let planClosed = state.planClosed
+	let planOpen = state.planOpen
+	let lastPlanStep = state.lastPlanStep
 	let autonomous = state.autonomous
 	let navStatus = state.navStatus
 	let input = state.input
+	const pose = state.robot.pose
 	if (state.autonomous) {
-		const head = goals.length > 0 ? goals[0] : null
-		if (head === null) {
+		const destination = goals.length > 0 ? goals[0] : null
+		if (destination === null) {
 			// Autonomy on but nothing to chase: idle the controller and stop the robot.
 			navStatus = 'idle'
 			input = { leftWheel: 0, rightWheel: 0 }
 			autonomous = false
+			path = []
 		} else {
-			const out = controlToGoal(state.robot.pose, head, state.nav)
+			// Replan towards the destination on the cadence, or immediately when the
+			// waypoints have been used up (so the robot re-derives a route on the
+			// now-richer grid rather than coasting on a stale/empty plan).
+			const due = state.stepCount - lastPlanStep >= REPLAN_STEP_INTERVAL
+			if (due || path.length === 0) {
+				const planned = replan({ ...state, goals, path, lastPlanStep })
+				path = planned.path
+				planClosed = planned.planClosed
+				planOpen = planned.planOpen
+				lastPlanStep = planned.lastPlanStep
+			}
+
+			// The controller chases the head planner waypoint if a plan exists;
+			// otherwise it drives straight at the destination (planner fallback).
+			const head: Goal = path[0] ?? destination
+			const out = controlToGoal(pose, head, state.nav)
 			input = out.input
 			navStatus = out.status
 			if (out.status === 'arrived') {
-				goals = popGoal(goals)
-				if (goals.length === 0) autonomous = false // nothing left to chase
+				if (path.length > 0) {
+					// Arrived at a planner waypoint: drop it and keep driving the rest.
+					path = path.slice(1)
+				} else {
+					// Arrived at the true destination: pop it, replan toward the next,
+					// and stop autonomy if the queue is now empty.
+					goals = popGoal(goals)
+					path = []
+					if (goals.length === 0) {
+						autonomous = false
+						navStatus = 'idle'
+					} else {
+						const next = replan({ ...state, goals, path, lastPlanStep: state.stepCount })
+						path = next.path
+						planClosed = next.planClosed
+						planOpen = next.planOpen
+						lastPlanStep = next.lastPlanStep
+					}
+				}
 			}
 		}
 	} else {
 		// Manual mode: the controller isn't running, so report idle.
 		navStatus = 'idle'
+		path = []
 	}
 
 	const robot = stepDifferentialDrive(state.robot, input, dt)
@@ -336,6 +491,10 @@ export function stepSimulation(state: SimState, dt: number = FIXED_DT): SimState
 		stepCount: state.stepCount + 1,
 		scan,
 		grid: state.grid,
+		path,
+		planClosed,
+		planOpen,
+		lastPlanStep,
 	}
 }
 

@@ -27,6 +27,11 @@ export function NavigationHud({ controls }: { controls: SimulationControls }) {
 	const robot = useSimulatorStore((s) => s.robot)
 	const setAutonomous = useSimulatorStore((s) => s.setAutonomous)
 	const clearGoals = useSimulatorStore((s) => s.clearGoals)
+	const planner = useSimulatorStore((s) => s.planner)
+	const setPlanner = useSimulatorStore((s) => s.setPlanner)
+	const showPath = useSimulatorStore((s) => s.showPath)
+	const togglePath = useSimulatorStore((s) => s.togglePath)
+	const path = useSimulatorStore((s) => s.path)
 
 	const active = goals[0]
 	const queueLen = goals.length
@@ -74,6 +79,38 @@ export function NavigationHud({ controls }: { controls: SimulationControls }) {
 			<span className="text-[10px] text-muted-foreground">
 				click the floor to set a goal · shift-click to queue waypoints
 			</span>
+
+			{/* Path planning controls (milestone 8): choose the search algorithm and
+			    toggle the open / closed / final-path overlay. */}
+			<div className="flex items-center justify-between gap-2">
+				<span className="text-muted-foreground text-xs">Planner</span>
+				<div className="flex items-center gap-1">
+					<Button
+						variant={planner.algorithm === 'astar' ? 'default' : 'outline'}
+						size="xs"
+						onClick={() => setPlanner({ ...planner, algorithm: 'astar' })}
+					>
+						A*
+					</Button>
+					<Button
+						variant={planner.algorithm === 'dijkstra' ? 'default' : 'outline'}
+						size="xs"
+						onClick={() => setPlanner({ ...planner, algorithm: 'dijkstra' })}
+					>
+						Dijkstra
+					</Button>
+				</div>
+			</div>
+			<div className="flex items-center justify-between">
+				<span className="text-muted-foreground text-xs">Path overlay</span>
+				<Button variant={showPath ? 'default' : 'outline'} size="xs" onClick={togglePath}>
+					{showPath ? 'On' : 'Off'}
+				</Button>
+			</div>
+			<div className="grid grid-cols-2 gap-x-3 gap-y-1">
+				<span className="text-muted-foreground text-xs">Waypoints</span>
+				<span className="text-right font-mono text-foreground text-xs">{path.length}</span>
+			</div>
 		</div>
 	)
 }

@@ -333,6 +333,12 @@ importers:
       '@robotics-lab/core':
         specifier: workspace:*
         version: link:../core
+      '@robotics-lab/geometry':
+        specifier: workspace:*
+        version: link:../geometry
+      '@robotics-lab/occupancy-grid':
+        specifier: workspace:*
+        version: link:../occupancy-grid
       '@robotics-lab/robot':
         specifier: workspace:*
         version: link:../robot

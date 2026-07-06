@@ -36,6 +36,7 @@ import {
 	setAutonomous as setSimAutonomous,
 	setGoals as setSimGoals,
 	setNavConfig as setSimNav,
+	setPlannerOptions as setSimPlanner,
 	setSimWorld,
 } from '@/sim/loop'
 import {
@@ -140,6 +141,7 @@ export function useSimulationLoop(): SimulationControls {
 	const goals = useSimulatorStore((s) => s.goals)
 	const autonomous = useSimulatorStore((s) => s.autonomous)
 	const navConfig = useSimulatorStore((s) => s.nav)
+	const planner = useSimulatorStore((s) => s.planner)
 	useEffect(() => {
 		const s = cur()
 		const sameGoals =
@@ -156,6 +158,14 @@ export function useSimulationLoop(): SimulationControls {
 		simRef.current = setSimNav(cur(), navConfig)
 		observe(cur())
 	}, [navConfig, observe, cur])
+
+	// Reflect planner tuning (algorithm / inflation / unknown handling) onto
+	// the sim. `setSimPlanner` schedules an immediate replan so the new knobs
+	// take effect on the next fixed step rather than waiting for the cadence.
+	useEffect(() => {
+		simRef.current = setSimPlanner(cur(), planner)
+		observe(cur())
+	}, [planner, observe, cur])
 
 	// The render-rate driver: measure wall clock, drain fixed steps, observe.
 	useEffect(() => {
