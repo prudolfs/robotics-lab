@@ -1,0 +1,4 @@
+# Playwright artifacts
+.results/
+.report/
+test-results/

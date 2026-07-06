@@ -9,7 +9,10 @@ export function DebugOverlay({ robot, onReset }: { robot: RobotState; onReset: (
 	const speed = Math.hypot(velocity.vx, velocity.vy)
 
 	return (
-		<div className="pointer-events-none absolute bottom-4 left-4 flex w-64 flex-col gap-2 rounded-lg border border-border bg-card/80 p-3 backdrop-blur-sm">
+		<div
+			data-testid="robot-debug"
+			className="pointer-events-none absolute bottom-4 left-4 flex w-64 flex-col gap-2 rounded-lg border border-border bg-card/80 p-3 backdrop-blur-sm"
+		>
 			<div className="flex items-center justify-between">
 				<span className="font-semibold text-foreground text-sm">Robot debug</span>
 				<Button variant="outline" size="xs" onClick={onReset} className="pointer-events-auto">

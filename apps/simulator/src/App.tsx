@@ -65,7 +65,7 @@ export default function App() {
 
 	return (
 		<div className="relative h-screen w-screen overflow-hidden bg-background">
-			<Canvas shadows gl={{ antialias: true }} camera={CAMERA}>
+			<Canvas data-testid="simulator-canvas" shadows gl={{ antialias: true }} camera={CAMERA}>
 				<SimulatorScene>
 					<FpsCounter onUpdate={handleFps} />
 					<WorldView world={world} />
@@ -80,13 +80,23 @@ export default function App() {
 				</SimulatorScene>
 			</Canvas>
 
-			<div className="pointer-events-none absolute top-4 left-4 flex flex-col gap-1">
+			<div
+				data-testid="simulator-hud"
+				className="pointer-events-none absolute top-4 left-4 flex flex-col gap-1"
+			>
 				<h1 className="font-semibold text-foreground text-lg">Robotics Lab — Simulator</h1>
-				<span className="font-mono text-muted-foreground text-sm">FPS: {fps}</span>
+				<span data-testid="fps-counter" className="font-mono text-muted-foreground text-sm">
+					FPS: {fps}
+				</span>
 				<span className="font-mono text-muted-foreground text-sm">Map: {world.name}</span>
 				<span className="font-mono text-muted-foreground text-sm">
 					Sim time: {simTime.toFixed(2)}s
 				</span>
+				{robot && (
+					<span data-testid="robot-marker" className="sr-only" aria-hidden="true">
+						robot present
+					</span>
+				)}
 			</div>
 
 			<div className="pointer-events-none absolute top-4 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2">

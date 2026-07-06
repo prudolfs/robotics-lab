@@ -100,272 +100,19 @@ Very small suite.
 
 ---
 
-# Core E2E Scenarios
+# What We Will NOT Test
 
-## 1. Application starts
+We intentionally avoid E2E tests for:
 
-Purpose:
-
-Detect startup regressions.
-
-Flow:
-
-- open simulator
-- canvas becomes visible
-- HUD renders
-- FPS counter appears
-- robot exists
-
-Verifies:
-
-- routing
-- asset loading
-- React
-- Three.js initialization
-
----
-
-## 2. Simulation runs
-
-Purpose:
-
-Ensure simulation loop works.
-
-Flow:
-
-- open app
-- wait
-- simulation clock advances
-
-Verifies:
-
-- fixed timestep
-- render loop
-- browser integration
-
----
-
-## 3. Pause / Resume
-
-Flow:
-
-- pause
-- verify simulation time stops
-- resume
-- verify time advances again
-
-Verifies:
-
-- playback controls
-- simulation scheduler
-
----
-
-## 4. Reset
-
-Flow:
-
-- move robot
-- reset
-- robot returns to initial pose
-
-Verifies:
-
-- reset pipeline
-- renderer synchronization
-
----
-
-## 5. Keyboard Teleoperation
-
-Flow:
-
-- hold forward key
-- robot moves
-- release
-- robot stops
-
-Repeat for:
-
-- reverse
-- rotate left
-- rotate right
-
-Verifies:
-
-- keyboard input
-- simulation
-- rendering
-
----
-
-## 6. Navigation Goal
-
-Flow:
-
-- click destination
-- goal marker appears
-- robot reaches goal
-
-Verifies:
-
-- input
-- planner
-- controller
-- renderer
-
----
-
-## 7. Sensor Rendering
-
-Flow:
-
-Enable lidar.
-
-Verify:
-
-- rays appear
-- hit points render
-- disabling removes visualization
-
-Verifies:
-
-- simulation → rendering pipeline
-
-Do not verify exact ray distances.
+- differential drive equations
+- raycasting math
+- occupancy probabilities
+- A*
+- geometry
+- serialization
+- planners
 
 Those belong in Vitest.
-
----
-
-## 8. Occupancy Grid
-
-Flow:
-
-move robot
-
-verify:
-
-- occupancy map changes
-- reset clears map
-
-Verifies:
-
-- integration only
-
-Do not verify probability values.
-
----
-
-# Long Running Stability Tests
-
-These are the most valuable tests.
-
----
-
-## Memory Leak Test
-
-Purpose:
-
-Detect browser memory leaks.
-
-Flow:
-
-- open simulator
-- run for 5–10 minutes
-- periodically drive robot
-- create/remove goals
-- toggle overlays
-- collect browser memory
-- verify memory growth stays below threshold
-
-Pass criteria:
-
-Memory should stabilize.
-
-Small growth is acceptable.
-
-Continuous linear growth is a failure.
-
----
-
-## Render Stability
-
-Run simulation for 15 minutes.
-
-Verify:
-
-- application stays responsive
-- no WebGL context loss
-- no crashes
-- no unhandled exceptions
-
----
-
-## Mount / Unmount Stress
-
-Purpose:
-
-Catch React resource leaks.
-
-Loop:
-
-- open simulator
-- leave page
-- return
-- repeat 30–50 times
-
-Verify:
-
-- no increasing memory
-- no duplicate event listeners
-- no additional animation loops
-
----
-
-## Visualization Toggle Stress
-
-Loop:
-
-Enable/disable:
-
-- lidar
-- occupancy grid
-- debug overlays
-- camera
-- helpers
-
-Verify:
-
-- no crashes
-- no memory growth
-
----
-
-# Browser Console
-
-Every test should fail on:
-
-- console.error
-- unhandled promise rejection
-- WebGL errors
-
-Warnings may be ignored selectively.
-
----
-
-# Test Fixtures
-
-Create reusable fixtures for:
-
-- launch simulator
-- reset world
-- wait for simulation idle
-- move robot
-- place goal
-- toggle visualization
-
-Tests should read like user stories rather than automation scripts.
 
 ---
 
@@ -383,21 +130,324 @@ Three.js canvas interactions should expose helper elements where possible.
 
 ---
 
-# Performance Budgets
+# Browser Console
 
-Track basic metrics:
+Every test should fail on:
 
-- startup time
-- FPS sanity
-- browser memory
-- JS heap
-- frame time
+- console.error
+- unhandled promise rejection
+- WebGL errors
 
-Tests should detect major regressions rather than optimize benchmarks.
+Warnings may be ignored selectively.
 
 ---
 
-# Future Agent Testing
+# Implementation Phases
+
+Each phase builds on the previous one and is only considered done when its entire checklist is complete.
+
+Phases are ordered so that each phase ships a runnable, green test suite before the next phase begins.
+
+External dependencies (Playwright, a CI server, performance tooling) are introduced only when a phase requires them.
+
+---
+
+# Phase 0 — E2E Foundation
+
+Goal:
+
+Bring the E2E toolchain into the repo and prove that a single test can launch the simulator in a real browser.
+
+## Tooling
+
+- [x] Install Playwright in the simulator app
+- [x] Add Playwright config
+- [x] Configure headless Chromium as the default browser
+- [x] Add `test:e2e` script to the app and workspace root
+- [x] Configure dev/preview server for tests
+- [x] Add Playwright to CI
+
+## Selectors
+
+- [x] Add `data-testid` to the canvas element
+- [x] Add `data-testid` to the HUD root
+- [x] Add `data-testid` to the FPS counter
+- [x] Add `data-testid` to the robot marker
+
+## Smoke Test
+
+- [x] Application opens
+- [x] Canvas becomes visible
+- [x] HUD renders
+- [x] FPS counter appears
+- [x] Robot exists
+
+## Console Guard
+
+- [x] Fail test on `console.error`
+- [x] Fail test on unhandled promise rejection
+- [x] Fail test on WebGL context loss
+
+## Fixtures
+
+- [x] `launchSimulator` fixture
+- [x] `resetWorld` fixture
+- [x] `waitForIdle` fixture
+
+---
+
+# Phase 1 — Simulation Lifecycle
+
+Goal:
+
+Verify the simulation loop and playback controls work in the browser.
+
+## Tasks
+
+- [ ] Simulation clock advances when running
+- [ ] Pause stops the simulation clock
+- [ ] Resume restarts the simulation clock
+- [ ] Reset returns the robot to its initial pose
+- [ ] Reset syncs the renderer to the new state
+
+## Selectors
+
+- [ ] `data-testid` for simulation time readout
+- [ ] `data-testid` for pause / resume button
+- [ ] `data-testid` for reset button
+
+---
+
+# Phase 2 — Teleoperation
+
+Goal:
+
+Verify keyboard input drives the simulated robot through the full stack.
+
+## Tasks
+
+- [ ] Hold forward key → robot moves
+- [ ] Release forward key → robot stops
+- [ ] Hold reverse key → robot moves backward
+- [ ] Press rotate left → robot rotates left
+- [ ] Press rotate right → robot rotates right
+- [ ] Emergency stop halts the robot
+
+## Selectors
+
+- [ ] `data-testid` for key hints panel
+- [ ] Expose a stable way to read robot pose from the UI
+
+---
+
+# Phase 3 — Navigation
+
+Goal:
+
+Verify the end-to-end navigation flow from user click to robot arrival.
+
+## Tasks
+
+- [ ] Click destination → goal marker appears
+- [ ] Robot reaches the goal
+- [ ] Queued goals are processed in order
+- [ ] Cancel goal removes the marker
+
+## Selectors
+
+- [ ] `data-testid` for goal marker
+- [ ] `data-testid` for the clear goals button
+
+---
+
+# Phase 4 — Sensor Rendering
+
+Goal:
+
+Verify the simulation-to-rendering pipeline for sensors without asserting exact values.
+
+## Tasks
+
+- [ ] Enable lidar → rays appear
+- [ ] Enable lidar → hit points render
+- [ ] Disable lidar → visualization is removed
+- [ ] Robot camera viewport renders
+
+## Selectors
+
+- [ ] `data-testid` for lidar toggle
+- [ ] `data-testid` for camera viewport
+
+---
+
+# Phase 5 — Occupancy Grid
+
+Goal:
+
+Verify the occupancy grid integration only.
+
+## Tasks
+
+- [ ] Move robot → occupancy map changes
+- [ ] Reset → occupancy map clears
+- [ ] Minimap reflects grid updates
+
+## Selectors
+
+- [ ] `data-testid` for occupancy grid overlay
+- [ ] `data-testid` for minimap
+
+---
+
+# Phase 6 — Console & Error Hygiene
+
+Goal:
+
+Guarantee a clean console across every existing E2E scenario.
+
+## Tasks
+
+- [ ] Capture console output globally for every test
+- [ ] No `console.error` in any scenario
+- [ ] No unhandled promise rejections
+- [ ] No WebGL context loss
+
+---
+
+# Phase 7 — Performance Budgets
+
+Goal:
+
+Detect major performance regressions rather than micro-optimize.
+
+## Tasks
+
+- [ ] Track startup time metric
+- [ ] Track FPS sanity metric
+- [ ] Track JS heap size metric
+- [ ] Track frame time metric
+- [ ] Record metrics in CI artifacts
+- [ ] Define soft budgets (warn only) for each metric
+
+---
+
+# Phase 8 — Memory Leak Test
+
+Purpose:
+
+Detect browser memory leaks over a long session.
+
+## Tasks
+
+- [ ] Open simulator
+- [ ] Run for 5–10 minutes
+- [ ] Periodically drive the robot
+- [ ] Periodically create / remove goals
+- [ ] Periodically toggle overlays
+- [ ] Collect browser memory samples
+- [ ] Assert memory growth stays below threshold
+
+## Pass criteria
+
+- [ ] Memory stabilizes
+- [ ] Small growth is acceptable
+- [ ] Continuous linear growth fails the test
+
+---
+
+# Phase 9 — Render Stability
+
+Purpose:
+
+Guarantee the app stays responsive during a long run.
+
+## Tasks
+
+- [ ] Run simulation for 15 minutes
+- [ ] Application stays responsive
+- [ ] No WebGL context loss
+- [ ] No crashes
+- [ ] No unhandled exceptions
+
+---
+
+# Phase 10 — Mount / Unmount Stress
+
+Purpose:
+
+Catch React resource leaks when the scene is torn down.
+
+## Tasks
+
+- [ ] Open simulator
+- [ ] Leave page
+- [ ] Return to page
+- [ ] Repeat 30–50 times
+- [ ] Assert no increasing memory
+- [ ] Assert no duplicate event listeners
+- [ ] Assert no additional animation loops
+
+---
+
+# Phase 11 — Visualization Toggle Stress
+
+Purpose:
+
+Make sure toggling layers does not leak or crash.
+
+## Tasks
+
+- [ ] Enable / disable lidar in a loop
+- [ ] Enable / disable occupancy grid in a loop
+- [ ] Enable / disable debug overlays in a loop
+- [ ] Enable / disable camera in a loop
+- [ ] Enable / disable helpers in a loop
+- [ ] Assert no crashes
+- [ ] Assert no memory growth
+
+---
+
+# Phase 12 — Test Fixtures Refactor
+
+Goal:
+
+Reduce duplication across the suite once it has stabilized.
+
+The earlier phases intentionally write small inline tests so they read like user stories.
+
+This phase collapses repeated steps into shared fixtures.
+
+## Tasks
+
+- [ ] `launchSimulator` fixture (from Phase 0)
+- [ ] `resetWorld` fixture
+- [ ] `waitForIdle` fixture
+- [ ] `moveRobot` fixture
+- [ ] `placeGoal` fixture
+- [ ] `toggleVisualization` fixture
+
+Tests should read like user stories rather than automation scripts.
+
+---
+
+# Phase 13 — Performance Budgets (Hard Gates)
+
+Goal:
+
+Promote soft performance budgets into failing CI gates once baselines are stable.
+
+## Tasks
+
+- [ ] Lock baseline startup time
+- [ ] Lock baseline JS heap size
+- [ ] Lock baseline frame time
+- [ ] Lock baseline FPS
+- [ ] Fail build on regression beyond budget
+- [ ] Allow baseline updates via deliberate PR
+
+---
+
+# Phase 14 — Future Agent Testing
 
 The simulator behaves like a deterministic game.
 
@@ -413,57 +463,39 @@ Allowed actions:
 
 The agent should never modify internal state.
 
-Future scenarios:
+## Scenarios
 
-- drive robot around obstacles
-- explore map
-- build occupancy grid
-- reach randomly generated goals
-- complete navigation missions
-- detect UI regressions
-- detect stuck robots
-- detect infinite loops
+- [ ] Drive robot around obstacles
+- [ ] Explore map
+- [ ] Build occupancy grid
+- [ ] Reach randomly generated goals
+- [ ] Complete navigation missions
+- [ ] Detect UI regressions
+- [ ] Detect stuck robots
+- [ ] Detect infinite loops
 
 Because the simulation is deterministic, agent runs become reproducible and useful for regression testing.
 
 ---
 
-# What We Will NOT Test
-
-We intentionally avoid E2E tests for:
-
-- differential drive equations
-- raycasting math
-- occupancy probabilities
-- A*
-- geometry
-- serialization
-- planners
-
-Those belong in Vitest.
-
----
-
 # Success Criteria
+
+Phases 0–6 are the minimum viable E2E suite.
 
 A healthy build should prove that:
 
-✓ Application starts
+- ✓ Application starts
+- ✓ Simulation runs
+- ✓ User can control the robot
+- ✓ Navigation works
+- ✓ Sensors render correctly
+- ✓ World can reset
+- ✓ Browser remains stable over long sessions
+- ✓ No memory leaks are detected
+- ✓ No console errors occur
 
-✓ Simulation runs
+Phases 7–13 harden the suite for long-term maintenance.
 
-✓ User can control the robot
-
-✓ Navigation works
-
-✓ Sensors render correctly
-
-✓ World can reset
-
-✓ Browser remains stable over long sessions
-
-✓ No memory leaks are detected
-
-✓ No console errors occur
+Phase 14 opens the door to agent-driven regression testing.
 
 Everything else should be covered by deterministic unit tests.
