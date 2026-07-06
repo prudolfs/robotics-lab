@@ -1,0 +1,130 @@
+import { type ConsoleMessage, expect, test } from '@playwright/test'
+import { getSimTime, launchSimulator, resetWorld } from './fixtures'
+
+/**
+ * Phase 1 — Simulation Lifecycle.
+ *
+ * Verifies the simulation loop and playback controls work in the browser:
+ *  - the simulation clock advances when running
+ *  - pause stops the clock
+ *  - resume restarts the clock
+ *  - reset returns the robot to its initial pose
+ *  - reset syncs the renderer to the new state
+ *
+ * Console guards mirror the Phase 0 smoke suite so any scenario here also
+ * enforces a clean console.
+ */
+
+const failures: string[] = []
+
+test.beforeEach(async ({ page }) => {
+	failures.length = 0
+	page.on('console', (msg: ConsoleMessage) => {
+		if (msg.type() === 'error') failures.push(`console.error: ${msg.text()}`)
+	})
+	page.on('pageerror', (err: Error) => failures.push(`pageerror: ${err.message}`))
+	page.on('requestfailed', (req) => {
+		if (req.url().endsWith('/favicon.ico')) return
+		failures.push(`requestfailed: ${req.url()} — ${req.failure()?.errorText ?? ''}`)
+	})
+	page.on('console', (msg) => {
+		const text = msg.text()
+		if (text.includes('WebGL') && text.toLowerCase().includes('context')) {
+			failures.push(`webgl context issue: ${text}`)
+		}
+	})
+})
+
+test.afterEach(async () => {
+	if (failures.length > 0) {
+		throw new Error(`Console / browser errors detected:\n${failures.join('\n')}`)
+	}
+})
+
+test.describe('Phase 1 — Simulation lifecycle', () => {
+	test('simulation clock advances when running', async ({ page }) => {
+		await launchSimulator(page)
+
+		// Wait until the loop has produced a non-zero clock, then sample twice.
+		await expect
+			.poll(async () => Number(await getSimTime(page)), { timeout: 15_000 })
+			.toBeGreaterThan(0)
+
+		const before = await getSimTime(page)
+		// Give the fixed-step integrator a moment to advance.
+		await page.waitForTimeout(500)
+		const after = await getSimTime(page)
+
+		expect(after).toBeGreaterThan(before)
+	})
+
+	test('pause stops the simulation clock', async ({ page }) => {
+		await launchSimulator(page)
+
+		// Wait until the clock is running so pause is meaningful.
+		await expect
+			.poll(async () => Number(await getSimTime(page)), { timeout: 15_000 })
+			.toBeGreaterThan(0)
+
+		await page.getByTestId('pause-resume-button').click()
+		// The button flips to "Resume" once paused.
+		await expect(page.getByTestId('pause-resume-button')).toHaveText('Resume')
+
+		// Two samples while paused must be identical (no integration step).
+		const pausedA = await getSimTime(page)
+		await page.waitForTimeout(500)
+		const pausedB = await getSimTime(page)
+		expect(pausedB).toBe(pausedA)
+	})
+
+	test('resume restarts the simulation clock', async ({ page }) => {
+		await launchSimulator(page)
+
+		await expect
+			.poll(async () => Number(await getSimTime(page)), { timeout: 15_000 })
+			.toBeGreaterThan(0)
+
+		await page.getByTestId('pause-resume-button').click()
+		await expect(page.getByTestId('pause-resume-button')).toHaveText('Resume')
+		const paused = await getSimTime(page)
+
+		await page.getByTestId('pause-resume-button').click()
+		await expect(page.getByTestId('pause-resume-button')).toHaveText('Pause')
+
+		// After resume the clock must advance past the paused snapshot.
+		await expect
+			.poll(async () => Number(await getSimTime(page)), { timeout: 10_000 })
+			.toBeGreaterThan(paused)
+	})
+
+	test('reset returns the robot to its initial pose', async ({ page }) => {
+		await launchSimulator(page)
+
+		// Let the sim run so the clock is non-zero before reset.
+		await expect
+			.poll(async () => Number(await getSimTime(page)), { timeout: 15_000 })
+			.toBeGreaterThan(0)
+
+		await resetWorld(page)
+
+		// The spawn pose is the origin; the debug overlay reads it back.
+		const debug = page.getByTestId('robot-debug')
+		await expect(debug).toContainText(/Position\s*x 0\.00\s*y 0\.00/)
+		await expect(debug).toContainText(/Heading\s*0\.0°/)
+	})
+
+	test('reset syncs the renderer to the new state', async ({ page }) => {
+		await launchSimulator(page)
+
+		await expect
+			.poll(async () => Number(await getSimTime(page)), { timeout: 15_000 })
+			.toBeGreaterThan(0)
+
+		await resetWorld(page)
+
+		// The renderer's sim clock drops back to ~0 after reset.
+		await expect
+			.poll(async () => Number(await getSimTime(page)), { timeout: 10_000 })
+			.toBeLessThan(0.5)
+	})
+})

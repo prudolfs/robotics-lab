@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
 
 /**
  * Reusable helpers for the E2E suite.
@@ -14,6 +14,14 @@ export async function launchSimulator(page: Page, base: string = '/') {
 	await page.getByTestId('simulator-canvas').waitFor({ state: 'visible' })
 	await page.getByTestId('simulator-hud').waitFor({ state: 'visible' })
 	await page.getByTestId('robot-marker').waitFor({ state: 'attached' })
+}
+
+/** Read the simulation clock (seconds) from the HUD readout. */
+export async function getSimTime(page: Page): Promise<number> {
+	const text = await page.getByTestId('sim-time').textContent()
+	const match = text?.match(/Sim time:\s*([0-9.]+)/)
+	expect(match, `sim time readout not found: ${text}`).not.toBeNull()
+	return Number.parseFloat(match![1])
 }
 
 /** Reset the world and wait for the robot to settle. */

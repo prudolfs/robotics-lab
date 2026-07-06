@@ -204,17 +204,17 @@ Verify the simulation loop and playback controls work in the browser.
 
 ## Tasks
 
-- [ ] Simulation clock advances when running
-- [ ] Pause stops the simulation clock
-- [ ] Resume restarts the simulation clock
-- [ ] Reset returns the robot to its initial pose
-- [ ] Reset syncs the renderer to the new state
+- [x] Simulation clock advances when running
+- [x] Pause stops the simulation clock
+- [x] Resume restarts the simulation clock
+- [x] Reset returns the robot to its initial pose
+- [x] Reset syncs the renderer to the new state
 
 ## Selectors
 
-- [ ] `data-testid` for simulation time readout
-- [ ] `data-testid` for pause / resume button
-- [ ] `data-testid` for reset button
+- [x] `data-testid` for simulation time readout
+- [x] `data-testid` for pause / resume button
+- [x] `data-testid` for reset button
 
 ---
 

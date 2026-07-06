@@ -89,7 +89,7 @@ export default function App() {
 					FPS: {fps}
 				</span>
 				<span className="font-mono text-muted-foreground text-sm">Map: {world.name}</span>
-				<span className="font-mono text-muted-foreground text-sm">
+				<span data-testid="sim-time" className="font-mono text-muted-foreground text-sm">
 					Sim time: {simTime.toFixed(2)}s
 				</span>
 				{robot && (
@@ -102,13 +102,19 @@ export default function App() {
 			<div className="pointer-events-none absolute top-4 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2">
 				<div className="flex items-center gap-2">
 					<Button
+						data-testid="pause-resume-button"
 						variant={running ? 'default' : 'outline'}
 						onClick={controls.togglePause}
 						className="pointer-events-auto"
 					>
 						{running ? 'Pause' : 'Resume'}
 					</Button>
-					<Button variant="outline" onClick={controls.reset} className="pointer-events-auto">
+					<Button
+						data-testid="reset-button"
+						variant="outline"
+						onClick={controls.reset}
+						className="pointer-events-auto"
+					>
 						Reset
 					</Button>
 				</div>
