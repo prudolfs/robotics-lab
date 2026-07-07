@@ -268,15 +268,15 @@ Verify the simulation-to-rendering pipeline for sensors without asserting exact 
 
 ## Tasks
 
-- [ ] Enable lidar → rays appear
-- [ ] Enable lidar → hit points render
-- [ ] Disable lidar → visualization is removed
-- [ ] Robot camera viewport renders
+- [x] Enable lidar → rays appear
+- [x] Enable lidar → hit points render
+- [x] Disable lidar → visualization is removed
+- [x] Robot camera viewport renders
 
 ## Selectors
 
-- [ ] `data-testid` for lidar toggle
-- [ ] `data-testid` for camera viewport
+- [x] `data-testid` for lidar toggle
+- [x] `data-testid` for camera viewport
 
 ---
 

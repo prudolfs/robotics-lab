@@ -31,8 +31,8 @@ export function SensorHud() {
 			<div className="flex items-center justify-between">
 				<span className="font-semibold text-foreground text-sm">Sensors</span>
 				<div className="flex gap-1">
-					<ToggleButton label="Lidar" active={showLidar} onClick={toggleLidar} />
-					<ToggleButton label="Cam" active={showCamera} onClick={toggleCamera} />
+					<ToggleButton label="Lidar" active={showLidar} onClick={toggleLidar} data-testid="lidar-toggle" />
+					<ToggleButton label="Cam" active={showCamera} onClick={toggleCamera} data-testid="camera-toggle" />
 				</div>
 			</div>
 
@@ -125,13 +125,15 @@ function ToggleButton({
 	label,
 	active,
 	onClick,
+	'data-testid': testId,
 }: {
 	label: string
 	active: boolean
 	onClick: () => void
+	'data-testid'?: string
 }) {
 	return (
-		<Button variant={active ? 'default' : 'outline'} size="xs" onClick={onClick}>
+		<Button variant={active ? 'default' : 'outline'} size="xs" onClick={onClick} data-testid={testId}>
 			{label}
 		</Button>
 	)

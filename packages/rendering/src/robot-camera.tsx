@@ -72,6 +72,7 @@ export function RobotCameraViewport({
 			style={{ width, height, touchAction: 'none' }}
 			aria-label="Robot camera viewport"
 			role="img"
+			data-testid="camera-viewport"
 		>
 			<CameraCanvas
 				world={world}
