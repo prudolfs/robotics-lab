@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
-import { launchSimulator } from './fixtures'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
+import { launchSimulator } from './fixtures'
 
 /**
  * Phase 4 — Sensor Rendering.
@@ -58,9 +58,7 @@ test.describe('Phase 4 — Sensor Rendering', () => {
 		await launchSimulator(page)
 
 		// Toggle lidar off from its default-on state.
-		await page
-			.getByTestId('lidar-toggle')
-			.click()
+		await page.getByTestId('lidar-toggle').click()
 
 		// The LidarView unmounts from the scene; verify the renderer stays alive.
 		await page

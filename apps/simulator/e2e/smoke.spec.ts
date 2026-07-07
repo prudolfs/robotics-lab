@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
-import { launchSimulator } from './fixtures'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
+import { launchSimulator } from './fixtures'
 
 /**
  * Phase 0 — E2E Foundation: smoke test.

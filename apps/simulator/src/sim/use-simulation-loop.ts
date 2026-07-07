@@ -25,6 +25,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import {
 	accumulate,
 	setInput as applyInput,
+	cancelCoverage as cancelSimCoverage,
 	clearOccupancyGrid,
 	createSimulation,
 	type DriveInput,
@@ -37,9 +38,8 @@ import {
 	setGoals as setSimGoals,
 	setNavConfig as setSimNav,
 	setPlannerOptions as setSimPlanner,
-	startCoverage as startSimCoverage,
-	cancelCoverage as cancelSimCoverage,
 	setSimWorld,
+	startCoverage as startSimCoverage,
 } from '@/sim/loop'
 import {
 	DEFAULT_TELEOP_CONFIG,

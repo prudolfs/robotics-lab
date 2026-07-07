@@ -38,8 +38,18 @@ export function MapHud() {
 			<div className="flex items-center justify-between">
 				<span className="font-semibold text-foreground text-sm">Map</span>
 				<div className="flex gap-1">
-					<ToggleButton data-testid="occupancy-grid-toggle" label="Grid" active={showOccupancy} onClick={toggleOccupancy} />
-					<ToggleButton data-testid="minimap-toggle" label="Mini" active={showMinimap} onClick={toggleMinimap} />
+					<ToggleButton
+						data-testid="occupancy-grid-toggle"
+						label="Grid"
+						active={showOccupancy}
+						onClick={toggleOccupancy}
+					/>
+					<ToggleButton
+						data-testid="minimap-toggle"
+						label="Mini"
+						active={showMinimap}
+						onClick={toggleMinimap}
+					/>
 				</div>
 			</div>
 			<div className="flex flex-col gap-1 font-mono text-[11px] text-muted-foreground">

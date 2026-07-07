@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
-import { getGoalCount, getNavStatus, launchSimulator, placeGoal, queueGoal } from './fixtures'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
+import { getGoalCount, getNavStatus, launchSimulator, placeGoal, queueGoal } from './fixtures'
 
 /**
  * Phase 3 — Navigation.

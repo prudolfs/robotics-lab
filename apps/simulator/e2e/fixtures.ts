@@ -21,7 +21,7 @@ export async function getSimTime(page: Page): Promise<number> {
 	const text = await page.getByTestId('sim-time').textContent()
 	const match = text?.match(/Sim time:\s*([0-9.]+)/)
 	expect(match, `sim time readout not found: ${text}`).not.toBeNull()
-	return Number.parseFloat(match![1])
+	return Number.parseFloat(match?.[1])
 }
 
 /** Read the robot pose from the hidden debug readout: {x, y, heading (radians)}. */
@@ -30,9 +30,9 @@ export async function getRobotPose(page: Page): Promise<{ x: number; y: number; 
 	const match = text?.match(/x:\s*(-?[0-9.]+)\s*y:\s*(-?[0-9.]+)\s*heading:\s*(-?[0-9.]+)°/)
 	expect(match, `robot pose readout not found: ${text}`).not.toBeNull()
 	return {
-		x: Number.parseFloat(match![1]),
-		y: Number.parseFloat(match![2]),
-		heading: (Number.parseFloat(match![3]) * Math.PI) / 180,
+		x: Number.parseFloat(match?.[1]),
+		y: Number.parseFloat(match?.[2]),
+		heading: (Number.parseFloat(match?.[3]) * Math.PI) / 180,
 	}
 }
 
@@ -57,15 +57,15 @@ export async function placeGoal(
 		.getByTestId('fps-counter')
 		.filter({ hasText: /FPS: [1-9]/ })
 		.waitFor({ state: 'visible', timeout: 15_000 })
-	const cx = r!.x + r!.width * fx
-	const cy = r!.y + r!.height * fy
+	const cx = r?.x + r?.width * fx
+	const cy = r?.y + r?.height * fy
 	await page.mouse.click(cx, cy)
 	// Auto: ON + an active goal should appear.
 	await expect(page.getByTestId('active-goal')).not.toHaveText('—')
 	const text = (await page.getByTestId('active-goal').textContent()) ?? ''
 	const match = text.match(/\((-?[0-9.]+),\s*(-?[0-9.]+)\)/)
 	expect(match, `active goal not parseable: ${text}`).not.toBeNull()
-	return { x: Number.parseFloat(match![1]), y: Number.parseFloat(match![2]) }
+	return { x: Number.parseFloat(match?.[1]), y: Number.parseFloat(match?.[2]) }
 }
 
 /**
@@ -84,8 +84,8 @@ export async function queueGoal(page: Page, fx = 0.65, fy = 0.6): Promise<void> 
 		.getByTestId('fps-counter')
 		.filter({ hasText: /FPS: [1-9]/ })
 		.waitFor({ state: 'visible', timeout: 15_000 })
-	const cx = r!.x + r!.width * fx
-	const cy = r!.y + r!.height * fy
+	const cx = r?.x + r?.width * fx
+	const cy = r?.y + r?.height * fy
 	await page.keyboard.down('Shift')
 	await page.mouse.click(cx, cy)
 	await page.keyboard.up('Shift')
@@ -98,7 +98,7 @@ export async function getGoalDistance(page: Page): Promise<number | null> {
 	if (text.includes('—')) return null
 	const match = text.match(/([0-9.]+)\s*m/)
 	expect(match, `distance not parseable: ${text}`).not.toBeNull()
-	return Number.parseFloat(match![1])
+	return Number.parseFloat(match?.[1])
 }
 
 /** Read the queued-goal count reported by the HUD. */

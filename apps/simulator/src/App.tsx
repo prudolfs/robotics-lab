@@ -153,7 +153,10 @@ export default function App() {
 			)}
 
 			{showMinimap && (
-				<div data-testid="occupancy-minimap" className="pointer-events-none absolute top-1/2 left-4 flex -translate-y-1/2 flex-col gap-1">
+				<div
+					data-testid="occupancy-minimap"
+					className="pointer-events-none absolute top-1/2 left-4 flex -translate-y-1/2 flex-col gap-1"
+				>
 					<span className="font-mono text-[10px] text-muted-foreground">Minimap</span>
 					<div className="rounded-lg border border-border bg-card/80 p-1 backdrop-blur-sm">
 						<OccupancyMinimap

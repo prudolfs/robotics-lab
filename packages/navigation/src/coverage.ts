@@ -11,14 +11,13 @@
 
 import type { Vec2 } from '@robotics-lab/geometry'
 import {
-	cellCenterWorld,
 	type Cell2,
+	cellCenterWorld,
+	classify,
 	type OccupancyGrid,
 	worldToCell,
-	classify,
 } from '@robotics-lab/occupancy-grid'
 import type { Goal } from './index'
-import { planPath } from './planner'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -111,7 +110,7 @@ export function coveragePath(
 
 	// 1. Find all reachable free/unknown cells from the robot's starting cell.
 	const reachable = floodFill(grid, start, cfg)
-	const totalCells = grid.width * grid.height
+	const _totalCells = grid.width * grid.height
 	const freeOrUnknown = countFreeOrUnknown(grid, cfg)
 
 	if (reachable.size === 0) {
@@ -153,11 +152,7 @@ export function coveragePath(
 // Flood-fill to find reachable free/unknown cells
 // ---------------------------------------------------------------------------
 
-function floodFill(
-	grid: OccupancyGrid,
-	start: Cell2,
-	config: CoverageConfig,
-): Set<number> {
+function floodFill(grid: OccupancyGrid, start: Cell2, config: CoverageConfig): Set<number> {
 	const reachable = new Set<number>()
 	const w = grid.width
 	const h = grid.height
@@ -206,7 +201,7 @@ function buildStrips(
 	grid: OccupancyGrid,
 	region: CoverageRegion,
 	reachable: Set<number>,
-	config: CoverageConfig,
+	_config: CoverageConfig,
 	start: Cell2,
 ): { waypoints: Goal[]; strips: Cell2[][] } {
 	const waypoints: Goal[] = []
@@ -230,7 +225,7 @@ function buildStrips(
 		for (const run of runs) {
 			if (run.length === 0) continue
 			// Determine direction based on strip parity (alternating rows).
-			const isEvenStrip = ((row - region.minRow) % 2 === 0)
+			const isEvenStrip = (row - region.minRow) % 2 === 0
 			const ordered = isEvenStrip ? run : [...run].reverse()
 
 			// Cell centers waypoints for this run in world space.

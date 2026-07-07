@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
-import { getRobotPose, launchSimulator } from './fixtures'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
+import { getRobotPose, launchSimulator } from './fixtures'
 
 /**
  * Phase 2 — Teleoperation.

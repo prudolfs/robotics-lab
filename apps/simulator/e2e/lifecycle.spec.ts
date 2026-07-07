@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
-import { getSimTime, launchSimulator, resetWorld } from './fixtures'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
+import { getSimTime, launchSimulator, resetWorld } from './fixtures'
 
 /**
  * Phase 1 — Simulation Lifecycle.

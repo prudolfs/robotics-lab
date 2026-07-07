@@ -161,8 +161,8 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		planOpen: [],
 		planner: DEFAULT_PLANNER_OPTIONS,
 		showPath: true,
-					coverageMode: false,
-					coverageComplete: false,
+		coverageMode: false,
+		coverageComplete: false,
 		showLidar: true,
 		showCamera: false,
 		showOccupancy: true,
@@ -196,14 +196,16 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		setNav: (nav) => set({ nav }),
 		setPlanner: (planner) => set({ planner }),
 		togglePath: () => set((s) => ({ showPath: !s.showPath })),
-		startCoverage: () => set((s) => {
-			// Coverage mode is applied via the simulation loop
-			return s
-		}),
-		cancelCoverage: () => set((s) => {
-			// Cancel is applied via the simulation loop
-			return s
-		}),
+		startCoverage: () =>
+			set((s) => {
+				// Coverage mode is applied via the simulation loop
+				return s
+			}),
+		cancelCoverage: () =>
+			set((s) => {
+				// Cancel is applied via the simulation loop
+				return s
+			}),
 		observe: (next) => set(sampleState(next)),
 	}
 })

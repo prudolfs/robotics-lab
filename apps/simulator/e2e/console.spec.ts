@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test'
-import { expect as expectGlobal } from '@playwright/test'
-import { launchSimulator, resetWorld, placeGoal } from './fixtures'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
+import { launchSimulator, placeGoal, resetWorld } from './fixtures'
 
 /**
  * Phase 6 — Console & Error Hygiene.
@@ -34,11 +33,14 @@ test.describe('Phase 6 — Console & Error Hygiene', () => {
 		await launchSimulator(page)
 		await placeGoal(page, 0.6, 0.55)
 		await expect
-			.poll(async () => {
-				const el = page.getByTestId('goal-count')
-				const text = (await el.textContent()) ?? '0'
-				return Number.parseInt(text, 10)
-			}, { timeout: 30_000, intervals: [250] })
+			.poll(
+				async () => {
+					const el = page.getByTestId('goal-count')
+					const text = (await el.textContent()) ?? '0'
+					return Number.parseInt(text, 10)
+				},
+				{ timeout: 30_000, intervals: [250] },
+			)
 			.toBe(0)
 	})
 

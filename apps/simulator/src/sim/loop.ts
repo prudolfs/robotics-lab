@@ -19,11 +19,11 @@
 import type { Pose, Velocity, World } from '@robotics-lab/core'
 import type { Vec2 } from '@robotics-lab/geometry'
 import {
+	type CoverageConfig,
 	controlToGoal,
 	coveragePath,
 	DEFAULT_COVERAGE_CONFIG,
 	DEFAULT_NAV_CONFIG,
-	type CoverageConfig,
 	type Goal,
 	type NavConfig,
 	type NavStatus,

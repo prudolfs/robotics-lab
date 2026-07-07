@@ -96,11 +96,9 @@ export function NavigationHud({ controls }: { controls: SimulationControls }) {
 				<span className="font-semibold text-foreground text-xs">Coverage</span>
 				<div className="flex items-center gap-1">
 					{coverageMode && !coverageComplete && (
-						<span className="text-xs text-amber-500 animate-pulse">Running...</span>
+						<span className="animate-pulse text-amber-500 text-xs">Running...</span>
 					)}
-					{coverageComplete && (
-						<span className="text-xs text-emerald-500">Complete</span>
-					)}
+					{coverageComplete && <span className="text-emerald-500 text-xs">Complete</span>}
 				</div>
 			</div>
 			<div className="flex items-center gap-2">

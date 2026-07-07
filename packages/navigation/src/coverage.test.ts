@@ -1,6 +1,6 @@
-import { expect, test } from 'vitest'
 import type { OccupancyGrid } from '@robotics-lab/occupancy-grid'
-import { coveragePath, computeCoverageProgress, DEFAULT_COVERAGE_CONFIG } from './coverage'
+import { expect, test } from 'vitest'
+import { computeCoverageProgress, coveragePath, DEFAULT_COVERAGE_CONFIG } from './coverage'
 
 function makeGrid(width: number, height: number, resolution: number): OccupancyGrid {
 	return {
