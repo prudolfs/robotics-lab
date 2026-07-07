@@ -1,5 +1,6 @@
-import { type ConsoleMessage, expect, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { getGoalCount, getNavStatus, launchSimulator, placeGoal, queueGoal } from './fixtures'
+import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
 
 /**
  * Phase 3 — Navigation.
@@ -18,31 +19,8 @@ import { getGoalCount, getNavStatus, launchSimulator, placeGoal, queueGoal } fro
  * count, controller status) so tests assert on observable state instead.
  */
 
-const failures: string[] = []
-
-test.beforeEach(async ({ page }) => {
-	failures.length = 0
-	page.on('console', (msg: ConsoleMessage) => {
-		if (msg.type() === 'error') failures.push(`console.error: ${msg.text()}`)
-	})
-	page.on('pageerror', (err: Error) => failures.push(`pageerror: ${err.message}`))
-	page.on('requestfailed', (req) => {
-		if (req.url().endsWith('/favicon.ico')) return
-		failures.push(`requestfailed: ${req.url()} — ${req.failure()?.errorText ?? ''}`)
-	})
-	page.on('console', (msg) => {
-		const text = msg.text()
-		if (text.includes('WebGL') && text.toLowerCase().includes('context')) {
-			failures.push(`webgl context issue: ${text}`)
-		}
-	})
-})
-
-test.afterEach(async () => {
-	if (failures.length > 0) {
-		throw new Error(`Console / browser errors detected:\n${failures.join('\n')}`)
-	}
-})
+test.beforeEach(async ({ page }) => setupConsoleGuard(page))
+test.afterEach(async () => teardownConsoleGuard())
 
 test.describe('Phase 3 — Navigation', () => {
 	test('click destination places a goal marker', async ({ page }) => {

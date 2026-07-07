@@ -1,5 +1,6 @@
-import { type ConsoleMessage, expect, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { getSimTime, launchSimulator, resetWorld } from './fixtures'
+import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
 
 /**
  * Phase 1 — Simulation Lifecycle.
@@ -15,31 +16,8 @@ import { getSimTime, launchSimulator, resetWorld } from './fixtures'
  * enforces a clean console.
  */
 
-const failures: string[] = []
-
-test.beforeEach(async ({ page }) => {
-	failures.length = 0
-	page.on('console', (msg: ConsoleMessage) => {
-		if (msg.type() === 'error') failures.push(`console.error: ${msg.text()}`)
-	})
-	page.on('pageerror', (err: Error) => failures.push(`pageerror: ${err.message}`))
-	page.on('requestfailed', (req) => {
-		if (req.url().endsWith('/favicon.ico')) return
-		failures.push(`requestfailed: ${req.url()} — ${req.failure()?.errorText ?? ''}`)
-	})
-	page.on('console', (msg) => {
-		const text = msg.text()
-		if (text.includes('WebGL') && text.toLowerCase().includes('context')) {
-			failures.push(`webgl context issue: ${text}`)
-		}
-	})
-})
-
-test.afterEach(async () => {
-	if (failures.length > 0) {
-		throw new Error(`Console / browser errors detected:\n${failures.join('\n')}`)
-	}
-})
+test.beforeEach(async ({ page }) => setupConsoleGuard(page))
+test.afterEach(async () => teardownConsoleGuard())
 
 test.describe('Phase 1 — Simulation lifecycle', () => {
 	test('simulation clock advances when running', async ({ page }) => {

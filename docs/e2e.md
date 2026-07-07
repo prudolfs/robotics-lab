@@ -307,10 +307,10 @@ Guarantee a clean console across every existing E2E scenario.
 
 ## Tasks
 
-- [ ] Capture console output globally for every test
-- [ ] No `console.error` in any scenario
-- [ ] No unhandled promise rejections
-- [ ] No WebGL context loss
+- [x] Capture console output globally for every test
+- [x] No `console.error` in any scenario
+- [x] No unhandled promise rejections
+- [x] No WebGL context loss
 
 ---
 

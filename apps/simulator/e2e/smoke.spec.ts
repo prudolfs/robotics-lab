@@ -1,5 +1,6 @@
-import { type ConsoleMessage, expect, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { launchSimulator } from './fixtures'
+import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
 
 /**
  * Phase 0 — E2E Foundation: smoke test.
@@ -14,44 +15,8 @@ import { launchSimulator } from './fixtures'
  * WebGL context loss) for every test in the suite via `beforeEach`.
  */
 
-// Accumulated console / pageerror / webgl failures, captured globally.
-const failures: string[] = []
-
-test.beforeEach(async ({ page }) => {
-	failures.length = 0
-
-	page.on('console', (msg: ConsoleMessage) => {
-		if (msg.type() === 'error') {
-			failures.push(`console.error: ${msg.text()}`)
-		}
-	})
-
-	page.on('pageerror', (err: Error) => {
-		failures.push(`pageerror: ${err.message}`)
-	})
-
-	page.on('requestfailed', (req) => {
-		const url = req.url()
-		// Ignore favicon noise.
-		if (url.endsWith('/favicon.ico')) return
-		failures.push(`requestfailed: ${url} — ${req.failure()?.errorText ?? ''}`)
-	})
-
-	// Detect WebGL context loss: a 'webglcontextlost' event is dispatched on
-	// the <canvas>. We surface it as a failure.
-	page.on('console', (msg) => {
-		const text = msg.text()
-		if (text.includes('WebGL') && text.toLowerCase().includes('context')) {
-			failures.push(`webgl context issue: ${text}`)
-		}
-	})
-})
-
-test.afterEach(async () => {
-	if (failures.length > 0) {
-		throw new Error(`Console / browser errors detected:\n${failures.join('\n')}`)
-	}
-})
+test.beforeEach(async ({ page }) => setupConsoleGuard(page))
+test.afterEach(async () => teardownConsoleGuard())
 
 test.describe('Phase 0 — Application starts', () => {
 	test('canvas becomes visible', async ({ page }) => {

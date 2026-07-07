@@ -1,5 +1,6 @@
-import { type ConsoleMessage, expect, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { launchSimulator } from './fixtures'
+import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
 
 /**
  * Phase 4 — Sensor Rendering.
@@ -16,37 +17,8 @@ import { launchSimulator } from './fixtures'
  * so we verify the application remains stable and the toggle states change.
  */
 
-const failures: string[] = []
-
-test.beforeEach(async ({ page }) => {
-	failures.length = 0
-
-	page.on('console', (msg: ConsoleMessage) => {
-		if (msg.type() === 'error') failures.push(`console.error: ${msg.text()}`)
-	})
-
-	page.on('pageerror', (err: Error) => {
-		failures.push(`pageerror: ${err.message}`)
-	})
-
-	page.on('requestfailed', (req) => {
-		if (req.url().endsWith('/favicon.ico')) return
-		failures.push(`requestfailed: ${req.url()} — ${req.failure()?.errorText ?? ''}`)
-	})
-
-	page.on('console', (msg) => {
-		const text = msg.text()
-		if (text.includes('WebGL') && text.toLowerCase().includes('context')) {
-			failures.push(`webgl context issue: ${text}`)
-		}
-	})
-})
-
-test.afterEach(async () => {
-	if (failures.length > 0) {
-		throw new Error(`Console / browser errors detected:\n${failures.join('\n')}`)
-	}
-})
+test.beforeEach(async ({ page }) => setupConsoleGuard(page))
+test.afterEach(async () => teardownConsoleGuard())
 
 test.describe('Phase 4 — Sensor Rendering', () => {
 	test('enable lidar → rays appear', async ({ page }) => {
@@ -69,7 +41,6 @@ test.describe('Phase 4 — Sensor Rendering', () => {
 	test('enable lidar → hit points render', async ({ page }) => {
 		await launchSimulator(page)
 
-
 		// Toggle lidar off then on again, simulating a full re-mount of the
 		// lidar visualization layer (rays + hit points).
 		await page.getByTestId('lidar-toggle').click()
@@ -87,7 +58,9 @@ test.describe('Phase 4 — Sensor Rendering', () => {
 		await launchSimulator(page)
 
 		// Toggle lidar off from its default-on state.
-		await page.getByTestId('lidar-toggle').click()
+		await page
+			.getByTestId('lidar-toggle')
+			.click()
 
 		// The LidarView unmounts from the scene; verify the renderer stays alive.
 		await page
