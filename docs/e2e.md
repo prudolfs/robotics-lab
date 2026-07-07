@@ -288,14 +288,14 @@ Verify the occupancy grid integration only.
 
 ## Tasks
 
-- [ ] Move robot → occupancy map changes
-- [ ] Reset → occupancy map clears
-- [ ] Minimap reflects grid updates
+- [x] Move robot → occupancy map changes
+- [x] Reset → occupancy map clears
+- [x] Minimap reflects grid updates
 
 ## Selectors
 
-- [ ] `data-testid` for occupancy grid overlay
-- [ ] `data-testid` for minimap
+- [x] `data-testid` for occupancy grid overlay
+- [x] `data-testid` for minimap
 
 ---
 

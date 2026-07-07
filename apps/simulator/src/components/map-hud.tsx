@@ -38,8 +38,8 @@ export function MapHud() {
 			<div className="flex items-center justify-between">
 				<span className="font-semibold text-foreground text-sm">Map</span>
 				<div className="flex gap-1">
-					<ToggleButton label="Grid" active={showOccupancy} onClick={toggleOccupancy} />
-					<ToggleButton label="Mini" active={showMinimap} onClick={toggleMinimap} />
+					<ToggleButton data-testid="occupancy-grid-toggle" label="Grid" active={showOccupancy} onClick={toggleOccupancy} />
+					<ToggleButton data-testid="minimap-toggle" label="Mini" active={showMinimap} onClick={toggleMinimap} />
 				</div>
 			</div>
 			<div className="flex flex-col gap-1 font-mono text-[11px] text-muted-foreground">
@@ -48,6 +48,7 @@ export function MapHud() {
 				<span className="text-red-400">occupied {fmtPct(grid, occupied)}</span>
 			</div>
 			<Button
+				data-testid="clear-map-button"
 				variant="outline"
 				size="xs"
 				onClick={clearMap}
@@ -69,13 +70,15 @@ function ToggleButton({
 	label,
 	active,
 	onClick,
+	...props
 }: {
 	label: string
 	active: boolean
 	onClick: () => void
+	[key: string]: unknown
 }) {
 	return (
-		<Button variant={active ? 'default' : 'outline'} size="xs" onClick={onClick}>
+		<Button variant={active ? 'default' : 'outline'} size="xs" onClick={onClick} {...props}>
 			{label}
 		</Button>
 	)
