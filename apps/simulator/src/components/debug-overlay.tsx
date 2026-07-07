@@ -21,6 +21,9 @@ export function DebugOverlay({ robot, onReset }: { robot: RobotState; onReset: (
 			</div>
 
 			<DebugRow label="Position" value={`x ${fmt(pose.x)}  y ${fmt(pose.y)}`} />
+			<div data-testid="robot-pose" className="sr-only" aria-hidden="true">
+				x: {fmt(pose.x)} y: {fmt(pose.y)} heading: {deg(pose.heading)}
+			</div>
 			<DebugRow label="Heading" value={deg(pose.heading)} />
 			<DebugRow label="Speed" value={`${fmt(speed)} m/s`} />
 			<DebugRow label="Turn rate" value={`${fmt(velocity.omega)} rad/s`} />

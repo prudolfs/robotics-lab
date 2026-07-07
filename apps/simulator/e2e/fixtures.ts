@@ -24,6 +24,18 @@ export async function getSimTime(page: Page): Promise<number> {
 	return Number.parseFloat(match![1])
 }
 
+/** Read the robot pose from the hidden debug readout: {x, y, heading (radians)}. */
+export async function getRobotPose(page: Page): Promise<{ x: number; y: number; heading: number }> {
+	const text = await page.getByTestId('robot-pose').textContent()
+	const match = text?.match(/x:\s*(-?[0-9.]+)\s*y:\s*(-?[0-9.]+)\s*heading:\s*(-?[0-9.]+)°/)
+	expect(match, `robot pose readout not found: ${text}`).not.toBeNull()
+	return {
+		x: Number.parseFloat(match![1]),
+		y: Number.parseFloat(match![2]),
+		heading: (Number.parseFloat(match![3]) * Math.PI) / 180,
+	}
+}
+
 /**
  * Click the floor to place a navigation goal, at canvas-relative fractions
  * (fx/fy in [0, 1]). The GoalPicker raycasts floor hits; the actual world

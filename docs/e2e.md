@@ -226,17 +226,17 @@ Verify keyboard input drives the simulated robot through the full stack.
 
 ## Tasks
 
-- [ ] Hold forward key → robot moves
-- [ ] Release forward key → robot stops
-- [ ] Hold reverse key → robot moves backward
-- [ ] Press rotate left → robot rotates left
-- [ ] Press rotate right → robot rotates right
-- [ ] Emergency stop halts the robot
+- [x] Hold forward key → robot moves
+- [x] Release forward key → robot stops
+- [x] Hold reverse key → robot moves backward
+- [x] Press rotate left → robot rotates left
+- [x] Press rotate right → robot rotates right
+- [x] Emergency stop halts the robot
 
 ## Selectors
 
-- [ ] `data-testid` for key hints panel
-- [ ] Expose a stable way to read robot pose from the UI
+- [x] `data-testid` for key hints panel
+- [x] Expose a stable way to read robot pose from the UI
 
 ---
 

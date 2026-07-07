@@ -33,6 +33,9 @@ export function TeleopHud({ controls }: { controls: SimulationControls }) {
 			</div>
 
 			<ControlHints baseSpeed={teleop.baseSpeed} />
+			<div data-testid="teleop-status" className="sr-only" aria-hidden="true">
+				{status}
+			</div>
 
 			<div className="flex flex-col gap-1">
 				<span className="text-muted-foreground text-xs">Throttle (base speed)</span>
@@ -64,7 +67,13 @@ export function TeleopHud({ controls }: { controls: SimulationControls }) {
 				<span className="text-right font-mono text-foreground text-xs">{fmt(speed)} m/s</span>
 			</div>
 
-			<Button variant="destructive" size="sm" onClick={controls.emergencyStop} className="w-full">
+			<Button
+				data-testid="estop-button"
+				variant="destructive"
+				size="sm"
+				onClick={controls.emergencyStop}
+				className="w-full"
+			>
 				ESTOP
 			</Button>
 		</div>
@@ -98,7 +107,10 @@ function ControlHints({ baseSpeed }: { baseSpeed: number }) {
 		</div>
 	)
 	return (
-		<div className="flex flex-col gap-1 rounded border border-border bg-background/40 p-2">
+		<div
+			data-testid="key-hints"
+			className="flex flex-col gap-1 rounded border border-border bg-background/40 p-2"
+		>
 			<Row keys="W / ↑" label="forward" />
 			<Row keys="S / ↓" label="reverse" />
 			<Row keys="A / ←" label="turn left" />
