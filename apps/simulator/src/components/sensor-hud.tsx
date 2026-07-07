@@ -22,6 +22,8 @@ export function SensorHud() {
 	const toggleLidar = useSimulatorStore((s) => s.toggleLidar)
 	const showCamera = useSimulatorStore((s) => s.showCamera)
 	const toggleCamera = useSimulatorStore((s) => s.toggleCamera)
+	const cameraNoise = useSimulatorStore((s) => s.cameraNoise)
+	const cycleCameraNoise = useSimulatorStore((s) => s.cycleCameraNoise)
 
 	const update = (patch: Partial<typeof lidar>) =>
 		setLidar(createLidarConfig({ ...lidar, ...patch }))
@@ -104,7 +106,7 @@ export function SensorHud() {
 			</div>
 
 			<div className="flex flex-col gap-1">
-				<span className="text-muted-foreground text-xs">Noise</span>
+				<span className="text-muted-foreground text-xs">Lidar noise</span>
 				<div className="flex items-center gap-2">
 					<input
 						type="range"
@@ -120,6 +122,37 @@ export function SensorHud() {
 						{fmt(lidar.noise)}
 					</span>
 				</div>
+			</div>
+
+			<div className="flex flex-col gap-1">
+				<span className="text-muted-foreground text-xs">Dropouts</span>
+				<div className="flex items-center gap-2">
+					<input
+						type="range"
+						min={0}
+						max={0.3}
+						step={0.01}
+						value={lidar.dropoutRate}
+						onChange={(e) => update({ dropoutRate: Number(e.target.value) })}
+						aria-label="Lidar dropout rate"
+						className="h-1 flex-1 cursor-pointer accent-primary"
+					/>
+					<span className="w-14 text-right font-mono text-foreground text-xs">
+						{fmt(lidar.dropoutRate)}
+					</span>
+				</div>
+			</div>
+
+			<div className="flex items-center justify-between">
+				<span className="text-muted-foreground text-xs">Camera noise</span>
+				<Button
+					variant="outline"
+					size="xs"
+					onClick={cycleCameraNoise}
+					data-testid="camera-noise-button"
+				>
+					{cameraNoise}
+				</Button>
 			</div>
 
 			{showCamera && (

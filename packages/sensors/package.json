@@ -10,7 +10,8 @@
 	},
 	"dependencies": {
 		"@robotics-lab/core": "workspace:*",
-		"@robotics-lab/geometry": "workspace:*"
+		"@robotics-lab/geometry": "workspace:*",
+		"@robotics-lab/noise": "workspace:*"
 	},
 	"scripts": {
 		"test": "vitest run",

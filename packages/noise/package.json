@@ -1,6 +1,7 @@
 {
-	"name": "@robotics-lab/robot",
-	"version": "0.0.0",
+	"name": "@robotics-lab/noise",
+	"version": "0.0.1",
+	"private": true,
 	"type": "module",
 	"exports": {
 		".": {
@@ -8,12 +9,12 @@
 			"import": "./src/index.ts"
 		}
 	},
-	"dependencies": {
-		"@robotics-lab/core": "workspace:*",
-		"@robotics-lab/noise": "workspace:*"
-	},
 	"scripts": {
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit -p tsconfig.json"
+	},
+	"devDependencies": {
+		"typescript": "^5.7.3",
+		"vitest": "^3.0.5"
 	}
 }

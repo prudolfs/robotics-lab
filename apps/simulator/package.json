@@ -25,6 +25,7 @@
 		"@robotics-lab/maps": "workspace:*",
 		"@robotics-lab/navigation": "workspace:*",
 		"@robotics-lab/occupancy-grid": "workspace:*",
+		"@robotics-lab/noise": "workspace:*",
 		"@robotics-lab/rendering": "workspace:*",
 		"@robotics-lab/robot": "workspace:*",
 		"@robotics-lab/sensors": "workspace:*",

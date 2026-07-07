@@ -26,6 +26,21 @@ const DEFAULT_FOV = 70
 const DEFAULT_WIDTH = 256
 const DEFAULT_HEIGHT = 192
 
+export type CameraNoiseLevel = 'none' | 'low' | 'medium' | 'high'
+
+function noiseOpacity(level: CameraNoiseLevel): number {
+	switch (level) {
+		case 'low':
+			return 0.05
+		case 'medium':
+			return 0.15
+		case 'high':
+			return 0.35
+		default:
+			return 0
+	}
+}
+
 export type RobotCameraViewportProps = {
 	/** The world to render inside the camera view. */
 	world: World
@@ -44,6 +59,8 @@ export type RobotCameraViewportProps = {
 	className?: string
 	/** DOM ref to the inset box, for parent layout / drag handling. */
 	trackRef?: React.RefObject<HTMLDivElement | null>
+	/** Image noise level applied over the rendered camera feed. */
+	noise?: CameraNoiseLevel
 }
 
 /**
@@ -63,13 +80,14 @@ export function RobotCameraViewport({
 	onPitch,
 	className,
 	trackRef,
+	noise = 'none',
 }: RobotCameraViewportProps) {
 	if (!active) return null
 	return (
 		<div
 			ref={trackRef}
 			className={className}
-			style={{ width, height, touchAction: 'none' }}
+			style={{ width, height, touchAction: 'none', position: 'relative' }}
 			aria-label="Robot camera viewport"
 			role="img"
 			data-testid="camera-viewport"
@@ -81,6 +99,7 @@ export function RobotCameraViewport({
 				pitch={pitch}
 				onPitch={onPitch}
 			/>
+			<CameraNoiseOverlay width={width} height={height} noise={noise} />
 		</div>
 	)
 }
@@ -155,5 +174,40 @@ function Lights() {
 			<directionalLight position={[8, 12, 6]} intensity={0.6} />
 			<ambientLight intensity={0.25} />
 		</>
+	)
+}
+
+/** SVG static-noise overlay rendered on top of the camera viewport.
+ *  Pure CSS noise via feTurbulence; no WebGL post-processing needed. */
+function CameraNoiseOverlay({
+	width,
+	height,
+	noise,
+}: {
+	width: number
+	height: number
+	noise: CameraNoiseLevel
+}) {
+	const opacity = noiseOpacity(noise)
+	if (opacity <= 0) return null
+	return (
+		<svg
+			width={width}
+			height={height}
+			style={{
+				position: 'absolute',
+				top: 0,
+				left: 0,
+				pointerEvents: 'none',
+				zIndex: 1,
+				mixBlendMode: 'overlay',
+				opacity,
+			}}
+		>
+			<filter id="noise">
+				<feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves={3} stitchTiles="stitch" />
+			</filter>
+			<rect width="100%" height="100%" filter="url(#noise)" />
+		</svg>
 	)
 }

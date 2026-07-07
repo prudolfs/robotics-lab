@@ -32,6 +32,7 @@ import {
 	planPath,
 	popGoal,
 } from '@robotics-lab/navigation'
+import { seededRng } from '@robotics-lab/noise'
 import { applyScan, createGrid, type OccupancyGrid, resetGrid } from '@robotics-lab/occupancy-grid'
 import {
 	createRobot,
@@ -397,7 +398,8 @@ function configsEqual(a: LidarConfig, b: LidarConfig): boolean {
 		a.fieldOfView === b.fieldOfView &&
 		a.rayCount === b.rayCount &&
 		a.range === b.range &&
-		a.noise === b.noise
+		a.noise === b.noise &&
+		a.dropoutRate === b.dropoutRate
 	)
 }
 
@@ -533,8 +535,10 @@ export function stepSimulation(state: SimState, dt: number = FIXED_DT): SimState
 		path = []
 	}
 
-	const robot = stepDifferentialDrive(state.robot, input, dt)
-	const scan = state.world ? createScan(state.lidar, robot.pose, state.world) : null
+	// Deterministic RNG seeded from step count so noise is reproducible.
+	const rng = seededRng(state.stepCount + 1)
+	const robot = stepDifferentialDrive(state.robot, input, dt, rng)
+	const scan = state.world ? createScan(state.lidar, robot.pose, state.world, rng) : null
 	// Integrate the scan into the occupancy grid. The grid object is preserved
 	// across steps (mutated in place) so the map accumulates over time.
 	if (scan && state.grid && state.world) applyScan(state.grid, scan, state.world)

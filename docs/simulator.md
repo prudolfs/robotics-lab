@@ -344,17 +344,17 @@ Make the simulator more realistic.
 
 ## Lidar
 
-- [ ] Distance noise
-- [ ] Random dropouts
+- [x] Distance noise
+- [x] Random dropouts
 
 ## Motion
 
-- [ ] Wheel slip
-- [ ] Encoder drift
+- [x] Wheel slip
+- [x] Encoder drift
 
 ## Camera
 
-- [ ] Image noise
+- [x] Image noise
 
 ---
 

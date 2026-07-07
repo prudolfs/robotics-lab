@@ -12,6 +12,8 @@ export type LidarConfig = {
 	range: number
 	/** Noise added to the returned distance, in metres. */
 	noise: number
+	/** Probability (0–1) that any single ray returns a miss (random dropout). */
+	dropoutRate: number
 }
 
 export type LidarRay = {
@@ -26,6 +28,7 @@ export function createLidarConfig(override: Partial<LidarConfig> = {}): LidarCon
 		rayCount: 360,
 		range: 10,
 		noise: 0,
+		dropoutRate: 0,
 		...override,
 	}
 }

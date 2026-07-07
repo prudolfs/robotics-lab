@@ -6,6 +6,11 @@ import { DEFAULT_NAV_CONFIG } from '@robotics-lab/navigation'
 import type { OccupancyGrid } from '@robotics-lab/occupancy-grid'
 import type { RobotState } from '@robotics-lab/robot'
 import { createLidarConfig, type LidarConfig, type LidarScan } from '@robotics-lab/sensors'
+
+// Camera noise level passed to RobotCameraViewport; re-exported from rendering
+// so the store doesn't need a direct rendering dependency.
+type CameraNoiseLevel = 'none' | 'low' | 'medium' | 'high'
+
 import { create } from 'zustand'
 import { createSimulation, DEFAULT_PLANNER_OPTIONS, robotSpeed, type SimState } from '@/sim/loop'
 import { DEFAULT_TELEOP_CONFIG, type TeleopConfig } from '@/sim/teleop'
@@ -66,6 +71,8 @@ export type SimulatorStore = {
 	showLidar: boolean
 	/** App state: show the robot's onboard camera viewport. */
 	showCamera: boolean
+	/** App state: image noise level on the robot camera viewport. */
+	cameraNoise: CameraNoiseLevel
 	/** App state: show the occupancy grid overlay on the floor. */
 	showOccupancy: boolean
 	/** App state: show the occupancy minimap in the corner. */
@@ -86,6 +93,8 @@ export type SimulatorStore = {
 	toggleLidar: () => void
 	/** App action: toggle the robot camera viewport. */
 	toggleCamera: () => void
+	/** App action: cycle the camera image noise level. */
+	cycleCameraNoise: () => void
 	/** App action: toggle the occupancy grid floor overlay. */
 	toggleOccupancy: () => void
 	/** App action: toggle the occupancy minimap. */
@@ -165,6 +174,7 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		coverageComplete: false,
 		showLidar: true,
 		showCamera: false,
+		cameraNoise: 'none' as CameraNoiseLevel,
 		showOccupancy: true,
 		showMinimap: true,
 		mapNonce: 0,
@@ -179,6 +189,12 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		setLidar: (config) => set({ lidar: config }),
 		toggleLidar: () => set((s) => ({ showLidar: !s.showLidar })),
 		toggleCamera: () => set((s) => ({ showCamera: !s.showCamera })),
+		cycleCameraNoise: () =>
+			set((s) => {
+				const levels: CameraNoiseLevel[] = ['none', 'low', 'medium', 'high']
+				const idx = levels.indexOf(s.cameraNoise)
+				return { cameraNoise: levels[(idx + 1) % levels.length] }
+			}),
 		toggleOccupancy: () => set((s) => ({ showOccupancy: !s.showOccupancy })),
 		toggleMinimap: () => set((s) => ({ showMinimap: !s.showMinimap })),
 		clearMap: () => {

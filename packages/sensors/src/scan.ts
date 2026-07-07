@@ -11,6 +11,7 @@
 // is applied via an injected `Rng` so scans stay deterministic and testable.
 
 import type { Pose, World } from '@robotics-lab/core'
+import { shouldDrop } from '@robotics-lab/noise'
 import type { LidarConfig, LidarRay } from './index'
 import { generateRays } from './index'
 import { castRaysAgainst, type RayHit } from './raycast'
@@ -64,13 +65,23 @@ export function createScan(
 	for (let i = 0; i < hits.length; i++) {
 		const hit = hits[i]
 		const ray = rays[i]
-		const distance = hit.touched
+
+		// Distance noise (passive per-ray perturbation).
+		let distance = hit.touched
 			? Math.min(applyNoise(hit.distance, config.noise, rng), config.range)
 			: config.range
+
+		// Random dropouts: ray is discarded and reported as a miss.
+		let hitKind: 'wall' | 'box' | 'cylinder' | null = hit.touched ? hit.obstacleKind : null
+		if (config.dropoutRate > 0 && shouldDrop(config.dropoutRate, rng)) {
+			distance = config.range
+			hitKind = null
+		}
+
 		samples[i] = {
 			angle: ray?.angle ?? 0,
 			distance,
-			hit: hit.touched ? hit.obstacleKind : null,
+			hit: hitKind,
 		}
 	}
 	return { config, origin, samples }

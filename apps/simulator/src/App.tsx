@@ -38,6 +38,7 @@ export default function App() {
 	const grid = useSimulatorStore((s) => s.grid)
 	const showLidar = useSimulatorStore((s) => s.showLidar)
 	const showCamera = useSimulatorStore((s) => s.showCamera)
+	const cameraNoise = useSimulatorStore((s) => s.cameraNoise)
 	const showOccupancy = useSimulatorStore((s) => s.showOccupancy)
 	const showMinimap = useSimulatorStore((s) => s.showMinimap)
 	const selectMap = useSimulatorStore((s) => s.selectMap)
@@ -146,6 +147,7 @@ export default function App() {
 					pose={robot.pose}
 					robotParams={robot.params}
 					active={showCamera}
+					noise={cameraNoise}
 					pitch={pitch}
 					onPitch={setPitch}
 					className="pointer-events-auto absolute bottom-4 left-1/2 h-48 w-64 -translate-x-1/2 overflow-hidden rounded-lg border border-border bg-black/80 backdrop-blur-sm"
