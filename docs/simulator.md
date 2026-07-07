@@ -329,10 +329,10 @@ Turn the robot into a robotic vacuum.
 
 ## Features
 
-- [ ] Coverage algorithm
-- [ ] Area completion
-- [ ] Return to start
-- [ ] Cleaning visualization
+- [x] Coverage algorithm
+- [x] Area completion
+- [x] Return to start
+- [x] Cleaning visualization
 
 ---
 
@@ -505,7 +505,7 @@ Improve presentation without changing architecture.
 - [ ] User can place navigation goals
 - [ ] Robot autonomously reaches goals
 - [ ] A* avoids obstacles
-- [ ] Coverage planning works
+- [x] Coverage planning works
 - [ ] Simulation is deterministic
 - [ ] Core simulation is framework independent
 - [ ] Live demo is deployed

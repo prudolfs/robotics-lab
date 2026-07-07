@@ -20,7 +20,10 @@ import type { Pose, Velocity, World } from '@robotics-lab/core'
 import type { Vec2 } from '@robotics-lab/geometry'
 import {
 	controlToGoal,
+	coveragePath,
+	DEFAULT_COVERAGE_CONFIG,
 	DEFAULT_NAV_CONFIG,
+	type CoverageConfig,
 	type Goal,
 	type NavConfig,
 	type NavStatus,
@@ -111,6 +114,10 @@ export type SimState = {
 	/** Status reported by the controller on the last fixed step. Mirrors the
 	 *  controller's own enum so the HUD can read it from the sim snapshot. */
 	navStatus: NavStatus
+	/** When true, the robot is following a generated coverage path. */
+	coverageMode: boolean
+	/** Whether the coverage run has finished. */
+	coverageComplete: boolean
 }
 
 export type SimOptions = {
@@ -174,6 +181,8 @@ export function createSimulation(options: SimOptions = {}): SimState {
 		lastPlanStep: 0,
 		autonomous: options.autonomous ?? false,
 		navStatus: 'idle',
+		coverageMode: false,
+		coverageComplete: false,
 	}
 }
 
@@ -282,6 +291,44 @@ export function setPlannerOptions(state: SimState, planner: PlannerOptions): Sim
 	return { ...state, planner, lastPlanStep: state.stepCount - REPLAN_STEP_INTERVAL }
 }
 
+// --- Coverage planning (milestone 9) ---------------------------------------
+
+/** Generate a boustrophedon coverage path and set it as the current goal
+ *  queue, enabling autonomy. The robot will cover all reachable free/unknown
+ *  cells in the current occupancy grid, then optionally return to start. */
+export function startCoverage(state: SimState, config?: Partial<CoverageConfig>): SimState {
+	if (!state.grid) return state
+	const merged = { ...DEFAULT_COVERAGE_CONFIG, ...config }
+	const robotWorld: Vec2 = { x: state.robot.pose.x, y: state.robot.pose.y }
+	const result = coveragePath(state.grid, robotWorld, merged)
+	if (result.status !== 'ok' || result.waypoints.length === 0) return state
+	return {
+		...state,
+		goals: result.waypoints,
+		path: [],
+		planClosed: [],
+		planOpen: [],
+		autonomous: true,
+		coverageMode: true,
+		coverageComplete: false,
+		lastPlanStep: state.stepCount,
+	}
+}
+
+/** Exit coverage mode, clear goals, and stop the robot. */
+export function cancelCoverage(state: SimState): SimState {
+	return {
+		...state,
+		goals: [],
+		path: [],
+		autonomous: false,
+		coverageMode: false,
+		coverageComplete: false,
+		navStatus: 'idle',
+		input: { leftWheel: 0, rightWheel: 0 },
+	}
+}
+
 // --- Path planning integration (milestone 8) --------------------------------
 // The go-to-goal controller (milestone 7) drives straight at its head goal.
 // Milestone 8 sits a grid path planner between the user's *destination* and
@@ -384,6 +431,8 @@ export function resetSimulation(state: SimState): SimState {
 		lastPlanStep: 0,
 		autonomous: false,
 		navStatus: 'idle',
+		coverageMode: false,
+		coverageComplete: false,
 	}
 }
 
@@ -419,11 +468,13 @@ export function stepSimulation(state: SimState, dt: number = FIXED_DT): SimState
 	let autonomous = state.autonomous
 	let navStatus = state.navStatus
 	let input = state.input
+	let coverageComplete = state.coverageComplete
 	const pose = state.robot.pose
 	if (state.autonomous) {
 		const destination = goals.length > 0 ? goals[0] : null
 		if (destination === null) {
 			// Autonomy on but nothing to chase: idle the controller and stop the robot.
+			if (state.coverageMode) coverageComplete = true
 			navStatus = 'idle'
 			input = { leftWheel: 0, rightWheel: 0 }
 			autonomous = false
@@ -464,6 +515,7 @@ export function stepSimulation(state: SimState, dt: number = FIXED_DT): SimState
 					path = []
 					if (goals.length === 0) {
 						autonomous = false
+						if (state.coverageMode) coverageComplete = true
 						navStatus = 'idle'
 					} else {
 						const next = replan({ ...state, goals, path, lastPlanStep: state.stepCount })
@@ -501,6 +553,7 @@ export function stepSimulation(state: SimState, dt: number = FIXED_DT): SimState
 		planClosed,
 		planOpen,
 		lastPlanStep,
+		coverageComplete,
 	}
 }
 

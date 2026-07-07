@@ -4,6 +4,7 @@ import type { Pose } from '@robotics-lab/core'
 import { angularDelta } from '@robotics-lab/core'
 
 export * from './controller'
+export * from './coverage'
 export * from './goals'
 export * from './pathfinding'
 export * from './planner'

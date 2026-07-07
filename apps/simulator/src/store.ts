@@ -70,6 +70,10 @@ export type SimulatorStore = {
 	showOccupancy: boolean
 	/** App state: show the occupancy minimap in the corner. */
 	showMinimap: boolean
+	/** Observed: whether the robot is in coverage mode. */
+	coverageMode: boolean
+	/** Observed: whether the coverage run is complete. */
+	coverageComplete: boolean
 	/** App action nonce: incremented to signal the loop to clear the grid. */
 	mapNonce: number
 	/** App action: switch the active map (the loop resets the sim on change). */
@@ -104,6 +108,10 @@ export type SimulatorStore = {
 	setPlanner: (planner: PlannerOptions) => void
 	/** App action: toggle the planned-path overlay. */
 	togglePath: () => void
+	/** App action: start coverage planning mode. */
+	startCoverage: () => void
+	/** App action: cancel coverage mode. */
+	cancelCoverage: () => void
 	/** Observer: push the latest simulation snapshot for rendering / HUD. */
 	observe: (next: SimState) => void
 }
@@ -127,6 +135,8 @@ export function sampleState(next: SimState) {
 		path: next.path,
 		planClosed: next.planClosed,
 		planOpen: next.planOpen,
+		coverageMode: next.coverageMode,
+		coverageComplete: next.coverageComplete,
 	}
 }
 
@@ -151,6 +161,8 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		planOpen: [],
 		planner: DEFAULT_PLANNER_OPTIONS,
 		showPath: true,
+					coverageMode: false,
+					coverageComplete: false,
 		showLidar: true,
 		showCamera: false,
 		showOccupancy: true,
@@ -184,6 +196,14 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		setNav: (nav) => set({ nav }),
 		setPlanner: (planner) => set({ planner }),
 		togglePath: () => set((s) => ({ showPath: !s.showPath })),
+		startCoverage: () => set((s) => {
+			// Coverage mode is applied via the simulation loop
+			return s
+		}),
+		cancelCoverage: () => set((s) => {
+			// Cancel is applied via the simulation loop
+			return s
+		}),
 		observe: (next) => set(sampleState(next)),
 	}
 })

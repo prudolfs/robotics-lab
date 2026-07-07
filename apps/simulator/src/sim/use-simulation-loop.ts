@@ -37,6 +37,8 @@ import {
 	setGoals as setSimGoals,
 	setNavConfig as setSimNav,
 	setPlannerOptions as setSimPlanner,
+	startCoverage as startSimCoverage,
+	cancelCoverage as cancelSimCoverage,
 	setSimWorld,
 } from '@/sim/loop'
 import {
@@ -57,6 +59,10 @@ export type SimulationControls = {
 	emergencyStop: () => void
 	/** Release an emergency stop back to keyboard control. */
 	clearEmergencyStop: () => void
+	/** Start coverage (robotic vacuum) mode. */
+	startCoverage: () => void
+	/** Cancel coverage mode. */
+	cancelCoverage: () => void
 }
 
 /** Build a fresh sim seeded with the current world + lidar config. */
@@ -167,6 +173,19 @@ export function useSimulationLoop(): SimulationControls {
 		observe(cur())
 	}, [planner, observe, cur])
 
+	// Coverage mode: watch for start/cancel commands from the store.
+	const coverageMode = useSimulatorStore((s) => s.coverageMode)
+	const coverageComplete = useSimulatorStore((s) => s.coverageComplete)
+	useEffect(() => {
+		if (cur().coverageMode === coverageMode && cur().coverageComplete === coverageComplete) return
+		if (coverageMode && !cur().coverageMode) {
+			simRef.current = startSimCoverage(cur())
+		} else if (!coverageMode && cur().coverageMode) {
+			simRef.current = cancelSimCoverage(cur())
+		}
+		observe(cur())
+	}, [coverageMode, coverageComplete, observe, cur])
+
 	// The render-rate driver: measure wall clock, drain fixed steps, observe.
 	useEffect(() => {
 		let raf = 0
@@ -256,6 +275,14 @@ export function useSimulationLoop(): SimulationControls {
 		},
 		clearEmergencyStop: () => {
 			keyboardRef.current = { ...keyboardRef.current, stop: false }
+		},
+		startCoverage: () => {
+			simRef.current = startSimCoverage(cur())
+			observe(cur())
+		},
+		cancelCoverage: () => {
+			simRef.current = cancelSimCoverage(cur())
+			observe(cur())
 		},
 	}
 }

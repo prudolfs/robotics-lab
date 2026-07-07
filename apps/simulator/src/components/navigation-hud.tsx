@@ -32,6 +32,8 @@ export function NavigationHud({ controls }: { controls: SimulationControls }) {
 	const showPath = useSimulatorStore((s) => s.showPath)
 	const togglePath = useSimulatorStore((s) => s.togglePath)
 	const path = useSimulatorStore((s) => s.path)
+	const coverageMode = useSimulatorStore((s) => s.coverageMode)
+	const coverageComplete = useSimulatorStore((s) => s.coverageComplete)
 
 	const active = goals[0]
 	const queueLen = goals.length
@@ -89,8 +91,40 @@ export function NavigationHud({ controls }: { controls: SimulationControls }) {
 				click the floor to set a goal · shift-click to queue waypoints
 			</span>
 
-			{/* Path planning controls (milestone 8): choose the search algorithm and
-			    toggle the open / closed / final-path overlay. */}
+			{/* Coverage controls (milestone 9) */}
+			<div className="flex items-center justify-between gap-2">
+				<span className="font-semibold text-foreground text-xs">Coverage</span>
+				<div className="flex items-center gap-1">
+					{coverageMode && !coverageComplete && (
+						<span className="text-xs text-amber-500 animate-pulse">Running...</span>
+					)}
+					{coverageComplete && (
+						<span className="text-xs text-emerald-500">Complete</span>
+					)}
+				</div>
+			</div>
+			<div className="flex items-center gap-2">
+				<Button
+					data-testid="coverage-start"
+					variant={coverageMode ? 'default' : 'outline'}
+					size="xs"
+					onClick={controls.startCoverage}
+					disabled={coverageMode}
+				>
+					Clean Room
+				</Button>
+				<Button
+					data-testid="coverage-cancel"
+					variant="outline"
+					size="xs"
+					onClick={controls.cancelCoverage}
+					disabled={!coverageMode}
+				>
+					Stop
+				</Button>
+			</div>
+
+			{/* Path planning controls (milestone 8) */}
 			<div className="flex items-center justify-between gap-2">
 				<span className="text-muted-foreground text-xs">Planner</span>
 				<div className="flex items-center gap-1">
