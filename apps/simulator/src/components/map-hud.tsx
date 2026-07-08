@@ -31,10 +31,7 @@ export function MapHud() {
 	}
 
 	return (
-		<div
-			className="pointer-events-auto absolute right-4 flex w-56 -translate-y-2 flex-col gap-2 rounded-lg border border-border bg-card/80 p-3 backdrop-blur-sm"
-			style={{ top: 'calc(50% + 0rem)', transform: 'translateY(-50%)' }}
-		>
+		<div className="pointer-events-auto flex w-full flex-col gap-2 rounded-lg border border-border bg-card/80 p-3 backdrop-blur-sm">
 			<div className="flex items-center justify-between">
 				<span className="font-semibold text-foreground text-sm">Map</span>
 				<div className="flex gap-1">

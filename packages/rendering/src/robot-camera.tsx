@@ -194,6 +194,7 @@ function CameraNoiseOverlay({
 		<svg
 			width={width}
 			height={height}
+			aria-label="Camera noise overlay"
 			style={{
 				position: 'absolute',
 				top: 0,

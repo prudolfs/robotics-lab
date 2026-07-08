@@ -1,5 +1,6 @@
 import { Canvas } from '@react-three/fiber'
 import {
+	E2EBridge,
 	FpsCounter,
 	GoalPicker,
 	GoalView,
@@ -78,6 +79,7 @@ export default function App() {
 						<PathView closed={planClosed} open={planOpen} path={path} pose={robot.pose} />
 					)}
 					<GoalPicker world={world} onPick={handlePick} />
+					<E2EBridge />
 				</SimulatorScene>
 			</Canvas>
 
@@ -136,22 +138,37 @@ export default function App() {
 
 			<DebugOverlay robot={robot} onReset={controls.reset} />
 
-			<TeleopHud controls={controls} />
-			<SensorHud />
-			<MapHud />
+			{/* Right sidebar — a single scrollable column so the three HUDs stack
+			   at their natural heights even on short viewports; a flex-1 middle slot
+			   used to crush to 0px and let TeleopHud paint over the MapHud toggles. */}
+			<div className="pointer-events-none absolute top-4 right-4 z-10 flex max-h-[calc(100vh-2rem)] w-64 flex-col gap-3 overflow-y-auto">
+				<div className="pointer-events-auto flex-shrink-0">
+					<SensorHud />
+				</div>
+				<div className="pointer-events-auto flex-shrink-0">
+					<MapHud />
+				</div>
+				<div className="pointer-events-auto flex-shrink-0">
+					<TeleopHud controls={controls} />
+				</div>
+			</div>
+
 			<NavigationHud controls={controls} />
 
+			{/* Camera viewport floats above navigation, always visible when on */}
 			{showCamera && (
-				<RobotCameraViewport
-					world={world}
-					pose={robot.pose}
-					robotParams={robot.params}
-					active={showCamera}
-					noise={cameraNoise}
-					pitch={pitch}
-					onPitch={setPitch}
-					className="pointer-events-auto absolute bottom-4 left-1/2 h-48 w-64 -translate-x-1/2 overflow-hidden rounded-lg border border-border bg-black/80 backdrop-blur-sm"
-				/>
+				<div className="pointer-events-auto fixed inset-x-4 bottom-4 z-50 flex justify-center">
+					<RobotCameraViewport
+						world={world}
+						pose={robot.pose}
+						robotParams={robot.params}
+						active={showCamera}
+						noise={cameraNoise}
+						pitch={pitch}
+						onPitch={setPitch}
+						className="h-48 w-64 overflow-hidden rounded-lg border border-border bg-black/80 backdrop-blur-sm"
+					/>
+				</div>
 			)}
 
 			{showMinimap && (

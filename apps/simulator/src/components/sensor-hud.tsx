@@ -29,7 +29,7 @@ export function SensorHud() {
 		setLidar(createLidarConfig({ ...lidar, ...patch }))
 
 	return (
-		<div className="pointer-events-auto absolute top-4 right-4 flex w-64 flex-col gap-3 rounded-lg border border-border bg-card/80 p-3 backdrop-blur-sm">
+		<div className="pointer-events-auto flex w-full flex-col gap-3 rounded-lg border border-border bg-card/80 p-3 backdrop-blur-sm">
 			<div className="flex items-center justify-between">
 				<span className="font-semibold text-foreground text-sm">Sensors</span>
 				<div className="flex gap-1">

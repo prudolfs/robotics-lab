@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
-import { launchSimulator, placeGoal, resetWorld } from './fixtures'
+import { launchSimulator, resetWorld } from './fixtures'
+import { launchSimulatorForWorld, type Simulator } from './simulator'
 
 /**
  * Phase 6 — Console & Error Hygiene.
@@ -30,18 +31,11 @@ test.describe('Phase 6 — Console & Error Hygiene', () => {
 	})
 
 	test('no errors during navigation flow', async ({ page }) => {
-		await launchSimulator(page)
-		await placeGoal(page, 0.6, 0.55)
-		await expect
-			.poll(
-				async () => {
-					const el = page.getByTestId('goal-count')
-					const text = (await el.textContent()) ?? '0'
-					return Number.parseInt(text, 10)
-				},
-				{ timeout: 30_000, intervals: [250] },
-			)
-			.toBe(0)
+		const sim: Simulator = await launchSimulatorForWorld(page)
+		// Place a goal in world coordinates and let the robot reach it; the
+		// console guard must remain silent throughout the autonomous drive.
+		await sim.placeGoal({ x: 2, y: -1.5 })
+		await sim.waitForGoalReached(30_000)
 	})
 
 	test('no errors toggling sensors', async ({ page }) => {

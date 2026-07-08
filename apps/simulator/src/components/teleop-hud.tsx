@@ -26,7 +26,7 @@ export function TeleopHud({ controls }: { controls: SimulationControls }) {
 	const status = !running ? 'paused' : stopped ? 'idle' : 'driving'
 
 	return (
-		<div className="pointer-events-auto absolute right-4 bottom-4 flex w-64 flex-col gap-3 rounded-lg border border-border bg-card/80 p-3 backdrop-blur-sm">
+		<div className="pointer-events-auto flex w-full flex-col gap-3 rounded-lg border border-border bg-card/80 p-3 backdrop-blur-sm">
 			<div className="flex items-center justify-between">
 				<span className="font-semibold text-foreground text-sm">Teleop</span>
 				<StatusBadge status={status} />

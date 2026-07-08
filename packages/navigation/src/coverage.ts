@@ -176,7 +176,8 @@ function floodFill(grid: OccupancyGrid, start: Cell2, config: CoverageConfig): S
 	]
 
 	while (queue.length > 0) {
-		const cur = queue.pop()!
+		const cur = queue.pop()
+		if (!cur) continue
 		for (const m of moves) {
 			const nc = cur.col + m.dc
 			const nr = cur.row + m.dr

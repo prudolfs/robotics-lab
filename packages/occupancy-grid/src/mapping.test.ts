@@ -27,6 +27,7 @@ function makeScan(
 		rayCount: samples.length,
 		range: 10,
 		noise: 0,
+		dropoutRate: 0,
 	}
 	return { config, origin: { ...origin, heading: origin.heading }, samples }
 }

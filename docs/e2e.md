@@ -128,6 +128,25 @@ Prefer:
 
 Three.js canvas interactions should expose helper elements where possible.
 
+## World-space interactions
+
+Interaction with the 3D canvas is expressed in **world coordinates**, never
+pixel coordinates. The renderer owns projection (`packages/rendering/src/e2e-bridge.tsx`
+exposes `window.__E2E__.worldToScreen` / `screenToWorld`), and a `Simulator`
+fixture (`e2e/simulator.ts`) turns world points into real browser mouse events
+while rejecting clicks that would land under a HUD. See `docs/e2e-world-click.md`
+for the full design and the rationale. Tests read like user stories:
+
+```ts
+const sim = await launchSimulatorForWorld(page)
+await sim.placeGoal({ x: 2, y: -1.5 })
+await sim.waitForGoalReached()
+```
+
+Pixel coordinates, canvas fractions, and camera assumptions are kept out of
+specs by design — changing the camera or HUD layout must not require touching
+tests.
+
 ---
 
 # Browser Console
