@@ -1,6 +1,8 @@
+import type { RobotParams } from '@robotics-lab/robot'
 import { expect, test } from 'vitest'
 import {
 	accumulate,
+	clearOdometryTrail,
 	createSimulation,
 	FIXED_DT,
 	pause,
@@ -395,4 +397,75 @@ test('manual teleop input is ignored while autonomous drives the robot', () => {
 	// forward straight on" path would have moved mostly +x. Assert the x-component
 	// stays near 0, meaning autonomy's rotate dominated (not manual forward).
 	expect(Math.abs(after.robot.pose.x)).toBeLessThan(0.02)
+})
+
+// --- Localization (milestone 11) -----------------------------------------
+
+test('createSimulation seeds dead-reckoning odometry at the spawn pose', () => {
+	const sim = createSimulation({ spawnPose: { x: 2, y: -1, heading: 0.7 } })
+	expect(sim.odometry.pose).toEqual({ x: 2, y: -1, heading: 0.7 })
+	expect(sim.odometry.history).toEqual([{ x: 2, y: -1, heading: 0.7 }])
+})
+
+test('dead reckoning tracks ground truth under perfect motion (no noise)', () => {
+	const sim = createSimulation({ input: { leftWheel: 1, rightWheel: 0.8 } })
+	const after = runFor(sim, 1)
+	expect(after.odometry.pose.x).toBeCloseTo(after.robot.pose.x, 6)
+	expect(after.odometry.pose.y).toBeCloseTo(after.robot.pose.y, 6)
+	expect(after.odometry.pose.heading).toBeCloseTo(after.robot.pose.heading, 6)
+})
+
+test('dead reckoning drifts from ground truth once motion noise is enabled', () => {
+	const params: Partial<RobotParams> = {
+		noise: { wheelSlipSigma: 0.15, encoderDriftSigma: 0.05 },
+	}
+	const sim = createSimulation({
+		input: { leftWheel: 1, rightWheel: 0.8 },
+		robotParams: params,
+	})
+	const after = runFor(sim, 5)
+	const drift = Math.hypot(
+		after.odometry.pose.x - after.robot.pose.x,
+		after.odometry.pose.y - after.robot.pose.y,
+	)
+	// With slip + drift the estimate must diverge from the truth.
+	expect(drift).toBeGreaterThan(0.01)
+})
+
+test('odometry history accumulates a trail as the robot moves', () => {
+	const sim = createSimulation({ input: { leftWheel: 1, rightWheel: 1 } })
+	const after = runFor(sim, 1)
+	expect(after.odometry.history.length).toBeGreaterThan(1)
+	expect(after.odometry.history.length).toBeLessThanOrEqual(after.odometry.params.historyLimit)
+})
+
+test('resetSimulation clears the odometry estimate back to spawn', () => {
+	const sim = createSimulation({
+		spawnPose: { x: 0, y: 0, heading: 0 },
+		input: { leftWheel: 1, rightWheel: 1 },
+	})
+	const moved = runFor(sim, 2)
+	expect(moved.odometry.history.length).toBeGreaterThan(1)
+	expect(moved.odometry.stepCount).toBeGreaterThan(0)
+	const reset = resetSimulation(moved)
+	expect(reset.odometry.pose).toEqual({ x: 0, y: 0, heading: 0 })
+	expect(reset.odometry.stepCount).toBe(0)
+	expect(reset.odometry.history).toEqual([{ x: 0, y: 0, heading: 0 }])
+})
+
+test('paused simulation does not advance the odometry estimate', () => {
+	const sim = createSimulation({ input: { leftWheel: 1, rightWheel: 1 } })
+	const paused = pause(sim)
+	const after = stepSimulation(paused, FIXED_DT)
+	expect(after.odometry.pose).toEqual(paused.odometry.pose)
+	expect(after.odometry.stepCount).toBe(paused.odometry.stepCount)
+})
+
+test('clearOdometryTrail drops the trail but keeps the current estimate', () => {
+	const sim = createSimulation({ input: { leftWheel: 1, rightWheel: 1 } })
+	const moved = runFor(sim, 1)
+	expect(moved.odometry.history.length).toBeGreaterThan(1)
+	const cleared = clearOdometryTrail(moved)
+	expect(cleared.odometry.history).toEqual([cleared.odometry.pose])
+	expect(cleared.odometry.pose).toEqual(moved.odometry.pose)
 })

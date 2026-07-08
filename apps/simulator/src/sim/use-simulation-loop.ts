@@ -27,6 +27,7 @@ import {
 	setInput as applyInput,
 	cancelCoverage as cancelSimCoverage,
 	clearOccupancyGrid,
+	clearOdometryTrail as clearSimOdometryTrail,
 	createSimulation,
 	type DriveInput,
 	pause as pauseSim,
@@ -123,6 +124,18 @@ export function useSimulationLoop(): SimulationControls {
 		simRef.current = clearOccupancyGrid(cur())
 		observe(cur())
 	}, [mapNonce, observe, cur])
+
+	// Manual "clear odometry trail" action: drop the recorded pose history
+	// without touching the current estimate or the robot. (milestone 11)
+	const odometryNonce = useSimulatorStore((s) => s.odometryNonce)
+	const lastOdometryNonceRef = useRef<number>(odometryNonce)
+	useEffect(() => {
+		if (lastOdometryNonceRef.current === odometryNonce) return
+		lastOdometryNonceRef.current = odometryNonce
+		if (odometryNonce === 0) return
+		simRef.current = clearSimOdometryTrail(cur())
+		observe(cur())
+	}, [odometryNonce, observe, cur])
 
 	// Reflect world changes onto the sim without resetting the robot. The map
 	// change path above already rebuilds a fresh sim, so this effect handles

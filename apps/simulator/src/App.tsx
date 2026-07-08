@@ -7,6 +7,7 @@ import {
 	LidarView,
 	OccupancyGridView,
 	OccupancyMinimap,
+	OdometryView,
 	PathView,
 	RobotCameraViewport,
 	RobotView,
@@ -15,6 +16,7 @@ import {
 } from '@robotics-lab/rendering'
 import { useCallback, useState } from 'react'
 import { DebugOverlay } from '@/components/debug-overlay'
+import { LocalizationHud } from '@/components/localization-hud'
 import { MapHud } from '@/components/map-hud'
 import { NavigationHud } from '@/components/navigation-hud'
 import { SensorHud } from '@/components/sensor-hud'
@@ -50,6 +52,9 @@ export default function App() {
 	const planOpen = useSimulatorStore((s) => s.planOpen)
 	const planClosed = useSimulatorStore((s) => s.planClosed)
 	const showPath = useSimulatorStore((s) => s.showPath)
+	const showOdometry = useSimulatorStore((s) => s.showOdometry)
+	const odometryPose = useSimulatorStore((s) => s.odometryPose)
+	const odometryHistory = useSimulatorStore((s) => s.odometryHistory)
 
 	const controls = useSimulationLoop()
 
@@ -79,6 +84,7 @@ export default function App() {
 						<PathView closed={planClosed} open={planOpen} path={path} pose={robot.pose} />
 					)}
 					<GoalPicker world={world} onPick={handlePick} />
+					{showOdometry && <OdometryView history={odometryHistory} pose={odometryPose} />}
 					<E2EBridge />
 				</SimulatorScene>
 			</Canvas>
@@ -154,6 +160,7 @@ export default function App() {
 			</div>
 
 			<NavigationHud controls={controls} />
+			<LocalizationHud />
 
 			{/* Camera viewport floats above navigation, always visible when on */}
 			{showCamera && (

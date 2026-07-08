@@ -35,9 +35,14 @@ import {
 import { seededRng } from '@robotics-lab/noise'
 import { applyScan, createGrid, type OccupancyGrid, resetGrid } from '@robotics-lab/occupancy-grid'
 import {
+	clearOdometryHistory,
+	createOdometry,
 	createRobot,
+	type OdometryState,
 	type RobotParams,
+	resetOdometry,
 	stepDifferentialDrive,
+	stepOdometry,
 	type WheelSpeeds,
 } from '@robotics-lab/robot'
 import {
@@ -119,6 +124,10 @@ export type SimState = {
 	coverageMode: boolean
 	/** Whether the coverage run has finished. */
 	coverageComplete: boolean
+	/** Dead-reckoning odometry estimate derived from commanded wheel speeds
+	 *  (milestone 11). Tracks the robot pose independently of ground truth so
+	 *  the gap visibly opens up once motion noise is enabled (milestone 10). */
+	odometry: OdometryState
 }
 
 export type SimOptions = {
@@ -161,6 +170,7 @@ export function createSimulation(options: SimOptions = {}): SimState {
 	const world = options.world ?? null
 	const lidar = options.lidar ?? DEFAULT_LIDAR_CONFIG
 	const grid = world ? buildGrid(world, options.gridResolution, options.gridMargin) : null
+	const odometry = createOdometry(spawnPose, { wheelBase: robot.params.wheelBase })
 	return {
 		time: 0,
 		accumulator: 0,
@@ -184,6 +194,7 @@ export function createSimulation(options: SimOptions = {}): SimState {
 		navStatus: 'idle',
 		coverageMode: false,
 		coverageComplete: false,
+		odometry,
 	}
 }
 
@@ -418,6 +429,7 @@ export function resetSimulation(state: SimState): SimState {
 	const robot = createRobot(state.spawnPose, state.robot.params)
 	const scan = state.world ? createScan(state.lidar, robot.pose, state.world) : null
 	const grid = state.world ? buildGrid(state.world) : null
+	const odometry = resetOdometry(state.odometry, state.spawnPose)
 	return {
 		...state,
 		time: 0,
@@ -435,6 +447,7 @@ export function resetSimulation(state: SimState): SimState {
 		navStatus: 'idle',
 		coverageMode: false,
 		coverageComplete: false,
+		odometry,
 	}
 }
 
@@ -538,6 +551,11 @@ export function stepSimulation(state: SimState, dt: number = FIXED_DT): SimState
 	// Deterministic RNG seeded from step count so noise is reproducible.
 	const rng = seededRng(state.stepCount + 1)
 	const robot = stepDifferentialDrive(state.robot, input, dt, rng)
+	// Dead reckoning (milestone 11): integrate the *commanded* wheel speeds —
+	// the encoder's view, before the noise model perturbs them — so the
+	// estimate tracks the truth under perfect motion and visibly drifts once
+	// wheel slip / encoder drift are enabled (milestone 10).
+	const odometry = stepOdometry(state.odometry, input, dt)
 	const scan = state.world ? createScan(state.lidar, robot.pose, state.world, rng) : null
 	// Integrate the scan into the occupancy grid. The grid object is preserved
 	// across steps (mutated in place) so the map accumulates over time.
@@ -558,6 +576,7 @@ export function stepSimulation(state: SimState, dt: number = FIXED_DT): SimState
 		planOpen,
 		lastPlanStep,
 		coverageComplete,
+		odometry,
 	}
 }
 
@@ -605,4 +624,10 @@ export function runFor(state: SimState, seconds: number, dt: number = FIXED_DT):
 export function clearOccupancyGrid(state: SimState): SimState {
 	if (state.grid) resetGrid(state.grid)
 	return state
+}
+
+/** Clear the dead-reckoning pose history (trail), keeping only the current
+ *  estimate. The estimate pose itself is left untouched. (milestone 11) */
+export function clearOdometryTrail(state: SimState): SimState {
+	return { ...state, odometry: clearOdometryHistory(state.odometry) }
 }

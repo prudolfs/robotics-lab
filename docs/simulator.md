@@ -366,9 +366,9 @@ Estimate robot pose.
 
 ## Features
 
-- [ ] Dead reckoning
-- [ ] Odometry visualization
-- [ ] Pose history
+- [x] Dead reckoning
+- [x] Odometry visualization
+- [x] Pose history
 
 ---
 

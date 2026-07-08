@@ -1,4 +1,4 @@
-import { createWorld, type World } from '@robotics-lab/core'
+import { createWorld, type Pose, type World } from '@robotics-lab/core'
 import type { Vec2 } from '@robotics-lab/geometry'
 import { loadMap, mapNames } from '@robotics-lab/maps'
 import type { Goal, NavConfig, NavStatus, PlannerOptions } from '@robotics-lab/navigation'
@@ -81,6 +81,19 @@ export type SimulatorStore = {
 	coverageMode: boolean
 	/** Observed: whether the coverage run is complete. */
 	coverageComplete: boolean
+	/** Observed: dead-reckoning pose estimate (milestone 11). */
+	odometryPose: Pose
+	/** Observed: recent estimated pose trail (oldest first). */
+	odometryHistory: Pose[]
+	/** App state: show the odometry trail + estimate marker overlay. */
+	showOdometry: boolean
+	/** App action: toggle the odometry overlay. */
+	toggleOdometry: () => void
+	/** App action: clear the dead-reckoning trail (nonce the loop clears it). */
+	clearOdometry: () => void
+	/** Observed nonce incremented each time the user asks the loop to clear
+	 *  the dead-reckoning trail. */
+	odometryNonce: number
 	/** App action nonce: incremented to signal the loop to clear the grid. */
 	mapNonce: number
 	/** App action: switch the active map (the loop resets the sim on change). */
@@ -146,6 +159,8 @@ export function sampleState(next: SimState) {
 		planOpen: next.planOpen,
 		coverageMode: next.coverageMode,
 		coverageComplete: next.coverageComplete,
+		odometryPose: next.odometry.pose,
+		odometryHistory: next.odometry.history,
 	}
 }
 
@@ -178,6 +193,8 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		showOccupancy: true,
 		showMinimap: true,
 		mapNonce: 0,
+		showOdometry: true,
+		odometryNonce: 0,
 		selectMap: (name) => {
 			if (!names.includes(name)) return
 			set({ selectedMap: name, world: buildWorld(name) })
@@ -197,6 +214,8 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 			}),
 		toggleOccupancy: () => set((s) => ({ showOccupancy: !s.showOccupancy })),
 		toggleMinimap: () => set((s) => ({ showMinimap: !s.showMinimap })),
+		toggleOdometry: () => set((s) => ({ showOdometry: !s.showOdometry })),
+		clearOdometry: () => set((s) => ({ odometryNonce: s.odometryNonce + 1 })),
 		clearMap: () => {
 			// The loop owns the grid; we push the clear via the import below, but to
 			// keep store <-> loop circularity clean we expose the action as a flag
