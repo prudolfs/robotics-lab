@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
-import { launchSimulator } from './fixtures'
+import { activateTab, launchSimulator } from './fixtures'
 
 /**
  * Phase 5 — Occupancy Grid.
@@ -67,6 +67,10 @@ test.describe('Phase 5 — Occupancy Grid', () => {
 		// Minimap is visible by default.
 		await expect(page.getByTestId('occupancy-minimap')).toBeVisible()
 
+		// The minimap / grid toggles now live in the Map tab of the right panel
+		// (Phase 2). Switch to it so the toggles are clickable.
+		await activateTab(page, 'map')
+
 		// Toggle the minimap off.
 		await page.getByTestId('minimap-toggle').click()
 		await expect(page.getByTestId('occupancy-minimap')).toHaveCount(0)
@@ -84,6 +88,9 @@ test.describe('Phase 5 — Occupancy Grid', () => {
 
 	test('occupancy grid overlay toggles on and off', async ({ page }) => {
 		await launchSimulator(page)
+
+		// The grid toggle lives in the Map tab of the right panel (Phase 2).
+		await activateTab(page, 'map')
 
 		// Grid overlay is visible by default (showOccupancy is true).
 		// Verify the toggle button reflects the active state.

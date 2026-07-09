@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
-import { launchSimulator, resetWorld } from './fixtures'
+import { activateTab, launchSimulator, resetWorld } from './fixtures'
 import { launchSimulatorForWorld, type Simulator } from './simulator'
 
 /**
@@ -27,6 +27,9 @@ test.describe('Phase 6 — Console & Error Hygiene', () => {
 		await expect(page.getByTestId('pause-resume-button')).toHaveText('Resume')
 		await page.getByTestId('pause-resume-button').click()
 		await expect(page.getByTestId('pause-resume-button')).toHaveText('Pause')
+		// `resetWorld` clicks the Reset button inside the robot-debug card, now in
+		// the Utils tab of the right panel (Phase 2).
+		await activateTab(page, 'utils')
 		await resetWorld(page)
 	})
 
@@ -49,6 +52,9 @@ test.describe('Phase 6 — Console & Error Hygiene', () => {
 
 	test('no errors during occupancy grid toggles', async ({ page }) => {
 		await launchSimulator(page)
+		// The grid / minimap toggles live in the Map tab of the right panel
+		// (Phase 2).
+		await activateTab(page, 'map')
 		await page.getByTestId('occupancy-grid-toggle').click()
 		await page.getByTestId('occupancy-grid-toggle').click()
 		await page.getByTestId('minimap-toggle').click()

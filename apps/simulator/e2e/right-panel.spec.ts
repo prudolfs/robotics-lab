@@ -63,10 +63,7 @@ test.describe('Phase 1 — Right panel shell', () => {
 				.and(page.locator(':visible'))
 				.count()
 			expect(visibleCount).toBe(1)
-			await expect(page.getByTestId(`panel-tab-${id}`)).toHaveAttribute(
-				'aria-selected',
-				'true',
-			)
+			await expect(page.getByTestId(`panel-tab-${id}`)).toHaveAttribute('aria-selected', 'true')
 		}
 	})
 
@@ -85,7 +82,7 @@ test.describe('Phase 1 — Right panel shell', () => {
 		expect(utilsBox, 'utils tab must have a bounding box').not.toBeNull()
 		// By default the utils tab's left edge is to the right of the strip's
 		// visible right edge (i.e. scrolled off).
-		expect(utilsBox!.x).toBeGreaterThan(stripBox!.x + stripBox!.width - 1)
+		expect(utilsBox?.x).toBeGreaterThan(stripBox?.x + stripBox?.width - 1)
 
 		// Selecting utils scrolls it to the center of the strip.
 		await utilsTab.click()
@@ -93,9 +90,7 @@ test.describe('Phase 1 — Right panel shell', () => {
 
 		// After the smooth scroll, the tab is within the visible strip bounds.
 		const visibleBox = await utilsTab.boundingBox()
-		expect(visibleBox!.x).toBeGreaterThanOrEqual(stripBox!.x - 1)
-		expect(visibleBox!.x + visibleBox!.width).toBeLessThanOrEqual(
-			stripBox!.x + stripBox!.width + 1,
-		)
+		expect(visibleBox?.x).toBeGreaterThanOrEqual(stripBox?.x - 1)
+		expect(visibleBox?.x + visibleBox?.width).toBeLessThanOrEqual(stripBox?.x + stripBox?.width + 1)
 	})
 })

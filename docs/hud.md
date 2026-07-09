@@ -112,7 +112,7 @@ Rationale for grid coordinates instead of raw pixels: the reference snaps on dro
 - New e2e: `apps/simulator/e2e/right-panel.spec.ts` (panel visible/5 tabs, collapse+reopen, per-tab pane visibility, 5th-tab horizontal-scroll-into-view).
 - Verified: `pnpm typecheck` clean, `pnpm test` 65/65, `pnpm test:e2e` 44/44.
 
-### Phase 2 — Port existing widgets into tabs (no drag yet)
+### ✅ Phase 2 — Port existing widgets into tabs (no drag yet)  **[DONE]**
 
 **Goal:** every existing control surface lives inside a tab; remove the old floating placements from `App.tsx`.
 
@@ -140,6 +140,24 @@ Rationale for grid coordinates instead of raw pixels: the reference snaps on dro
 **Camera/minimap canvas caveat:** `RobotCameraViewport` and `OccupancyMinimap` are DOM elements that must sit outside `<Canvas>` and float over the viewport. Their *toggle* and *config* live in the panel widgets, but the *rendered element* continues to be mounted by `App.tsx` gated on `showCamera`/`showMinimap`. This matches today and avoids making the panel own R3F-adjacent elements. (A popped-out "camera widget" on the viewport would just be the controls, not a second live camera — duplicating a live WebGL viewport per panel instance is out of scope.)
 
 **Exit criteria:** all controls reachable from the right panel; the app no longer renders the old scattered overlay placements except the two canvas floats; `typecheck` + unit + e2e tests updated (see Phase 6) and green.
+
+**Phase 2 implementation notes (landed):**
+- New `apps/simulator/src/components/widgets/` folder with one file per widget, each composing a `WidgetCard` (the shared styled frame) with the existing HUD body. The widget bodies are inlined from the old HUD components rather than wrapping them as black boxes, because the old HUDs carried their own absolute positioning (`NavigationHud` `absolute bottom-4 left-1/2 -translate-x-1/2`, `LocalizationHud` `absolute right-88 bottom-4`, `DebugOverlay` `absolute bottom-4 left-4 pointer-events-none`) and card chrome (`border bg-card/80 p-3 backdrop-blur-sm`); both are now the `WidgetCard`'s job. All control text / labels / slider ranges / button wording / `data-testid`s are kept byte-for-byte from the originals.
+  - `widget-card.tsx` — the shared card: header row with **drag handle placeholder** (a non-interactive `GripVertical` lucide icon carrying `data-testid="widget-drag-handle"`), the widget title, and an optional right-aligned status chip; children = the widget body. `pointer-events-auto` is on the card (Phase 3 makes the handle a real HTML5 drag source).
+  - `lidar-widget.tsx` (Sensors) — `Lidar` toggle + range / resolution / FOV / noise / dropouts sliders, title "Sensors".
+  - `camera-widget.tsx` (Sensors) — `Cam` on/off toggle + `Camera noise` cycle + the "drag the camera pane to look up / down" hint, title "Camera". Per the plan, the Sensors tab holds both the lidar and camera cards; the live `RobotCameraViewport` canvas stays mounted in `App.tsx` (outside `<Canvas>`), gated on `showCamera`.
+  - `map-controls-widget.tsx` (Map) — `Grid` (`showOccupancy`) toggle + free/occupied/unknown % stats + `Clear map`, title "Map".
+  - `minimap-widget.tsx` (Map) — `Mini` (`showMinimap`) toggle, title "Minimap"; the `OccupancyMinimap` canvas stays mounted in `App.tsx`, gated on `showMinimap`.
+  - `navigation-widget.tsx` (Nav) — `Auto: ON/OFF`, `Clear goals`, coverage (`Clean Room` / `Stop`), planner (A*/Dijkstra), path overlay, active-goal / distance / queued / waypoints readouts, with the `nav-status` badge passed to `WidgetCard` as the status chip, title "Navigation".
+  - `localization-widget.tsx` (Nav) — estimate vs truth, drift, trail guard + `Clear trail`; the Phase-1 `right-88` absolute positioning is dropped (it becomes a normal-flow card), title "Localization" (`data-testid="localization-hud"` preserved).
+  - `teleop-widget.tsx` (Teleop) — key hints, throttle slider, command L/R + speed readouts, `ESTOP`, with the teleop status badge as the status chip, title "Teleop".
+  - `robot-debug-widget.tsx` (Utils) — pose / heading / speed / turn rate / wheels + `Reset` (`data-testid="robot-debug"` + hidden `data-testid="robot-pose"` preserved), title "Robot debug".
+  - `logs-widget.tsx` (Utils) — Phase-5-bait stub: a scrollable mono box rendering "No logs yet" (real ring-buffer logger deferred to Phase 5).
+- `apps/simulator/src/components/right-panel.tsx` — renders the 5 tab content panes via a small `TabPane` helper (kept mounted, `hidden` when inactive) stacking the relevant `WidgetCard`s with `gap-3`. `RightPanel` now takes `controls: SimulationControls` + `onReset` props (threaded from `App.tsx` → the Nav / Teleop / robot-debug widgets) so the loop remains the single owner of sim state. It also subscribes to `robot` so the Utils-tab debug widget re-renders each frame like the old `DebugOverlay` did.
+- `apps/simulator/src/App.tsx` — deleted the Phase-1 upper-left legacy stack (`SensorHud`/`MapHud`/`TeleopHud`), the absolutely-placed `NavigationHud` and `LocalizationHud`, and the bottom-left `DebugOverlay`. Kept `<RightPanel controls={controls} onReset={controls.reset} />`, the top-left HUD readouts, the top-center Pause/Reset/map buttons, and the two live canvas floats (`RobotCameraViewport` + `OccupancyMinimap`).
+- The old HUD component files (`sensor-hud.tsx`, `map-hud.tsx`, `navigation-hud.tsx`, `teleop-hud.tsx`, `localization-hud.tsx`, `debug-overlay.tsx`) are now **dead** (no longer imported in `src/` or `e2e/`). They are intentionally left in place for Phase 5 to delete as part of the inline-vs-wrap reconciliation noted there.
+- E2E tests updated per the Phase-6 guidance: an `activateTab(page, tab)` helper was added to `e2e/fixtures.ts`, and tests that click controls now in non-default tabs switch to that tab first (`smoke` → Utils for `robot-debug`; `teleoperation` → Teleop for `estop-button`; `navigation` → Nav for `clear-goals-button`; `localization` → Nav for the localization controls / Utils for `resetWorld`; `occupancy-grid` → Map for `minimap`/`occupancy-grid` toggles; `console` → Utils + `Map`). All `data-testid`s on the underlying controls were kept identical, minimizing selector churn.
+- Verified: `pnpm typecheck` clean, `pnpm test` 65/65, `pnpm test:e2e` 44/44, `pnpm build` clean, `pnpm lint` / `pnpm check` clean.
 
 ### Phase 3 — Drag handle + drop grid + pop-out duplication
 

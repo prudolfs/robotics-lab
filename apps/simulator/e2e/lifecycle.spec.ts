@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
-import { getSimTime, launchSimulator, resetWorld } from './fixtures'
+import { activateTab, getSimTime, launchSimulator, resetWorld } from './fixtures'
 
 /**
  * Phase 1 — Simulation Lifecycle.
@@ -83,6 +83,9 @@ test.describe('Phase 1 — Simulation lifecycle', () => {
 			.poll(async () => Number(await getSimTime(page)), { timeout: 15_000 })
 			.toBeGreaterThan(0)
 
+		// `resetWorld` clicks the Reset button inside the robot-debug card, now
+		// in the Utils tab of the right panel (Phase 2).
+		await activateTab(page, 'utils')
 		await resetWorld(page)
 
 		// The spawn pose is the origin; the debug overlay reads it back.
@@ -104,6 +107,9 @@ test.describe('Phase 1 — Simulation lifecycle', () => {
 		await page.getByTestId('pause-resume-button').click()
 		await expect(page.getByTestId('pause-resume-button')).toHaveText('Resume')
 
+		// `resetWorld` clicks the Reset button inside the robot-debug card, now
+		// in the Utils tab of the right panel (Phase 2).
+		await activateTab(page, 'utils')
 		await resetWorld(page)
 
 		expect(await getSimTime(page)).toBeLessThan(0.5)

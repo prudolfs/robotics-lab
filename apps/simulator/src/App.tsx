@@ -15,13 +15,7 @@ import {
 	WorldView,
 } from '@robotics-lab/rendering'
 import { useCallback, useState } from 'react'
-import { DebugOverlay } from '@/components/debug-overlay'
-import { LocalizationHud } from '@/components/localization-hud'
-import { MapHud } from '@/components/map-hud'
-import { NavigationHud } from '@/components/navigation-hud'
 import { RightPanel } from '@/components/right-panel'
-import { SensorHud } from '@/components/sensor-hud'
-import { TeleopHud } from '@/components/teleop-hud'
 import { Button } from '@/components/ui/button'
 import { useSimulationLoop } from '@/sim/use-simulation-loop'
 import { useSimulatorStore } from '@/store'
@@ -143,31 +137,17 @@ export default function App() {
 				</div>
 			</div>
 
-			<DebugOverlay robot={robot} onReset={controls.reset} />
+			<RightPanel controls={controls} onReset={controls.reset} />
 
-			<RightPanel />
+			{/* Phase 2: the old scattered HUD placements (SensorHud / MapHud /
+			   TeleopHud right-sidebar stack, the absolutely-placed NavigationHud and
+			   LocalizationHud, and the bottom-left DebugOverlay) are gone — their
+			   controls now live inside the right panel tabs (see right-panel.tsx).
+			   Only the two live canvas floats below remain, gated on their toggles
+			   (which now live in the Sensors / Map tabs). */}
 
-			{/* TEMPORARY (Phase 1): the legacy right-sidebar HUD stack still owns the
-			   live lidar/camera/minimap/teleop controls until Phase 2 relocates them into
-			   the new right panel. It is docked to the upper-left for Phase 1 so the new
-			   `<RightPanel>` can claim the right edge without overlap. Phase 2 deletes
-			   this block and folds these HUDs into the panel tabs. */}
-			<div className="pointer-events-none absolute top-32 left-4 z-10 flex max-h-[40vh] w-64 flex-col gap-3 overflow-y-auto">
-				<div className="pointer-events-auto flex-shrink-0">
-					<SensorHud />
-				</div>
-				<div className="pointer-events-auto flex-shrink-0">
-					<MapHud />
-				</div>
-				<div className="pointer-events-auto flex-shrink-0">
-					<TeleopHud controls={controls} />
-				</div>
-			</div>
-
-			<NavigationHud controls={controls} />
-			<LocalizationHud />
-
-			{/* Camera viewport floats above navigation, always visible when on */}
+			{/* Camera viewport floats above navigation, always visible when on. The
+			   `Cam` toggle + camera noise control moved into the Sensors tab. */}
 			{showCamera && (
 				<div className="pointer-events-auto fixed inset-x-4 bottom-4 z-50 flex justify-center">
 					<RobotCameraViewport

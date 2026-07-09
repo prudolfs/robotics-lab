@@ -1,14 +1,20 @@
-// Right panel shell (Phase 1 of docs/hud.md).
+// Right panel (docs/hud.md) — Phase 2.
 //
-// A single tabbed sidebar that will host all the HUD widgets in later phases.
-// For now it owns only its own show/hide toggle and a 5-tab strip where four
-// tabs are visible and the fifth is reachable by horizontal scroll (each tab
-// is flex-none w-1/4 of the strip, with snap-x + a hidden scrollbar).
+// A single tabbed sidebar that hosts all the HUD widgets. Phase 1 landed the
+// shell (show/hide toggle + a 5-tab strip where four tabs are visible and the
+// fifth is reached by horizontal scroll). Phase 2 fills the tab panes with the
+// existing controls, now wrapped in `WidgetCard`s. The old scattered HUD
+// overlays in `App.tsx` are removed in Phase 2; the two live canvas floats
+// (robot camera viewport + occupancy minimap) stay mounted in `App.tsx`
+// because they must sit outside `<Canvas>` — only their toggles moved here.
 //
 // The panel reads/writes only the `panel` slice of the Zustand store
 // (`panelOpen` / `activeTab` + `togglePanel` / `setTab`). It owns no
-// simulation state, per the "React observes, the loop owns" contract.
+// simulation state, per the "React observes, the loop owns" contract. The
+// `controls` from the simulation loop hook are threaded in as a prop so the
+// Nav / Teleop / robot-debug widgets can drive reset / e-stop / coverage.
 
+import type { LucideIcon } from 'lucide-react'
 import {
 	Compass,
 	Gamepad2,
@@ -18,9 +24,18 @@ import {
 	Radar,
 	Wrench,
 } from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
 import { useRef } from 'react'
+import { CameraWidget } from '@/components/widgets/camera-widget'
+import { LidarWidget } from '@/components/widgets/lidar-widget'
+import { LocalizationWidget } from '@/components/widgets/localization-widget'
+import { LogsWidget } from '@/components/widgets/logs-widget'
+import { MapControlsWidget } from '@/components/widgets/map-controls-widget'
+import { MinimapWidget } from '@/components/widgets/minimap-widget'
+import { NavigationWidget } from '@/components/widgets/navigation-widget'
+import { RobotDebugWidget } from '@/components/widgets/robot-debug-widget'
+import { TeleopWidget } from '@/components/widgets/teleop-widget'
 import { cn } from '@/lib/utils'
+import type { SimulationControls } from '@/sim/use-simulation-loop'
 import { type PanelTab, useSimulatorStore } from '@/store'
 
 type TabDef = { id: PanelTab; label: string; icon: LucideIcon }
@@ -33,25 +48,27 @@ const TABS: TabDef[] = [
 	{ id: 'utils', label: 'Utils', icon: Wrench },
 ]
 
-const TAB_CONTENT: Record<PanelTab, string> = {
-	sensors: 'Sensors widget area',
-	map: 'Map widget area',
-	nav: 'Nav widget area',
-	teleop: 'Teleop widget area',
-	utils: 'Utils widget area',
-}
-
 // The collapse toggle sits on the panel's leading edge. When collapsed we
 // slide the panel by `calc(100% - <toggle> - gap)` so the toggle stays poking
 // out and the panel remains reachable — matching the reference
 // `#collapse-toggle { left: -32px }` behaviour.
 const TOGGLE_W = '2rem' // w-8
 
-export function RightPanel() {
+export interface RightPanelProps {
+	/** Loop controls threaded down to the Nav / Teleop / robot-debug widgets. */
+	controls: SimulationControls
+	/** Imperative reset, passed to the robot-debug widget's Reset button. */
+	onReset: () => void
+}
+
+export function RightPanel({ controls, onReset }: RightPanelProps) {
 	const open = useSimulatorStore((s) => s.panelOpen)
 	const activeTab = useSimulatorStore((s) => s.activeTab)
 	const togglePanel = useSimulatorStore((s) => s.togglePanel)
 	const setTab = useSimulatorStore((s) => s.setTab)
+	// Robot is observed here so the Utils-tab debug widget re-renders each
+	// frame like the old `DebugOverlay` did (the store mirrors the loop).
+	const robot = useSimulatorStore((s) => s.robot)
 
 	// Keep refs to each tab button so selecting a tab can scroll it into view
 	// inside the horizontally-scrollable strip (the 5th tab is off-strip until
@@ -113,7 +130,7 @@ export function RightPanel() {
 				<div
 					role="tablist"
 					aria-label="Control panel tabs"
-					className="no-scrollbar flex flex-none snap-x snap-mandatory overflow-x-auto border-b border-border"
+					className="no-scrollbar flex flex-none snap-x snap-mandatory overflow-x-auto border-border border-b"
 				>
 					{TABS.map(({ id, label, icon: Icon }) => {
 						const active = id === activeTab
@@ -131,36 +148,64 @@ export function RightPanel() {
 								className={cn(
 									'flex w-1/4 flex-none snap-start flex-col items-center gap-1 py-2 transition-colors',
 									active
-										? 'border-b-2 border-primary text-primary'
-										: 'border-b-2 border-transparent text-muted-foreground hover:text-foreground',
+										? 'border-primary border-b-2 text-primary'
+										: 'border-transparent border-b-2 text-muted-foreground hover:text-foreground',
 								)}
 							>
 								<Icon className="size-4" />
-								<span className="text-[9px] font-semibold uppercase tracking-wider">
-									{label}
-								</span>
+								<span className="font-semibold text-[9px] uppercase tracking-wider">{label}</span>
 							</button>
 						)
 					})}
 				</div>
 
-				{/* Tab content panes — empty in Phase 1, filled in Phase 2. */}
+				{/* Tab content panes — each pane holds the relevant `WidgetCard`s
+				    stacked vertically with the existing gap spacing. Inactive panes
+				    are kept mounted but `hidden` so switching tabs is instant. */}
 				<div className="flex-1 overflow-y-auto p-4">
-					{TABS.map(({ id }) => (
-						<div
-							key={id}
-							role="tabpanel"
-							data-testid={`panel-content-${id}`}
-							hidden={id !== activeTab}
-							className="flex flex-col gap-3"
-						>
-							<span className="font-mono text-muted-foreground text-xs">
-								{TAB_CONTENT[id]}
-							</span>
-						</div>
-					))}
+					<TabPane tab="sensors" active={activeTab}>
+						<LidarWidget />
+						<CameraWidget />
+					</TabPane>
+					<TabPane tab="map" active={activeTab}>
+						<MapControlsWidget />
+						<MinimapWidget />
+					</TabPane>
+					<TabPane tab="nav" active={activeTab}>
+						<NavigationWidget controls={controls} />
+						<LocalizationWidget />
+					</TabPane>
+					<TabPane tab="teleop" active={activeTab}>
+						<TeleopWidget controls={controls} />
+					</TabPane>
+					<TabPane tab="utils" active={activeTab}>
+						<RobotDebugWidget robot={robot} onReset={onReset} />
+						<LogsWidget />
+					</TabPane>
 				</div>
 			</div>
 		</aside>
+	)
+}
+
+/** A tab pane kept mounted but visually hidden when inactive. */
+function TabPane({
+	tab,
+	active,
+	children,
+}: {
+	tab: PanelTab
+	active: PanelTab
+	children: React.ReactNode
+}) {
+	return (
+		<div
+			role="tabpanel"
+			data-testid={`panel-content-${tab}`}
+			hidden={tab !== active}
+			className="flex flex-col gap-3"
+		>
+			{children}
+		</div>
 	)
 }

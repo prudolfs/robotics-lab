@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
-import { launchSimulator, resetWorld, waitForIdle } from './fixtures'
+import { activateTab, launchSimulator, resetWorld, waitForIdle } from './fixtures'
 
 /**
  * Phase 11 — Localization.
@@ -25,6 +25,10 @@ test.describe('Phase 11 — Localization', () => {
 	test('localization HUD mounts and exposes the dead-reckoned pose', async ({ page }) => {
 		await launchSimulator(page)
 
+		// The localization HUD now lives in the Nav tab of the right panel (
+		// Phase 2). Switch to it so the controls are visible.
+		await activateTab(page, 'nav')
+
 		const hud = page.getByTestId('localization-hud')
 		await expect(hud).toBeVisible()
 		await expect(page.getByTestId('odometry-pose')).toBeVisible()
@@ -40,6 +44,9 @@ test.describe('Phase 11 — Localization', () => {
 
 	test('dead-reckoning trail grows as the robot moves', async ({ page }) => {
 		await launchSimulator(page)
+		// `resetWorld` clicks the Reset button inside the robot-debug card,
+		// which lives in the Utils tab of the right panel (Phase 2).
+		await activateTab(page, 'utils')
 		await resetWorld(page)
 
 		// Drive forward for a moment.
@@ -56,6 +63,9 @@ test.describe('Phase 11 — Localization', () => {
 	test('toggle trail off removes the overlay then on restores it', async ({ page }) => {
 		await launchSimulator(page)
 
+		// The trail toggle lives in the Nav tab of the right panel (Phase 2).
+		await activateTab(page, 'nav')
+
 		const toggle = page.getByTestId('odometry-toggle')
 		await expect(toggle).toBeVisible()
 
@@ -67,6 +77,9 @@ test.describe('Phase 11 — Localization', () => {
 
 	test('clear trail empties the history but keeps the estimate', async ({ page }) => {
 		await launchSimulator(page)
+		// `resetWorld` clicks the Reset button inside the robot-debug card,
+		// which lives in the Utils tab of the right panel (Phase 2).
+		await activateTab(page, 'utils')
 		await resetWorld(page)
 
 		// Move so a trail builds up.
@@ -82,11 +95,15 @@ test.describe('Phase 11 — Localization', () => {
 		await page.getByTestId('pause-resume-button').click()
 		await waitForIdle(page)
 
+		// `Clear trail` lives in the Nav tab of the right panel (Phase 2).
+		await activateTab(page, 'nav')
 		await page.getByTestId('clear-odometry-button').click()
 		// With the sim paused the cleared trail cannot regrow: exactly one sample
 		// (the current estimate) remains.
 		await expect
-			.poll(async () => Number.parseInt((await page.getByTestId('odometry-count').textContent()) ?? '0', 10))
+			.poll(async () =>
+				Number.parseInt((await page.getByTestId('odometry-count').textContent()) ?? '0', 10),
+			)
 			.toBe(1)
 		await waitForIdle(page)
 	})

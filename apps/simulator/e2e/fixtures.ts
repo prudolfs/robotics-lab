@@ -23,6 +23,20 @@ export async function launchSimulator(page: Page, base: string = '/') {
 	await waitForIdle(page)
 }
 
+/**
+ * Switch the right panel to a given tab so its controls become visible /
+ * clickable (Phase 2 of docs/hud.md moved the scattered HUDs into tabbed
+ * panes; only the active tab's pane is visible). Idempotent. The default
+ * active tab is `sensors`.
+ */
+export async function activateTab(page: Page, tab: 'sensors' | 'map' | 'nav' | 'teleop' | 'utils') {
+	const btn = page.getByTestId(`panel-tab-${tab}`)
+	await btn.click()
+	await expect(btn).toHaveAttribute('aria-selected', 'true')
+	// Inactive panes carry a `hidden` attribute; the active one does not.
+	await expect(page.getByTestId(`panel-content-${tab}`)).toBeVisible()
+}
+
 /** Read the simulation clock (seconds) from the HUD readout. */
 export async function getSimTime(page: Page): Promise<number> {
 	const text = await page.getByTestId('sim-time').textContent()

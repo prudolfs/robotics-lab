@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
+import { activateTab } from './fixtures'
 import { launchSimulatorForWorld, type Simulator } from './simulator'
 
 /**
@@ -96,6 +97,8 @@ test.describe('Phase 3 — Navigation', () => {
 		await sim.placeGoal(CLEAR_GOAL)
 		await expect(page.getByTestId('goal-count')).toHaveText('1')
 
+		// `Clear goals` now lives in the Nav tab of the right panel (Phase 2).
+		await activateTab(page, 'nav')
 		await page.getByTestId('clear-goals-button').click()
 
 		// The goal queue empties and autonomy drops; the active goal readout clears.

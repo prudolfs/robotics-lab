@@ -1,0 +1,49 @@
+// Robot debug widget (Utils tab) — Phase 2 of docs/hud.md.
+//
+// Wraps the debug readout from the old `DebugOverlay`: pose / heading / speed /
+// turn rate / wheels + a Reset button. All labels and the hidden
+// `data-testid="robot-pose"` readout are kept byte-for-byte; the absolute,
+// `pointer-events-none` placement of the old overlay is dropped — it is now a
+// normal-flow card in the Utils tab. `data-testid="robot-debug"` is kept on
+// the card so existing tests that read the pose / hit the Reset button keep
+// working once they switch to the Utils tab.
+
+import type { RobotState } from '@robotics-lab/robot'
+import { Button } from '@/components/ui/button'
+import { WidgetCard } from '@/components/widgets/widget-card'
+
+const fmt = (n: number) => n.toFixed(2)
+const deg = (rad: number) => `${((rad * 180) / Math.PI).toFixed(1)}°`
+
+export function RobotDebugWidget({ robot, onReset }: { robot: RobotState; onReset: () => void }) {
+	const { pose, velocity, wheels } = robot
+	const speed = Math.hypot(velocity.vx, velocity.vy)
+
+	return (
+		<WidgetCard title="Robot debug" data-testid="robot-debug" bodyClassName="gap-2">
+			<div className="flex items-center justify-end">
+				<Button variant="outline" size="xs" onClick={onReset}>
+					Reset
+				</Button>
+			</div>
+
+			<DebugRow label="Position" value={`x ${fmt(pose.x)}  y ${fmt(pose.y)}`} />
+			<div data-testid="robot-pose" className="sr-only" aria-hidden="true">
+				x: {fmt(pose.x)} y: {fmt(pose.y)} heading: {deg(pose.heading)}
+			</div>
+			<DebugRow label="Heading" value={deg(pose.heading)} />
+			<DebugRow label="Speed" value={`${fmt(speed)} m/s`} />
+			<DebugRow label="Turn rate" value={`${fmt(velocity.omega)} rad/s`} />
+			<DebugRow label="Wheels" value={`L ${fmt(wheels.leftWheel)}  R ${fmt(wheels.rightWheel)}`} />
+		</WidgetCard>
+	)
+}
+
+function DebugRow({ label, value }: { label: string; value: string }) {
+	return (
+		<div className="flex flex-col">
+			<span className="text-muted-foreground text-xs">{label}</span>
+			<span className="font-mono text-foreground text-sm">{value}</span>
+		</div>
+	)
+}

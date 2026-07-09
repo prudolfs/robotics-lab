@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
-import { launchSimulator } from './fixtures'
+import { activateTab, launchSimulator } from './fixtures'
 
 /**
  * Phase 0 — E2E Foundation: smoke test.
@@ -41,6 +41,8 @@ test.describe('Phase 0 — Application starts', () => {
 	test('robot exists', async ({ page }) => {
 		await launchSimulator(page)
 		await expect(page.getByTestId('robot-marker')).toBeAttached()
+		// robot debug now lives in the Utils tab of the right panel (Phase 2).
+		await activateTab(page, 'utils')
 		await expect(page.getByTestId('robot-debug')).toBeVisible()
 	})
 })
