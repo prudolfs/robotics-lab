@@ -341,12 +341,12 @@ Detect major performance regressions rather than micro-optimize.
 
 ## Tasks
 
-- [ ] Track startup time metric
-- [ ] Track FPS sanity metric
-- [ ] Track JS heap size metric
-- [ ] Track frame time metric
-- [ ] Record metrics in CI artifacts
-- [ ] Define soft budgets (warn only) for each metric
+- [x] Track startup time metric
+- [x] Track FPS sanity metric
+- [x] Track JS heap size metric
+- [x] Track frame time metric
+- [x] Record metrics in CI artifacts
+- [x] Define soft budgets (warn only) for each metric
 
 ---
 

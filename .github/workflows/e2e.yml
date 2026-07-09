@@ -41,3 +41,11 @@ jobs:
           name: playwright-report
           path: apps/simulator/e2e/.report
           retention-days: 14
+
+      - name: Upload performance metrics
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-metrics
+          path: apps/simulator/e2e/.results
+          retention-days: 30

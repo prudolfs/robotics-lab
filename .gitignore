@@ -35,3 +35,8 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .DS_Store
 
 .temp
+
+# Playwright / E2E runtime output
+apps/simulator/e2e/.report
+apps/simulator/e2e/.results
+apps/simulator/test-results
