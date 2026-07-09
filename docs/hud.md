@@ -89,7 +89,7 @@ Rationale for grid coordinates instead of raw pixels: the reference snaps on dro
 
 ## Implementation phases
 
-### Phase 1 — Right panel shell + tab strip (no widgets yet)
+### ✅ Phase 1 — Right panel shell + tab strip (no widgets yet)  **[DONE]**
 
 **Files:**
 - `apps/simulator/src/components/right-panel.tsx` (new) — `<RightPanel>` shell.
@@ -103,6 +103,14 @@ Rationale for grid coordinates instead of raw pixels: the reference snaps on dro
 - Tabs: `Sensors` (icon `sensors`), `Map` (`map`), `Nav` (`explore`), `Teleop` (`joystick`), `Utils` (`build`). Use `lucide-react` icons (already a dep) — `Radar`/`ScanLine`, `Map`, `Compass`, `Joystick`/`Gamepad2`, `Wrench` — instead of Material Symbols (not installed).
 
 **Exit criteria:** panel shows, toggles, the 5 tabs switch an empty content area; 4 visible, 5th scrolls in. Existing tests still green (we haven't removed the old components' exports yet, only stopped mounting them in the right sidebar).
+
+**Phase 1 implementation notes (landed):**
+- `panel` slice added to `apps/simulator/src/store.ts`: `panelOpen`, `activeTab` (`PanelTab` type: `sensors | map | nav | teleop | utils`), `togglePanel()`, `setTab(tab)`. Covered by `apps/simulator/src/store.test.ts`.
+- `apps/simulator/src/components/right-panel.tsx`: the shell — fixed right-edge `aside`, a collapse toggle that slides the panel almost fully off-screen leaving the toggle poking out (`translate-x-[calc(100%-1rem-2rem)]` when closed), and a horizontally-scrollable tab strip (`no-scrollbar`, `snap-x snap-mandatory`, each tab `w-1/4` so **4 tabs fit** and the **5th scrolls in**; selecting a tab `scrollIntoView({inline:'center'})`).
+- `.no-scrollbar` utility added to `apps/simulator/src/styles.css`.
+- `apps/simulator/src/App.tsx` mounts `<RightPanel />`. **Temporary:** so the new panel can claim the right edge without overlapping the live legacy HUDs, the legacy right-sidebar stack (`SensorHud`/`MapHud`/`TeleopHud`) is docked to the **upper-left** (`top-32 left-4 max-h-[40vh]`) and `LocalizationHud` is shifted from `right-72` to `right-88` to clear the panel. These are throwaway Phase-1 placements; **Phase 2 deletes them** and folds the HUD bodies into the panel tabs (the `localization-hud.tsx` `right-88` tweak should be reverted/removed then).
+- New e2e: `apps/simulator/e2e/right-panel.spec.ts` (panel visible/5 tabs, collapse+reopen, per-tab pane visibility, 5th-tab horizontal-scroll-into-view).
+- Verified: `pnpm typecheck` clean, `pnpm test` 65/65, `pnpm test:e2e` 44/44.
 
 ### Phase 2 — Port existing widgets into tabs (no drag yet)
 

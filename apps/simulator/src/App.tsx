@@ -19,6 +19,7 @@ import { DebugOverlay } from '@/components/debug-overlay'
 import { LocalizationHud } from '@/components/localization-hud'
 import { MapHud } from '@/components/map-hud'
 import { NavigationHud } from '@/components/navigation-hud'
+import { RightPanel } from '@/components/right-panel'
 import { SensorHud } from '@/components/sensor-hud'
 import { TeleopHud } from '@/components/teleop-hud'
 import { Button } from '@/components/ui/button'
@@ -144,10 +145,14 @@ export default function App() {
 
 			<DebugOverlay robot={robot} onReset={controls.reset} />
 
-			{/* Right sidebar — a single scrollable column so the three HUDs stack
-			   at their natural heights even on short viewports; a flex-1 middle slot
-			   used to crush to 0px and let TeleopHud paint over the MapHud toggles. */}
-			<div className="pointer-events-none absolute top-4 right-4 z-10 flex max-h-[calc(100vh-2rem)] w-64 flex-col gap-3 overflow-y-auto">
+			<RightPanel />
+
+			{/* TEMPORARY (Phase 1): the legacy right-sidebar HUD stack still owns the
+			   live lidar/camera/minimap/teleop controls until Phase 2 relocates them into
+			   the new right panel. It is docked to the upper-left for Phase 1 so the new
+			   `<RightPanel>` can claim the right edge without overlap. Phase 2 deletes
+			   this block and folds these HUDs into the panel tabs. */}
+			<div className="pointer-events-none absolute top-32 left-4 z-10 flex max-h-[40vh] w-64 flex-col gap-3 overflow-y-auto">
 				<div className="pointer-events-auto flex-shrink-0">
 					<SensorHud />
 				</div>

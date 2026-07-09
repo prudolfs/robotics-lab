@@ -128,3 +128,14 @@
 		@apply font-sans;
 	}
 }
+
+/* Hide scrollbar on the right-panel tab strip while keeping scrollability,
+   so four tabs stay visible and the fifth is reached by horizontal scroll
+   (see docs/hud.md Phase 1). */
+.no-scrollbar {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
+}

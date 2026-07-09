@@ -15,6 +15,9 @@ import { create } from 'zustand'
 import { createSimulation, DEFAULT_PLANNER_OPTIONS, robotSpeed, type SimState } from '@/sim/loop'
 import { DEFAULT_TELEOP_CONFIG, type TeleopConfig } from '@/sim/teleop'
 
+/** Right-panel tab identifiers. */
+export type PanelTab = 'sensors' | 'map' | 'nav' | 'teleop' | 'utils'
+
 // Default spawn pose: center of the floor, facing +x.
 export const SPAWN_POSE = { x: 0, y: 0, heading: 0 }
 
@@ -94,6 +97,15 @@ export type SimulatorStore = {
 	/** Observed nonce incremented each time the user asks the loop to clear
 	 *  the dead-reckoning trail. */
 	odometryNonce: number
+	/* ----------------------------- Right panel ----------------------------- */
+	/** App state: whether the right panel is visible. */
+	panelOpen: boolean
+	/** App state: which right-panel tab is active (sensors/map/nav/teleop/utils). */
+	activeTab: PanelTab
+	/** App action: toggle the right panel open/closed. */
+	togglePanel: () => void
+	/** App action: switch the active right-panel tab. */
+	setTab: (tab: PanelTab) => void
 	/** App action nonce: incremented to signal the loop to clear the grid. */
 	mapNonce: number
 	/** App action: switch the active map (the loop resets the sim on change). */
@@ -193,6 +205,8 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		showOccupancy: true,
 		showMinimap: true,
 		mapNonce: 0,
+		panelOpen: true,
+		activeTab: 'sensors',
 		showOdometry: true,
 		odometryNonce: 0,
 		selectMap: (name) => {
@@ -241,6 +255,8 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 				// Cancel is applied via the simulation loop
 				return s
 			}),
+		togglePanel: () => set((s) => ({ panelOpen: !s.panelOpen })),
+		setTab: (tab) => set({ activeTab: tab }),
 		observe: (next) => set(sampleState(next)),
 	}
 })

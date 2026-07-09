@@ -33,7 +33,7 @@ export function LocalizationHud() {
 	return (
 		<div
 			data-testid="localization-hud"
-			className="pointer-events-auto absolute right-72 bottom-4 flex w-56 flex-col gap-2 rounded-lg border border-border bg-card/80 p-3 backdrop-blur-sm"
+			className="pointer-events-auto absolute right-88 bottom-4 flex w-56 flex-col gap-2 rounded-lg border border-border bg-card/80 p-3 backdrop-blur-sm"
 		>
 			<div className="flex items-center justify-between">
 				<span className="font-semibold text-foreground text-sm">Localization</span>
