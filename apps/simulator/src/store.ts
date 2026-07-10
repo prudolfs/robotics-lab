@@ -18,6 +18,43 @@ import { DEFAULT_TELEOP_CONFIG, type TeleopConfig } from '@/sim/teleop'
 /** Right-panel tab identifiers. */
 export type PanelTab = 'sensors' | 'map' | 'nav' | 'teleop' | 'utils'
 
+/**
+ * Widget kinds that can be dragged out of the right panel onto the viewport
+ * (docs/hud.md Phase 3). Each maps to one `WidgetCard` rendered in a tab.
+ */
+export type WidgetId =
+	| 'sensors.lidar'
+	| 'sensors.camera.controls'
+	| 'sensors.camera.feed'
+	| 'map.controls'
+	| 'map.minimap'
+	| 'nav.navigation'
+	| 'nav.localization'
+	| 'teleop.controls'
+	| 'utils.robotDebug'
+	| 'utils.logs'
+
+/**
+ * Dock edge a popped widget snaps to. Per the Phase-3 design, dragging a
+ * widget out of the panel does *not* drop a free-floating copy in the viewport
+ * centre — instead the panel closes and the user drops onto one of four edge
+ * zones (top / right / bottom / left); the widget docks to that edge.
+ */
+export type DropEdge = 'top' | 'right' | 'bottom' | 'left'
+
+/**
+ * A widget rendered as a docked overlay on the main viewport. The widget is
+ * **moved** out of the panel (not duplicated): while a kind is popped, the
+ * panel slot is empty and the popped copy owns the widget body (including any
+ * live feed). Clicking the popped copy's close button moves it back to its tab.
+ */
+export type PoppedWidget = {
+	/** The widget kind (also the instance id — a kind is popped at most once). */
+	widget: WidgetId
+	/** Dock edge on the viewport. */
+	edge: DropEdge
+}
+
 // Default spawn pose: center of the floor, facing +x.
 export const SPAWN_POSE = { x: 0, y: 0, heading: 0 }
 
@@ -35,6 +72,8 @@ export type SimulatorStore = {
 	robot: RobotState
 	/** Observed: simulation clock in seconds. */
 	simTime: number
+	/** Observed: last reported render FPS (pushed by App's <FpsCounter>). */
+	fps: number
 	/** Observed: linear robot speed in m/s. */
 	speed: number
 	/** Observed: the current commanded wheel speeds (m/s). */
@@ -106,8 +145,27 @@ export type SimulatorStore = {
 	togglePanel: () => void
 	/** App action: switch the active right-panel tab. */
 	setTab: (tab: PanelTab) => void
+	/* ------------------------- Popped widgets ------------------------- */
+	/** App state: widget copies docked onto the main viewport (docs Phase 3). */
+	popped: PoppedWidget[]
+	/** App state: the widget kind currently being dragged out of the panel
+	 *  (drives the close-panel + edge-zone overlay behaviour), or null. */
+	draggingWidget: WidgetId | null
+	/** App action: begin dragging a widget handle out of the panel. Closes the
+	 *  right panel so the viewport edge zones are reachable. */
+	startDragWidget: (widget: WidgetId) => void
+	/** App action: end the drag with a drop. The widget is moved to that edge
+	 *  (a kind is a singleton — re-dropping the same kind moves its existing
+	 *  copy to the new edge). The panel reopens. */
+	dropPoppedWidget: (widget: WidgetId, edge: DropEdge) => void
+	/** App action: end the drag without a drop — cancel, reopen the panel. */
+	cancelDragWidget: () => void
+	/** App action: move a popped widget back to the right panel (close button). */
+	undockWidget: (widget: WidgetId) => void
 	/** App action nonce: incremented to signal the loop to clear the grid. */
 	mapNonce: number
+	/** App action: record the latest render FPS (from <FpsCounter>). */
+	setFps: (fps: number) => void
 	/** App action: switch the active map (the loop resets the sim on change). */
 	selectMap: (name: string) => void
 	/** App action: tune the teleop throttle (base speed). */
@@ -186,6 +244,7 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		// The loop is the authority; the store only mirrors its state so React
 		// can observe it. The hook calls `observe` every frame after stepping.
 		...sampleState(createSimulation({ spawnPose: SPAWN_POSE })),
+		fps: 0,
 		teleop: DEFAULT_TELEOP_CONFIG,
 		lidar: DEFAULT_LIDAR_CONFIG,
 		nav: DEFAULT_NAV_CONFIG,
@@ -207,6 +266,8 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		mapNonce: 0,
 		panelOpen: true,
 		activeTab: 'sensors',
+		popped: [],
+		draggingWidget: null,
 		showOdometry: true,
 		odometryNonce: 0,
 		selectMap: (name) => {
@@ -257,6 +318,20 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 			}),
 		togglePanel: () => set((s) => ({ panelOpen: !s.panelOpen })),
 		setTab: (tab) => set({ activeTab: tab }),
+		setFps: (fps) => set({ fps }),
+		startDragWidget: (widget) => set({ draggingWidget: widget, panelOpen: false }),
+		dropPoppedWidget: (widget, edge) =>
+			set((s) => ({
+				draggingWidget: null,
+				panelOpen: true,
+				popped: mergePopped(s.popped, { widget, edge }),
+			})),
+		cancelDragWidget: () => set({ draggingWidget: null, panelOpen: true }),
+		undockWidget: (widget) =>
+			set((s) => ({
+				panelOpen: true,
+				popped: s.popped.filter((p) => p.widget !== widget),
+			})),
 		observe: (next) => set(sampleState(next)),
 	}
 })
@@ -264,4 +339,25 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 /** Teleop throttle must stay strictly positive; clamp UI slip to a small floor. */
 function clampPositive(value: number): number {
 	return Number.isFinite(value) && value > 0 ? value : DEFAULT_TELEOP_CONFIG.baseSpeed
+}
+
+/**
+ * Merge a popped widget into the list. A widget kind is a singleton (it is
+ * moved out of the panel, not duplicated), so the kind's `widget` doubles as
+ * its instance id. Dropping the same kind again moves it to the new edge.
+ */
+function mergePopped(
+	popped: PoppedWidget[],
+	next: { widget: WidgetId; edge: DropEdge },
+): PoppedWidget[] {
+	const existing = popped.find((p) => p.widget === next.widget)
+	if (existing) {
+		return popped.map((p) => (p.widget === next.widget ? { ...p, edge: next.edge } : p))
+	}
+	return [...popped, { widget: next.widget, edge: next.edge }]
+}
+
+/** Is a given widget kind currently popped onto the viewport? */
+export function isWidgetPopped(popped: PoppedWidget[], widget: WidgetId): boolean {
+	return popped.some((p) => p.widget === widget)
 }

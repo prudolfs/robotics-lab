@@ -17,6 +17,8 @@
 		"typecheck": "tsc --noEmit -p tsconfig.json"
 	},
 	"dependencies": {
+		"@dnd-kit/core": "^6.3.1",
+		"@dnd-kit/utilities": "^3.2.2",
 		"@fontsource-variable/geist": "^5.2.9",
 		"@react-three/drei": "^10.7.7",
 		"@react-three/fiber": "^9.6.1",
@@ -24,8 +26,8 @@
 		"@robotics-lab/geometry": "workspace:*",
 		"@robotics-lab/maps": "workspace:*",
 		"@robotics-lab/navigation": "workspace:*",
-		"@robotics-lab/occupancy-grid": "workspace:*",
 		"@robotics-lab/noise": "workspace:*",
+		"@robotics-lab/occupancy-grid": "workspace:*",
 		"@robotics-lab/rendering": "workspace:*",
 		"@robotics-lab/robot": "workspace:*",
 		"@robotics-lab/sensors": "workspace:*",

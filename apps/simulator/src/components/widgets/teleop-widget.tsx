@@ -23,7 +23,7 @@ export function TeleopWidget({ controls }: { controls: SimulationControls }) {
 	const status: 'paused' | 'idle' | 'driving' = !running ? 'paused' : stopped ? 'idle' : 'driving'
 
 	return (
-		<WidgetCard title="Teleop" status={<StatusBadge status={status} />}>
+		<WidgetCard title="Teleop" widget="teleop.controls" status={<StatusBadge status={status} />}>
 			<ControlHints baseSpeed={teleop.baseSpeed} />
 			<div data-testid="teleop-status" className="sr-only" aria-hidden="true">
 				{status}

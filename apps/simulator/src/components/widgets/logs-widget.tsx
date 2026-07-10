@@ -11,7 +11,7 @@ import { WidgetCard } from '@/components/widgets/widget-card'
 
 export function LogsWidget() {
 	return (
-		<WidgetCard title="System Logs" bodyClassName="gap-2">
+		<WidgetCard title="System Logs" widget="utils.logs" bodyClassName="gap-2">
 			<div className="max-h-40 overflow-y-auto rounded border border-border bg-background/40 p-2 font-mono text-[11px] text-muted-foreground">
 				No logs yet
 			</div>

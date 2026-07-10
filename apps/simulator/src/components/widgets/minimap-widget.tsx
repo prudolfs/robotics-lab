@@ -1,48 +1,69 @@
-// Minimap widget (Map tab) — Phase 2 of docs/hud.md.
+// Minimap live-feed widget (Map tab + dockable on viewport) — Phase 3.
 //
-// Owns only the `Mini` (showMinimap) toggle from the old `MapHud`. The
-// occupancy minimap canvas itself (`OccupancyMinimap`) stays a floating
-// element mounted in `App.tsx` (per the camera/minimap caveat in the plan:
-// those DOM elements must sit outside `<Canvas>`), so this widget is
-// controls-only — flipping the toggle gates the floater in `App.tsx`.
+// The occupancy minimap canvas is a live-feed widget with its own drag handle
+// (`map.minimap`), gated by the `Mini` on/off toggle. With the "move, not
+// duplicate" model there is ever only one rendered copy of this widget —
+// panel or popped — and it owns the single live minimap canvas.
+//
+// The minimap canvas stays outside the main `<Canvas>` (it's a 2D HTML-canvas
+// overlay, per the camera/minimap caveat); it is mounted here rather than in
+// `App.tsx`.
 
+import { OccupancyMinimap } from '@robotics-lab/rendering'
 import { Button } from '@/components/ui/button'
 import { WidgetCard } from '@/components/widgets/widget-card'
-import { useSimulatorStore } from '@/store'
+import { useSimulatorStore, type WidgetId } from '@/store'
 
-export function MinimapWidget() {
-	const showMinimap = useSimulatorStore((s) => s.showMinimap)
-	const toggleMinimap = useSimulatorStore((s) => s.toggleMinimap)
+const WIDGET: WidgetId = 'map.minimap'
 
-	return (
-		<WidgetCard title="Minimap" bodyClassName="gap-2">
-			<div className="flex items-center justify-between">
-				<span className="text-muted-foreground text-xs">Corner minimap</span>
-				<ToggleButton
-					data-testid="minimap-toggle"
-					label="Mini"
-					active={showMinimap}
-					onClick={toggleMinimap}
-				/>
-			</div>
-		</WidgetCard>
-	)
+export interface MinimapWidgetProps {
+	/** True when this is the popped copy docked on the viewport. (Unused now
+	 *  under the move model — but kept for registry API symmetry.) */
+	dockedOnViewport?: boolean
+	/** Square canvas px size. */
+	size?: number
 }
 
-function ToggleButton({
-	label,
-	active,
-	onClick,
-	...props
-}: {
-	label: string
-	active: boolean
-	onClick: () => void
-	[key: string]: unknown
-}) {
+export function MinimapWidget({ size = 160 }: MinimapWidgetProps) {
+	const showMinimap = useSimulatorStore((s) => s.showMinimap)
+	const toggleMinimap = useSimulatorStore((s) => s.toggleMinimap)
+	const grid = useSimulatorStore((s) => s.grid)
+	const world = useSimulatorStore((s) => s.world)
+	const robot = useSimulatorStore((s) => s.robot)
+	const scan = useSimulatorStore((s) => s.scan)
+
 	return (
-		<Button variant={active ? 'default' : 'outline'} size="xs" onClick={onClick} {...props}>
-			{label}
-		</Button>
+		<WidgetCard title="Minimap" widget={WIDGET} data-testid="minimap-widget" bodyClassName="gap-2">
+			<div className="flex items-center justify-between">
+				<span className="text-muted-foreground text-xs">Corner minimap</span>
+				<Button
+					variant={showMinimap ? 'default' : 'outline'}
+					size="xs"
+					onClick={toggleMinimap}
+					data-testid="minimap-toggle"
+				>
+					Mini
+				</Button>
+			</div>
+
+			{!showMinimap ? (
+				<span className="font-mono text-[10px] text-muted-foreground">
+					minimap off — press Mini to enable
+				</span>
+			) : (
+				<div data-testid="occupancy-minimap" className="flex flex-col items-center gap-1">
+					<div className="rounded-md border border-border bg-card/60 p-1">
+						<OccupancyMinimap
+							grid={grid}
+							world={world}
+							pose={robot.pose}
+							scan={scan}
+							size={size}
+							className="block rounded"
+						/>
+					</div>
+				</div>
+			)}
+		</WidgetCard>
 	)
 }

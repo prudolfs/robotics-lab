@@ -26,7 +26,12 @@ export function LocalizationWidget() {
 	const headingErr = Math.abs(odometryPose.heading - robot.pose.heading)
 
 	return (
-		<WidgetCard title="Localization" data-testid="localization-hud" bodyClassName="gap-2">
+		<WidgetCard
+			title="Localization"
+			widget="nav.localization"
+			data-testid="localization-hud"
+			bodyClassName="gap-2"
+		>
 			<div className="flex items-center justify-end">
 				<Button
 					variant={showOdometry ? 'default' : 'outline'}

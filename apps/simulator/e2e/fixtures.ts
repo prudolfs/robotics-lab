@@ -37,9 +37,23 @@ export async function activateTab(page: Page, tab: 'sensors' | 'map' | 'nav' | '
 	await expect(page.getByTestId(`panel-content-${tab}`)).toBeVisible()
 }
 
-/** Read the simulation clock (seconds) from the HUD readout. */
+/** Read the simulation clock (seconds) from the HUD readout.
+ *
+ *  The readout format changed across phases (Phase 3 moved it to the footer
+ *  status bar as `SIM_TIME: HH:MM:SS.cc`), so this helper accepts both the old
+ *  `Sim time: 1.42s` form and the new clock form. */
 export async function getSimTime(page: Page): Promise<number> {
 	const text = await page.getByTestId('sim-time').textContent()
+	// New footer form: `SIM_TIME: 00:00:12.34`.
+	const clock = text?.match(/SIM_TIME:\s*(\d+):(\d+):(\d+)\.(\d+)/)
+	if (clock) {
+		const hh = Number(clock[1])
+		const mm = Number(clock[2])
+		const ss = Number(clock[3])
+		const cc = Number(clock[4])
+		return hh * 3600 + mm * 60 + ss + cc / 100
+	}
+	// Legacy form: `Sim time: 1.42s`.
 	const match = text?.match(/Sim time:\s*([0-9.]+)/)
 	expect(match, `sim time readout not found: ${text}`).not.toBeNull()
 	return Number.parseFloat(match?.[1])

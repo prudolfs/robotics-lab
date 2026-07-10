@@ -36,6 +36,7 @@ export function NavigationWidget({ controls }: { controls: SimulationControls })
 	return (
 		<WidgetCard
 			title="Navigation"
+			widget="nav.navigation"
 			status={<StatusBadge status={navStatus} autonomous={autonomous} />}
 		>
 			<div className="flex items-center gap-2">

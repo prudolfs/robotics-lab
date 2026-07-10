@@ -7,7 +7,7 @@
 > - `docs/simulator.md` — architecture & milestone context (React observes, the loop owns)
 > - `.temp/right-panel/robotics_lab_workspace_v9_integrated_camera_utils_tab/code.html` — the target **5-tab, 4-visible + scroll** layout (sensors / map / nav / teleop / utils)
 > - `.temp/right-panel/robotics_lab_map_tab_state_refined/code.html` — fill-state version showing **per-widget drag handles** (`drag_indicator` icon before each widget title)
-> - `.temp/right-panel/drag-and-drop/code.html` — the **drag-out / drop-grid / pop-out widget** interaction model (duplicates widget on the viewport, keeps it in the panel)
+> - `.temp/right-panel/drag-and-drop/code.html` — the **drag-out / drop-grid / pop-out widget** interaction model (inspiration only — we move widgets onto viewport **edges** with dnd-kit rather than duplicating onto a centre grid)
 > - `.temp/right-panel/cyber_kinetic_terminal/DESIGN.md` — design tokens (glassmorphism, neon-cyan, JetBrains Mono data, Inter labels)
 
 ---
@@ -18,8 +18,8 @@
 2. The right panel has **5 tabs**: `Sensors`, `Map`, `Nav`, `Teleop`, `Utils`.
 3. **4 tabs are visible** in the tab strip; the **5th is reachable by horizontal scroll** of the strip.
 4. The whole panel has a **show/hide toggle** (chevron on the panel's leading edge).
-5. Every widget has a **drag handle** before its title. Dragging a handle **out** of the panel duplicates that widget onto the main viewport and shows a **grid overlay** on the viewport indicating valid drop cells.
-6. A popped-out widget shows a **remove button** to take it off the viewport. The widget **stays in the right panel** (duplication, not move) — simpler state, no empty slots.
+5. Every widget has a **drag handle** before its title. Dragging a handle **out** of the panel **closes the panel**, surfaces four **edge drop zones** (top/right/bottom/left) that bracket — never cover — the simulation viewport, and dropping on an edge **moves** the widget onto that edge. (The simulation centre is intentionally not a drop target; widgets never occlude the scene.) Drag is driven by **dnd-kit** (pointer events) rather than native HTML5 drag.
+6. A popped-out widget shows a **close (X) button** instead of a drag handle (plus a small re-dock handle). Clicking close **moves the widget back to its tab** in the panel. The widget is **moved**, not duplicated — while a kind is popped its panel slot is hidden entirely (one live instance ever, including live feeds).
 7. Keep all controls and text **as close as possible** to what exists today; the reference HTMLs are design inspiration, not a literal restyle of every token (current app uses shadcn tokens; the references use the Cyber-Kinetic palette — we adapt the *structure*, not the *color system*).
 
 ## Non Goals
@@ -56,34 +56,37 @@ Add a `panel` slice to `apps/simulator/src/store.ts` (pure UI state — no sim o
 
 ```ts
 type WidgetId =
-  | 'sensors.lidar' | 'sensors.camera'
+  | 'sensors.lidar' | 'sensors.camera.controls' | 'sensors.camera.feed'
   | 'map.controls' | 'map.minimap'
   | 'nav.navigation' | 'nav.localization'
   | 'teleop.controls'
   | 'utils.robotDebug' | 'utils.logs'
 
+type DropEdge = 'top' | 'right' | 'bottom' | 'left'
+
+// A widget is MOVED onto the viewport (not duplicated). The kind doubles as
+// the instance id — a kind is popped at most once; re-dropping it moves it.
 type PoppedWidget = {
-  id: WidgetId            // unique instance id (allows duplicates later)
-  widget: WidgetId        // which widget kind
-  gridX: number            // drop-grid column
-  gridY: number            // drop-grid row
-  // viewport pixel pos derived from grid cell at render time
+  widget: WidgetId       // which widget kind (also the instance id)
+  edge: DropEdge          // dock edge on the viewport
 }
 
 type PanelState = {
   open: boolean            // panel show/hide
   activeTab: 'sensors' | 'map' | 'nav' | 'teleop' | 'utils'
-  popped: PoppedWidget[]   // widgets rendered on the main viewport
+  popped: PoppedWidget[]   // widgets moved onto the main viewport
+  draggingWidget: WidgetId | null  // kind being dragged / zones shown
   // actions
   togglePanel: () => void
   setTab: (tab) => void
-  popWidget: (widget: WidgetId, gridX: number, gridY: number) => void
-  removePopped: (id: string) => void
-  movePopped: (id: string, gridX: number, gridY: number) => void // drag within viewport
+  startDragWidget: (widget: WidgetId) => void        // closes panel, mounts zones
+  dropPoppedWidget: (widget: WidgetId, edge: DropEdge) => void  // move onto edge
+  cancelDragWidget: () => void                       // reopen, no pop
+  undockWidget: (widget: WidgetId) => void           // close button → back to tab
 }
 ```
 
-Rationale for grid coordinates instead of raw pixels: the reference snaps on drop and re-snaps on internal drag; storing grid cells keeps it resolution-independent and trivial to render the drop grid (a 4×4 lattice over the viewport, matching `drag-and-drop/code.html`).
+Rationale for an `edge` (not pixels / a centre grid): the simulation centre must stay unoccluded, so widgets dock to one of four viewport edges. dnd-kit's pointer-based drag computes the active zone from the pointer position; storing `edge` keeps it resolution-independent and trivial to render the drop zone overlay.
 
 ---
 
@@ -159,28 +162,45 @@ Rationale for grid coordinates instead of raw pixels: the reference snaps on dro
 - E2E tests updated per the Phase-6 guidance: an `activateTab(page, tab)` helper was added to `e2e/fixtures.ts`, and tests that click controls now in non-default tabs switch to that tab first (`smoke` → Utils for `robot-debug`; `teleoperation` → Teleop for `estop-button`; `navigation` → Nav for `clear-goals-button`; `localization` → Nav for the localization controls / Utils for `resetWorld`; `occupancy-grid` → Map for `minimap`/`occupancy-grid` toggles; `console` → Utils + `Map`). All `data-testid`s on the underlying controls were kept identical, minimizing selector churn.
 - Verified: `pnpm typecheck` clean, `pnpm test` 65/65, `pnpm test:e2e` 44/44, `pnpm build` clean, `pnpm lint` / `pnpm check` clean.
 
-### Phase 3 — Drag handle + drop grid + pop-out duplication
+### ✅ Phase 3 — Drag handle + edge drop zones + pop-out (move, not duplicate)  **[DONE]***
 
-**Goal:** dragging a widget handle out of the panel drops a **duplicate** onto the viewport and shows the grid overlay; the panel copy stays.
+**Goal:** dragging a widget handle out of the panel **closes the panel**, surfaces four **edge drop zones** (top/right/bottom/left) around — never on top of — the simulation viewport, and dropping on a zone **moves** the widget onto that edge. The widget is not duplicated: while a kind is popped its panel slot is hidden entirely (no empty placeholder) and the lone rendered copy owns its body — including any live feed (camera/minimap). The popped copy shows a **close (X) button** instead of a drag handle; clicking it moves the widget back to its tab.
+
+Also folds the scattered top-left HUD + top-centre button cluster into a **top app bar** (h-12) and a **footer status bar** (h-8); panel insets become `top-12 bottom-8`.
 
 **Files:**
-- `apps/simulator/src/components/widgets/widget-card.tsx` — make the `GripVertical` handle a real drag source using **HTML5 drag-and-drop** (`draggable`, `onDragStart`), mirroring `drag-and-drop/code.html`'s `handleDragStart`:
-  - on dragstart: set a module-level `draggedWidgetId`, add `drag-overlay-active` class to `<body>`, show `#drag-grid`, and synthesize a translucent ghost drag image (clone the card, apply `widget-ghost` styling, `setDragImage`).
-- `apps/simulator/src/components/drop-grid.tsx` (new) — the 4×4 lattice overlay over `#simulation-viewport`, `pointer-events-none` until `active`, dashed `border-primary/30` cells; the cell under the cursor highlights (`border-primary/60` + glow). CSS ported from the reference `style` block + the `.drop-grid` rules.
-- `apps/simulator/src/components/viewport-widgets-layer.tsx` (new) — an `absolute inset-0 pointer-events-none` layer over the viewport that renders the `popped[]` array; each popped widget child is `pointer-events-auto`.
-- `apps/simulator/src/App.tsx` — add overlay classes/containers: the `drag-overlay-active` class dims/blurs the sim image (`filter: brightness(0.3) blur(4px)` from the reference), mount `<DropGrid>` + `<ViewportWidgetsLayer>` inside `#simulation-viewport`. The viewport already exists in the reference as `#simulation-viewport`; reuse the same id.
-- `apps/simulator/src/store.ts` — wire `popWidget(widget, gridX, gridY)` (called from the viewport's `onDrop`), `removePopped(id)`, and the `dragend` cleanup (clear `drag-overlay-active`, hide grid).
+- `apps/simulator/src/store.ts` — `panel.popped` (now `{ widget, edge }` — no per-instance `id`, since a kind is a singleton) + `draggingWidget` + `startDragWidget` / `dropPoppedWidget` / `cancelDragWidget` / **`undockWidget`** (replaces the old `removePopped(id)`) + `isWidgetPopped` selector. Dropping stores an `edge: DropEdge` (not pixels/grid cells); re-dropping the same kind moves its existing copy to the new edge.
+- `apps/simulator/src/components/dnd-context.tsx` (new) — a `DndProvider` wrapping the panel + overlays using `@dnd-kit/core`. A `PointerSensor` (8px activation threshold) drives the drag; on `dragStart` it records the active kind + mode ('pop' vs 'redock') and calls `startDragWidget` (closes the panel + mounts the zones). On `dragEnd` it reads `over.data.current.edge` and calls `dropPoppedWidget(widget, edge)` or `cancelDragWidget()`. A `DragOverlay` renders a tiny ghost card that follows the pointer. Helpers `useWidgetDragHandle(widget, mode)` and `useEdgeDropZone(edge)` are exported for the handle/zone elements. **Why dnd-kit:** the previous native HTML5 `draggable` + `onDragStart`/`onDrop` flow was not firing reliably in the browser and was un-drivable by Playwright (synthetic `DragEvent` dispatch doesn't run a real gesture). dnd-kit uses pointer events, so a real mouse works and Playwright's `page.mouse` can drive it.
+- `apps/simulator/src/components/widgets/widget-card.tsx` — the `GripVertical` handle becomes a **dnd-kit drag source** via `useWidgetDragHandle(widget, 'pop')`; spreading `dragHandleProps` attaches the pointer listeners. In panel mode, when the kind is already popped the card renders `hidden` (move, not duplicate — the panel slot is empty while the widget lives on the viewport). In `PoppedContext` it renders body-only (the popped wrapper owns the title + close button + re-dock handle).
+- `apps/simulator/src/components/drop-zones.tsx` (new) — a `pointer-events-auto` overlay shown only while `draggingWidget` is set. Four edge bands (top/right/bottom/left) bracket the viewport — **the simulation centre is not a drop target**. Each is a dnd-kit `useDroppable` (`useEdgeDropZone`); the one under the pointer highlights (`data-over`, primary glow). The sim canvas behind is dimmed while active.
+- `apps/simulator/src/components/viewport-widgets-layer.tsx` (new) — a `pointer-events-none` layer rendering the `popped[]` array, hidden while dragging. Each copy is `pointer-events-auto`, docked to its `edge` (clear of the app bars), and renders the widget body via the shared `renderWidget` registry wrapped in `PoppedContextProvider` (body-only). Its header carries a small **re-dock drag handle** (`useWidgetDragHandle(widget, 'redock')`) and a **close (X) button** (`undockWidget(widget)` → moves the widget back to its tab).
+- `apps/simulator/src/components/widgets/camera-feed-widget.tsx` — the live `RobotCameraViewport` moves **into** this widget (it no longer lives in `App.tsx`). With the move model there is ever one rendered copy; it owns the single live canvas whether docked-in-panel or popped.
+- `apps/simulator/src/components/widgets/minimap-widget.tsx` — same: the live `OccupancyMinimap` moves into this widget and owns the single live canvas.
+- `apps/simulator/src/components/widgets/widget-registry.tsx` — `renderWidget(widget, props)` is the single place that maps a `WidgetId` to its body, so the panel panes and the viewport layer never drift apart. (`dockedOnViewport?` is kept on the interface for symmetry but unused under the move model.)
+- `apps/simulator/src/App.tsx` — mounts `<TopAppBar>` + `<FooterStatusBar>`, wraps the panel + `<DropZones>` + `<ViewportWidgetsLayer>` in `<DndProvider>`, moves the panel to `top-12 bottom-8`, and removes the old unconditional `RobotCameraViewport` / `OccupancyMinimap` floats (they live in the widgets now).
 
-**Drop logic** (ported from the reference `viewport.addEventListener('drop')`):
-- compute grid cell from `e.clientX/clientY` vs viewport rect and `/cellW`, `/cellH`.
-- call `popWidget(widgetId, gridX, gridY)`.
-- **panel copy is untouched** — duplication, per requirement ("keep it in right panel to make things simple").
+**Drop logic** (edge zones, not a centre grid):
+- on `dragStart` of a panel handle (mode 'pop'): `startDragWidget(widget)` → `panelOpen=false`, `draggingWidget=widget`, zones appear.
+- the viewport is bracketed by 4 edge bands (top/right/bottom/left) — each is a dnd-kit droppable; the centre (the simulation view) is **not** a drop target and is covered by a dim backdrop + a "drop on a viewport edge to dock" hint.
+- on `drop` over an edge: `dropPoppedWidget(widget, edge)` moves the widget to that edge (singleton — a kind is popped at most once; re-dropping moves it). If `over` is null (released over the centre / outside the window / cancelled by Esc) → `cancelDragWidget()`. Either way the drag collapses and the panel reopens.
 
-**Popped widget rendering** (ported from `popOutWidget()`):
-- a `WidgetCard` with an extra header: the existing drag handle (for repositioning inside the viewport), the widget title, and a **remove button** (`lucide` `X` or `LogOut` → reference uses `logout`). Clicking remove calls `removePopped(id)`.
-- internal drag repositioning via pointer-events on the handle, snapping to the 4×4 grid on release (ported `mousedown`/`mousemove`/`mouseup` logic, grid-snap math).
+**Popped widget rendering:**
+- a card docked to its edge (clear of the app bars), header row with a small **re-dock drag handle** (dnd-kit mode 'redock' — re-triggers the edge-zone flow to move it to another edge), the title, and a **close (X) button**. Clicking the close button calls `undockWidget(widget)` and **moves the widget back to its tab** (panel card un-hides).
+- a widget kind is in exactly one place at a time: while popped, the panel card renders `hidden` (no empty placeholder, no duplicate). Live-feed kinds (`sensors.camera.feed`, `map.minimap`) render their live canvas wherever that one copy lives.
 
-**Exit criteria:** drag a Sensors/Map/Nav/Teleop/Utils widget handle out → grid appears, drop → duplicate floats on the viewport at the snapped cell, panel copy remains; remove button clears the popped copy; dragging the popped copy's handle moves + re-snaps it.
+**Exit criteria:** drag a Sensors/Map/Nav/Teleop/Utils widget handle out → panel slides closed, edge zones appear; drop on an edge → widget moves onto that edge and the panel slot hides; click the popped copy's close button → it moves back to its tab and its panel card reappears; drag the popped copy's handle to drop on another edge → it re-docks there (never duplicated). Existing `data-testid`s preserved; top app bar + footer render and stay green.
+
+**Phase 3 implementation notes (landed):**
+- `@dnd-kit/core` + `@dnd-kit/utilities` added. `DndProvider` (`components/dnd-context.tsx`) owns the `DndContext`, a `PointerSensor` (8px activation so a click doesn't start a drag), and a `DragOverlay` ghost. `useWidgetDragHandle(widget, mode)` returns `{ dragHandleProps, isDragging }`; `useEdgeDropZone(edge)` returns `{ dropZoneProps, isOver }`.
+- `store.ts`: `PoppedWidget` is now `{ widget, edge }` (no `id` — the kind doubles as the instance id). `mergePopped` replaces-in-place on the same `widget`. New action `undockWidget(widget)` removes the kind from `popped` and reopens the panel; the old `removePopped(id)` + `newPoppedId()` are gone. `isWidgetPopped` is unchanged.
+- `widget-card.tsx`: panel mode hides the card entirely (`hidden`) while its kind is popped (move, not duplicate). The handle spreads `dragHandleProps` (dnd-kit listeners) and carries `data-testid="widget-drag-handle"` + `data-widget`.
+- `drop-zones.tsx`: four `useEdgeDropZone` bands (`drop-zone-${edge}` with `data-over` when active) bracketing the viewport; sim view dimmed behind; centre carries the hint and is not droppable.
+- `viewport-widgets-layer.tsx` (mode 'redock' handle + `data-testid="popped-remove-${widget}"` close button → `undockWidget(widget)`). `data-testid="popped-widget-${widget}"` + `data-edge` preserved for the e2e suite.
+- `camera-feed-widget.tsx` / `minimap-widget.tsx` now **own** the live `RobotCameraViewport` / `OccupancyMinimap` canvases (moved out of `App.tsx`); the single rendered copy owns the live feed whether panel or popped.
+- `App.tsx` wraps the panel + overlays in `<DndProvider>`; the legacy unconditional camera/minimap floats are removed.
+- `store.test.ts` updated for the move model: the per-instance `id` + `removePopped` tests became `undockWidget` tests (moves a kind back + reopens the panel; no-op for a non-popped kind).
+- E2E: `widgets-drag.spec.ts` rewritten to drive dnd-kit with the **real `page.mouse`** (move onto handle → `mouse.down` → nudge past the 8px threshold → wait for `drop-zones` → move to edge → wait for `drop-zone-${edge}[data-over=true]` → `mouse.up`). Covers: drag start closes panel + shows zones; drop moves the lidar widget to an edge (panel handle count drops by one); close button moves it back; re-dock handle moves to a new edge; re-dropping never duplicates; the camera feed pops out carrying its live viewport, and closing returns the feed to the panel.
+- Verified: `pnpm typecheck` clean, `pnpm test` 75/75, `pnpm test:e2e` 50/50, `pnpm lint` / `pnpm check` clean.
 
 ### Phase 4 — Interactions polish & a11y
 
@@ -206,20 +226,13 @@ Rationale for grid coordinates instead of raw pixels: the reference snaps on dro
 
 ### Phase 6 — Tests
 
-- **Unit (vitest):** `store` panel slice — `togglePanel`, `setTab`, `popWidget` adds to `popped` with correct grid coords + leaves panel copy logically present, `removePopped` removes one by id, `movePopped` updates coords. Grid-clamp helpers (drop coords out of range are clamped to `[0,3]`).
+- **Unit (vitest):** `store` panel slice — `togglePanel`, `setTab`, `startDragWidget` (closes the panel + sets `draggingWidget`), `dropPoppedWidget(widget, edge)` moves the kind to that edge (singleton — re-dropping the same kind moves it), `cancelDragWidget` reopens without popping, `undockWidget(widget)` removes from `popped` + reopens the panel (no-op for a non-popped kind), `isWidgetPopped` selector.
 - **E2E (playwright):**
   - `right-panel.spec.ts` — panel visible by default; collapse toggle hides it; each of the 5 tabs is selectable; the 5th tab requires horizontal scroll to become visible (assert it's off-strip until scrolled).
-  - `widgets-drag.spec.ts` — drag the Lidar widget handle out of the panel → assert a popped widget appears on the viewport, the panel copy still present, drop grid visible during drag, remove button dismisses the popped widget. (Use `page.mouse` for the native DnD; the reference is mouse-based.)
+  - `widgets-drag.spec.ts` — drive a real dnd-kit drag with `page.mouse` (move onto the handle → `mouse.down` → nudge past the 8px activation threshold → wait for `drop-zones` → move to the edge → wait for `drop-zone-${edge}[data-over=true]` → `mouse.up`): assert drag start closes the panel + shows the zones, dropping moves the widget onto the edge (panel handle count drops by one — move, not duplicate), the close button moves it back, the re-dock handle moves it to a new edge, re-dropping never duplicates, and the camera feed pops out carrying its live viewport.
   - Update `smoke.spec.ts`/`sensors.spec.ts`/`navigation.spec.ts`/`teleoperation.spec.ts`/`localization.spec.ts`/`occupancy-grid.spec.ts` selectors that today target the scattered overlays (e.g. `nav-status`, `estop-button`, `lidar-toggle`, `clear-map-button`, `robot-pose`, `odometry-pose`) so they target the same controls now living inside the right panel tabs. Keep the `data-testid` attributes identical on the underlying controls to minimize churn.
 - **Visual/parity:** quick manual pass: every slider label, value format (`fmt`/`deg`), button text, and toggle wording matches today's strings.
 
 **Exit criteria:** all unit + e2e green; `pnpm typecheck` + `pnpm build` clean.
 
 ---
-
-## Open questions (decide before Phase 3)
-
-1. **Drop grid resolution:** reference uses 4×4 in `drag-and-drop/code.html` (and a 3×2 in the inline demo). Propose **4×4** for both the overlay and the snap lattice; revisit if popped widgets overlap on small viewports.
-2. **Duplicate ids:** if a user drops the *same* widget kind twice, two popped instances share a `widget` id. Use a per-instance `id` (`crypto.randomUUID()` or a counter) for `removePopped`/`movePopped` keys — already in the `PoppedWidget` type above.
-3. **Camera/minimap as popped widgets:** since the live WebGL viewports are singletons mounted by `App.tsx`, a popped "camera widget" on the viewport would be controls-only (no second live feed). Confirm acceptable (assumed yes — requirement says "duplicate widget", not "duplicate live render"). Map this explicitly in Phase 3 docs.
-4. **Top app bar / footer status bar:** the references include a 48px top bar (title, map-type toggle, play/reset/estop) and a 32px footer (sim time / fps / status). Today these controls are scattered (top-left HUD + top-center buttons). Out of scope for this plan; a future "app shell" task can fold them in. The panel's `top`/`bottom` insets in Phase 1 leave room for them.

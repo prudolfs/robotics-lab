@@ -105,7 +105,7 @@ test.describe('Phase 2 — Teleoperation', () => {
 			.poll(async () => (await getRobotPose(page)).x, { timeout: 15_000, intervals: [100] })
 			.toBeGreaterThan(start.x + 0.2)
 
-		// ESTOP now lives in the Teleop tab of the right panel (Phase 2).
+		// ESTOP lives in the Teleop tab of the right panel (Phase 2).
 		await activateTab(page, 'teleop')
 		await page.getByTestId('estop-button').click()
 		// Space held down keeps the keyboard stop intent; the click zeroes the

@@ -25,7 +25,7 @@ export function LidarWidget() {
 		setLidar(createLidarConfig({ ...lidar, ...patch }))
 
 	return (
-		<WidgetCard title="Sensors" bodyClassName="gap-3">
+		<WidgetCard title="Sensors" widget="sensors.lidar" bodyClassName="gap-3">
 			<div className="flex items-center justify-end">
 				<Button
 					variant={showLidar ? 'default' : 'outline'}

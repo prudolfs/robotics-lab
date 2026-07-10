@@ -30,7 +30,7 @@ export function MapControlsWidget() {
 	}
 
 	return (
-		<WidgetCard title="Map" bodyClassName="gap-2">
+		<WidgetCard title="Map" widget="map.controls" bodyClassName="gap-2">
 			<div className="flex items-center justify-end">
 				<ToggleButton
 					data-testid="occupancy-grid-toggle"

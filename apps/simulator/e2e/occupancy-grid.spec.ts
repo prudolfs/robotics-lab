@@ -64,12 +64,13 @@ test.describe('Phase 5 — Occupancy Grid', () => {
 	test('minimap reflects grid updates', async ({ page }) => {
 		await launchSimulator(page)
 
+		// The minimap widget lives in the Map tab of the right panel (Phase 3 moved
+		// the live minimap canvas out of the fixed App.tsx float and into the
+		// MinimapWidget, so it is only rendered while that tab is the active pane).
+		await activateTab(page, 'map')
+
 		// Minimap is visible by default.
 		await expect(page.getByTestId('occupancy-minimap')).toBeVisible()
-
-		// The minimap / grid toggles now live in the Map tab of the right panel
-		// (Phase 2). Switch to it so the toggles are clickable.
-		await activateTab(page, 'map')
 
 		// Toggle the minimap off.
 		await page.getByTestId('minimap-toggle').click()

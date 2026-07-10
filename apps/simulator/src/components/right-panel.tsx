@@ -1,18 +1,20 @@
-// Right panel (docs/hud.md) — Phase 2.
+// Right panel (docs/hud.md) — Phase 3.
 //
 // A single tabbed sidebar that hosts all the HUD widgets. Phase 1 landed the
-// shell (show/hide toggle + a 5-tab strip where four tabs are visible and the
-// fifth is reached by horizontal scroll). Phase 2 fills the tab panes with the
-// existing controls, now wrapped in `WidgetCard`s. The old scattered HUD
-// overlays in `App.tsx` are removed in Phase 2; the two live canvas floats
-// (robot camera viewport + occupancy minimap) stay mounted in `App.tsx`
-// because they must sit outside `<Canvas>` — only their toggles moved here.
+// shell (show/hide toggle + 5-tab strip, four visible + one scrolled). Phase 2
+// filled the panes. Phase 3 makes the per-card drag handle a real HTML5 drag
+// source: dragging a handle closes the panel and drops that widget kind onto a
+// viewport edge (see `DropZones` + `ViewportWidgetsLayer` in `App.tsx`). When
+// a kind is already popped, its panel card hides the handle (the feed widgets
+// compute this internally from `isPopped && !dockedOnViewport`) so the two
+// copies don't both advertise dragging — and live-feed widgets (camera /
+// minimap) show a placeholder in the panel while the live stream lives in the
+// popped copy.
 //
-// The panel reads/writes only the `panel` slice of the Zustand store
-// (`panelOpen` / `activeTab` + `togglePanel` / `setTab`). It owns no
+// The panel reads/writes only UI state from the Zustand store. It owns no
 // simulation state, per the "React observes, the loop owns" contract. The
-// `controls` from the simulation loop hook are threaded in as a prop so the
-// Nav / Teleop / robot-debug widgets can drive reset / e-stop / coverage.
+// `controls` from the simulation loop hook are threaded down so the Nav /
+// Teleop / robot-debug widgets can drive reset / e-stop / coverage.
 
 import type { LucideIcon } from 'lucide-react'
 import {
@@ -25,7 +27,8 @@ import {
 	Wrench,
 } from 'lucide-react'
 import { useRef } from 'react'
-import { CameraWidget } from '@/components/widgets/camera-widget'
+import { CameraControlsWidget } from '@/components/widgets/camera-controls-widget'
+import { CameraFeedWidget } from '@/components/widgets/camera-feed-widget'
 import { LidarWidget } from '@/components/widgets/lidar-widget'
 import { LocalizationWidget } from '@/components/widgets/localization-widget'
 import { LogsWidget } from '@/components/widgets/logs-widget'
@@ -50,8 +53,7 @@ const TABS: TabDef[] = [
 
 // The collapse toggle sits on the panel's leading edge. When collapsed we
 // slide the panel by `calc(100% - <toggle> - gap)` so the toggle stays poking
-// out and the panel remains reachable — matching the reference
-// `#collapse-toggle { left: -32px }` behaviour.
+// out and the panel remains reachable.
 const TOGGLE_W = '2rem' // w-8
 
 export interface RightPanelProps {
@@ -66,13 +68,7 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 	const activeTab = useSimulatorStore((s) => s.activeTab)
 	const togglePanel = useSimulatorStore((s) => s.togglePanel)
 	const setTab = useSimulatorStore((s) => s.setTab)
-	// Robot is observed here so the Utils-tab debug widget re-renders each
-	// frame like the old `DebugOverlay` did (the store mirrors the loop).
-	const robot = useSimulatorStore((s) => s.robot)
 
-	// Keep refs to each tab button so selecting a tab can scroll it into view
-	// inside the horizontally-scrollable strip (the 5th tab is off-strip until
-	// scrolled). The reference `switchTab()` does `scrollIntoView({inline:'center'})`.
 	const tabRefs = useRef<Record<PanelTab, HTMLButtonElement | null>>({
 		sensors: null,
 		map: null,
@@ -83,7 +79,6 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 
 	const selectTab = (tab: PanelTab) => {
 		setTab(tab)
-		// Defer so the button exists in the DOM after the state swap.
 		requestAnimationFrame(() => {
 			tabRefs.current[tab]?.scrollIntoView({
 				behavior: 'smooth',
@@ -99,15 +94,11 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 			data-open={open}
 			aria-label="Control panel"
 			className={cn(
-				'pointer-events-auto absolute top-4 right-4 bottom-4 z-10 flex w-80 max-w-[calc(100vw-2rem)] flex-col overflow-visible rounded-lg border border-border bg-card/80 shadow-2xl backdrop-blur-md transition-transform duration-300',
-				// Slide almost fully off-screen when collapsed, leaving the toggle
-				// (which lives at the panel's leading edge) visible.
+				// `top-12 bottom-8` clears the top app bar + footer status bar.
+				'pointer-events-auto absolute top-12 right-4 bottom-8 z-10 flex w-80 max-w-[calc(100vw-2rem)] flex-col overflow-visible rounded-lg border border-border bg-card/80 shadow-2xl backdrop-blur-md transition-transform duration-300',
 				open ? 'translate-x-0' : `translate-x-[calc(100%-1rem-${TOGGLE_W})]`,
 			)}
 		>
-			{/* Collapse toggle — on the panel's leading (left) edge. Because it is
-			    a child of the translated panel, when the panel is "collapsed" the
-			    toggle stays poking out and remains clickable to re-open it. */}
 			<button
 				type="button"
 				data-testid="panel-toggle"
@@ -125,8 +116,6 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 			</button>
 
 			<div id="right-panel-content" className="flex h-full flex-col overflow-hidden">
-				{/* Tab strip: horizontally scrollable, 4 tabs visible, 5th scrolled in.
-				    `no-scrollbar` hides the scrollbar while preserving scrolling. */}
 				<div
 					role="tablist"
 					aria-label="Control panel tabs"
@@ -159,13 +148,11 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 					})}
 				</div>
 
-				{/* Tab content panes — each pane holds the relevant `WidgetCard`s
-				    stacked vertically with the existing gap spacing. Inactive panes
-				    are kept mounted but `hidden` so switching tabs is instant. */}
 				<div className="flex-1 overflow-y-auto p-4">
 					<TabPane tab="sensors" active={activeTab}>
 						<LidarWidget />
-						<CameraWidget />
+						<CameraControlsWidget />
+						<CameraFeedWidget />
 					</TabPane>
 					<TabPane tab="map" active={activeTab}>
 						<MapControlsWidget />
@@ -179,7 +166,7 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 						<TeleopWidget controls={controls} />
 					</TabPane>
 					<TabPane tab="utils" active={activeTab}>
-						<RobotDebugWidget robot={robot} onReset={onReset} />
+						<RobotDebugWidget onReset={onReset} />
 						<LogsWidget />
 					</TabPane>
 				</div>

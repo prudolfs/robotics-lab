@@ -6,52 +6,47 @@ import {
 	GoalView,
 	LidarView,
 	OccupancyGridView,
-	OccupancyMinimap,
 	OdometryView,
 	PathView,
-	RobotCameraViewport,
 	RobotView,
 	SimulatorScene,
 	WorldView,
 } from '@robotics-lab/rendering'
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
+import { DndProvider } from '@/components/dnd-context'
+import { DropZones } from '@/components/drop-zones'
+import { FooterStatusBar } from '@/components/footer-status-bar'
 import { RightPanel } from '@/components/right-panel'
-import { Button } from '@/components/ui/button'
+import { TopAppBar } from '@/components/top-app-bar'
+import { ViewportWidgetsLayer } from '@/components/viewport-widgets-layer'
 import { useSimulationLoop } from '@/sim/use-simulation-loop'
 import { useSimulatorStore } from '@/store'
 
+// The main orbit camera config.
 const CAMERA = { position: [6, 6, 6] as const, fov: 50, near: 0.2, far: 1000 }
 
 export default function App() {
-	const [fps, setFps] = useState(0)
-	const handleFps = useCallback((value: number) => setFps(Math.round(value)), [])
-
-	const mapNames = useSimulatorStore((s) => s.mapNames)
-	const selectedMap = useSimulatorStore((s) => s.selectedMap)
+	const setFps = useSimulatorStore((s) => s.setFps)
 	const world = useSimulatorStore((s) => s.world)
 	const robot = useSimulatorStore((s) => s.robot)
-	const simTime = useSimulatorStore((s) => s.simTime)
-	const running = useSimulatorStore((s) => s.running)
 	const scan = useSimulatorStore((s) => s.scan)
 	const grid = useSimulatorStore((s) => s.grid)
-	const showLidar = useSimulatorStore((s) => s.showLidar)
-	const showCamera = useSimulatorStore((s) => s.showCamera)
-	const cameraNoise = useSimulatorStore((s) => s.cameraNoise)
-	const showOccupancy = useSimulatorStore((s) => s.showOccupancy)
-	const showMinimap = useSimulatorStore((s) => s.showMinimap)
-	const selectMap = useSimulatorStore((s) => s.selectMap)
 	const goals = useSimulatorStore((s) => s.goals)
 	const setGoal = useSimulatorStore((s) => s.setGoal)
 	const addGoal = useSimulatorStore((s) => s.addGoal)
 	const path = useSimulatorStore((s) => s.path)
 	const planOpen = useSimulatorStore((s) => s.planOpen)
 	const planClosed = useSimulatorStore((s) => s.planClosed)
+	const showOccupancy = useSimulatorStore((s) => s.showOccupancy)
+	const showLidar = useSimulatorStore((s) => s.showLidar)
 	const showPath = useSimulatorStore((s) => s.showPath)
 	const showOdometry = useSimulatorStore((s) => s.showOdometry)
 	const odometryPose = useSimulatorStore((s) => s.odometryPose)
 	const odometryHistory = useSimulatorStore((s) => s.odometryHistory)
 
 	const controls = useSimulationLoop()
+
+	const handleFps = useCallback((value: number) => setFps(Math.round(value)), [setFps])
 
 	// Click destination on the floor: replace the goal queue, or append (Shift).
 	const handlePick = useCallback(
@@ -62,11 +57,11 @@ export default function App() {
 		[setGoal, addGoal],
 	)
 
-	// Camera look tilt (radians); user-controlled via drag on the viewport.
-	const [pitch, setPitch] = useState(0)
-
 	return (
-		<div className="relative h-screen w-screen overflow-hidden bg-background">
+		<div
+			data-testid="simulation-viewport"
+			className="relative h-screen w-screen overflow-hidden bg-background"
+		>
 			<Canvas data-testid="simulator-canvas" shadows gl={{ antialias: true }} camera={CAMERA}>
 				<SimulatorScene>
 					<FpsCounter onUpdate={handleFps} />
@@ -84,102 +79,23 @@ export default function App() {
 				</SimulatorScene>
 			</Canvas>
 
-			<div
-				data-testid="simulator-hud"
-				className="pointer-events-none absolute top-4 left-4 flex flex-col gap-1"
-			>
-				<h1 className="font-semibold text-foreground text-lg">Robotics Lab — Simulator</h1>
-				<span data-testid="fps-counter" className="font-mono text-muted-foreground text-sm">
-					FPS: {fps}
-				</span>
-				<span className="font-mono text-muted-foreground text-sm">Map: {world.name}</span>
-				<span data-testid="sim-time" className="font-mono text-muted-foreground text-sm">
-					Sim time: {simTime.toFixed(2)}s
-				</span>
-				{robot && (
-					<span data-testid="robot-marker" className="sr-only" aria-hidden="true">
-						robot present
-					</span>
-				)}
-			</div>
+			{/* Phase 3 app shell: the formerly-scattered top-left HUD + top-centre
+			   controls fold into the top app bar; the fps/sim-time readouts move
+			   to the footer. The right panel insets move to top-12 bottom-8. */}
+			<TopAppBar controls={controls} />
+			<FooterStatusBar />
 
-			<div className="pointer-events-none absolute top-4 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2">
-				<div className="flex items-center gap-2">
-					<Button
-						data-testid="pause-resume-button"
-						variant={running ? 'default' : 'outline'}
-						onClick={controls.togglePause}
-						className="pointer-events-auto"
-					>
-						{running ? 'Pause' : 'Resume'}
-					</Button>
-					<Button
-						data-testid="reset-button"
-						variant="outline"
-						onClick={controls.reset}
-						className="pointer-events-auto"
-					>
-						Reset
-					</Button>
-				</div>
-				<div className="flex flex-wrap justify-center gap-2">
-					{mapNames.map((name) => (
-						<Button
-							key={name}
-							variant={name === selectedMap ? 'default' : 'outline'}
-							onClick={() => selectMap(name)}
-							size="xs"
-							className="pointer-events-auto"
-						>
-							{name}
-						</Button>
-					))}
-				</div>
-			</div>
+			{/* dnd-kit context owns the drag (panel handles + popped re-dock
+			   handles) and the edge drop zones. Everything that drags or drops
+			   must be inside. */}
+			<DndProvider>
+				<RightPanel controls={controls} onReset={controls.reset} />
 
-			<RightPanel controls={controls} onReset={controls.reset} />
-
-			{/* Phase 2: the old scattered HUD placements (SensorHud / MapHud /
-			   TeleopHud right-sidebar stack, the absolutely-placed NavigationHud and
-			   LocalizationHud, and the bottom-left DebugOverlay) are gone — their
-			   controls now live inside the right panel tabs (see right-panel.tsx).
-			   Only the two live canvas floats below remain, gated on their toggles
-			   (which now live in the Sensors / Map tabs). */}
-
-			{/* Camera viewport floats above navigation, always visible when on. The
-			   `Cam` toggle + camera noise control moved into the Sensors tab. */}
-			{showCamera && (
-				<div className="pointer-events-auto fixed inset-x-4 bottom-4 z-50 flex justify-center">
-					<RobotCameraViewport
-						world={world}
-						pose={robot.pose}
-						robotParams={robot.params}
-						active={showCamera}
-						noise={cameraNoise}
-						pitch={pitch}
-						onPitch={setPitch}
-						className="h-48 w-64 overflow-hidden rounded-lg border border-border bg-black/80 backdrop-blur-sm"
-					/>
-				</div>
-			)}
-
-			{showMinimap && (
-				<div
-					data-testid="occupancy-minimap"
-					className="pointer-events-none absolute top-1/2 left-4 flex -translate-y-1/2 flex-col gap-1"
-				>
-					<span className="font-mono text-[10px] text-muted-foreground">Minimap</span>
-					<div className="rounded-lg border border-border bg-card/80 p-1 backdrop-blur-sm">
-						<OccupancyMinimap
-							grid={grid}
-							world={world}
-							pose={robot.pose}
-							scan={scan}
-							className="block h-40 w-40 rounded"
-						/>
-					</div>
-				</div>
-			)}
+				{/* Edge drop zones shown while a widget handle is being dragged out of
+				   the panel; and the popped-widget overlay layer (docked copies). */}
+				<DropZones />
+				<ViewportWidgetsLayer controls={controls} onReset={controls.reset} />
+			</DndProvider>
 		</div>
 	)
 }
