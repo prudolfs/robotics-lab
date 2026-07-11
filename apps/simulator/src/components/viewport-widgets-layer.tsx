@@ -1,18 +1,39 @@
-// Viewport widgets layer (docs/hud.md Phase 3).
+// Viewport widgets layer (docs/hud.md Phase 3 + Phase 4c).
 //
-// Renders the `popped[]` array as docked overlay cards on the main viewport,
-// one per viewport edge. Each copy:
-//   - is docked to its `edge` (top/right/bottom/left), clear of the app bars,
-//   - has a header row with the title and a **close button** (the popped copy's
-//     drag handle becomes a close button per the new Phase-3 model), clicking
-//     it calls `undockWidget(widget)` and moves the widget back to its tab,
-//   - also carries a small re-dock drag handle (dnd-kit mode 'redock') so the
-//     user can drag it to another edge without first closing it,
+// Renders the `popped[]` array as docked overlay cards on the main viewport.
+// Phase 4c changed the layout model: instead of anchoring each card to the
+// same edge coordinates (which stacked multiple `top` widgets on identical
+// pixels), one **per-edge strip** element holds all widgets dropped on that
+// edge. The strips are flex-column containers laid out in normal document flow
+// with `gap-2`, so widgets on the same edge **never overlap**: the second
+// `top` widget lands below the first; the second `right` widget lands above
+// the first in the column. Each strip scrolls (`overflow-y-auto`) when the
+// stacked cards overflow its allotted span.
+//
+// Corner non-overlap: when a horizontal strip (`top`/`bottom`) is populated,
+// the side strips (`left`/`right`) shrink their vertical span to clear the
+// horizontal strip's `max-h-[40vh]` (via `top-72`/`bottom-72`) so a corner
+// top widget and a side widget never collide. Empty edges render no strip,
+// so the remaining strips take the full side span when their horizontal peer
+// is unpopulated.
+//
+// Each popped card:
+//   - is a child of its edge strip (absolute-positioned to the edge),
+//   - has a header row with a re-dock drag handle (dnd-kit mode 'redock') so
+//     the user can drag it to another edge without first closing it,
+//   - carries a **close (X) button** that calls `undockWidget(widget)` and
+//     moves the widget back to its tab in the right panel,
 //   - renders the widget body via the shared `renderWidget` registry, wrapped
-//     in `PoppedContextProvider` so the inner `WidgetCard` is body-only (no
-//     double chrome).
+//     in `PoppedContextProvider` so the inner `WidgetCard` is body-only.
 //
-// The layer is `pointer-events-none` except for the popped cards themselves.
+// Live-feed widgets (`sensors.camera.feed`, `map.minimap`) keep their canvas
+// fixed (`flex-none` + the canvas's own height) so the scroll container
+// reserves the right space when the strip overflows.
+//
+// The layer is `pointer-events-none` except for the strips + cards themselves.
+// The strips are hidden while a drag is in progress (the drop zones take over).
+// When the right panel is open, the strips clear the panel footprint so the
+// panel's tabs stay clickable (see `PANEL_CLEAR_CLASS`).
 
 import { X } from 'lucide-react'
 import { useWidgetDragHandle, WIDGET_TITLES } from '@/components/dnd-context'
@@ -23,26 +44,53 @@ import { cn } from '@/lib/utils'
 import type { SimulationControls } from '@/sim/use-simulation-loop'
 import { type DropEdge, type PoppedWidget, useSimulatorStore } from '@/store'
 
-const EDGE_CLASS: Record<DropEdge, string> = {
-	top: 'top-14 inset-x-3 items-start',
-	bottom: 'bottom-10 inset-x-3 items-end',
-	left: 'left-3 top-16 bottom-12 items-start',
-	right: 'right-3 top-16 bottom-12 items-end',
+/**
+ * Tailwind classes anchoring each horizontal edge strip. Side edges are
+ * handled separately because their vertical span depends on which horizontal
+ * strips are populated.
+ */
+const STRIP_BASE: Record<DropEdge, string> = {
+	top: 'absolute top-14 inset-x-3 flex-col items-center max-h-[40vh] overflow-y-auto',
+	bottom: 'absolute bottom-10 inset-x-3 flex-col items-center max-h-[40vh] overflow-y-auto',
+	left: 'absolute left-3 flex-col items-start max-w-xs overflow-y-auto',
+	right: 'absolute right-3 flex-col items-end max-w-xs overflow-y-auto',
 }
 
-const WIDTH_CLASS: Record<DropEdge, string> = {
-	top: 'max-w-md',
-	bottom: 'max-w-md',
-	left: 'max-w-xs',
-	right: 'max-w-xs',
+/** Vertical clearance applied to side strips when a horizontal strip is
+ *  populated. The top strip occupies `top-14` (56px) + up to `max-h-[40vh]`
+ *  (288px at 720 viewport) → bottom edge as deep as y=344. Side strips must
+ *  start at or below that, so we anchor them at `top-[22rem]` (352px — 344 +
+ *  8px gap). Symmetric for the bottom strip (`bottom-[22rem]`). These are
+ *  static utilities Tailwind v4 emits. */
+const STRIP_CLEAR_TOP = 'top-[22rem]'
+const STRIP_CLEAR_BOTTOM = 'bottom-[22rem]'
+
+/** Side-strip default top when no `top` strip is present (clears top app bar). */
+const STRIP_DEFAULT_TOP = 'top-16'
+/** Side-strip default bottom when no `bottom` strip is present (clears footer). */
+const STRIP_DEFAULT_BOTTOM = 'bottom-12'
+
+/** Align cards toward the edge they were dropped on within the strip column. */
+const ITEMS_CLASS: Record<DropEdge, string> = {
+	top: 'items-center',
+	bottom: 'items-center',
+	left: 'items-start',
+	right: 'items-end',
 }
 
-const SCROLL_CLASS: Record<DropEdge, string> = {
-	top: 'max-h-[40vh] overflow-y-auto',
-	bottom: 'max-h-[40vh] overflow-y-auto',
-	left: 'max-h-full overflow-y-auto',
-	right: 'max-h-full overflow-y-auto',
+/** Extra insets applied while the right panel is open so strips clear the
+ *  panel footprint (`w-[18rem]` ≈ 18rem + `right-4` gap ≈ 20rem). Keeps the
+ *  panel's tabs clickable. The `right` strip shifts to the left of the panel.
+ *  `left` needs no shift because the panel is on the right. */
+const PANEL_CLEAR_CLASS: Record<DropEdge, string> = {
+	top: 'right-[20rem]',
+	bottom: 'right-[20rem]',
+	left: '',
+	right: 'right-[20rem]',
 }
+
+/** The prioritized order in which edges appear in the overlay's DOM. */
+const EDGE_ORDER: DropEdge[] = ['top', 'right', 'bottom', 'left']
 
 export interface ViewportWidgetsLayerProps extends WidgetRenderProps {
 	controls: SimulationControls
@@ -52,6 +100,7 @@ export interface ViewportWidgetsLayerProps extends WidgetRenderProps {
 export function ViewportWidgetsLayer(props: ViewportWidgetsLayerProps) {
 	const popped = useSimulatorStore((s) => s.popped)
 	const draggingWidget = useSimulatorStore((s) => s.draggingWidget)
+	const panelOpen = useSimulatorStore((s) => s.panelOpen)
 
 	// Hide the popped cards while dragging any widget (the drop zones take over).
 	const visible = !draggingWidget
@@ -60,8 +109,62 @@ export function ViewportWidgetsLayer(props: ViewportWidgetsLayerProps) {
 
 	return (
 		<div className="pointer-events-none absolute inset-0 z-30">
-			{popped.map((p) => (
-				<PoppedCard key={p.widget} popped={p} renderProps={props} />
+			{EDGE_ORDER.map((edge) => (
+				<EdgeStrip
+					key={edge}
+					edge={edge}
+					popped={popped}
+					renderProps={props}
+					panelOpen={panelOpen}
+				/>
+			))}
+		</div>
+	)
+}
+
+/** A vertical flex column anchored to one viewport edge; maps its edge's
+ *  popped widgets to stacked popped cards. Empty edges render nothing (so the
+ *  remaining strips take the full span when their peer is unpopulated). */
+function EdgeStrip({
+	edge,
+	popped,
+	renderProps,
+	panelOpen,
+}: {
+	edge: DropEdge
+	popped: PoppedWidget[]
+	renderProps: WidgetRenderProps
+	panelOpen: boolean
+}) {
+	const onEdge = popped.filter((p) => p.edge === edge)
+	if (onEdge.length === 0) return null
+
+	// Which other edges are populated? Side strips clear the horizontal
+	// strips that have cards so corner cards never collide.
+	const hasTop = popped.some((p) => p.edge === 'top')
+	const hasBottom = popped.some((p) => p.edge === 'bottom')
+
+	// Build the strip's class list: base classes; for the side edges compose
+	// the top/bottom bound that clears the populated horizontal strip (or its
+	// default). Dynamic class assembly is fine here — each class token is a
+	// static string Tailwind v4 recognises individually.
+	const sideTop = hasTop ? STRIP_CLEAR_TOP : STRIP_DEFAULT_TOP
+	const sideBottom = hasBottom ? STRIP_CLEAR_BOTTOM : STRIP_DEFAULT_BOTTOM
+	const stripClass =
+		edge === 'left' || edge === 'right'
+			? `${STRIP_BASE[edge]} ${sideTop} ${sideBottom}`
+			: STRIP_BASE[edge]
+
+	return (
+		<div
+			className={cn(
+				'edge-scroll pointer-events-auto z-30 flex gap-2',
+				stripClass,
+				panelOpen && PANEL_CLEAR_CLASS[edge],
+			)}
+		>
+			{onEdge.map((p) => (
+				<PoppedCard key={p.widget} popped={p} renderProps={renderProps} />
 			))}
 		</div>
 	)
@@ -82,21 +185,19 @@ function PoppedCard({
 		<div
 			data-testid={`popped-widget-${popped.widget}`}
 			data-edge={popped.edge}
-			className={cn(
-				'pointer-events-auto absolute flex flex-col',
-				EDGE_CLASS[popped.edge],
-				WIDTH_CLASS[popped.edge],
-			)}
+			// `flex-none` keeps the card from shrinking in the strip so stacked
+			// cards each take their natural height and the strip can scroll.
+			className={cn('pointer-events-auto flex w-full flex-none flex-col', ITEMS_CLASS[popped.edge])}
 		>
 			<div className="flex w-full flex-col gap-2 rounded-lg border border-border bg-card/90 p-3 shadow-2xl backdrop-blur-md">
 				<div className="flex items-center justify-between gap-2">
 					<div className="flex min-w-0 items-center gap-1.5">
-						{/* Re-dock drag handle (dnd-kit, mode 'redock'). */}
-						{/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: drag handle is a static affordance; aria-label is the accessible name */}
-						<span
+						<button
+							type="button"
 							{...dragHandleProps}
+							tabIndex={0}
 							className={cn(
-								'flex cursor-grab touch-none select-none text-muted-foreground/60 hover:text-muted-foreground active:cursor-grabbing',
+								'flex cursor-grab touch-none select-none bg-transparent p-0 text-muted-foreground/60 hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing',
 								isDragging && 'opacity-40',
 							)}
 							aria-label={`Drag ${title} to re-dock`}
@@ -105,7 +206,7 @@ function PoppedCard({
 							<span className="text-muted-foreground/60" aria-hidden="true">
 								⠿
 							</span>
-						</span>
+						</button>
 						<span className="truncate font-semibold text-foreground text-sm">{title}</span>
 					</div>
 					<Button
@@ -120,7 +221,10 @@ function PoppedCard({
 					</Button>
 				</div>
 				<PoppedContextProvider value={true}>
-					<div className={cn('flex flex-col gap-3', SCROLL_CLASS[popped.edge])}>
+					{/* Live-feed widgets (camera/minimap) render their canvas with a
+					    fixed height — `flex-none` on the body keeps it from stretching
+					    the strip and lets the strip scroll predictably. */}
+					<div className="flex w-full flex-none flex-col gap-3">
 						{renderWidget(popped.widget, { ...renderProps, dockedOnViewport: true })}
 					</div>
 				</PoppedContextProvider>

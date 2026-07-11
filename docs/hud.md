@@ -18,13 +18,13 @@
 2. The right panel has **5 tabs**: `Sensors`, `Map`, `Nav`, `Teleop`, `Utils`.
 3. **4 tabs are visible** in the tab strip; the **5th is reachable by horizontal scroll** of the strip.
 4. The whole panel has a **show/hide toggle** (chevron on the panel's leading edge).
-5. Every widget has a **drag handle** before its title. Dragging a handle **out** of the panel **closes the panel**, surfaces four **edge drop zones** (top/right/bottom/left) that bracket — never cover — the simulation viewport, and dropping on an edge **moves** the widget onto that edge. (The simulation centre is intentionally not a drop target; widgets never occlude the scene.) Drag is driven by **dnd-kit** (pointer events) rather than native HTML5 drag.
+5. Every widget has a **drag handle** before its title. Dragging a handle **out** of the panel surfaces four **edge drop zones** (top/right/bottom/left) that bracket — never cover — the simulation viewport, and dropping on an edge **moves** the widget onto that edge. (The simulation centre is intentionally not a drop target; widgets never occlude the scene.) Drag is driven by **dnd-kit** (pointer events) rather than native HTML5 drag. **The right panel is *not* hidden during the drag** — the drop zones overlay the viewport beside the panel (updated in Phase 4; the old "drag closes the panel" rule is revoked).
 6. A popped-out widget shows a **close (X) button** instead of a drag handle (plus a small re-dock handle). Clicking close **moves the widget back to its tab** in the panel. The widget is **moved**, not duplicated — while a kind is popped its panel slot is hidden entirely (one live instance ever, including live feeds).
-7. Keep all controls and text **as close as possible** to what exists today; the reference HTMLs are design inspiration, not a literal restyle of every token (current app uses shadcn tokens; the references use the Cyber-Kinetic palette — we adapt the *structure*, not the *color system*).
+7. Keep all controls and text **as close as possible** to what exists today; the reference HTMLs are design inspiration, not a literal restyle of every token. The app ships in **dark mode by default** (see `.temp/right-panel/cyber_kinetic_terminal/DESIGN.md` — glass surfaces, neon-cyan primary, JetBrains-Mono data, Inter labels), applied through the **existing shadcn token system** (`Button`, `border`, `bg-card/80`, `text-primary`, `text-muted-foreground`) rather than a parallel hex palette — the references drive the *structure + dark look-and-feel*, not a custom color system. A light/dark toggle lets the user opt out.
 
 ## Non Goals
 
-- Re-skinning the whole app to the Cyber-Kinetic palette / JetBrains-Mono-everywhere. (A later theme pass can do that; this work reuses existing shadcn `Button`, `border`, `bg-card/80`, `backdrop-blur-sm` surfaces.)
+- Re-skinning the whole app to the Cyber-Kinetic palette / JetBrains-Mono-everywhere. (A later theme pass can do that; this work reuses existing shadcn `Button`, `border`, `bg-card/80`, `backdrop-blur-sm` surfaces.) **This is still true** even once Phase 4 wires the dark theme: we toggle the shadcn `dark` variant — we do **not** introduce the Cyber-Kinetic hex palette as new CSS. JetBrains-Mono-only typography stays a later pass.
 - Widget layout persistence across reloads (out for now; can be a follow-up).
 - Redocking a popped-out widget back into a custom order in the panel.
 - Touch/pen drag support in v1 — pointer (mouse) only, matching the reference.
@@ -72,17 +72,20 @@ type PoppedWidget = {
 }
 
 type PanelState = {
-  open: boolean            // panel show/hide
+  open: boolean            // panel show/hide (only `togglePanel` flips this — drags do not)
   activeTab: 'sensors' | 'map' | 'nav' | 'teleop' | 'utils'
   popped: PoppedWidget[]   // widgets moved onto the main viewport
   draggingWidget: WidgetId | null  // kind being dragged / zones shown
+  theme: 'light' | 'dark'  // app color scheme (Phase 4)
   // actions
   togglePanel: () => void
   setTab: (tab) => void
-  startDragWidget: (widget: WidgetId) => void        // closes panel, mounts zones
+  startDragWidget: (widget: WidgetId) => void        // mount zones (does NOT touch panelOpen)
   dropPoppedWidget: (widget: WidgetId, edge: DropEdge) => void  // move onto edge
-  cancelDragWidget: () => void                       // reopen, no pop
+  cancelDragWidget: () => void                       // unmount zones, no pop
   undockWidget: (widget: WidgetId) => void           // close button → back to tab
+  toggleTheme: () => void
+  setTheme: (theme: 'light' | 'dark') => void
 }
 ```
 
@@ -109,7 +112,7 @@ Rationale for an `edge` (not pixels / a centre grid): the simulation centre must
 
 **Phase 1 implementation notes (landed):**
 - `panel` slice added to `apps/simulator/src/store.ts`: `panelOpen`, `activeTab` (`PanelTab` type: `sensors | map | nav | teleop | utils`), `togglePanel()`, `setTab(tab)`. Covered by `apps/simulator/src/store.test.ts`.
-- `apps/simulator/src/components/right-panel.tsx`: the shell — fixed right-edge `aside`, a collapse toggle that slides the panel almost fully off-screen leaving the toggle poking out (`translate-x-[calc(100%-1rem-2rem)]` when closed), and a horizontally-scrollable tab strip (`no-scrollbar`, `snap-x snap-mandatory`, each tab `w-1/4` so **4 tabs fit** and the **5th scrolls in**; selecting a tab `scrollIntoView({inline:'center'})`).
+- `apps/simulator/src/components/right-panel.tsx`: the shell — fixed right-edge `aside`, a collapse toggle that slides the panel almost fully off-screen leaving the toggle poking out (`translate-x-[calc(100%-1rem-2rem)]` when closed; **brittle — the dynamic class is not emitted by Tailwind v4 so the slide never happens; fixed in Phase 4**), and a horizontally-scrollable tab strip (`no-scrollbar`, `snap-x snap-mandatory`, each tab `w-1/4` so **4 tabs fit** and the **5th scrolls in**; selecting a tab `scrollIntoView({inline:'center'})`).
 - `.no-scrollbar` utility added to `apps/simulator/src/styles.css`.
 - `apps/simulator/src/App.tsx` mounts `<RightPanel />`. **Temporary:** so the new panel can claim the right edge without overlapping the live legacy HUDs, the legacy right-sidebar stack (`SensorHud`/`MapHud`/`TeleopHud`) is docked to the **upper-left** (`top-32 left-4 max-h-[40vh]`) and `LocalizationHud` is shifted from `right-72` to `right-88` to clear the panel. These are throwaway Phase-1 placements; **Phase 2 deletes them** and folds the HUD bodies into the panel tabs (the `localization-hud.tsx` `right-88` tweak should be reverted/removed then).
 - New e2e: `apps/simulator/e2e/right-panel.spec.ts` (panel visible/5 tabs, collapse+reopen, per-tab pane visibility, 5th-tab horizontal-scroll-into-view).
@@ -202,16 +205,93 @@ Also folds the scattered top-left HUD + top-centre button cluster into a **top a
 - E2E: `widgets-drag.spec.ts` rewritten to drive dnd-kit with the **real `page.mouse`** (move onto handle → `mouse.down` → nudge past the 8px threshold → wait for `drop-zones` → move to edge → wait for `drop-zone-${edge}[data-over=true]` → `mouse.up`). Covers: drag start closes panel + shows zones; drop moves the lidar widget to an edge (panel handle count drops by one); close button moves it back; re-dock handle moves to a new edge; re-dropping never duplicates; the camera feed pops out carrying its live viewport, and closing returns the feed to the panel.
 - Verified: `pnpm typecheck` clean, `pnpm test` 75/75, `pnpm test:e2e` 50/50, `pnpm lint` / `pnpm check` clean.
 
-### Phase 4 — Interactions polish & a11y
+### Phase 4 — Interactions polish, non-overlapping edge docks & the dark theme  **[TODO]**
 
-- Keyboard: each tab button `role="tab"` + `aria-selected`; the strip is `role="tablist"`; arrow Left/Right moves between tabs (wraps). The 5th tab is still scrolled-to on focus.
-- The panel collapse toggle is a real `<button>` with `aria-expanded`/`aria-controls` and a visible focus ring (today's overlays are decorative-only).
-- Drag handle has `aria-label="Drag {widget} out of panel"` and a `cursor-grab`/`active:cursor-grabbing`.
-- Popped widget remove button has `aria-label="Remove {widget} from viewport"`.
-- `prefers-reduced-motion`: disable the panel slide transition and the drop-grid fade.
-- Drop grid cells announce themselves subtly; the dim/blur on `drag-overlay-active` is reduced under reduced-motion.
+**Scope change (vs. the original Phase 4 stub):** Phase 4 was a placeholder a11y pass; it is now the phase that fixes three real bugs the surfaced while using the panel, lands the **dark-theme foundation** the reference design has been waiting on, and wires the a11y + reduced-motion polish that the old stub only described. It also reflects a **change of plans** for the drag flow: the right panel **no longer hides during a drag** — the drop zones overlay the viewport beside the live panel.
 
-**Exit criteria:** keyboard-only user can switch tabs, collapse/expand the panel, and trigger the (mouse) pop-out flow's drop; screen-reader labels present; reduced-motion respected.
+**Goal:** (1) make the show/hide toggle actually slide the panel in/out of view, (2) keep the right panel open during widget drag, (3) prevent popped widgets on the same edge from overlapping and let the edge strip scroll when full, (4) ship dark mode by default + a light/dark toggle, (5) wire keyboard nav, aria labels, and `prefers-reduced-motion`.
+
+> **Reference authority for look-and-feel:** `.temp/right-panel/cyber_kinetic_terminal/DESIGN.md` and the `.temp/right-panel/*/code.html` mocks. They already speak shadcn tokens (`bg-card/80`, `border`, `text-primary`, `text-muted-foreground`, `backdrop-blur-md`); Phase 4 does **not** introduce their custom hex palette — we just turn the shadcn `dark` variant on and toggle it. The panel structure, widget content, and per-tab positions are correct as-is and stay put.
+
+#### 4a — Fix the panel slide (the toggle "does nothing" bug)
+
+**Root cause (confirmed):** the closed-state class is built dynamically via a template literal —
+```ts
+open ? 'translate-x-0' : `translate-x-[calc(100%-1rem-${TOGGLE_W})]`
+```
+Two compounding failures:
+1. **Tailwind v4 statically scans source text for class names.** The literal `translate-x-[calc(100%-1rem-2rem)]` never appears in `*.tsx` — it's assembled at runtime — so Tailwind never emits the rule. `getComputedStyle(el).transform` returns `"none"` even with the class on the element.
+2. **`calc()` without spaces is invalid CSS** inside `transform: translateX(...)`. Even if the rule were emitted, `translateX(calc(100%-1rem-2rem))` is dropped by the browser. The sibling `max-w-[calc(100vw-2rem)]` happens to slot into a property where the engine tolerates it, masking the symptom.
+
+**Fix — split the slide from the toggle so each job is a static utility:**
+- The sliding element is the panel card itself. Closed state uses a **static**, **space-internal** class so Tailwind v4 emits it and the browser accepts it: `translate-x-full` (slide fully off to the right; this is what the reference HTMLs use — `#right-panel.collapsed { transform: translateX(100%); }`).
+- The collapse toggle is **rendered outside the sliding element** (a sibling fixed to `right-2 top-1/2`) so it never travels with the off-screen panel; the toggle stays put in both states, acting as the always-reachable handle. This matches the reference (`#collapse-toggle` is positioned independently at `left: -32px`).
+- The panel's `right-4` gap is dropped from the slide math (the toggle no longer needs to "poke out" because it's a sibling). When open, the panel sits at `right-4` as today; when closed, `translate-x-full` pushes it fully off the right edge.
+- `transition-transform duration-300` stays on the panel for the slide. `prefers-reduced-motion: reduce` drops it (see 4e).
+- Keep `data-testid="right-panel"` + `data-open={open}` on the panel and `data-testid="panel-toggle"` + `aria-expanded={open}` + `aria-controls="right-panel-content"` on the toggle. The existing `right-panel.spec.ts` collapse test still passes (it reads `data-open`); add a new assertion that the closed panel's bounding box is **off the right edge of the viewport** (`x + width > innerWidth`).
+
+#### 4b — Keep the right panel open during drag (change of plans)
+
+**User intent:** *"when I drag a widget, droppable zone hide right panel and looks great. we dont need to hide right panel."* — the panel hiding as a drag side effect is no longer wanted; the drop zones can overlay the viewport beside a live panel.
+
+**Fix:** stop coupling `panelOpen` to the drag lifecycle.
+- `startDragWidget(widget)` → `{ draggingWidget: widget }` only. Do **not** set `panelOpen: false`.
+- `dropPoppedWidget(widget, edge)` → `{ draggingWidget: null, popped: mergePopped(...) }` only. Do **not** force `panelOpen: true`.
+- `cancelDragWidget()` → `{ draggingWidget: null }` only. Do not force `panelOpen: true`.
+- `undockWidget(widget)` → `{ popped: filter... }` only. Do **not** reopen the panel (the panel was never closed). The close button on a popped copy just moves the widget back to its tab; the panel's own `panelOpen` is untouched.
+- `togglePanel()` keeps the exclusive ownership of `panelOpen` — it is the only action that flips it. (Phase 3's coupling is gone.)
+- Place `<DropZones>` at a z-index above the panel content (e.g. `z-30`) so the four edge bands are reachable even when the panel is open at `z-10`. The centre dim/backdrop covers only the viewport area (it's `inset-0` inside the viewport root), not the panel — verify with `pointer-events` that the panel stays interactive only when its slot is not under a drop band. (Drop bands are narrow edge strips; the panel is a wider right strip; on the `right` edge the band sits inside `right-3 right-2` so the panel covers it — that's fine because dropping to the `right` edge sits the widget where the panel is, which is the desired visual.)
+
+**State-model note:** the `PanelState` snippet above already reflects the new signatures — `startDragWidget`'s comment is now `// mount zones (does NOT touch panelOpen)`, `cancelDragWidget`'s is `// unmount zones, no pop`, and the `undockWidget` comment is `// close button → back to tab` (no panel force). The store's `startDragWidget`/`dropPoppedWidget`/`cancelDragWidget`/`undockWidget` implementations must be edited to match; `store.test.ts` must drop the `expect(s.panelOpen).toBe(false/true)` assertions on drag (those no longer apply) and add assertions that **only** `togglePanel` flips `panelOpen`.
+
+**Goal #5, the Phase 3 "Drop logic" block, and the Phase 3 exit criteria** all say the drag hides the panel; Phase 4 revokes that rule. The Phase 3 notes are left as-is (they are the *landed* historical record); Phase 4 is the authoritative contract going forward.
+
+#### 4c — Non-overlapping edge docks (scroll-free first, then scroll-on-overflow)
+
+**User intent:** *"widgets overlap when we drop more than one in top or even one in top and one in left. we want to widget never overlap and if there is no space for next widget then dropzone gets scrollable."*
+
+**Root cause (confirmed):** `ViewportWidgetsLayer` anchors every card on an edge to the same coordinates (`top-14 inset-x-3` for `top`, `right-3 top-16 bottom-12` for `right`, etc.). Two widgets dropped on `top` land at exactly `x:12, y:56` and stack on top of each other (verified by bounding-box probe). There is no per-edge flow container.
+
+**Fix — one flex container per edge, growing toward the open centre, scrolling when full:**
+- Replace the `EDGE_CLASS[popped.edge]` per-card anchor with a single **per-edge strip** element per edge that has widgets on it. The four strips are absolute-positioned to their edge:
+  - `top` strip: `absolute top-14 inset-x-3 flex-col items-center gap-2 max-h-[40vh] overflow-y-auto`
+  - `bottom` strip: `absolute bottom-10 inset-x-3 flex-col items-center gap-2 max-h-[40vh] overflow-y-auto`
+  - `left` strip: `absolute left-3 top-16 bottom-12 flex-col items-start gap-2 max-w-xs overflow-y-auto` (column on the left is still vertical; the available height is the long span)
+  - `right` strip: `absolute right-3 top-16 bottom-12 flex-col items-end gap-2 max-w-xs overflow-y-auto`
+  Each strip is `pointer-events-auto` and a single `z-30` element. The popped widgets are **children** of the strip, laid out in normal document flow with `gap-2`, so they never stack on the same pixels — the second one on `top` lands below the first; the second one on `right` lands above the first in the column.
+- For horizontal edges (`top`/`bottom`), cards are stacked **vertically** (down/up from the edge) and the column scrolls when `max-h-[40vh]` is exceeded — newest widgets appear at the open end (away from the edge). For side edges (`left`/`right`), cards stack **vertically** along the edge and scroll when `the stacked card heights exceed the available top-16 to bottom-12 span`.
+- Ordering on drop: `mergePopped` already moves a re-dropped kind in place; for a **new** kind on a given edge, append it to the end of that edge's order (i.e. natural `popped` array order → DOM order → strip flow). This way re-docking to the **same** edge never truncates a neighbour (it just moves the existing card), and dropping a **new** widget simply adds to the open end. (No new `order` field — the existing `popped[]` array order is the canonical order.)
+- **Scroll-on-overflow** uses Tailwind scrollbar styling (`.no-scrollbar` could hide it, but here we want it visible — use a thin custom scrollbar via a new `.edge-scroll` utility mirroring the reference's hairline scrollbar (`::-webkit-scrollbar { width: 4px }`, `::-webkit-scrollbar-thumb { background: var(--border) }`).
+- **Live-feed widgets** (`sensors.camera.feed`, `map.minimap`) inside the strip: keep their canvas height fixed (e.g. `h-48`/`h-40`) so they don't stretch the strip unpredictably. The strip's `overflow-y-auto` lets the strip scroll without the canvas height being clipped unexpectedly — set the canvas to a `flex-none` so the scroll container reserves the right space.
+- **Drag zones vs. strips:** the `DropZones` overlay is unchanged (still `inset-0 z-30`, four edge bands). A drop **onto the same edge** the widget just left is a no-op re-dock (existing `mergePopped` semantics). The edge strip's own `pointer-events-auto` does **not** block the drop bands because the bands are shown only during a drag while the strips are hidden (the layer does `visible = !draggingWidget` today; keep that).
+
+**Exit criteria:** drop two widgets on `top` → both visible, neither occluding the other, the second below the first within `40vh`; drop three more on `top` → the strip scrolls; drop one on `top` and one on `left` → they live in different strips and never intersect; re-dock a `top` widget to `right` → it leaves the top strip and joins the right strip at the open end. Add `viewport-edge-docks.spec.ts` (e2e) asserting pairwise bounding boxes per edge are disjoint after dropping up to 4 widgets, and that the `top` strip is `overflow-y-auto` (assert `scrollHeight > clientHeight` after dropping enough widgets to overflow).
+
+#### 4d — Dark theme foundation + light/dark toggle in the top app bar
+
+**User intent:** *"based overall design look and feel on what we have in `.temp/right-panel/` dark theme etc."* — the app has been rendering in light mode because no `dark` class exists on `<html>` (verified: `getComputedStyle(<body>).backgroundColor` is white in the current build). The reference mocks are dark Cyber-Kinetic; we ship dark by default through the existing shadcn token system.
+
+**Implementation:**
+- `store.ts`: add a `theme: 'light' | 'dark'` slice + `toggleTheme()` + `setTheme(t)`. Initial value: read `localStorage.getItem('robotics-lab.theme')`; fall back to `window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'` (default dark). `toggleTheme`/`setTheme` write the choice back to `localStorage` and set state.
+- `App.tsx`: add a `useTheme` effect that mirrors `theme` to `document.documentElement.classList.toggle('dark', theme === 'dark')`. (On `<html>` rather than the root `<div data-testid="simulation-viewport">` so the `body`'s `bg-background` goes dark too — the custom-variant is `&:is(.dark *)`, so the class must wrap `body`.)
+- `components/top-app-bar.tsx`: add a `Sun`/`Moon` toggle button (lucide-react) between the map-name group and the Pause/Reset cluster — `data-testid="theme-toggle"`, `aria-label="Switch to {next} theme"`, `aria-pressed={theme === 'dark'}`. Default visible state: when dark, show `Sun` (click → go light); when light, show `Moon` (click → go dark) — match the common invert-on-active convention.
+- Do **not** introduce new color tokens. The existing `.dark { ... }` block in `styles.css` already defines the dark palette (background `oklch(0.145 0 0)`, foreground `oklch(0.985 0 0)`, primary `oklch(0.922 0 0)`, border `oklch(1 0 0 / 10%)`); applying the class is enough. The Cyber-Kinetic neon cyan (`#00f5ff`) is **not** wired up as `--primary` in this phase — that's a later theme pass; the shadcn dark-primary (near-white) is what we ship. This keeps the Non-Goal respected.
+- The dropped-widget strips (4c), the panel shell, the cards, and the popped cards already use token classes (`bg-card/80`, `text-primary`, `border-border`, `text-muted-foreground`), so they pick up the dark palette for free once the class is on `<html>`. Visually verify against `.temp/right-panel/robotics_lab_workspace_v9_integrated_camera_utils_tab/screen.png`: glass surface, dark background, primary-glow accents.
+
+**Exit criteria:** on first load the app is dark (background near-black) with no console errors; clicking the top-bar toggle flips `<html>` between `dark` and not-dark; the choice persists across reload (`localStorage`). Add `theme.spec.ts` (unit) asserting `toggleTheme` flips and `setTheme` writes to `localStorage`; add `theme-toggle.spec.ts` (e2e) clicking the toggle, asserting `documentElement.classList` changes + `data-testid="theme-toggle"` `aria-pressed` updates, and reloading preserves the choice.
+
+#### 4e — A11y + reduced-motion (actually wired)
+
+This is the old Phase 4 scope, made real now that the panel and toggle live as real elements:
+- **Tablist keyboard nav:** `role="tablist"` on the strip (already present), `role="tab"` + `aria-selected` on each tab (already present). Add an `onKeyDown` to the strip that, on ArrowLeft/ArrowRight (and Home/End), moves `activeTab` between the five tabs, wrapping, and `scrollIntoView`s the newly-active tab. The 5th tab is reachable by both horizontal scroll (existing) and keyboard.
+- **Toggle:** real `<button>` (already), `aria-expanded`/`aria-controls` (already). Add a visible `focus-visible:ring-2 focus-visible:ring-ring` on the toggle (today's overlays are decorative); ensure the chevron icon flips on `open` (already).
+- **Drag handle:** keep `aria-label="Drag {title} out of panel"` (already), `cursor-grab`/`active:cursor-grabbing` (already). Add `role="button"`-equivalent semantics — since it's a `<span>` with dnd-kit listeners, give it `tabIndex={0}` and an `Enter`/`Space` handler that opens a small modal listing the four edges as drop targets (mouse-only is acceptable in v1, but a keyboard path must exist — the modal is the minimum). If the keyboard path is too much for this phase, document it as a Phase 5 follow-up and only ship the `tabIndex` + `aria-label` now.
+- **Popped remove button:** `aria-label="Close {title} — return to panel"` (already).
+- **Theme toggle:** `aria-label` + `aria-pressed` (4d).
+- **`prefers-reduced-motion: reduce`:** add a `motion-reduce:transition-none` (and `motion-reduce:translate-x-0` for the closed state) on the panel and `motion-reduce:transition-none` on `DropZones`'s fade-in. Drop the `duration-300` slide to instant under reduce. Confirm `tw-animate-css` (already imported in `styles.css`) provides the `motion-reduce:` variant; if not, add a `@media (prefers-reduced-motion: reduce)` block to `styles.css`.
+- **Dim/blur on `drag-overlay-active`:** the drop zones dim the sim canvas with `bg-background/50 backdrop-blur-[1px]` today; under reduced motion drop the `backdrop-blur` (instant dim, no fade) — `motion-reduce:backdrop-blur-none`.
+
+**Exit criteria:** keyboard-only user can switch tabs (arrows + Home/End + wrap) and the tab strip scrolls the 5th into view; the panel toggle is focus-visible; the theme toggle is keyboard-operable; screen-reader labels are present on the drag handle, popped close, and theme toggle; `prefers-reduced-motion` users see no slide or fade.
 
 ### Phase 5 — Utils tab content (logs) + polish gaps
 
@@ -226,12 +306,22 @@ Also folds the scattered top-left HUD + top-centre button cluster into a **top a
 
 ### Phase 6 — Tests
 
-- **Unit (vitest):** `store` panel slice — `togglePanel`, `setTab`, `startDragWidget` (closes the panel + sets `draggingWidget`), `dropPoppedWidget(widget, edge)` moves the kind to that edge (singleton — re-dropping the same kind moves it), `cancelDragWidget` reopens without popping, `undockWidget(widget)` removes from `popped` + reopens the panel (no-op for a non-popped kind), `isWidgetPopped` selector.
+- **Unit (vitest):** `store` panel slice —
+  - `togglePanel` flips `panelOpen` (and **only** this action does).
+  - `setTab` switches the active tab without touching `panelOpen`.
+  - `startDragWidget(widget)` sets `draggingWidget` and does **not** touch `panelOpen` (Phase 4 change — drop the old `expect(s.panelOpen).toBe(false)` assertion).
+  - `dropPoppedWidget(widget, edge)` moves the kind to that edge (singleton — re-dropping the same kind moves it) and clears `draggingWidget`; does **not** force `panelOpen: true`.
+  - `cancelDragWidget()` clears `draggingWidget` without popping and without forcing `panelOpen`.
+  - `undockWidget(widget)` removes from `popped` (no-op for a non-popped kind) and does **not** force `panelOpen: true`.
+  - `isWidgetPopped` selector.
+  - `toggleTheme` flips `theme` and writes `localStorage['robotics-lab.theme']`; `setTheme('dark'|'light')` sets it and persists; initial value falls back to `prefers-color-scheme: dark` when no stored value (mock `window.matchMedia` + `localStorage` in the test).
 - **E2E (playwright):**
-  - `right-panel.spec.ts` — panel visible by default; collapse toggle hides it; each of the 5 tabs is selectable; the 5th tab requires horizontal scroll to become visible (assert it's off-strip until scrolled).
-  - `widgets-drag.spec.ts` — drive a real dnd-kit drag with `page.mouse` (move onto the handle → `mouse.down` → nudge past the 8px activation threshold → wait for `drop-zones` → move to the edge → wait for `drop-zone-${edge}[data-over=true]` → `mouse.up`): assert drag start closes the panel + shows the zones, dropping moves the widget onto the edge (panel handle count drops by one — move, not duplicate), the close button moves it back, the re-dock handle moves it to a new edge, re-dropping never duplicates, and the camera feed pops out carrying its live viewport.
+  - `right-panel.spec.ts` — panel visible by default; collapse toggle hides it and the **closed bounding box is off the right edge of the viewport** (`x + width > innerWidth` — the Phase 4 slide fix); reopening restores it; each of the 5 tabs is selectable; the 5th tab requires horizontal scroll to become visible (assert it's off-strip until scrolled). Keyboard arrow nav moves between tabs and wraps.
+  - `widgets-drag.spec.ts` — drive a real dnd-kit drag with `page.mouse` (move onto the handle → `mouse.down` → nudge past the 8px activation threshold → wait for `drop-zones` → move to the edge → wait for `drop-zone-${edge}[data-over=true]` → `mouse.up`): assert drag start **does not close the panel** (`data-open` stays `true`) but shows the zones, dropping moves the widget onto the edge (panel handle count drops by one — move, not duplicate), the close button moves it back, the re-dock handle moves it to a new edge, re-dropping never duplicates, and the camera feed pops out carrying its live viewport.
+  - `viewport-edge-docks.spec.ts` (new, Phase 4c) — drop two widgets on `top` and assert their bounding boxes are disjoint; drop a third on `left` and assert it does not intersect either `top` widget; drop enough widgets on one edge to force scroll and assert the strip's `scrollHeight > clientHeight`.
+  - `theme-toggle.spec.ts` (new, Phase 4d) — click `data-testid="theme-toggle"`, assert `document.documentElement.classList` toggles `dark` and the button's `aria-pressed` flips; reload and assert the choice persisted.
   - Update `smoke.spec.ts`/`sensors.spec.ts`/`navigation.spec.ts`/`teleoperation.spec.ts`/`localization.spec.ts`/`occupancy-grid.spec.ts` selectors that today target the scattered overlays (e.g. `nav-status`, `estop-button`, `lidar-toggle`, `clear-map-button`, `robot-pose`, `odometry-pose`) so they target the same controls now living inside the right panel tabs. Keep the `data-testid` attributes identical on the underlying controls to minimize churn.
-- **Visual/parity:** quick manual pass: every slider label, value format (`fmt`/`deg`), button text, and toggle wording matches today's strings.
+- **Visual/parity:** quick manual pass: every slider label, value format (`fmt`/`deg`), button text, and toggle wording matches today's strings; the dark theme visually matches `.temp/right-panel/robotics_lab_workspace_v9_integrated_camera_utils_tab/screen.png` (glass surface, dark background, primary accents) modulo the cyan-vs-white primary token difference (a later theme pass).
 
 **Exit criteria:** all unit + e2e green; `pnpm typecheck` + `pnpm build` clean.
 

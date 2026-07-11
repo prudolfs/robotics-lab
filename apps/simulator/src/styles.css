@@ -139,3 +139,36 @@
 .no-scrollbar::-webkit-scrollbar {
 	display: none;
 }
+
+/* Thin hairline scrollbar for popped-widget edge strips (docs/hud.md Phase 4c).
+   Mirrors the reference mock's `::-webkit-scrollbar { width: 4px }`. */
+.edge-scroll {
+	scrollbar-width: thin;
+	scrollbar-color: var(--border) transparent;
+}
+.edge-scroll::-webkit-scrollbar {
+	width: 4px;
+	height: 4px;
+}
+.edge-scroll::-webkit-scrollbar-track {
+	background: transparent;
+}
+.edge-scroll::-webkit-scrollbar-thumb {
+	background: var(--border);
+	border-radius: 2px;
+}
+
+/* Respect `prefers-reduced-motion`: no slide / fade transitions. Tailwind's
+   `motion-reduce:` variant covers utility-driven transitions (panel slide,
+   drop-zone fade, dim blur); this block + the variant above give us a
+   belt-and-bracers fallback where a utility is missing the variant. */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms;
+		animation-iteration-count: 1;
+		transition-duration: 0.01ms;
+		scroll-behavior: auto;
+	}
+}

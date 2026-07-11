@@ -22,8 +22,10 @@ export function DropZones() {
 		<section
 			data-testid="drop-zones"
 			className={cn(
-				'pointer-events-auto absolute inset-0 z-20 transition-opacity duration-200',
-				'bg-background/50 backdrop-blur-[1px]',
+				// z-30 places the zones above the right panel (z-20) so the right
+				// edge band is reachable even while the panel stays open (Phase 4).
+				'pointer-events-auto absolute inset-0 z-30 transition-opacity duration-200 motion-reduce:transition-none',
+				'bg-background/50 backdrop-blur-[1px] motion-reduce:backdrop-blur-none',
 			)}
 			aria-label="Drop widget on a viewport edge"
 		>

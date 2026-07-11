@@ -10,6 +10,25 @@ import { createLidarConfig, type LidarConfig, type LidarScan } from '@robotics-l
 // Camera noise level passed to RobotCameraViewport; re-exported from rendering
 // so the store doesn't need a direct rendering dependency.
 type CameraNoiseLevel = 'none' | 'low' | 'medium' | 'high'
+export type ThemeMode = 'light' | 'dark'
+
+/** localStorage key persisting the user's theme choice. */
+export const THEME_STORAGE_KEY = 'robotics-lab.theme'
+
+/** Resolve the initial theme: stored choice → OS preference → dark by default. */
+export function resolveInitialTheme(): ThemeMode {
+	try {
+		const stored =
+			typeof localStorage !== 'undefined' ? localStorage.getItem(THEME_STORAGE_KEY) : null
+		if (stored === 'light' || stored === 'dark') return stored
+	} catch {
+		// localStorage may be unavailable (SSR / restricted env) — fall through.
+	}
+	if (typeof window !== 'undefined' && window.matchMedia) {
+		return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+	}
+	return 'dark'
+}
 
 import { create } from 'zustand'
 import { createSimulation, DEFAULT_PLANNER_OPTIONS, robotSpeed, type SimState } from '@/sim/loop'
@@ -148,20 +167,32 @@ export type SimulatorStore = {
 	/* ------------------------- Popped widgets ------------------------- */
 	/** App state: widget copies docked onto the main viewport (docs Phase 3). */
 	popped: PoppedWidget[]
-	/** App state: the widget kind currently being dragged out of the panel
-	 *  (drives the close-panel + edge-zone overlay behaviour), or null. */
+	/** App state: the widget kind currently being dragged (drives the edge-zone
+	 *  overlay); null when idle. Phase 4 change: dragging no longer touches
+	 *  `panelOpen` — the drop zones overlay the viewport beside a live panel. */
 	draggingWidget: WidgetId | null
-	/** App action: begin dragging a widget handle out of the panel. Closes the
-	 *  right panel so the viewport edge zones are reachable. */
+	/** App action: begin dragging a widget handle. Mounts the edge drop zones.
+	 *  Phase 4: does **not** close the right panel (only `togglePanel` flips
+	 *  `panelOpen`). */
 	startDragWidget: (widget: WidgetId) => void
-	/** App action: end the drag with a drop. The widget is moved to that edge
-	 *  (a kind is a singleton — re-dropping the same kind moves its existing
-	 *  copy to the new edge). The panel reopens. */
+	/** App action: end the drag with a drop. Moves the widget to that edge (a
+	 *  kind is a singleton — re-dropping moves its existing copy). Phase 4:
+	 *  does **not** force `panelOpen` back to true (the panel never closed). */
 	dropPoppedWidget: (widget: WidgetId, edge: DropEdge) => void
-	/** App action: end the drag without a drop — cancel, reopen the panel. */
+	/** App action: end the drag without a drop — cancel (no pop). Phase 4: clears
+	 *  `draggingWidget` only — does not touch `panelOpen`. */
 	cancelDragWidget: () => void
-	/** App action: move a popped widget back to the right panel (close button). */
+	/** App action: move a popped widget back to the right panel (close button).
+	 *  Phase 4: does **not** reopen the panel (the panel never closed). */
 	undockWidget: (widget: WidgetId) => void
+	/* ----------------------------- Theme (Phase 4d) ----------------------------- */
+	/** App state: app color scheme ('light' | 'dark'). Applied by App.tsx
+	 *  mirroring to `document.documentElement.classList`. Default: dark. */
+	theme: ThemeMode
+	/** App action: flip `theme` and persist the choice to localStorage. */
+	toggleTheme: () => void
+	/** App action: set `theme` and persist the choice to localStorage. */
+	setTheme: (theme: ThemeMode) => void
 	/** App action nonce: incremented to signal the loop to clear the grid. */
 	mapNonce: number
 	/** App action: record the latest render FPS (from <FpsCounter>). */
@@ -268,6 +299,7 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		activeTab: 'sensors',
 		popped: [],
 		draggingWidget: null,
+		theme: resolveInitialTheme(),
 		showOdometry: true,
 		odometryNonce: 0,
 		selectMap: (name) => {
@@ -319,19 +351,15 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		togglePanel: () => set((s) => ({ panelOpen: !s.panelOpen })),
 		setTab: (tab) => set({ activeTab: tab }),
 		setFps: (fps) => set({ fps }),
-		startDragWidget: (widget) => set({ draggingWidget: widget, panelOpen: false }),
+		// Phase 4: dragging no longer touches panelOpen — the drop zones overlay
+		// the viewport beside the live panel. Only togglePanel flips panelOpen.
+		startDragWidget: (widget) => set({ draggingWidget: widget }),
 		dropPoppedWidget: (widget, edge) =>
-			set((s) => ({
-				draggingWidget: null,
-				panelOpen: true,
-				popped: mergePopped(s.popped, { widget, edge }),
-			})),
-		cancelDragWidget: () => set({ draggingWidget: null, panelOpen: true }),
-		undockWidget: (widget) =>
-			set((s) => ({
-				panelOpen: true,
-				popped: s.popped.filter((p) => p.widget !== widget),
-			})),
+			set((s) => ({ draggingWidget: null, popped: mergePopped(s.popped, { widget, edge }) })),
+		cancelDragWidget: () => set({ draggingWidget: null }),
+		undockWidget: (widget) => set((s) => ({ popped: s.popped.filter((p) => p.widget !== widget) })),
+		toggleTheme: () => set((s) => ({ theme: persistTheme(s.theme === 'dark' ? 'light' : 'dark') })),
+		setTheme: (theme) => set({ theme: persistTheme(theme) }),
 		observe: (next) => set(sampleState(next)),
 	}
 })
@@ -339,6 +367,16 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 /** Teleop throttle must stay strictly positive; clamp UI slip to a small floor. */
 function clampPositive(value: number): number {
 	return Number.isFinite(value) && value > 0 ? value : DEFAULT_TELEOP_CONFIG.baseSpeed
+}
+
+/** Persist a theme choice to localStorage (best-effort) and return it. */
+function persistTheme(theme: ThemeMode): ThemeMode {
+	try {
+		localStorage.setItem(THEME_STORAGE_KEY, theme)
+	} catch {
+		// Same guarding as resolveInitialTheme: SSR / restricted environments.
+	}
+	return theme
 }
 
 /**

@@ -123,11 +123,12 @@ export function WidgetCard({
 function DragHandle({ widget, title }: { widget: WidgetId; title: string }) {
 	const { dragHandleProps, isDragging } = useWidgetDragHandle(widget, 'pop')
 	return (
-		// biome-ignore lint/a11y/useAriaPropsSupportedByRole: drag handle is a static affordance; aria-label is the accessible name
-		<span
+		<button
+			type="button"
 			{...dragHandleProps}
+			tabIndex={0}
 			className={cn(
-				'flex cursor-grab touch-none select-none text-muted-foreground/60 hover:text-muted-foreground active:cursor-grabbing',
+				'flex cursor-grab touch-none select-none bg-transparent p-0 text-muted-foreground/60 hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing',
 				isDragging && 'opacity-40',
 			)}
 			aria-label={`Drag ${title} out of panel`}
@@ -135,6 +136,6 @@ function DragHandle({ widget, title }: { widget: WidgetId; title: string }) {
 			data-widget={widget}
 		>
 			<GripVertical className="size-4" aria-hidden="true" />
-		</span>
+		</button>
 	)
 }

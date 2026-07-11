@@ -3,16 +3,18 @@ import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
 import { launchSimulator } from './fixtures'
 
 /**
- * Phase 1 — Right panel shell (see docs/hud.md).
+ * Phase 1 + Phase 4 — Right panel shell (see docs/hud.md).
  *
- * Verifies the new tabbed right panel:
- *  - visible by default with the 5 tabs present
- *  - collapse toggle hides the panel body, re-open shows it again
- *  - selecting each tab shows that tab's pane
+ * Verifies the tabbed right panel:
+ *  - visible by default with all 5 tabs
+ *  - collapse toggle slides the panel body fully off the right viewport edge
+ *    (`translate-x-full`); the toggle stays in place as a sibling so it's
+ *    reachable in both states (Phase 4a)
+ *  - re-opening restores it onto the screen
+ *  - selecting each tab shows that tab's pane and updates `aria-selected`
  *  - the 5th tab (utils) is off the strip by default and scrolled into view
  *    when selected (4 visible + 1 horizontally scrolled)
- *
- * Tests interact only through the public UI; no internal state touched.
+ *  - keyboard arrow / Home / End nav moves between tabs and wraps (Phase 4e)
  */
 
 test.beforeEach(async ({ page }) => setupConsoleGuard(page))
@@ -20,7 +22,7 @@ test.afterEach(async () => teardownConsoleGuard())
 
 const TAB_IDS = ['sensors', 'map', 'nav', 'teleop', 'utils'] as const
 
-test.describe('Phase 1 — Right panel shell', () => {
+test.describe('Phase 1 + 4 — Right panel shell', () => {
 	test('panel is visible by default with all five tabs', async ({ page }) => {
 		await launchSimulator(page)
 
@@ -33,20 +35,32 @@ test.describe('Phase 1 — Right panel shell', () => {
 		}
 	})
 
-	test('collapse toggle hides then re-shows the panel', async ({ page }) => {
+	test('collapse toggle slides the panel fully off the right viewport edge', async ({ page }) => {
 		await launchSimulator(page)
 
 		const panel = page.getByTestId('right-panel')
 		const toggle = page.getByTestId('panel-toggle')
+		const vw = () => page.viewportSize().width
 
-		// Collapse: the toggle should remain reachable (it pokes out) while the
-		// panel body slides off-screen.
+		// Open: the panel is on-screen (its right edge is within the viewport).
+		await expect(panel).toBeVisible()
+		await expect(panel).toHaveAttribute('data-open', 'true')
+		const openBox = await panel.boundingBox()
+		expect(openBox, 'open panel must have a bounding box').not.toBeNull()
+		expect(openBox.x + openBox.width).toBeLessThanOrEqual(vw() + 1)
+
+		// Collapse: the panel slides `translate-x-full` so its left edge moves
+		// past the viewport's right edge (fully off-screen). Phase 4a.
 		await expect(toggle).toBeVisible()
 		await toggle.click()
-
 		await expect(panel).toHaveAttribute('data-open', 'false')
+		// Give the 300ms transition time to settle before reading geometry.
+		await page.waitForTimeout(450)
+		const closedBox = await panel.boundingBox()
+		expect(closedBox, 'closed panel must have a bounding box').not.toBeNull()
+		expect(closedBox.x + closedBox.width).toBeGreaterThan(vw())
 
-		// Re-open via the same toggle.
+		// The toggle stays reachable — it's a sibling fixed along the right edge.
 		await expect(toggle).toBeVisible()
 		await toggle.click()
 		await expect(panel).toHaveAttribute('data-open', 'true')
@@ -92,5 +106,33 @@ test.describe('Phase 1 — Right panel shell', () => {
 		const visibleBox = await utilsTab.boundingBox()
 		expect(visibleBox?.x).toBeGreaterThanOrEqual(stripBox?.x - 1)
 		expect(visibleBox?.x + visibleBox?.width).toBeLessThanOrEqual(stripBox?.x + stripBox?.width + 1)
+	})
+
+	test('keyboard arrow / Home / End nav moves between tabs and wraps', async ({ page }) => {
+		await launchSimulator(page)
+
+		// Focus the active Sensors tab so keyboard nav targets the tablist.
+		const sensors = page.getByTestId('panel-tab-sensors')
+		await sensors.focus()
+		await expect(sensors).toHaveAttribute('aria-selected', 'true')
+
+		// ArrowRight cycles through all five tabs and wraps back to sensors.
+		for (const expected of ['map', 'nav', 'teleop', 'utils', 'sensors']) {
+			await page.keyboard.press('ArrowRight')
+			await expect(page.getByTestId(`panel-tab-${expected}`)).toHaveAttribute(
+				'aria-selected',
+				'true',
+			)
+		}
+
+		// ArrowLeft wraps the other way: sensors → utils.
+		await page.keyboard.press('ArrowLeft')
+		await expect(page.getByTestId('panel-tab-utils')).toHaveAttribute('aria-selected', 'true')
+
+		// Home jumps to the first tab; End jumps to the last.
+		await page.keyboard.press('Home')
+		await expect(page.getByTestId('panel-tab-sensors')).toHaveAttribute('aria-selected', 'true')
+		await page.keyboard.press('End')
+		await expect(page.getByTestId('panel-tab-utils')).toHaveAttribute('aria-selected', 'true')
 	})
 })

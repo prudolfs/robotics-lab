@@ -12,7 +12,7 @@ import {
 	SimulatorScene,
 	WorldView,
 } from '@robotics-lab/rendering'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { DndProvider } from '@/components/dnd-context'
 import { DropZones } from '@/components/drop-zones'
 import { FooterStatusBar } from '@/components/footer-status-bar'
@@ -43,10 +43,18 @@ export default function App() {
 	const showOdometry = useSimulatorStore((s) => s.showOdometry)
 	const odometryPose = useSimulatorStore((s) => s.odometryPose)
 	const odometryHistory = useSimulatorStore((s) => s.odometryHistory)
+	const theme = useSimulatorStore((s) => s.theme)
 
 	const controls = useSimulationLoop()
 
 	const handleFps = useCallback((value: number) => setFps(Math.round(value)), [setFps])
+
+	// Phase 4d: mirror the theme to <html>'s classList. The shadcn dark variant
+	// is `&:is(.dark *)`, so the class must wrap the whole body (not just the
+	// simulation-viewport root) for `body`'s `bg-background` to pick it up.
+	useEffect(() => {
+		document.documentElement.classList.toggle('dark', theme === 'dark')
+	}, [theme])
 
 	// Click destination on the floor: replace the goal queue, or append (Shift).
 	const handlePick = useCallback(

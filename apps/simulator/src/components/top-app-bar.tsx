@@ -9,6 +9,7 @@
 //   - ESTOP lives only in the Teleop tab (kept off the top bar to avoid a
 //     duplicate global control / collision with the teleop `estop-button`).
 
+import { Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { SimulationControls } from '@/sim/use-simulation-loop'
@@ -24,6 +25,8 @@ export function TopAppBar({ controls }: TopAppBarProps) {
 	const running = useSimulatorStore((s) => s.running)
 	const robot = useSimulatorStore((s) => s.robot)
 	const selectMap = useSimulatorStore((s) => s.selectMap)
+	const theme = useSimulatorStore((s) => s.theme)
+	const toggleTheme = useSimulatorStore((s) => s.toggleTheme)
 
 	return (
 		<header
@@ -58,8 +61,19 @@ export function TopAppBar({ controls }: TopAppBarProps) {
 				})}
 			</div>
 
-			{/* Right: sim controls. */}
+			{/* Right: sim controls + theme toggle. */}
 			<div className="flex items-center gap-2">
+				<Button
+					data-testid="theme-toggle"
+					variant="ghost"
+					size="icon"
+					className="size-8"
+					onClick={toggleTheme}
+					aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+					aria-pressed={theme === 'dark'}
+				>
+					{theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
+				</Button>
 				<Button
 					data-testid="pause-resume-button"
 					variant={running ? 'outline' : 'default'}

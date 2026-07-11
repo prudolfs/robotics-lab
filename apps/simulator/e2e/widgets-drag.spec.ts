@@ -6,7 +6,7 @@ import { launchSimulator } from './fixtures'
  * Phase 3 — Widget drag-out + edge drop pop-out (see docs/hud.md).
  *
  * Verifies the pop-out interaction with dnd-kit (pointer-based drag):
- *  - dragstart closes the panel and surfaces the viewport edge drop zones
+ *  - dragstart surfaces the viewport edge drop zones without closing the panel (Phase 4)
  *  - dropping on an edge moves the widget onto the viewport (panel slot hides)
  *  - the popped copy shows a close button; the panel copy is gone while popped
  *  - clicking close moves the widget back to the panel
@@ -65,7 +65,7 @@ async function dragHandleToEdge(
 	await page.mouse.down()
 	// Nudge past the 8px activation threshold to trigger the dnd-kit drag.
 	await page.mouse.move(start.x + 12, start.y + 12, { steps: 4 })
-	// Wait for the panel to close + drop zones to mount.
+	// Wait for the drop zones to mount (Phase 4: the panel stays open).
 	await expect(page.getByTestId('drop-zones')).toBeVisible({ timeout: 5_000 })
 	// Drag to the edge zone and wait for it to highlight as the active drop
 	// target before releasing — avoids a release that lands before dnd-kit's
@@ -77,23 +77,25 @@ async function dragHandleToEdge(
 }
 
 test.describe('Phase 3 — Widget drag-out + edge drop', () => {
-	test('dragstart closes the panel and surfaces the edge drop zones', async ({ page }) => {
+	test('dragstart keeps the panel open and surfaces the edge drop zones', async ({ page }) => {
 		await launchSimulator(page)
 		await expect(page.getByTestId('right-panel')).toHaveAttribute('data-open', 'true')
 		await expect(page.getByTestId('drop-zones')).toHaveCount(0)
 
 		// Move onto the first handle, press, and nudge past the threshold so the
-		// dnd-kit drag starts (panel closes + zones appear). Then cancel via Esc.
+		// dnd-kit drag starts (zones appear). Phase 4: the panel STAYS open.
 		const start = await centerOf(page, '[data-testid="widget-drag-handle"]')
 		await page.mouse.move(start.x, start.y)
 		await page.mouse.down()
 		await page.mouse.move(start.x + 12, start.y + 12, { steps: 4 })
-		await expect(page.getByTestId('right-panel')).toHaveAttribute('data-open', 'false')
+		// Phase 4: the panel stays open (data-open stays 'true').
+		await expect(page.getByTestId('right-panel')).toHaveAttribute('data-open', 'true')
 		await expect(page.getByTestId('drop-zones')).toBeVisible()
 
 		// Cancel the drag (Esc). dnd-kit cancels on Escape.
 		await page.keyboard.press('Escape')
 		await expect(page.getByTestId('right-panel')).toHaveAttribute('data-open', 'true')
+		await expect(page.getByTestId('drop-zones')).toHaveCount(0)
 	})
 
 	test('drop on right edge moves the lidar widget onto the viewport', async ({ page }) => {
