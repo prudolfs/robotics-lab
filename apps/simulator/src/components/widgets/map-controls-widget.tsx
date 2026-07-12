@@ -1,10 +1,9 @@
-// Map controls widget (Map tab) — Phase 2 of docs/hud.md.
+// Map controls widget (Map tab) — docs/hud.md.
 //
-// Wraps the occupancy-grid controls from the old `MapHud`: the `Grid`
-// (showOccupancy) toggle, the free / occupied / unknown stats, and the
-// `Clear map` button. All text / formatters are kept byte-for-byte. The
-// `Mini` (showMinimap) toggle lives in the separate `MinimapWidget`; the
-// minimap canvas itself stays a floating element mounted in `App.tsx`.
+// The occupancy-grid controls: the `Grid` (showOccupancy) toggle, the free /
+// occupied / unknown stats, and the `Clear map` button. All text / formatters
+// are kept byte-for-byte from the original HUD. The `Mini` (showMinimap) toggle
+// lives in the separate `MinimapWidget`.
 
 import { Button } from '@/components/ui/button'
 import { WidgetCard } from '@/components/widgets/widget-card'

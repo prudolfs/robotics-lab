@@ -1,11 +1,10 @@
-// Navigation widget (Nav tab) — Phase 2 of docs/hud.md.
+// Navigation widget (Nav tab) — docs/hud.md.
 //
-// Wraps the click-to-goal / autonomy / coverage / planner controls from the old
-// `NavigationHud`. All text, labels, button wording and testids are kept
-// byte-for-byte; the `nav-status` badge is passed to `WidgetCard` as the
-// status chip (was the top-right badge in the old HUD). The absolute
-// positioning of the old HUD is dropped — it is now a normal-flow card in the
-// Nav tab.
+// The click-to-goal / autonomy / coverage / planner controls. All text,
+// labels, button wording and testids are kept byte-for-byte from the original
+// HUD; the `nav-status` badge is passed to `WidgetCard` as the status chip
+// (was the top-right badge in the old HUD). The absolute positioning is gone —
+// it is now a normal-flow card in the Nav tab.
 
 import { Button } from '@/components/ui/button'
 import { WidgetCard } from '@/components/widgets/widget-card'

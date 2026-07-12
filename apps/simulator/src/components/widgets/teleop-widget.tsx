@@ -1,9 +1,9 @@
-// Teleop widget (Teleop tab) — Phase 2 of docs/hud.md.
+// Teleop widget (Teleop tab) — docs/hud.md.
 //
-// Wraps the manual-driving overlay from the old `TeleopHud`. All key hints,
-// status badge text, throttle slider, command readouts and the ESTOP button
-// are kept byte-for-byte; only the card chrome moved into `WidgetCard` and the
-// status badge is passed as the status chip.
+// The manual-driving overlay: key hints, status badge text, throttle slider,
+// command readouts and the ESTOP button. All wording is kept byte-for-byte;
+// only the card chrome moved into `WidgetCard` and the status badge is passed
+// as the status chip.
 
 import { Button } from '@/components/ui/button'
 import { WidgetCard } from '@/components/widgets/widget-card'

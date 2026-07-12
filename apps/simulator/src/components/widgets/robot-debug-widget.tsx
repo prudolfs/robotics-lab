@@ -1,12 +1,11 @@
-// Robot debug widget (Utils tab) — Phase 2 of docs/hud.md.
+// Robot debug widget (Utils tab) — docs/hud.md.
 //
-// Wraps the debug readout from the old `DebugOverlay`: pose / heading / speed /
-// turn rate / wheels + a Reset button. All labels and the hidden
-// `data-testid="robot-pose"` readout are kept byte-for-byte; the absolute,
-// `pointer-events-none` placement of the old overlay is dropped — it is now a
-// normal-flow card in the Utils tab or docked on the viewport. The widget
-// subscribes to the observed `robot` from the store itself so it re-renders
-// each frame like the old overlay (it is shared between the panel copy and
+// The debug readout: pose / heading / speed / turn rate / wheels + a Reset
+// button. All labels and the hidden `data-testid="robot-pose"` readout are
+// kept byte-for-byte from the original overlay; the absolute, `pointer-events-none`
+// placement is gone — it is now a normal-flow card in the Utils tab or docked on
+// the viewport. The widget subscribes to the observed `robot` from the store
+// itself so it re-renders each frame (it is shared between the panel copy and
 // the popped copy via the widget registry).
 // `data-testid="robot-debug"` is kept on the card so existing tests that read
 // the pose / hit the Reset button keep working once they switch to the Utils

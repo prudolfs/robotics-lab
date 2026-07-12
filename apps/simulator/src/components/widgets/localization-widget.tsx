@@ -1,10 +1,8 @@
-// Localization widget (Nav tab) — Phase 2 of docs/hud.md.
+// Localization widget (Nav tab) — docs/hud.md.
 //
-// Wraps the dead-reckoning odometry controls from the old `LocalizationHud`.
-// All text / labels / testids are kept byte-for-byte; only the absolute
-// positioning (`absolute right-88 bottom-4`) is dropped — it is now a
-// normal-flow card in the Nav tab. This also reverts the Phase-1 `right-88`
-// tweak the old HUD carried to clear the right panel.
+// The dead-reckoning odometry controls. All text / labels / testids are kept
+// byte-for-byte from the original HUD; only the absolute positioning is gone —
+// it is now a normal-flow card in the Nav tab.
 
 import { Button } from '@/components/ui/button'
 import { WidgetCard } from '@/components/widgets/widget-card'

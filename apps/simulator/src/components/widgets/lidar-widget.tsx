@@ -1,11 +1,10 @@
-// Lidar widget (Sensors tab) — Phase 2 of docs/hud.md.
+// Lidar widget (Sensors tab) — docs/hud.md.
 //
-// Wraps the lidar sliders + the `Lidar` visualization toggle from the old
-// `SensorHud`. All control text / labels / slider ranges are kept byte-for-byte
-// from `SensorHud`; only the header chrome moved into `WidgetCard`. The
-// camera toggle / noise control live in the separate `CameraWidget` (also in
-// the Sensors tab); the robot camera viewport canvas itself stays mounted in
-// `App.tsx` (it must live outside `<Canvas>`).
+// The lidar sliders + the `Lidar` visualization toggle. All control text /
+// labels / slider ranges are kept byte-for-byte from the original HUD; only the
+// header chrome moved into `WidgetCard`. The camera toggle / noise control live
+// in the separate `CameraControlsWidget` / `CameraFeedWidget` (also in the
+// Sensors tab).
 
 import { createLidarConfig } from '@robotics-lab/sensors'
 import { Button } from '@/components/ui/button'
