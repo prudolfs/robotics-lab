@@ -382,11 +382,11 @@ Guarantee the app stays responsive during a long run.
 
 ## Tasks
 
-- [ ] Run simulation for 15 minutes
-- [ ] Application stays responsive
-- [ ] No WebGL context loss
-- [ ] No crashes
-- [ ] No unhandled exceptions
+- [x] Run simulation for 15 minutes
+- [x] Application stays responsive
+- [x] No WebGL context loss
+- [x] No crashes
+- [x] No unhandled exceptions
 
 ---
 
