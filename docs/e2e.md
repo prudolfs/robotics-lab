@@ -358,19 +358,19 @@ Detect browser memory leaks over a long session.
 
 ## Tasks
 
-- [ ] Open simulator
-- [ ] Run for 5–10 minutes
-- [ ] Periodically drive the robot
-- [ ] Periodically create / remove goals
-- [ ] Periodically toggle overlays
-- [ ] Collect browser memory samples
-- [ ] Assert memory growth stays below threshold
+- [x] Open simulator
+- [x] Run for 5–10 minutes
+- [x] Periodically drive the robot
+- [x] Periodically create / remove goals
+- [x] Periodically toggle overlays
+- [x] Collect browser memory samples
+- [x] Assert memory growth stays below threshold
 
 ## Pass criteria
 
-- [ ] Memory stabilizes
-- [ ] Small growth is acceptable
-- [ ] Continuous linear growth fails the test
+- [x] Memory stabilizes
+- [x] Small growth is acceptable
+- [x] Continuous linear growth fails the test
 
 ---
 

@@ -25,6 +25,14 @@ export default defineConfig({
 		trace: 'retain-on-failure',
 		screenshot: 'only-on-failure',
 		video: 'retain-on-failure',
+		// Expose `window.gc()` so the Phase 8 memory-leak test can take
+		// GC-accurate heap samples between rounds (instead of reading a stale
+		// `performance.memory.usedJSHeapSize` that only refreshes on a major GC
+		// that headless Chromium otherwise rarely schedules). Picking it up is
+		// optional for the rest of the suite — they never call `window.gc`.
+		launchOptions: {
+			args: ['--js-flags=--expose-gc'],
+		},
 	},
 	projects: [
 		{
