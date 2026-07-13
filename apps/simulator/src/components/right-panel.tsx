@@ -112,7 +112,7 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 			data-testid="right-panel-root"
 			data-open={open}
 			aria-label="Control panel"
-			className="pointer-events-none absolute top-12 right-0 bottom-8 z-10 flex w-80 max-w-[100vw] items-stretch justify-end"
+			className="pointer-events-none absolute top-12 right-0 bottom-8 z-10 flex w-[21rem] max-w-[100vw] items-stretch justify-end"
 		>
 			{/* Phase 4a: the collapse toggle is a sibling that sits **outside** the
 			    sliding panel so it stays in place (always reachable) whether the
@@ -143,7 +143,7 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 				data-testid="right-panel"
 				data-open={open}
 				className={cn(
-					'pointer-events-auto absolute top-0 right-4 bottom-0 z-20 flex w-[18rem] max-w-[calc(100vw-2rem)] flex-col overflow-visible rounded-lg border border-border bg-card/80 shadow-2xl backdrop-blur-md transition-transform duration-300 motion-reduce:transition-none',
+					'pointer-events-auto absolute top-0 right-4 bottom-0 z-20 flex w-[20rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden border-border border-l bg-card/80 shadow-2xl backdrop-blur-md transition-transform duration-300 motion-reduce:transition-none',
 					open ? 'translate-x-0' : 'translate-x-full motion-reduce:translate-x-0',
 				)}
 			>
@@ -175,13 +175,15 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 									)}
 								>
 									<Icon className="size-4" />
-									<span className="font-semibold text-[9px] uppercase tracking-wider">{label}</span>
+									<span className="font-mono font-semibold text-[9px] uppercase tracking-wider">
+										{label}
+									</span>
 								</button>
 							)
 						})}
 					</div>
 
-					<div className="flex-1 overflow-y-auto p-4">
+					<div className="edge-scroll flex-1 overflow-y-auto p-4">
 						<TabPane tab="sensors" active={activeTab}>
 							<LidarWidget />
 							<CameraControlsWidget />

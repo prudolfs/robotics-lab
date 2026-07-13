@@ -144,7 +144,7 @@ function assertDisjoint(
 }
 
 test.describe('Phase 4c — Non-overlapping edge docks', () => {
-	test('two widgets dropped on top are stacked vertically (no overlap)', async ({ page }) => {
+	test('two widgets dropped on top are laid out horizontally (no overlap)', async ({ page }) => {
 		await launchSimulator(page)
 
 		// Drop the first Sensors-tab widget (lidar) on `top`.
@@ -155,9 +155,15 @@ test.describe('Phase 4c — Non-overlapping edge docks', () => {
 		await dragActiveFirstHandleToEdge(page, 'top')
 		await expect(page.getByTestId('popped-widget-sensors.camera.controls')).toBeVisible()
 
+		// Phase 4 look-and-feel pass: `top`/`bottom` strips are `flex-row`, so
+		// the two dropped widgets sit side-by-side (the second is to the right
+		// of the first, never on the same pixels).
 		const boxes = await poppedBoxes(page, 'top')
 		expect(boxes.length).toBe(2)
 		assertDisjoint(boxes[0], boxes[1])
+		expect(boxes[1].x, 'second top widget is to the right of the first').toBeGreaterThanOrEqual(
+			boxes[0].x + boxes[0].w,
+		)
 	})
 
 	test('a widget on top and one on left never intersect', async ({ page }) => {
@@ -178,32 +184,43 @@ test.describe('Phase 4c — Non-overlapping edge docks', () => {
 		assertDisjoint(topBoxes[0], leftBoxes[0])
 	})
 
-	test('dropping enough widgets on one edge makes the strip scrollable', async ({ page }) => {
+	test('dropping enough widgets on `top` makes the horizontal strip scrollable', async ({
+		page,
+	}) => {
 		await launchSimulator(page)
 
-		// Drop the three Sensors-tab widgets on `top` — the strip has a cap of
-		// `max-h-[40vh]`, so three cards should overflow on small viewports and
-		// report `scrollHeight > clientHeight`.
-		await dragActiveFirstHandleToEdge(page, 'top')
-		await dragActiveFirstHandleToEdge(page, 'top')
-		await dragActiveFirstHandleToEdge(page, 'top')
+		// Drop all three Sensors-tab widgets on `top` (lidar, camera controls,
+		// camera feed), then switch to Map and drop both Map-tab widgets on
+		// `top` too — five cards side-by-side overflow the top strip's usable
+		// width and force horizontal scroll (`scrollWidth > clientWidth`).
+		const dropOnTop = async () => {
+			await dragActiveFirstHandleToEdge(page, 'top')
+		}
+		await dropOnTop() // sensors.lidar
+		await dropOnTop() // sensors.camera.controls
+		await dropOnTop() // sensors.camera.feed
 		await expect(page.getByTestId('popped-widget-sensors.lidar')).toBeVisible()
 		await expect(page.getByTestId('popped-widget-sensors.camera.controls')).toBeVisible()
 		await expect(page.getByTestId('popped-widget-sensors.camera.feed')).toBeVisible()
 
-		// The three popped cards share an edge strip container. Each popped
-		// card is `[data-testid^="popped-widget-"][data-edge="top"]`; their
-		// common parent strip is the parent `div.edge-scroll`. Assert the
-		// strip can scroll: `scrollHeight` exceeds `clientHeight` once the
-		// stacked cards exceed `40vh`.
+		await activateTab(page, 'map')
+		await dropOnTop() // map.controls
+		await dropOnTop() // map.minimap
+		await expect(page.getByTestId('popped-widget-map.controls')).toBeVisible()
+		await expect(page.getByTestId('popped-widget-map.minimap')).toBeVisible()
+
+		// The popped cards share an edge strip container. Each popped card is
+		// `[data-testid^="popped-widget-"][data-edge="top"]`; their common
+		// parent strip is the parent `div.edge-scroll`. The top strip is
+		// `flex-row overflow-x-auto` (Phase 4), so the scroll axis is **x**.
 		const scrollable = await page.evaluate(() => {
 			const card = document.querySelector('[data-testid^="popped-widget-"][data-edge="top"]')
 			const strip = card?.parentElement
 			if (!strip) return null
-			return { scrollHeight: strip.scrollHeight, clientHeight: strip.clientHeight }
+			return { scrollWidth: strip.scrollWidth, clientWidth: strip.clientWidth }
 		})
 		expect(scrollable, 'edge strip must exist').not.toBeNull()
-		expect(scrollable.scrollHeight).toBeGreaterThan(scrollable.clientHeight)
+		expect(scrollable.scrollWidth).toBeGreaterThan(scrollable.clientWidth)
 	})
 
 	test('re-docking the top widget to the right moves it between strips', async ({ page }) => {

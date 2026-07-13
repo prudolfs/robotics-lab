@@ -20,7 +20,7 @@ export function FooterStatusBar() {
 	return (
 		<footer
 			data-testid="footer-status-bar"
-			className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex h-8 items-center justify-between border-border border-t bg-card/70 px-3 font-mono text-[11px] text-muted-foreground backdrop-blur-md"
+			className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex h-8 items-center justify-between border-border border-t bg-card/80 px-3 font-mono text-[11px] text-muted-foreground backdrop-blur-md"
 		>
 			<div className="flex items-center gap-4">
 				<span data-testid="sim-time">
@@ -32,8 +32,8 @@ export function FooterStatusBar() {
 				</span>
 			</div>
 			<div className="flex items-center gap-4">
-				<span className="uppercase tracking-wider">v2.4.0-dev</span>
-				<span className="font-semibold text-foreground">{status}</span>
+				<span className="text-[10px] uppercase tracking-wider">v2.4.0-dev</span>
+				<span className="font-semibold text-foreground uppercase tracking-wider">{status}</span>
 			</div>
 		</footer>
 	)
