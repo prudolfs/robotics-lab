@@ -398,13 +398,13 @@ Catch React resource leaks when the scene is torn down.
 
 ## Tasks
 
-- [ ] Open simulator
-- [ ] Leave page
-- [ ] Return to page
-- [ ] Repeat 30–50 times
-- [ ] Assert no increasing memory
-- [ ] Assert no duplicate event listeners
-- [ ] Assert no additional animation loops
+- [x] Open simulator
+- [x] Leave page
+- [x] Return to page
+- [x] Repeat 30–50 times
+- [x] Assert no increasing memory
+- [x] Assert no duplicate event listeners
+- [x] Assert no additional animation loops
 
 ---
 
