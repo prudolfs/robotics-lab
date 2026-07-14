@@ -136,7 +136,12 @@ export function NavigationWidget({ controls }: { controls: SimulationControls })
 			</div>
 			<div className="flex items-center justify-between">
 				<span className="text-muted-foreground text-xs">Path overlay</span>
-				<Button variant={showPath ? 'default' : 'outline'} size="xs" onClick={togglePath}>
+				<Button
+					variant={showPath ? 'default' : 'outline'}
+					size="xs"
+					onClick={togglePath}
+					data-testid="path-toggle"
+				>
 					{showPath ? 'On' : 'Off'}
 				</Button>
 			</div>

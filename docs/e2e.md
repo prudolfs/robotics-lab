@@ -412,17 +412,21 @@ Catch React resource leaks when the scene is torn down.
 
 Purpose:
 
-Make sure toggling layers does not leak or crash.
+Make sure toggling layers does not leak or crash. The round count is
+configurable via the `E2E_VIZ_ROUNDS` env var (default 3) and the settle
+between an off and on half of a round via `E2E_VIZ_TOGGLE_DELAY_MS`
+(default 150ms) — mirroring Phase 8 / 9 / 10's configurable-long-run
+pattern. Raise the rounds for the canonical long soak (e.g. nightly).
 
 ## Tasks
 
-- [ ] Enable / disable lidar in a loop
-- [ ] Enable / disable occupancy grid in a loop
-- [ ] Enable / disable debug overlays in a loop
-- [ ] Enable / disable camera in a loop
-- [ ] Enable / disable helpers in a loop
-- [ ] Assert no crashes
-- [ ] Assert no memory growth
+- [x] Enable / disable lidar in a loop
+- [x] Enable / disable occupancy grid in a loop
+- [x] Enable / disable debug overlays in a loop
+- [x] Enable / disable camera in a loop
+- [x] Enable / disable helpers in a loop
+- [x] Assert no crashes
+- [x] Assert no memory growth
 
 ---
 
