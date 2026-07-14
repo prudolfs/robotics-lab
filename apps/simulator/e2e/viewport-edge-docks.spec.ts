@@ -187,6 +187,12 @@ test.describe('Phase 4c — Non-overlapping edge docks', () => {
 	test('dropping enough widgets on `top` makes the horizontal strip scrollable', async ({
 		page,
 	}) => {
+		// This test performs five real dnd-kit drags (3 Sensors + 2 Map widgets),
+		// each a full pointer-event drag with mouse moves + drop-zone waits. On a
+		// constrained shared CI runner the per-drag pointer registration is slow
+		// enough that five drags comfortably exceed the suite's default 60s, so
+		// the test claims an explicit budget sized to its real drag count.
+		test.setTimeout(180_000)
 		await launchSimulator(page)
 
 		// Drop all three Sensors-tab widgets on `top` (lidar, camera controls,

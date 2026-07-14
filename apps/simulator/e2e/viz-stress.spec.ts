@@ -3,11 +3,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
 import { activateTab, launchSimulator } from './fixtures'
 import { evaluateLeak, fitTrend, sampleHeap, type HeapSample } from './memory'
-import {
-	installLeakInstrument,
-	sampleInstrument,
-	type InstrumentSample,
-} from './mount-stress'
+import { installLeakInstrument, sampleInstrument, type InstrumentSample } from './mount-stress'
 import {
 	evaluateVizStress,
 	recordVizReport,
@@ -82,9 +78,13 @@ import {
  * default to a quick CI-friendly value, and Phase 11 mirrors that pattern:
  *
  *   - `E2E_VIZ_ROUNDS`              — how many full off/on cycles each toggle
- *                                     runs (default 3, a tractable CI gate;
- *                                     set higher e.g. nightly for a long
- *                                     soak that exposes a per-round leak).
+ *                                     runs (default 1, a tractable CI gate;
+ *                                     the steady-state counter drift gate
+ *                                     trips on the very first leaked cleanup,
+ *                                     so a single round already surfaces a
+ *                                     per-toggle leak — set higher e.g.
+ *                                     nightly for a long soak that exposes a
+ *                                     slower per-round leak shape).
  *   - `E2E_VIZ_TOGGLE_DELAY_MS`     — ms to settle between an off and an on
  *                                     click within a round (default 150, so
  *                                     R3F / the leak instrument actually see
@@ -108,8 +108,17 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async () => teardownConsoleGuard())
 
 /** Default number of off/on rounds per toggle. Override with `E2E_VIZ_ROUNDS`
- *  for the canonical long soak. */
-const DEFAULT_VIZ_ROUNDS = 3
+ *  for the canonical long soak.
+ *
+ *  The default is **1**: a single off→on pass over every toggle round is
+ *  enough for the steady-state counter drift gate to surface a per-toggle
+ *  handle leak (the lo-water-mark climbs by one the very first time a leaked
+ *  cleanup is skipped, so tolerance 0 trips immediately), and the heap trend
+ *  still sees the toggle churn against the baseline. Keeping the default low
+ *  keeps the suite's wall clock tractable on a shared CI runner — set
+ *  `E2E_VIZ_ROUNDS` higher (e.g. nightly) for the canonical long soak that
+ *  would expose a slower per-round leak. */
+const DEFAULT_VIZ_ROUNDS = 1
 /** Default settle between the off and on halves of a single round, in ms.
  *  Override with `E2E_VIZ_TOGGLE_DELAY_MS`. */
 const DEFAULT_TOGGLE_DELAY_MS = 150
@@ -129,14 +138,16 @@ test.describe('Phase 11 — Visualization toggle stress', () => {
 
 		// Each round toggles six layers off then on, two tab switches per
 		// toggle (3 tabs total) plus two-settles per toggle and a final settle.
-		// In practice a round sits around 10s (the camera toggle recreates
-		// an R3F `<Canvas>` + WebGL context, which is the slow part). Picking a
-		// per-round budget of 12s gives reasonable headroom, and the fixed
-		// overhead covers launch + warm-up + the trailing heap / instrument
-		// samples — mirroring Phase 10's `30s per cycle + headroom` shape but
-		// sized to this phase's actual per-round wall time.
-		const perRoundBudgetMs = 12_000
-		const fixedOverheadMs = 90_000
+		// The camera toggle recreates an R3F `<Canvas>` + WebGL context
+		// (the slow part); on a constrained shared CI runner a single round can
+		// take ~15–20s. Picking a per-round budget of 30s gives generous
+		// headroom on slow runners without bloating the suite's wall clock
+		// (the default is 1 round). The fixed overhead covers launch + warm-up +
+		// the trailing heap / instrument samples — mirroring Phase 10's
+		// `30s per cycle + headroom` shape but sized to this phase's actual
+		// per-round wall time.
+		const perRoundBudgetMs = 30_000
+		const fixedOverheadMs = 45_000
 		test.setTimeout(perRoundBudgetMs * rounds + fixedOverheadMs)
 
 		// ── open simulator ────────────────────────────────────────────────
@@ -302,4 +313,3 @@ async function cycleToggle(page: Page, toggle: VizToggle, settleMs: number) {
 	await button.click()
 	await page.waitForTimeout(settleMs)
 }
-

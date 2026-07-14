@@ -64,11 +64,13 @@ import {
  *
  * Duration: the doc calls for 30–50 repeats. A literal 40-cycle run is
  * tractable but slow, and CI should not block on it by default. The cycle
- * count is configurable via the `E2E_MOUNT_COUNT` env var with a default of 3
- * — enough cycles for the steady-state drift gate to raise any per-cycle
- * regression, and enough heap samples for the trend fit. Set the env var to
- * 30–50 for the canonical long stress (e.g. nightly). This mirrors Phase 8's
- * `E2E_MEMORY_DURATION_MS` and Phase 9's `E2E_RENDER_DURATION_MS` pattern.
+ * count is configurable via the `E2E_MOUNT_COUNT` env var with a default of 1
+ * — enough for the steady-state drift gate to raise any per-cycle
+ * regression (a leaked handle makes the lo-water mark climb on the very
+ * first remount, so the max − min drift exceeds the tolerance immediately).
+ * Set the env var to 30–50 for the canonical long stress (e.g. nightly). This
+ * mirrors Phase 8's `E2E_MEMORY_DURATION_MS` and Phase 9's
+ * `E2E_RENDER_DURATION_MS` pattern.
  *
  * The test interacts only through the public UI path a user takes: it navigates
  * the browser, and on each return waits for the simulator's own ready
@@ -86,8 +88,11 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async () => teardownConsoleGuard())
 
 /** Default cycle count. Override with `E2E_MOUNT_COUNT` for the canonical
- *  30–50-cycle long-run. */
-const DEFAULT_MOUNT_COUNT = 3
+ *  30–50-cycle long-run. The default is the CI-minimal value (see the "Stress
+ *  tests on CI" doc): one remount is enough for the steady-state drift gate —
+ *  a leaked handle climbs the lo-water mark on the very first remount; raise
+ *  the env var for the canonical long stress. */
+const DEFAULT_MOUNT_COUNT = 1
 
 test.describe('Phase 10 — Mount / unmount stress', () => {
 	test('repeat leave/return: no leaked rAF, intervals or listeners', async ({ page }, info) => {

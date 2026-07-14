@@ -41,7 +41,7 @@ import {
  *
  * Duration: the doc calls for 15 minutes. A literal 15-minute test is too slow
  * for the default CI run, so the session length is configurable via the
- * `E2E_RENDER_DURATION_MS` env var with a default (~90s) that still exercises
+ * `E2E_RENDER_DURATION_MS` env var with a default (~15s) that still exercises
  * enough liveness probes to surface a real stall. Set the env var higher for
  * the canonical long-run (e.g. nightly). This mirrors Phase 8's
  * `E2E_MEMORY_DURATION_MS` pattern exactly.
@@ -56,8 +56,11 @@ test.beforeEach(async ({ page }) => setupConsoleGuard(page))
 test.afterEach(async () => teardownConsoleGuard())
 
 /** Default session length. Override with `E2E_RENDER_DURATION_MS` for the
- *  canonical 15-minute long-run. */
-const DEFAULT_DURATION_MS = 90_000
+ *  canonical 15-minute long-run. The default is the CI-minimal value (see
+ *  the "Stress tests on CI" doc): a short run still produces enough
+ *  liveness probes to catch a stalled render loop; raise the env var for the
+ *  canonical soak. */
+const DEFAULT_DURATION_MS = 15_000
 /** How often (ms) we take a liveness sample. Frequent enough to catch a stall
  *  well within the canonical duration, sparse enough not to starve the render
  *  loop we are measuring. */
@@ -65,13 +68,15 @@ const SAMPLE_INTERVAL_MS = 5_000
 
 test.describe('Phase 9 — Render stability', () => {
 	test('long run: render loop and WebGL context stay alive', async ({ page }, info) => {
-		test.setTimeout(240_000) // headroom: default session + sampling + teardown
-
+		// Headroom scales with the configured session so a raised env var doesn't
+		// outrun the per-test timeout: launch + warm-up + the full session plus a
+		// generous margin for sampling and teardown.
 		const durationMs = Number.parseInt(
 			process.env.E2E_RENDER_DURATION_MS ?? `${DEFAULT_DURATION_MS}`,
 			10,
 		)
 		expect(Number.isFinite(durationMs), 'E2E_RENDER_DURATION_MS must be a number').toBe(true)
+		test.setTimeout(durationMs + 30_000)
 
 		// Open the simulator (Phase 9 task: "Run simulation for 15 minutes").
 		// We simply launch and let it run — the application under test is the

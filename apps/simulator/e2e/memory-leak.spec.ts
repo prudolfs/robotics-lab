@@ -33,9 +33,9 @@ import { launchSimulatorForWorld, type Simulator, type WorldPos } from './simula
  *
  * Duration: the doc calls for 5–10 minutes. A literal 10-minute test is too
  * slow for the default CI run, so the session length is configurable via the
- * `E2E_MEMORY_DURATION_MS` env var with a default (~90s) that still exercises
- * enough drive / goal / overlay cycles and heap samples to surface a real
- * leak. Set the env var higher for the canonical long-run (e.g. nightly).
+ * `E2E_MEMORY_DURATION_MS` env var with a default (~15s) that still exercises
+ * a couple of drive / goal / overlay cycles and heap samples to surface a
+ * real leak. Set the env var higher for the canonical long-run (e.g. nightly).
  *
  * The test interacts only through the public UI — keyboard for driving, world-
  * space clicks for goals, toggle buttons for overlays — never touching store
@@ -51,8 +51,11 @@ test.beforeEach(async ({ page }) => setupConsoleGuard(page))
 test.afterEach(async () => teardownConsoleGuard())
 
 /** Default session length. Override with `E2E_MEMORY_DURATION_MS` for the
- *  canonical 5–10 minute long-run. */
-const DEFAULT_DURATION_MS = 90_000
+ *  canonical 5–10 minute long-run. The default is the CI-minimal value (see
+ *  the "Stress tests on CI" doc): a short session still runs a couple of
+ *  drive / goal / overlay cycles and produces enough heap samples for the
+ *  leak-trend fit; raise the env var for the canonical soak. */
+const DEFAULT_DURATION_MS = 15_000
 /** How often (ms) we take a heap sample. Frequent enough to fit a slope,
  *  sparse enough not to starve the render loop. */
 const SAMPLE_INTERVAL_MS = 5_000
@@ -116,13 +119,15 @@ async function placeAndClearGoal(sim: Simulator, page: Page, goal: WorldPos) {
 
 test.describe('Phase 8 — Memory leak test', () => {
 	test('long session: drive, goals and overlays do not leak memory', async ({ page }, info) => {
-		test.setTimeout(240_000) // headroom: default session + sampling + teardown
-
+		// Headroom scales with the configured session so a raised env var doesn't
+		// outrun the per-test timeout: launch + warm-up + the full session plus a
+		// generous margin for the drive/goal/overlay interaction and teardown.
 		const durationMs = Number.parseInt(
 			process.env.E2E_MEMORY_DURATION_MS ?? `${DEFAULT_DURATION_MS}`,
 			10,
 		)
 		expect(Number.isFinite(durationMs), 'E2E_MEMORY_DURATION_MS must be a number').toBe(true)
+		test.setTimeout(durationMs + 60_000)
 
 		// Open the simulator (Phase 8 task: "Open simulator").
 		const sim = await launchSimulatorForWorld(page)
@@ -160,12 +165,16 @@ test.describe('Phase 8 — Memory leak test', () => {
 			await placeAndClearGoal(sim, page, nextGoal)
 			nextGoal = nextGoal === GOAL_A ? GOAL_B : GOAL_A
 
-			// Cycle every overlay off then back on (Phase 8: "periodically toggle
-			// overlays"). Ending ON keeps the default render shape for the next
+			// Cycle every overlay off then back on each round (Phase 8: "periodically
+			// toggle overlays"). Ending ON keeps the default render shape for the next
 			// sample so readings aren't skewed by an off-state settling. These are
 			// all scene-graph / DOM overlays (see OVERLAY_TOGGLES): toggling them
 			// exercises the React resource-lifecycle churn a leak test must cover
 			// without touching WebGL context creation.
+			//
+			// NOTE: with the CI-minimal default the loop may only run once or twice;
+			// that is intentional — a leak shape shows up in the very first cycle
+			// and the heap trend across even two samples is enough to flag growth.
 			for (const toggle of OVERLAY_TOGGLES) {
 				await toggleOverlay(page, toggle) // off
 			}

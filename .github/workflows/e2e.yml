@@ -32,6 +32,11 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Run E2E tests
+        # No E2E_* stress env vars are set here on purpose: the stress tests
+        # (Phases 8 / 9 / 10 / 11) fall back to their CI-minimal defaults so the
+        # whole suite stays a fast per-PR gate. Raise the env vars locally or in
+        # a nightly job for the canonical long soak — see docs/e2e.md
+        # ("Stress tests on CI").
         run: pnpm test:e2e
 
       - name: Upload Playwright report

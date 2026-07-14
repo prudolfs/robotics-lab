@@ -66,6 +66,33 @@ Prefer waiting for observable state.
 
 ---
 
+## Stress tests on CI
+
+Phases 8 / 9 / 10 / 11 are soak tests whose canonical duration (5–15 min,
+30–50 cycles, many toggle rounds) is far too slow for a per-PR CI gate.
+They ship with a **CI-minimal default** that still exercises the exact same
+leak shape — one or two rounds of the loop, a short session — because the
+steady-state signal (counter drift, leak-trend slope) trips on the very first
+leaked cleanup, so a single round already surfaces a real regression.
+
+Run the canonical long soak locally or nightly by raising the env var — or
+use the convenience script that sets them all at once:
+
+    pnpm test:e2e:soak
+
+| Phase | Env var | CI default | Canonical soak |
+| --- | --- | --- | --- |
+| 8  | `E2E_MEMORY_DURATION_MS`  | `15000`  | `600000` (5–10 min) |
+| 9  | `E2E_RENDER_DURATION_MS`  | `15000`  | `900000` (15 min) |
+| 10 | `E2E_MOUNT_COUNT`         | `1`      | `30`–`50` |
+| 11 | `E2E_VIZ_ROUNDS`          | `1`      | `8`+ |
+| 11 | `E2E_VIZ_TOGGLE_DELAY_MS` | `150`    | `150` |
+
+The CI defaults keep the whole suite fast on a shared runner; the env vars are
+the deliberate opt-in for the long soak a leak regression is eventually worth.
+
+---
+
 # Test Pyramid
 
 ## Vitest
@@ -356,6 +383,9 @@ Purpose:
 
 Detect browser memory leaks over a long session.
 
+CI default session length is ~15s via `E2E_MEMORY_DURATION_MS`; raise the env
+var for the canonical 5–10 minute soak (see **Stress tests on CI** above).
+
 ## Tasks
 
 - [x] Open simulator
@@ -380,6 +410,9 @@ Purpose:
 
 Guarantee the app stays responsive during a long run.
 
+CI default session length is ~15s via `E2E_RENDER_DURATION_MS`; raise the env
+var for the canonical 15-minute soak (see **Stress tests on CI** above).
+
 ## Tasks
 
 - [x] Run simulation for 15 minutes
@@ -395,6 +428,9 @@ Guarantee the app stays responsive during a long run.
 Purpose:
 
 Catch React resource leaks when the scene is torn down.
+
+CI default cycle count is `1` via `E2E_MOUNT_COUNT`; raise the env var for the
+canonical 30–50-cycle soak (see **Stress tests on CI** above).
 
 ## Tasks
 
@@ -413,10 +449,13 @@ Catch React resource leaks when the scene is torn down.
 Purpose:
 
 Make sure toggling layers does not leak or crash. The round count is
-configurable via the `E2E_VIZ_ROUNDS` env var (default 3) and the settle
-between an off and on half of a round via `E2E_VIZ_TOGGLE_DELAY_MS`
+configurable via the `E2E_VIZ_ROUNDS` env var (**default 1** for the fast CI
+gate — the steady-state counter-drift gate trips on the very first leaked
+cleanup, so a single round already surfaces a real per-toggle leak) and the
+settle between an off and on half of a round via `E2E_VIZ_TOGGLE_DELAY_MS`
 (default 150ms) — mirroring Phase 8 / 9 / 10's configurable-long-run
-pattern. Raise the rounds for the canonical long soak (e.g. nightly).
+pattern (see **Stress tests on CI** above). Raise the rounds for the
+canonical long soak (e.g. nightly).
 
 ## Tasks
 
