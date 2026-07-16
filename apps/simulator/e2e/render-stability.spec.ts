@@ -1,9 +1,8 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page, test } from '@playwright/test'
 
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
-import { getSimTime, launchSimulator } from './fixtures'
+import { launchSimulator } from './fixtures'
 import {
-	RENDER_ARTIFACT,
 	type RenderReport,
 	type RenderSample,
 	recordRenderReport,
@@ -229,13 +228,14 @@ function evaluateReport(input: {
 		simTime: number
 	})[]
 
-	if (usableFps.length === 0) warnings.push('FPS readout never parseable — render liveness unverified')
-	if (usableClock.length === 0) warnings.push('sim-time readout never parseable — clock liveness unverified')
+	if (usableFps.length === 0)
+		warnings.push('FPS readout never parseable — render liveness unverified')
+	if (usableClock.length === 0)
+		warnings.push('sim-time readout never parseable — clock liveness unverified')
 
 	const firstClock = usableClock.length > 0 ? usableClock[0].simTime : null
 	const lastClock = usableClock.length > 0 ? usableClock[usableClock.length - 1].simTime : null
-	const clockAdvanced =
-		firstClock != null && lastClock != null ? lastClock > firstClock : null
+	const clockAdvanced = firstClock != null && lastClock != null ? lastClock > firstClock : null
 	if (clockAdvanced === false) {
 		warnings.push(`sim clock did not advance over the run (${firstClock}s → ${lastClock}s)`)
 	}

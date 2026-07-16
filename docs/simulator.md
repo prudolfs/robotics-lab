@@ -380,15 +380,15 @@ Create an interactive world editor.
 
 ## World
 
-- [ ] Add wall
-- [ ] Remove wall
-- [ ] Move obstacle
-- [ ] Resize obstacle
+- [x] Add wall
+- [x] Remove wall
+- [x] Move obstacle
+- [x] Resize obstacle
 
 ## Robot
 
-- [ ] Spawn robot
-- [ ] Reset pose
+- [x] Spawn robot
+- [x] Reset pose
 - [ ] Duplicate robot (future)
 
 ---

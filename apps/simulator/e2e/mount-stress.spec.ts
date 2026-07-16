@@ -2,16 +2,16 @@ import { expect, test } from '@playwright/test'
 
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
 import { launchSimulator } from './fixtures'
-import { evaluateLeak, fitTrend, sampleHeap, type HeapSample } from './memory'
+import { evaluateLeak, fitTrend, type HeapSample, sampleHeap } from './memory'
 import {
 	evaluateMount,
+	type InstrumentSample,
 	installLeakInstrument,
 	MOUNT_BUDGETS,
+	type MountStressReport,
 	recordMountReport,
 	sampleInstrument,
 	writeMountMetrics,
-	type InstrumentSample,
-	type MountStressReport,
 } from './mount-stress'
 
 /**

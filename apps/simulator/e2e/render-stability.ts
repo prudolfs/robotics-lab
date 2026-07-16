@@ -99,27 +99,16 @@ export function recordRenderReport(report: RenderReport, info: TestInfo): Render
 		},
 		{
 			type: `fpsMin ${report.fpsMin?.toFixed(0) ?? '?'}`,
-			description: report.passed
-				? 'ok'
-				: 'render loop produced zero frames at least once',
+			description: report.passed ? 'ok' : 'render loop produced zero frames at least once',
 		},
 		{
 			type: `clock ${report.clockFirst?.toFixed(1) ?? '?'}→${report.clockLast?.toFixed(1) ?? '?'}`,
-			description:
-				report.clockAdvanced === false
-					? 'FAIL: sim clock did not advance'
-					: 'ok',
+			description: report.clockAdvanced === false ? 'FAIL: sim clock did not advance' : 'ok',
 		},
 	)
-	const verdict = report.passed ? 'PASS' : 'FAIL'
+	const _verdict = report.passed ? 'PASS' : 'FAIL'
 	for (const w of report.warnings) console.warn(`[render] ${report.scenario}: ${w}`)
-	console.log(
-		`[render] ${report.scenario}: ${verdict} — ` +
-			`fps=${report.fpsMedian?.toFixed(0) ?? '?'} ` +
-			`(min ${report.fpsMin?.toFixed(0) ?? '?'}, max ${report.fpsMax?.toFixed(0) ?? '?'}) ` +
-			`clock=${report.clockFirst?.toFixed(1) ?? '?'}→${report.clockLast?.toFixed(1) ?? '?'} ` +
-			`samples=${report.samples.length}`,
-	)
+
 	return report
 }
 

@@ -220,8 +220,18 @@ export function evaluateVizStress(
 		return {
 			passed: memVerdict?.passed ?? true,
 			warnings: [...warnings, ...(memVerdict?.warnings ?? [])],
-			baseline: { rafLive: null, intervalLive: null, windowListeners: null, documentListeners: null },
-			maxDrift: { rafLive: null, intervalLive: null, windowListeners: null, documentListeners: null },
+			baseline: {
+				rafLive: null,
+				intervalLive: null,
+				windowListeners: null,
+				documentListeners: null,
+			},
+			maxDrift: {
+				rafLive: null,
+				intervalLive: null,
+				windowListeners: null,
+				documentListeners: null,
+			},
 		}
 	}
 
@@ -290,7 +300,9 @@ export function recordVizReport(report: VizStressReport, info: TestInfo): VizStr
 		{
 			type: `rafDrift ${fmt(report.maxDrift.rafLive)}`,
 			description:
-				(report.maxDrift.rafLive ?? 0) > VIZ_COUNTER_DRIFT_TOLERANCE ? 'FAIL: rAF loops leak' : 'ok',
+				(report.maxDrift.rafLive ?? 0) > VIZ_COUNTER_DRIFT_TOLERANCE
+					? 'FAIL: rAF loops leak'
+					: 'ok',
 		},
 		{
 			type: `intervalDrift ${fmt(report.maxDrift.intervalLive)}`,
@@ -318,18 +330,9 @@ export function recordVizReport(report: VizStressReport, info: TestInfo): VizStr
 			description: report.passed ? 'ok' : 'FAIL: memory growth',
 		},
 	)
-	const verdict = report.passed ? 'PASS' : 'FAIL'
+	const _verdict = report.passed ? 'PASS' : 'FAIL'
 	for (const w of report.warnings) console.warn(`[viz] ${report.scenario}: ${w}`)
-	console.log(
-		`[viz] ${report.scenario}: ${verdict} — ` +
-			`rounds=${report.rounds} ` +
-			`rafDrift=${fmt(report.maxDrift.rafLive)} ` +
-			`intervalDrift=${fmt(report.maxDrift.intervalLive)} ` +
-			`winDrift=${fmt(report.maxDrift.windowListeners)} ` +
-			`docDrift=${fmt(report.maxDrift.documentListeners)} ` +
-			`growth=${report.growthMb != null ? report.growthMb.toFixed(1) + 'MB' : '?'} ` +
-			`slope=${report.slopeMbPerMin.toFixed(2)}MB/min r²=${report.r2.toFixed(2)}`,
-	)
+
 	return report
 }
 

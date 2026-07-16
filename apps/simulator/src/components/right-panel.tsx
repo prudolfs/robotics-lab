@@ -23,6 +23,7 @@ import {
 	Map as MapIcon,
 	PanelRightClose,
 	PanelRightOpen,
+	PencilRuler,
 	Radar,
 	Wrench,
 } from 'lucide-react'
@@ -36,7 +37,9 @@ import { MapControlsWidget } from '@/components/widgets/map-controls-widget'
 import { MinimapWidget } from '@/components/widgets/minimap-widget'
 import { NavigationWidget } from '@/components/widgets/navigation-widget'
 import { RobotDebugWidget } from '@/components/widgets/robot-debug-widget'
+import { RobotEditorWidget } from '@/components/widgets/robot-editor-widget'
 import { TeleopWidget } from '@/components/widgets/teleop-widget'
+import { WorldEditorWidget } from '@/components/widgets/world-editor-widget'
 import { cn } from '@/lib/utils'
 import type { SimulationControls } from '@/sim/use-simulation-loop'
 import { type PanelTab, useSimulatorStore } from '@/store'
@@ -49,6 +52,7 @@ const TABS: TabDef[] = [
 	{ id: 'nav', label: 'Nav', icon: Compass },
 	{ id: 'teleop', label: 'Teleop', icon: Gamepad2 },
 	{ id: 'utils', label: 'Utils', icon: Wrench },
+	{ id: 'editor', label: 'Editor', icon: PencilRuler },
 ]
 
 export interface RightPanelProps {
@@ -70,6 +74,7 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 		nav: null,
 		teleop: null,
 		utils: null,
+		editor: null,
 	})
 
 	const selectTab = (tab: PanelTab) => {
@@ -84,7 +89,7 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 	}
 
 	const onTablistKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-		const order: PanelTab[] = ['sensors', 'map', 'nav', 'teleop', 'utils']
+		const order: PanelTab[] = ['sensors', 'map', 'nav', 'teleop', 'utils', 'editor']
 		const idx = order.indexOf(activeTab)
 		let next: PanelTab | null = null
 		switch (e.key) {
@@ -203,6 +208,10 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 						<TabPane tab="utils" active={activeTab}>
 							<RobotDebugWidget onReset={onReset} />
 							<LogsWidget />
+						</TabPane>
+						<TabPane tab="editor" active={activeTab}>
+							<WorldEditorWidget />
+							<RobotEditorWidget controls={controls} />
 						</TabPane>
 					</div>
 				</div>

@@ -1,17 +1,17 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page, test } from '@playwright/test'
 
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
 import { activateTab, launchSimulator } from './fixtures'
-import { evaluateLeak, fitTrend, sampleHeap, type HeapSample } from './memory'
-import { installLeakInstrument, sampleInstrument, type InstrumentSample } from './mount-stress'
+import { evaluateLeak, fitTrend, type HeapSample, sampleHeap } from './memory'
+import { type InstrumentSample, installLeakInstrument, sampleInstrument } from './mount-stress'
 import {
 	evaluateVizStress,
 	recordVizReport,
 	VIZ_BUDGETS,
 	VIZ_TOGGLES,
-	writeVizMetrics,
 	type VizStressReport,
 	type VizToggle,
+	writeVizMetrics,
 } from './viz-stress'
 
 /**

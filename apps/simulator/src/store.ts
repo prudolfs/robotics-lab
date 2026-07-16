@@ -1,4 +1,17 @@
-import { createWorld, type Pose, type World } from '@robotics-lab/core'
+import {
+	addWall,
+	boxIndexAt,
+	createWorld,
+	cylinderIndexAt,
+	moveBox,
+	moveCylinder,
+	nearestWallIndex,
+	type Pose,
+	removeWall,
+	resizeBox,
+	resizeCylinder,
+	type World,
+} from '@robotics-lab/core'
 import type { Vec2 } from '@robotics-lab/geometry'
 import { loadMap, mapNames } from '@robotics-lab/maps'
 import type { Goal, NavConfig, NavStatus, PlannerOptions } from '@robotics-lab/navigation'
@@ -35,7 +48,17 @@ import { createSimulation, DEFAULT_PLANNER_OPTIONS, robotSpeed, type SimState } 
 import { DEFAULT_TELEOP_CONFIG, type TeleopConfig } from '@/sim/teleop'
 
 /** Right-panel tab identifiers. */
-export type PanelTab = 'sensors' | 'map' | 'nav' | 'teleop' | 'utils'
+export type PanelTab = 'sensors' | 'map' | 'nav' | 'teleop' | 'utils' | 'editor'
+
+/** Editor tools (milestone 12). `'none'` is the idle / no-edit state. */
+export type EditorTool = 'none' | 'addWall' | 'removeWall' | 'move' | 'resize' | 'setSpawn'
+
+/** Which obstacle (if any) the editor has selected for move/resize. */
+export type EditorSelection =
+	| { kind: 'none' }
+	| { kind: 'box'; index: number }
+	| { kind: 'cylinder'; index: number }
+	| { kind: 'wall'; index: number }
 
 /**
  * Widget kinds that can be dragged out of the right panel onto the viewport
@@ -52,6 +75,8 @@ export type WidgetId =
 	| 'teleop.controls'
 	| 'utils.robotDebug'
 	| 'utils.logs'
+	| 'editor.world'
+	| 'editor.robot'
 
 /**
  * Dock edge a popped widget snaps to. Per the Phase-3 design, dragging a
@@ -76,6 +101,10 @@ export type PoppedWidget = {
 
 // Default spawn pose: center of the floor, facing +x.
 export const SPAWN_POSE = { x: 0, y: 0, heading: 0 }
+
+/** Click tolerance (metres) for the pick-a-wall-to-remove tool. A click within
+ *  this distance of a wall segment removes it; farther clicks are ignored. */
+export const EDITOR_WALL_PICK_TOLERANCE = 0.3
 
 /** Default lidar spec for the HUD / sensor inspector. */
 export const DEFAULT_LIDAR_CONFIG = createLidarConfig({ range: 8, rayCount: 180 })
@@ -155,6 +184,43 @@ export type SimulatorStore = {
 	/** Observed nonce incremented each time the user asks the loop to clear
 	 *  the dead-reckoning trail. */
 	odometryNonce: number
+	/* ----------------------------- Editor (milestone 12) ----------------------------- */
+	/** App state: active editor tool (`'none'` leaves the world read-only). */
+	editorTool: EditorTool
+	/** App state: the obstacle the editor has selected (move/resize), if any. */
+	editorSelection: EditorSelection
+	/** App state: first endpoint of the wall being drawn (click 1 of 2); null
+	 *  until the first click lands. Cleared on completion / tool change. */
+	wallStart: Vec2 | null
+	/** App state: the robot spawn pose used on Reset / map switch. */
+	spawnPose: Pose
+	/** App action: set / clear the first endpoint of the wall being drawn. */
+	setWallStart: (point: Vec2 | null) => void
+	/** App action: switch the active editor tool. Clears in-progress state and,
+	 *  for `'none'`, also drops the selection so the overlay markers vanish. */
+	setEditorTool: (tool: EditorTool) => void
+	/** App action: add a wall segment to the world. */
+	editorAddWall: (start: Vec2, end: Vec2) => void
+	/** App action: remove the wall nearest to a world point (within tolerance). */
+	editorRemoveWallAt: (point: Vec2) => void
+	/** App action: begin a move / resize on the obstacle nearest the point.
+	 *  Selects a box or cylinder (whichever is closest to the click). */
+	editorSelectAt: (point: Vec2) => void
+	/** App action: move the selected obstacle to a new world point. */
+	editorMoveSelectionTo: (point: Vec2) => void
+	/** App action: resize the selected box by deltas (width/depth in metres). */
+	editorResizeBox: (index: number, width: number, depth: number) => void
+	/** App action: resize the selected cylinder by a new radius. */
+	editorResizeCylinder: (index: number, radius: number) => void
+	/** App action: clear the editor selection. */
+	clearEditorSelection: () => void
+	/** App action: set spawn pose to a world point (heading preserved). */
+	editorSetSpawn: (point: Vec2) => void
+	/** App action: rebase the spawn pose to the robot's current pose, then reset. */
+	editorResetRobotPose: () => void
+	/** Observed nonce incremented each time the user requests a spawn rebase +
+	 *  reset (the loop reads it and calls `resetSimulation` with the new spawn). */
+	spawnNonce: number
 	/* ----------------------------- Right panel ----------------------------- */
 	/** App state: whether the right panel is visible. */
 	panelOpen: boolean
@@ -302,6 +368,11 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		theme: resolveInitialTheme(),
 		showOdometry: true,
 		odometryNonce: 0,
+		editorTool: 'none',
+		editorSelection: { kind: 'none' },
+		wallStart: null,
+		spawnPose: SPAWN_POSE,
+		spawnNonce: 0,
 		selectMap: (name) => {
 			if (!names.includes(name)) return
 			set({ selectedMap: name, world: buildWorld(name) })
@@ -323,6 +394,54 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		toggleMinimap: () => set((s) => ({ showMinimap: !s.showMinimap })),
 		toggleOdometry: () => set((s) => ({ showOdometry: !s.showOdometry })),
 		clearOdometry: () => set((s) => ({ odometryNonce: s.odometryNonce + 1 })),
+		// --- Editor (milestone 12) ---------------------------------------------
+		// The editor owns the world: it mutates the in-memory `World` the store
+		// already feeds to the simulation loop via the existing `world` effect in
+		// `use-simulation-loop`. Re-creating the world object each edit gives React
+		// a fresh reference so the renderer and the sim both pick up the change.
+		setEditorTool: (tool) =>
+			set((s) => ({
+				editorTool: tool,
+				wallStart: s.editorTool === tool ? s.wallStart : null,
+				editorSelection:
+					tool === 'move' || tool === 'resize' ? s.editorSelection : { kind: 'none' },
+			})),
+		setWallStart: (point) => set({ wallStart: point }),
+		editorAddWall: (start, end) =>
+			set((s) => ({ world: addWall(s.world, { kind: 'wall', start, end }), wallStart: null })),
+		editorRemoveWallAt: (point) =>
+			set((s) => {
+				const idx = nearestWallIndex(s.world, point, EDITOR_WALL_PICK_TOLERANCE)
+				if (idx < 0) return {}
+				return { world: removeWall(s.world, idx) }
+			}),
+		editorSelectAt: (point) =>
+			set((s) => {
+				const box = boxIndexAt(s.world, point)
+				if (box >= 0) return { editorSelection: { kind: 'box', index: box } }
+				const cyl = cylinderIndexAt(s.world, point)
+				if (cyl >= 0) return { editorSelection: { kind: 'cylinder', index: cyl } }
+				return { editorSelection: { kind: 'none' } }
+			}),
+		editorMoveSelectionTo: (point) =>
+			set((s) => {
+				const sel = s.editorSelection
+				if (sel.kind === 'box') return { world: moveBox(s.world, sel.index, point) }
+				if (sel.kind === 'cylinder') return { world: moveCylinder(s.world, sel.index, point) }
+				return {}
+			}),
+		editorResizeBox: (index, width, depth) =>
+			set((s) => ({ world: resizeBox(s.world, index, { width, depth }) })),
+		editorResizeCylinder: (index, radius) =>
+			set((s) => ({ world: resizeCylinder(s.world, index, radius) })),
+		clearEditorSelection: () => set({ editorSelection: { kind: 'none' } }),
+		editorSetSpawn: (point) =>
+			set((s) => ({ spawnPose: { ...s.spawnPose, x: point.x, y: point.y } })),
+		editorResetRobotPose: () =>
+			set((s) => ({
+				spawnPose: { x: s.robot.pose.x, y: s.robot.pose.y, heading: s.robot.pose.heading },
+				spawnNonce: s.spawnNonce + 1,
+			})),
 		clearMap: () => {
 			// The loop owns the grid; we push the clear via the import below, but to
 			// keep store <-> loop circularity clean we expose the action as a flag

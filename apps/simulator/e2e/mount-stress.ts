@@ -300,7 +300,11 @@ export function installLeakInstrument(page: Page): void {
  *  Returns null counters (not a throw) when the probe isn't installed, so a
  *  missing counters API degrades to a warning rather than a mid-run abort —
  *  the same gap-aware shape Phase 7 / 8 / 9 use for their measurement APIs. */
-export async function sampleInstrument(page: Page, t0: number, i: number): Promise<InstrumentSample> {
+export async function sampleInstrument(
+	page: Page,
+	t0: number,
+	i: number,
+): Promise<InstrumentSample> {
 	const snap = await page
 		.evaluate(() => {
 			const api = (window as unknown as { __E2E_LEAKS__?: { snapshot: () => unknown } })
@@ -315,7 +319,14 @@ export async function sampleInstrument(page: Page, t0: number, i: number): Promi
 		})
 		.catch(() => null)
 	if (snap == null) {
-		return { i, elapsedMs: Date.now() - t0, rafLive: null, intervalLive: null, windowListeners: null, documentListeners: null }
+		return {
+			i,
+			elapsedMs: Date.now() - t0,
+			rafLive: null,
+			intervalLive: null,
+			windowListeners: null,
+			documentListeners: null,
+		}
 	}
 	return {
 		i,
@@ -356,15 +367,39 @@ export function evaluateMount(
 	samples: InstrumentSample[],
 	memVerdict: { passed: boolean; warnings: string[] } | null,
 	mem: { growthMb: number | null; slopeMbPerMin: number; r2: number },
-): { passed: boolean; warnings: string[]; baseline: MountStressReport['baseline']; maxDrift: MountStressReport['maxDrift'] } {
+): {
+	passed: boolean
+	warnings: string[]
+	baseline: MountStressReport['baseline']
+	maxDrift: MountStressReport['maxDrift']
+} {
 	const warnings: string[] = []
-	if (samples.length === 0 || samples.every((s) => s.rafLive == null && s.intervalLive == null && s.windowListeners == null && s.documentListeners == null)) {
+	if (
+		samples.length === 0 ||
+		samples.every(
+			(s) =>
+				s.rafLive == null &&
+				s.intervalLive == null &&
+				s.windowListeners == null &&
+				s.documentListeners == null,
+		)
+	) {
 		warnings.push('leak instrument unavailable — counter drift unverified')
 		return {
 			passed: memVerdict?.passed ?? true,
 			warnings: [...warnings, ...(memVerdict?.warnings ?? [])],
-			baseline: { rafLive: null, intervalLive: null, windowListeners: null, documentListeners: null },
-			maxDrift: { rafLive: null, intervalLive: null, windowListeners: null, documentListeners: null },
+			baseline: {
+				rafLive: null,
+				intervalLive: null,
+				windowListeners: null,
+				documentListeners: null,
+			},
+			maxDrift: {
+				rafLive: null,
+				intervalLive: null,
+				windowListeners: null,
+				documentListeners: null,
+			},
 		}
 	}
 
@@ -468,18 +503,9 @@ export function recordMountReport(report: MountStressReport, info: TestInfo): Mo
 			description: report.passed ? 'ok' : 'FAIL: memory growth',
 		},
 	)
-	const verdict = report.passed ? 'PASS' : 'FAIL'
+	const _verdict = report.passed ? 'PASS' : 'FAIL'
 	for (const w of report.warnings) console.warn(`[mount] ${report.scenario}: ${w}`)
-	console.log(
-		`[mount] ${report.scenario}: ${verdict} — ` +
-			`cycles=${report.cycles} ` +
-			`rafDrift=${fmt(report.maxDrift.rafLive)} ` +
-			`intervalDrift=${fmt(report.maxDrift.intervalLive)} ` +
-			`winDrift=${fmt(report.maxDrift.windowListeners)} ` +
-			`docDrift=${fmt(report.maxDrift.documentListeners)} ` +
-			`growth=${report.growthMb != null ? report.growthMb.toFixed(1) + 'MB' : '?'} ` +
-			`slope=${report.slopeMbPerMin.toFixed(2)}MB/min r²=${report.r2.toFixed(2)}`,
-	)
+
 	return report
 }
 

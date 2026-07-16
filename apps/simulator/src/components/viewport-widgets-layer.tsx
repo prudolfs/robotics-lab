@@ -261,10 +261,7 @@ function PoppedCard({
 					    overflowing it. Side strips leave the body unconstrained
 					    (their own `overflow-y-auto` handles the scroll). */}
 					<div
-						className={cn(
-							'flex w-full flex-none flex-col gap-3',
-							BODY_SCROLL_CLASS[popped.edge],
-						)}
+						className={cn('flex w-full flex-none flex-col gap-3', BODY_SCROLL_CLASS[popped.edge])}
 					>
 						{renderWidget(popped.widget, { ...renderProps, dockedOnViewport: true })}
 					</div>

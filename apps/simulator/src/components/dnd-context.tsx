@@ -120,6 +120,8 @@ export const WIDGET_TITLES: Record<WidgetId, string> = {
 	'teleop.controls': 'Teleop',
 	'utils.robotDebug': 'Robot debug',
 	'utils.logs': 'System Logs',
+	'editor.world': 'World editor',
+	'editor.robot': 'Robot editor',
 }
 
 /** Shared drag-handle icon (matches the panel/popped visual). */

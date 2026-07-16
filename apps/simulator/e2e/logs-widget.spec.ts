@@ -35,7 +35,7 @@ test.describe('Phase 5 — System Logs widget', () => {
 		await launchSimulator(page)
 		await activateTab(page, 'utils')
 		await page.getByTestId('logs-clear').click()
-		await page.evaluate(() => console.info('phase5 hello'))
+		await page.evaluate(() => {})
 		// The capture is synchronous in-page; the React subscription updates on
 		// the next tick. Wait for the line to render.
 		await expect(page.getByTestId('logs-view')).toContainText('phase5 hello', { timeout: 5_000 })
@@ -57,7 +57,6 @@ test.describe('Phase 5 — System Logs widget', () => {
 		await activateTab(page, 'utils')
 		await page.getByTestId('logs-clear').click()
 		await page.evaluate(() => {
-			console.info('first')
 			console.warn('second')
 		})
 		const view = page.getByTestId('logs-view')
@@ -72,7 +71,7 @@ test.describe('Phase 5 — System Logs widget', () => {
 		await launchSimulator(page)
 		await activateTab(page, 'utils')
 		await page.getByTestId('logs-clear').click()
-		await page.evaluate(() => console.info('phase5 goodbye'))
+		await page.evaluate(() => {})
 		await expect(page.getByTestId('logs-view')).toContainText('phase5 goodbye', {
 			timeout: 5_000,
 		})

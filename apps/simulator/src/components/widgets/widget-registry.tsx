@@ -16,7 +16,9 @@ import { MapControlsWidget } from '@/components/widgets/map-controls-widget'
 import { MinimapWidget } from '@/components/widgets/minimap-widget'
 import { NavigationWidget } from '@/components/widgets/navigation-widget'
 import { RobotDebugWidget } from '@/components/widgets/robot-debug-widget'
+import { RobotEditorWidget } from '@/components/widgets/robot-editor-widget'
 import { TeleopWidget } from '@/components/widgets/teleop-widget'
+import { WorldEditorWidget } from '@/components/widgets/world-editor-widget'
 import type { SimulationControls } from '@/sim/use-simulation-loop'
 import type { WidgetId } from '@/store'
 
@@ -51,6 +53,10 @@ export function renderWidget(widget: WidgetId, props: WidgetRenderProps): ReactN
 			return <RobotDebugWidget onReset={props.onReset} />
 		case 'utils.logs':
 			return <LogsWidget />
+		case 'editor.world':
+			return <WorldEditorWidget />
+		case 'editor.robot':
+			return <RobotEditorWidget controls={props.controls} />
 		default:
 			return null
 	}

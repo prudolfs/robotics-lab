@@ -1,16 +1,16 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page, test } from '@playwright/test'
 
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
 import { activateTab } from './fixtures'
 import {
 	evaluateLeak,
 	fitTrend,
+	type HeapSample,
 	MEMORY_BUDGETS,
+	type MemoryReport,
 	recordMemoryReport,
 	sampleHeap,
 	writeMemoryMetrics,
-	type HeapSample,
-	type MemoryReport,
 } from './memory'
 import { launchSimulatorForWorld, type Simulator, type WorldPos } from './simulator'
 

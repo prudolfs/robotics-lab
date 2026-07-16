@@ -189,9 +189,7 @@ export async function sampleHeap(
  * matching the Phase 7 philosophy).
  */
 export function fitTrend(samples: HeapSample[]): MemoryTrend {
-	const usable = samples.filter(
-		(s): s is HeapSample & { heapMb: number } => s.heapMb != null,
-	)
+	const usable = samples.filter((s): s is HeapSample & { heapMb: number } => s.heapMb != null)
 	if (usable.length < 2) {
 		return {
 			slopeMbPerMin: 0,
@@ -267,9 +265,7 @@ export function evaluateLeak(
 		trend.slopeMbPerMin > budgets.maxLeakMbPerMinute && trend.r2 >= budgets.leakTrendR2
 
 	if (trend.growthMb != null && !growthOk) {
-		warnings.push(
-			`growth ${trend.growthMb.toFixed(1)}MB exceeds budget ${budgets.maxGrowthMb}MB`,
-		)
+		warnings.push(`growth ${trend.growthMb.toFixed(1)}MB exceeds budget ${budgets.maxGrowthMb}MB`)
 	}
 	if (leakTrend) {
 		warnings.push(
@@ -302,14 +298,9 @@ export function recordMemoryReport(report: MemoryReport, info: TestInfo): Memory
 			description: report.passed ? 'ok' : 'leak fit strong',
 		},
 	)
-	const verdict = report.passed ? 'PASS' : 'FAIL'
+	const _verdict = report.passed ? 'PASS' : 'FAIL'
 	for (const w of report.warnings) console.warn(`[memory] ${report.scenario}: ${w}`)
-	console.log(
-		`[memory] ${report.scenario}: ${verdict} — ` +
-			`growth=${report.growthMb != null ? report.growthMb.toFixed(1) + 'MB' : '?'} ` +
-			`slope=${report.slopeMbPerMin.toFixed(2)}MB/min r²=${report.r2.toFixed(2)} ` +
-			`n=${report.samples.length}`,
-	)
+
 	return report
 }
 

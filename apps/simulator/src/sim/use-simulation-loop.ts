@@ -39,6 +39,7 @@ import {
 	setGoals as setSimGoals,
 	setNavConfig as setSimNav,
 	setPlannerOptions as setSimPlanner,
+	setSpawnPose as setSimSpawnPose,
 	setSimWorld,
 	startCoverage as startSimCoverage,
 } from '@/sim/loop'
@@ -136,6 +137,29 @@ export function useSimulationLoop(): SimulationControls {
 		simRef.current = clearSimOdometryTrail(cur())
 		observe(cur())
 	}, [odometryNonce, observe, cur])
+
+	// Editor (milestone 12): rebase the spawn pose to the robot's current pose
+	// and reset, dropping the robot onto its new spawn. Watched via a monotonic
+	// nonce so it fires exactly once per click. The loop owns the sim; the store
+	// raised the nonce after updating `spawnPose`.
+	const spawnNonce = useSimulatorStore((s) => s.spawnNonce)
+	const lastSpawnNonceRef = useRef<number>(spawnNonce)
+	useEffect(() => {
+		if (lastSpawnNonceRef.current === spawnNonce) return
+		lastSpawnNonceRef.current = spawnNonce
+		if (spawnNonce === 0) return
+		const { spawnPose } = useSimulatorStore.getState()
+		simRef.current = setSimSpawnPose(cur(), spawnPose)
+		simRef.current = resetSimulation(cur())
+		// Reset cleared the goal queue / autonomy in the sim; mirror that into
+		// the store so the HUD updates synchronously.
+		useSimulatorStore.getState().clearGoals()
+		// Re-derive the input from the keyboard so the robot doesn't keep rolling.
+		const desired = driveInputFromKeyboard(keyboardRef.current, teleopRef.current)
+		if (!INPUT_EQ(cur().input, desired)) simRef.current = applyInput(cur(), desired)
+		lastInputRef.current = desired
+		observe(cur())
+	}, [spawnNonce, observe, cur, keyboardRef.current])
 
 	// Reflect world changes onto the sim without resetting the robot. The map
 	// change path above already rebuilds a fresh sim, so this effect handles

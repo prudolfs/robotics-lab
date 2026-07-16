@@ -456,6 +456,12 @@ export function robotSpeed(robot: { velocity: Velocity }): number {
 	return Math.hypot(robot.velocity.vx, robot.velocity.vy)
 }
 
+/** Replace the spawn pose (used on Reset / map switch). Does not move the
+ *  current robot; call `resetSimulation` afterwards to send it there. */
+export function setSpawnPose(state: SimState, spawnPose: Pose): SimState {
+	return state.spawnPose === spawnPose ? state : { ...state, spawnPose }
+}
+
 /**
  * Advance the simulation by exactly one fixed timestep.
  *
