@@ -80,6 +80,14 @@ export const VIZ_BUDGETS = {
 	// R² floor: only treat a slope as a "leak trend" when the linear fit is
 	// reasonably good; below this the series is noise.
 	leakTrendR2: 0.6,
+	// Minimum usable samples before the linear-leak gate runs (mirrors Phase
+	// 8 / 10's `leakMinSamples`). The CI-minimal `E2E_VIZ_ROUNDS=1` collects
+	// only two samples, where R² is trivially 1.00 and a single ~1MB GC-noise
+	// bump reads as a perfectly-fit "linear leak". The growth cap above and
+	// the per-toggle counter drift gate still catch a real per-toggle leak from
+	// a single round; the trend is the multi-round backstop and only fires
+	// once enough samples define it.
+	leakMinSamples: 4,
 } as const
 
 /** A description of a single visualization toggle button in the public UI.

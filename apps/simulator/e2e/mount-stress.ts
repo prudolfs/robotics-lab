@@ -111,6 +111,13 @@ export const MOUNT_BUDGETS = {
 	// R² floor: only treat a slope as a "leak trend" when the linear fit is
 	// reasonably good; below this the series is noise.
 	leakTrendR2: 0.6,
+	// Minimum usable samples before the linear-leak gate runs (mirrors Phase 8's
+	// `MEMORY_BUDGETS.leakMinSamples`). The CI-minimal `E2E_MOUNT_COUNT=1`
+	// collects only two samples, where R² is trivially 1.00 and a single ~1MB
+	// GC-noise bump reads as a ~20MB/min "linear leak". The growth cap above and
+	// the per-cycle counter drift gate still catch a real single-cycle leak; the
+	// trend is the multi-cycle backstop and only fires once it is meaningful.
+	leakMinSamples: 4,
 } as const
 
 /** A single instrumentation snapshot from `window.__E2E_LEAKS__`. */

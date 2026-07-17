@@ -55,6 +55,16 @@ export const MEMORY_BUDGETS = {
 	// is reasonably good. Below this R² the series is dominated by noise, not
 	// a monotonic increase — the small-growth check above is what guards it.
 	leakTrendR2: 0.6,
+	// Minimum *usable* samples before the linear-leak gate runs at all. With
+	// fewer than this, the fit is statistically meaningless: two points have
+	// R² = 1.00 by construction, so a single ~1MB GC-noise bump reads as a
+	// perfectly-fit ~20MB/min "linear leak" over a ~3s CI-minimal run (Phase
+	// 10's default `E2E_MOUNT_COUNT=1` takes exactly two samples). The growth
+	// cap above still guards a single-cycle leak from the small-growth check;
+	// the *trend* gate only fires once enough samples exist to define a trend.
+	// Canonical long soaks (Phases 8/9/10 nightly) take many more samples and
+	// stay fully gated.
+	leakMinSamples: 4,
 } as const
 
 export type HeapSample = {
@@ -217,7 +227,12 @@ export function fitTrend(samples: HeapSample[]): MemoryTrend {
 	}
 	const slopePerMs = sxx > 0 ? sxy / sxx : 0
 	const slopeMbPerMin = slopePerMs * 60_000
-	const r2 = syy > 0 ? (sxy * sxy) / (sxx * syy) : 0
+	// R² is mathematically 1.00 for a two-point fit (any two points lie on a
+	// perfect line); with two/three points it is therefore not a "trend" signal
+	// at all, regardless of the slope magnitude. Report 0 so the leak-trend
+	// gate (which keys on R² ≥ leakTrendR2) does not fire on under-sampled
+	// CI-minimal runs; the growth cap above still guards the single-cycle case.
+	const r2 = n >= 4 ? (syy > 0 ? (sxy * sxy) / (sxx * syy) : 0) : 0
 	const firstMb = ys[0]
 	const lastMb = ys[ys.length - 1]
 	return {
@@ -258,11 +273,22 @@ export function evaluateLeak(
 		// A genuinely missing API is a transparent gap, not a leak: do not fail.
 		return { passed: true, warnings }
 	}
+	if (trend.n < budgets.leakMinSamples) {
+		warnings.push(
+			`too few samples (${trend.n}) to fit a leak trend — linear gate skipped ` +
+			`(needs ${budgets.leakMinSamples}, growth cap still active)`,
+		)
+	}
 
 	const growthOk = trend.growthMb != null && trend.growthMb <= budgets.maxGrowthMb
 	const slopeRateMb = trend.slopeMbPerMin * (durationMs / 60_000)
+	// The linear-fit *trend* gate only fires once enough samples define a trend;
+	// see `leakMinSamples`. The growth cap above still catches any single-cycle
+	// leak from just two samples — the trend is the backstop, not the trip.
 	const leakTrend =
-		trend.slopeMbPerMin > budgets.maxLeakMbPerMinute && trend.r2 >= budgets.leakTrendR2
+		trend.n >= budgets.leakMinSamples &&
+		trend.slopeMbPerMin > budgets.maxLeakMbPerMinute &&
+		trend.r2 >= budgets.leakTrendR2
 
 	if (trend.growthMb != null && !growthOk) {
 		warnings.push(`growth ${trend.growthMb.toFixed(1)}MB exceeds budget ${budgets.maxGrowthMb}MB`)

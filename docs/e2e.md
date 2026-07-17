@@ -91,6 +91,21 @@ use the convenience script that sets them all at once:
 The CI defaults keep the whole suite fast on a shared runner; the env vars are
 the deliberate opt-in for the long soak a leak regression is eventually worth.
 
+### Leak-trend gate vs. sample count
+
+The heap-leak verdict has two independent arms: a **growth cap** (last − first
+sample ≤ `maxGrowthMb`) and a **linear-trend gate** (slope ≤ `maxLeakMbPerMinute`
+AND `R² ≥ leakTrendR2`). The trend gate only fires once enough samples define a
+trend — `leakMinSamples` (default 4). With fewer points the fit is
+statistically meaningless: two points have `R² = 1.00` by construction, so a
+single ~1MB GC-noise bump over a ~3s CI-minimal run reads as a perfectly-fit
+~20MB/min "linear leak" and false-fails. The growth cap still catches any
+real single-cycle leak from just two samples; the trend is the multi-cycle
+backstop and only bites once it is meaningful. So the CI-minimal default
+Phases 10 / 11 (`cycles = 1`) report `too few samples — linear gate skipped`
+as a warning and rely on the growth cap + the counter-drift gate; the
+canonical soak (many cycles) restores the full trend gate.
+
 ---
 
 # Test Pyramid

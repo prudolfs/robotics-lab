@@ -23,6 +23,40 @@ async function openPlayback(page: import('@playwright/test').Page) {
 	await expect(page.getByTestId('playback-timeline')).toBeVisible()
 }
 
+/** Drive the robot with a held key for `holdMs`, release, and then wait until
+ *  the recorded timeline holds at least one frame (the frame-count readout is
+ *  `i / N` with `N > 0`).
+ *
+ *  The suite's own principle is "no timing assumptions — wait on observable
+ *  state" (docs/e2e.md): the simulation loop captures a frame every
+ *  `RECORD_EVERY_N_STEPS` fixed steps, so the exact wall-clock at which the
+ *  first frame lands is load-dependent. Polling the readout (instead of
+ *  trusting a fixed timeout) keeps the recording step deterministic whether
+ *  the run is cold or shares the runner with 20 other specs. */
+async function recordAFewFrames(
+	page: import('@playwright/test').Page,
+	key: 'w' | 'd',
+	holdMs = 900,
+	timeoutMs = 10_000,
+) {
+	await page.keyboard.down(key)
+	await page.waitForTimeout(holdMs)
+	await page.keyboard.up(key)
+	// Cadence-committed: stop driving as soon as the timeline reflects
+	// ≥1 captured frame, rather than waiting a fixed settle after release. This
+	// is the observable-state signal for "the recorder captured something".
+	await expect
+		.poll(
+			async () => {
+				const count = await page.getByTestId('playback-frame-count').textContent()
+				const m = count?.match(/^(\d+) \/ (\d+)$/)
+				return m ? Number(m[2]) : 0
+			},
+			{ timeout: timeoutMs },
+		)
+		.toBeGreaterThan(0)
+}
+
 test.describe('Milestone 13 — Playback', () => {
 	test('the widget renders in the Playback tab with all controls', async ({ page }) => {
 		await openPlayback(page)
@@ -44,10 +78,7 @@ test.describe('Milestone 13 — Playback', () => {
 		await expect(page.getByTestId('playback-status')).toHaveText('recording')
 
 		// Hold W to drive forward; the loop captures frames at the cadence.
-		await page.keyboard.down('w')
-		await page.waitForTimeout(900)
-		await page.keyboard.up('w')
-		await page.waitForTimeout(200)
+		await recordAFewFrames(page, 'w')
 
 		// Stop recording.
 		await page.getByTestId('record-stop').click()
@@ -71,10 +102,7 @@ test.describe('Milestone 13 — Playback', () => {
 
 		// Record a short run while driving.
 		await page.getByTestId('record-start').click()
-		await page.keyboard.down('w')
-		await page.waitForTimeout(900)
-		await page.keyboard.up('w')
-		await page.waitForTimeout(200)
+		await recordAFewFrames(page, 'w')
 		await page.getByTestId('record-stop').click()
 
 		// Capture the download triggered by Save run.
@@ -118,10 +146,7 @@ test.describe('Milestone 13 — Playback', () => {
 
 		// Record a short run.
 		await page.getByTestId('record-start').click()
-		await page.keyboard.down('d')
-		await page.waitForTimeout(900)
-		await page.keyboard.up('d')
-		await page.waitForTimeout(200)
+		await recordAFewFrames(page, 'd')
 		await page.getByTestId('record-stop').click()
 
 		// Scrub partway: status becomes paused. Seek to the second frame (index 1)
@@ -141,10 +166,7 @@ test.describe('Milestone 13 — Playback', () => {
 	test('Clear empties the recording and resets the timeline', async ({ page }) => {
 		await openPlayback(page)
 		await page.getByTestId('record-start').click()
-		await page.keyboard.down('w')
-		await page.waitForTimeout(300)
-		await page.keyboard.up('w')
-		await page.waitForTimeout(100)
+		await recordAFewFrames(page, 'w', 300)
 		await page.getByTestId('record-stop').click()
 		await expect(page.getByTestId('playback-frame-count')).toContainText(/^\d+ \/ \d+$/)
 
