@@ -26,6 +26,7 @@ import {
 	PencilRuler,
 	Radar,
 	Wrench,
+	History as HistoryIcon,
 } from 'lucide-react'
 import { useRef } from 'react'
 import { CameraControlsWidget } from '@/components/widgets/camera-controls-widget'
@@ -36,6 +37,7 @@ import { LogsWidget } from '@/components/widgets/logs-widget'
 import { MapControlsWidget } from '@/components/widgets/map-controls-widget'
 import { MinimapWidget } from '@/components/widgets/minimap-widget'
 import { NavigationWidget } from '@/components/widgets/navigation-widget'
+import { PlaybackWidget } from '@/components/widgets/playback-widget'
 import { RobotDebugWidget } from '@/components/widgets/robot-debug-widget'
 import { RobotEditorWidget } from '@/components/widgets/robot-editor-widget'
 import { TeleopWidget } from '@/components/widgets/teleop-widget'
@@ -53,6 +55,7 @@ const TABS: TabDef[] = [
 	{ id: 'teleop', label: 'Teleop', icon: Gamepad2 },
 	{ id: 'utils', label: 'Utils', icon: Wrench },
 	{ id: 'editor', label: 'Editor', icon: PencilRuler },
+	{ id: 'playback', label: 'Playback', icon: HistoryIcon },
 ]
 
 export interface RightPanelProps {
@@ -75,6 +78,7 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 		teleop: null,
 		utils: null,
 		editor: null,
+		playback: null,
 	})
 
 	const selectTab = (tab: PanelTab) => {
@@ -89,7 +93,7 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 	}
 
 	const onTablistKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-		const order: PanelTab[] = ['sensors', 'map', 'nav', 'teleop', 'utils', 'editor']
+		const order: PanelTab[] = ['sensors', 'map', 'nav', 'teleop', 'utils', 'editor', 'playback']
 		const idx = order.indexOf(activeTab)
 		let next: PanelTab | null = null
 		switch (e.key) {
@@ -212,6 +216,9 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 						<TabPane tab="editor" active={activeTab}>
 							<WorldEditorWidget />
 							<RobotEditorWidget controls={controls} />
+						</TabPane>
+						<TabPane tab="playback" active={activeTab}>
+							<PlaybackWidget />
 						</TabPane>
 					</div>
 				</div>

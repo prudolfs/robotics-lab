@@ -15,6 +15,7 @@ import { LogsWidget } from '@/components/widgets/logs-widget'
 import { MapControlsWidget } from '@/components/widgets/map-controls-widget'
 import { MinimapWidget } from '@/components/widgets/minimap-widget'
 import { NavigationWidget } from '@/components/widgets/navigation-widget'
+import { PlaybackWidget } from '@/components/widgets/playback-widget'
 import { RobotDebugWidget } from '@/components/widgets/robot-debug-widget'
 import { RobotEditorWidget } from '@/components/widgets/robot-editor-widget'
 import { TeleopWidget } from '@/components/widgets/teleop-widget'
@@ -57,6 +58,8 @@ export function renderWidget(widget: WidgetId, props: WidgetRenderProps): ReactN
 			return <WorldEditorWidget />
 		case 'editor.robot':
 			return <RobotEditorWidget controls={props.controls} />
+		case 'playback.controls':
+			return <PlaybackWidget />
 		default:
 			return null
 	}

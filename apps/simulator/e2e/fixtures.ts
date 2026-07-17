@@ -29,7 +29,10 @@ export async function launchSimulator(page: Page, base: string = '/') {
  * panes; only the active tab's pane is visible). Idempotent. The default
  * active tab is `sensors`.
  */
-export async function activateTab(page: Page, tab: 'sensors' | 'map' | 'nav' | 'teleop' | 'utils') {
+export async function activateTab(
+	page: Page,
+	tab: 'sensors' | 'map' | 'nav' | 'teleop' | 'utils' | 'editor' | 'playback',
+) {
 	const btn = page.getByTestId(`panel-tab-${tab}`)
 	await btn.click()
 	await expect(btn).toHaveAttribute('aria-selected', 'true')

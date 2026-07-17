@@ -401,10 +401,10 @@ Record and replay simulations.
 
 ## Recording
 
-- [ ] Timeline
-- [ ] Save run
-- [ ] Load run
-- [ ] Replay
+- [x] Timeline
+- [x] Save run
+- [x] Load run
+- [x] Replay
 
 ---
 

@@ -45,10 +45,24 @@ export function resolveInitialTheme(): ThemeMode {
 
 import { create } from 'zustand'
 import { createSimulation, DEFAULT_PLANNER_OPTIONS, robotSpeed, type SimState } from '@/sim/loop'
+import {
+	createPlaybackState,
+	createRecording,
+	deserializeRecording,
+	hasFrames,
+	type PlaybackState,
+	pausePlayback,
+	playPlayback,
+	type Recording,
+	seekPlayback,
+	serializeRecording,
+	setPlaybackSpeed,
+	stopPlayback,
+} from '@/sim/playback'
 import { DEFAULT_TELEOP_CONFIG, type TeleopConfig } from '@/sim/teleop'
 
 /** Right-panel tab identifiers. */
-export type PanelTab = 'sensors' | 'map' | 'nav' | 'teleop' | 'utils' | 'editor'
+export type PanelTab = 'sensors' | 'map' | 'nav' | 'teleop' | 'utils' | 'editor' | 'playback'
 
 /** Editor tools (milestone 12). `'none'` is the idle / no-edit state. */
 export type EditorTool = 'none' | 'addWall' | 'removeWall' | 'move' | 'resize' | 'setSpawn'
@@ -77,6 +91,7 @@ export type WidgetId =
 	| 'utils.logs'
 	| 'editor.world'
 	| 'editor.robot'
+	| 'playback.controls'
 
 /**
  * Dock edge a popped widget snaps to. Per the Phase-3 design, dragging a
@@ -221,6 +236,43 @@ export type SimulatorStore = {
 	/** Observed nonce incremented each time the user requests a spawn rebase +
 	 *  reset (the loop reads it and calls `resetSimulation` with the new spawn). */
 	spawnNonce: number
+	/* ----------------------------- Playback (milestone 13) ----------------------------- */
+	/** App state: whether the loop is currently capturing frames into `recording`. */
+	recording: boolean
+	/** App state: the recording being built while `recording`, or the most recent
+	 *  finished one (used for Save run). The loop appends frames to it. */
+	recordingData: Recording
+	/** App state: a saved run loaded for replay (`null` until a Load succeeds). */
+	loadedRecording: Recording | null
+	/** App state: the replay player state (index / playing / speed). */
+	playback: PlaybackState
+	/** Observed: true while replaying a recording (overrides observed sim state
+	 *  with the replayed frame's pose). Mirror of `playback.index >= 0`. */
+	replaying: boolean
+	/** Observed: the map the loaded recording was captured on (so a Load can
+	 *  switch the active map). Parallel to `loadedRecording?.map`. */
+	loadedMap: string | null
+	/** App action: start recording the live simulation into a fresh run. */
+	startRecording: (map: string) => void
+	/** App action: stop recording and keep the run for Save / Replay. */
+	stopRecording: () => void
+	/** App action: clear the current recording (after the user is done with it). */
+	clearRecording: () => void
+	/** App action: serialize the current recording to JSON (Save run). */
+	saveRecording: () => string | null
+	/** App action: parse a JSON run and set it as the loaded recording, switching
+	 *  the active map to the run's source map. Throws on a malformed file. */
+	loadRecording: (json: string) => void
+	/** App action: start replaying the loaded recording from the current index. */
+	playRecording: () => void
+	/** App action: pause replay (leaves the playhead where it is). */
+	pauseRecording: () => void
+	/** App action: stop replay and return the playhead to before the first frame. */
+	stopReplay: () => void
+	/** App action: scrub the playhead to an absolute frame index (pauses). */
+	seekRecording: (index: number) => void
+	/** App action: set the replay playback speed multiplier. */
+	setPlaybackSpeed: (speed: number) => void
 	/* ----------------------------- Right panel ----------------------------- */
 	/** App state: whether the right panel is visible. */
 	panelOpen: boolean
@@ -331,7 +383,7 @@ export function sampleState(next: SimState) {
 	}
 }
 
-export const useSimulatorStore = create<SimulatorStore>((set) => {
+export const useSimulatorStore = create<SimulatorStore>((set, get) => {
 	const names = mapNames()
 	const initial = names[0] ?? ''
 	return {
@@ -373,6 +425,13 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 		wallStart: null,
 		spawnPose: SPAWN_POSE,
 		spawnNonce: 0,
+		// --- Playback (milestone 13) ---------------------------------------------
+		recording: false,
+		recordingData: createRecording(initial),
+		loadedRecording: null,
+		playback: createPlaybackState(),
+		replaying: false,
+		loadedMap: null,
 		selectMap: (name) => {
 			if (!names.includes(name)) return
 			set({ selectedMap: name, world: buildWorld(name) })
@@ -442,6 +501,66 @@ export const useSimulatorStore = create<SimulatorStore>((set) => {
 				spawnPose: { x: s.robot.pose.x, y: s.robot.pose.y, heading: s.robot.pose.heading },
 				spawnNonce: s.spawnNonce + 1,
 			})),
+		// --- Playback (milestone 13) ---------------------------------------------
+		// Store owns only the UI-facing knobs the loop reads/writes. The loop is
+		// the authority for frame capture (it appends while `recording` is on) and
+		// for playback advancement (it pushes the replayed pose into the store so
+		// the viewport shows the recorded motion). These actions only flip flags +
+		// mutate the lightweight player state.
+		startRecording: (map) =>
+			set(() => ({
+				recording: true,
+				recordingData: createRecording(map),
+				loadedRecording: null,
+				playback: stopPlayback(createPlaybackState()),
+				replaying: false,
+			})),
+		stopRecording: () => set({ recording: false }),
+		clearRecording: () =>
+			set((s) => ({
+				recordingData: createRecording(s.selectedMap),
+				loadedRecording: null,
+				playback: stopPlayback(createPlaybackState()),
+				replaying: false,
+				loadedMap: null,
+			})),
+		saveRecording: () => {
+			const s = get()
+			const rec = hasFrames(s.recordingData) ? s.recordingData : s.loadedRecording
+			return rec ? serializeRecording(rec) : null
+		},
+		loadRecording: (json) => {
+			const rec = deserializeRecording(json)
+			// Switch the active map to the run's source map (no-op if already on it
+			// or unknown; `selectMap` guards unknown names).
+			if (rec.map && rec.map !== get().selectedMap && get().mapNames.includes(rec.map)) {
+				const { selectMap } = get()
+				selectMap(rec.map)
+			}
+			set(() => ({
+				loadedRecording: rec,
+				loadedMap: rec.map,
+				recording: false,
+				playback: stopPlayback(createPlaybackState()),
+				replaying: false,
+			}))
+		},
+		playRecording: () =>
+			set((s) => {
+				const rec = s.loadedRecording
+				const next = rec ? playPlayback(rec, s.playback) : s.playback
+				return { playback: next, replaying: next.playing || next.index >= 0 }
+			}),
+		pauseRecording: () => set((s) => ({ playback: pausePlayback(s.playback) })),
+		stopReplay: () =>
+			set(() => ({ playback: stopPlayback(createPlaybackState()), replaying: false })),
+		seekRecording: (index) =>
+			set((s) => {
+				const rec = s.loadedRecording
+				const next = rec ? seekPlayback(rec, s.playback, index) : createPlaybackState()
+				return { playback: next, replaying: next.index >= 0 }
+			}),
+		setPlaybackSpeed: (speed) => set((s) => ({ playback: setPlaybackSpeed(s.playback, speed) })),
 		clearMap: () => {
 			// The loop owns the grid; we push the clear via the import below, but to
 			// keep store <-> loop circularity clean we expose the action as a flag

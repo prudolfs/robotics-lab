@@ -122,6 +122,7 @@ export const WIDGET_TITLES: Record<WidgetId, string> = {
 	'utils.logs': 'System Logs',
 	'editor.world': 'World editor',
 	'editor.robot': 'Robot editor',
+	'playback.controls': 'Playback',
 }
 
 /** Shared drag-handle icon (matches the panel/popped visual). */

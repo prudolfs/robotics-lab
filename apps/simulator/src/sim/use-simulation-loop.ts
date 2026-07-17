@@ -21,6 +21,7 @@
 // autonomy is on. The manual keyboard takes precedence: touching a drive key
 // while autonomous drops autonomy back to manual teleop.
 
+import { createScan, type LidarScan } from '@robotics-lab/sensors'
 import { useCallback, useEffect, useRef } from 'react'
 import {
 	accumulate,
@@ -43,6 +44,14 @@ import {
 	setSimWorld,
 	startCoverage as startSimCoverage,
 } from '@/sim/loop'
+import {
+	advancePlayback,
+	appendFrame,
+	currentFrame,
+	type PlaybackFrame,
+	type PlaybackState,
+	RECORD_EVERY_N_STEPS,
+} from '@/sim/playback'
 import {
 	DEFAULT_TELEOP_CONFIG,
 	driveInputFromKeyboard,
@@ -225,6 +234,86 @@ export function useSimulationLoop(): SimulationControls {
 
 	// The render-rate driver: measure wall clock, drain fixed steps, observe.
 	useEffect(() => {
+		/** Push one captured frame into the store's `recordingData`. */
+		const captureFrame = (s: SimState) => {
+			const frame: PlaybackFrame = {
+				time: s.time,
+				stepCount: s.stepCount,
+				pose: s.robot.pose,
+				velocity: s.robot.velocity,
+				wheels: s.robot.wheels,
+				input: s.input,
+				navStatus: s.navStatus,
+				autonomous: s.autonomous,
+				goals: s.goals.map((g) => ({ x: g.x, y: g.y })),
+				coverageMode: s.coverageMode,
+				coverageComplete: s.coverageComplete,
+			}
+			useSimulatorStore.setState((prev) => ({
+				recordingData: appendFrame(prev.recordingData, frame),
+			}))
+		}
+
+		// Advance the simulation or the replay player, depending on `replaying`.
+		const stepThen = (dt: number) => {
+			const storeS = useSimulatorStore.getState()
+			// Replay path: don't advance the live sim. Advance the player and
+			// observe a state whose robot pose / scan match the replayed frame
+			// (lidar recomputed against the live world so rays follow the motion).
+			if (storeS.replaying) {
+				const rec = storeS.loadedRecording
+				if (!rec || rec.frames.length === 0) {
+					useSimulatorStore.getState().stopReplay()
+					simRef.current = accumulate(cur(), dt).state
+					observe(cur())
+					return
+				}
+				const next: PlaybackState = advancePlayback(rec, storeS.playback)
+				useSimulatorStore.setState({ playback: next })
+				// Finished on its own (advanced onto the last frame): drop the replaying
+				// flag so the loop returns to live stepping, but keep the playhead so the
+				// user can scrub the final frame.
+				if (!next.playing && storeS.playback.playing) {
+					useSimulatorStore.setState({ replaying: false })
+				}
+				const frame = currentFrame(rec, next)
+				if (frame) {
+					const live = cur()
+					const robot = {
+						...live.robot,
+						pose: frame.pose,
+						velocity: frame.velocity,
+						wheels: frame.wheels,
+					}
+					const world = live.world
+					const scan: LidarScan | null = world ? createScan(live.lidar, frame.pose, world) : null
+					observe({
+						...live,
+						robot,
+						scan,
+						time: frame.time,
+						input: frame.input,
+						goals: frame.goals,
+						navStatus: frame.navStatus,
+						autonomous: frame.autonomous,
+						coverageMode: frame.coverageMode,
+						coverageComplete: frame.coverageComplete,
+					})
+				} else {
+					useSimulatorStore.getState().stopReplay()
+					simRef.current = accumulate(cur(), dt).state
+					observe(cur())
+				}
+				return
+			}
+			// Live path: step the sim, capture a frame when recording.
+			simRef.current = accumulate(cur(), dt).state
+			if (storeS.recording && cur().stepCount % RECORD_EVERY_N_STEPS === 0) {
+				captureFrame(cur())
+			}
+			observe(cur())
+		}
+
 		let raf = 0
 		const tick = (nowMs: number) => {
 			raf = requestAnimationFrame(tick)
@@ -260,8 +349,7 @@ export function useSimulationLoop(): SimulationControls {
 			}
 			lastInputRef.current = desired
 
-			simRef.current = accumulate(cur(), dt).state
-			observe(cur())
+			stepThen(dt)
 		}
 		raf = requestAnimationFrame(tick)
 		return () => cancelAnimationFrame(raf)
