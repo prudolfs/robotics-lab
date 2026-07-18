@@ -412,16 +412,16 @@ Record and replay simulations.
 
 ## HUD
 
-- [ ] Robot inspector
-- [ ] Sensor inspector
-- [ ] Statistics
-- [ ] Performance metrics
+- [x] Robot inspector
+- [x] Sensor inspector
+- [x] Statistics
+- [x] Performance metrics
 
 ## Controls
 
-- [ ] Debug toggles
-- [ ] Visualization toggles
-- [ ] Theme support
+- [x] Debug toggles
+- [x] Visualization toggles
+- [x] Theme support
 
 ---
 

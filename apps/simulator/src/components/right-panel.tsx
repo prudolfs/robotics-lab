@@ -20,13 +20,14 @@ import type { LucideIcon } from 'lucide-react'
 import {
 	Compass,
 	Gamepad2,
+	Gauge,
+	History as HistoryIcon,
 	Map as MapIcon,
 	PanelRightClose,
 	PanelRightOpen,
 	PencilRuler,
 	Radar,
 	Wrench,
-	History as HistoryIcon,
 } from 'lucide-react'
 import { useRef } from 'react'
 import { CameraControlsWidget } from '@/components/widgets/camera-controls-widget'
@@ -37,10 +38,15 @@ import { LogsWidget } from '@/components/widgets/logs-widget'
 import { MapControlsWidget } from '@/components/widgets/map-controls-widget'
 import { MinimapWidget } from '@/components/widgets/minimap-widget'
 import { NavigationWidget } from '@/components/widgets/navigation-widget'
+import { PerformanceWidget } from '@/components/widgets/performance-widget'
 import { PlaybackWidget } from '@/components/widgets/playback-widget'
 import { RobotDebugWidget } from '@/components/widgets/robot-debug-widget'
 import { RobotEditorWidget } from '@/components/widgets/robot-editor-widget'
+import { RobotInspectorWidget } from '@/components/widgets/robot-inspector-widget'
+import { SensorInspectorWidget } from '@/components/widgets/sensor-inspector-widget'
+import { StatisticsWidget } from '@/components/widgets/statistics-widget'
 import { TeleopWidget } from '@/components/widgets/teleop-widget'
+import { TogglesWidget } from '@/components/widgets/toggles-widget'
 import { WorldEditorWidget } from '@/components/widgets/world-editor-widget'
 import { cn } from '@/lib/utils'
 import type { SimulationControls } from '@/sim/use-simulation-loop'
@@ -56,6 +62,7 @@ const TABS: TabDef[] = [
 	{ id: 'utils', label: 'Utils', icon: Wrench },
 	{ id: 'editor', label: 'Editor', icon: PencilRuler },
 	{ id: 'playback', label: 'Playback', icon: HistoryIcon },
+	{ id: 'inspect', label: 'Inspect', icon: Gauge },
 ]
 
 export interface RightPanelProps {
@@ -79,6 +86,7 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 		utils: null,
 		editor: null,
 		playback: null,
+		inspect: null,
 	})
 
 	const selectTab = (tab: PanelTab) => {
@@ -93,7 +101,16 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 	}
 
 	const onTablistKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-		const order: PanelTab[] = ['sensors', 'map', 'nav', 'teleop', 'utils', 'editor', 'playback']
+		const order: PanelTab[] = [
+			'sensors',
+			'map',
+			'nav',
+			'teleop',
+			'utils',
+			'editor',
+			'playback',
+			'inspect',
+		]
 		const idx = order.indexOf(activeTab)
 		let next: PanelTab | null = null
 		switch (e.key) {
@@ -219,6 +236,13 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 						</TabPane>
 						<TabPane tab="playback" active={activeTab}>
 							<PlaybackWidget />
+						</TabPane>
+						<TabPane tab="inspect" active={activeTab}>
+							<RobotInspectorWidget />
+							<SensorInspectorWidget />
+							<StatisticsWidget />
+							<PerformanceWidget />
+							<TogglesWidget />
 						</TabPane>
 					</div>
 				</div>

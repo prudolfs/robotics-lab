@@ -15,10 +15,15 @@ import { LogsWidget } from '@/components/widgets/logs-widget'
 import { MapControlsWidget } from '@/components/widgets/map-controls-widget'
 import { MinimapWidget } from '@/components/widgets/minimap-widget'
 import { NavigationWidget } from '@/components/widgets/navigation-widget'
+import { PerformanceWidget } from '@/components/widgets/performance-widget'
 import { PlaybackWidget } from '@/components/widgets/playback-widget'
 import { RobotDebugWidget } from '@/components/widgets/robot-debug-widget'
 import { RobotEditorWidget } from '@/components/widgets/robot-editor-widget'
+import { RobotInspectorWidget } from '@/components/widgets/robot-inspector-widget'
+import { SensorInspectorWidget } from '@/components/widgets/sensor-inspector-widget'
+import { StatisticsWidget } from '@/components/widgets/statistics-widget'
 import { TeleopWidget } from '@/components/widgets/teleop-widget'
+import { TogglesWidget } from '@/components/widgets/toggles-widget'
 import { WorldEditorWidget } from '@/components/widgets/world-editor-widget'
 import type { SimulationControls } from '@/sim/use-simulation-loop'
 import type { WidgetId } from '@/store'
@@ -60,6 +65,16 @@ export function renderWidget(widget: WidgetId, props: WidgetRenderProps): ReactN
 			return <RobotEditorWidget controls={props.controls} />
 		case 'playback.controls':
 			return <PlaybackWidget />
+		case 'inspect.robot':
+			return <RobotInspectorWidget />
+		case 'inspect.sensors':
+			return <SensorInspectorWidget />
+		case 'inspect.stats':
+			return <StatisticsWidget />
+		case 'inspect.perf':
+			return <PerformanceWidget />
+		case 'inspect.toggles':
+			return <TogglesWidget />
 		default:
 			return null
 	}

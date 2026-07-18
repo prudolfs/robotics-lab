@@ -48,6 +48,8 @@ export default function App() {
 	const odometryPose = useSimulatorStore((s) => s.odometryPose)
 	const odometryHistory = useSimulatorStore((s) => s.odometryHistory)
 	const theme = useSimulatorStore((s) => s.theme)
+	const showSceneGrid = useSimulatorStore((s) => s.showSceneGrid)
+	const showSceneAxes = useSimulatorStore((s) => s.showSceneAxes)
 
 	// Editor (milestone 12).
 	const editorTool = useSimulatorStore((s) => s.editorTool)
@@ -147,7 +149,7 @@ export default function App() {
 			className="relative h-screen w-screen overflow-hidden bg-background"
 		>
 			<Canvas data-testid="simulator-canvas" shadows gl={{ antialias: true }} camera={CAMERA}>
-				<SimulatorScene>
+				<SimulatorScene showGrid={showSceneGrid} showAxes={showSceneAxes}>
 					<FpsCounter onUpdate={handleFps} />
 					<WorldView world={world} />
 					<RobotView pose={robot.pose} params={robot.params} />

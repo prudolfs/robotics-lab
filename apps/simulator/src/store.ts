@@ -62,7 +62,15 @@ import {
 import { DEFAULT_TELEOP_CONFIG, type TeleopConfig } from '@/sim/teleop'
 
 /** Right-panel tab identifiers. */
-export type PanelTab = 'sensors' | 'map' | 'nav' | 'teleop' | 'utils' | 'editor' | 'playback'
+export type PanelTab =
+	| 'sensors'
+	| 'map'
+	| 'nav'
+	| 'teleop'
+	| 'utils'
+	| 'editor'
+	| 'playback'
+	| 'inspect'
 
 /** Editor tools (milestone 12). `'none'` is the idle / no-edit state. */
 export type EditorTool = 'none' | 'addWall' | 'removeWall' | 'move' | 'resize' | 'setSpawn'
@@ -92,6 +100,11 @@ export type WidgetId =
 	| 'editor.world'
 	| 'editor.robot'
 	| 'playback.controls'
+	| 'inspect.robot'
+	| 'inspect.sensors'
+	| 'inspect.stats'
+	| 'inspect.perf'
+	| 'inspect.toggles'
 
 /**
  * Dock edge a popped widget snaps to. Per the Phase-3 design, dragging a
@@ -135,6 +148,8 @@ export type SimulatorStore = {
 	robot: RobotState
 	/** Observed: simulation clock in seconds. */
 	simTime: number
+	/** Observed: total fixed steps executed since creation / last reset. */
+	stepCount: number
 	/** Observed: last reported render FPS (pushed by App's <FpsCounter>). */
 	fps: number
 	/** Observed: linear robot speed in m/s. */
@@ -192,8 +207,17 @@ export type SimulatorStore = {
 	odometryHistory: Pose[]
 	/** App state: show the odometry trail + estimate marker overlay. */
 	showOdometry: boolean
+	/* ----------------------------- UI Polish (milestone 14) ----------------------------- */
+	/** App state: show the infinite ground grid in the 3D scene (debug toggle). */
+	showSceneGrid: boolean
+	/** App state: show the RGB coordinate axes at the world origin (debug toggle). */
+	showSceneAxes: boolean
 	/** App action: toggle the odometry overlay. */
 	toggleOdometry: () => void
+	/** App action: toggle the ground grid (milestone 14 debug toggle). */
+	toggleSceneGrid: () => void
+	/** App action: toggle the coordinate axes (milestone 14 debug toggle). */
+	toggleSceneAxes: () => void
 	/** App action: clear the dead-reckoning trail (nonce the loop clears it). */
 	clearOdometry: () => void
 	/** Observed nonce incremented each time the user asks the loop to clear
@@ -365,6 +389,7 @@ export function sampleState(next: SimState) {
 	return {
 		robot: next.robot,
 		simTime: next.time,
+		stepCount: next.stepCount,
 		speed: robotSpeed(next.robot),
 		input: next.input,
 		running: next.running,
@@ -412,6 +437,8 @@ export const useSimulatorStore = create<SimulatorStore>((set, get) => {
 		cameraNoise: 'none' as CameraNoiseLevel,
 		showOccupancy: true,
 		showMinimap: true,
+		showSceneGrid: true,
+		showSceneAxes: true,
 		mapNonce: 0,
 		panelOpen: true,
 		activeTab: 'sensors',
@@ -452,6 +479,8 @@ export const useSimulatorStore = create<SimulatorStore>((set, get) => {
 		toggleOccupancy: () => set((s) => ({ showOccupancy: !s.showOccupancy })),
 		toggleMinimap: () => set((s) => ({ showMinimap: !s.showMinimap })),
 		toggleOdometry: () => set((s) => ({ showOdometry: !s.showOdometry })),
+		toggleSceneGrid: () => set((s) => ({ showSceneGrid: !s.showSceneGrid })),
+		toggleSceneAxes: () => set((s) => ({ showSceneAxes: !s.showSceneAxes })),
 		clearOdometry: () => set((s) => ({ odometryNonce: s.odometryNonce + 1 })),
 		// --- Editor (milestone 12) ---------------------------------------------
 		// The editor owns the world: it mutates the in-memory `World` the store

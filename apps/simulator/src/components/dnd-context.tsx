@@ -123,6 +123,11 @@ export const WIDGET_TITLES: Record<WidgetId, string> = {
 	'editor.world': 'World editor',
 	'editor.robot': 'Robot editor',
 	'playback.controls': 'Playback',
+	'inspect.robot': 'Robot inspector',
+	'inspect.sensors': 'Sensor inspector',
+	'inspect.stats': 'Statistics',
+	'inspect.perf': 'Performance',
+	'inspect.toggles': 'Toggles',
 }
 
 /** Shared drag-handle icon (matches the panel/popped visual). */

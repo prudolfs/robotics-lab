@@ -261,3 +261,47 @@ test('initial theme falls back to dark when neither localStorage nor window exis
 	// Node test env: neither `localStorage` nor `window` is defined.
 	expect(resolveInitialTheme()).toBe('dark')
 })
+
+/* ----------------------- UI Polish (milestone 14) ------------------------ */
+
+test('inspect tab is a valid panel tab and starts hidden behind sensors', () => {
+	// The new Inspect tab hosts the robot/sensor/stats/perf/toggles widgets.
+	expect(useSimulatorStore.getState().activeTab).toBe('sensors')
+	useSimulatorStore.getState().setTab('inspect')
+	expect(useSimulatorStore.getState().activeTab).toBe('inspect')
+})
+
+test('scene debug toggles default on and flip independently of each other', () => {
+	const s = useSimulatorStore.getState()
+	expect(s.showSceneGrid).toBe(true)
+	expect(s.showSceneAxes).toBe(true)
+
+	useSimulatorStore.getState().toggleSceneGrid()
+	expect(useSimulatorStore.getState().showSceneGrid).toBe(false)
+	expect(useSimulatorStore.getState().showSceneAxes).toBe(true) // axes untouched
+
+	useSimulatorStore.getState().toggleSceneAxes()
+	expect(useSimulatorStore.getState().showSceneAxes).toBe(false)
+	expect(useSimulatorStore.getState().showSceneGrid).toBe(false) // grid stays off
+
+	useSimulatorStore.getState().toggleSceneGrid()
+	expect(useSimulatorStore.getState().showSceneGrid).toBe(true)
+})
+
+test('inspect widget kinds can be dragged out (widget id slice)', () => {
+	// The five Inspect widgets each get a WidgetId so they can pop onto the
+	// viewport edge like every other panel card.
+	const ids: WidgetId[] = [
+		'inspect.robot',
+		'inspect.sensors',
+		'inspect.stats',
+		'inspect.perf',
+		'inspect.toggles',
+	]
+	useSimulatorStore.getState().dropPoppedWidget('inspect.perf', 'right')
+	const popped = useSimulatorStore.getState().popped
+	expect(popped).toHaveLength(1)
+	expect(popped[0].widget).toBe('inspect.perf')
+	expect(isWidgetPopped(popped, 'inspect.perf')).toBe(true)
+	expect(ids).toContain('inspect.perf')
+})
