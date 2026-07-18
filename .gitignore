@@ -40,3 +40,4 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 apps/simulator/e2e/.report
 apps/simulator/e2e/.results
 apps/simulator/test-results
+apps/simulator/screenshots/.results
