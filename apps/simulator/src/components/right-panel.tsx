@@ -65,7 +65,7 @@ const TABS: TabDef[] = [
 	{ id: 'inspect', label: 'Inspect', icon: Gauge },
 ]
 
-export interface RightPanelProps {
+export type RightPanelProps = {
 	/** Loop controls threaded down to the Nav / Teleop / robot-debug widgets. */
 	controls: SimulationControls
 	/** Imperative reset, passed to the robot-debug widget's Reset button. */

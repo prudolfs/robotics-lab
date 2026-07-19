@@ -27,7 +27,7 @@ import type { Goal, NavStatus } from '@robotics-lab/navigation'
 export type PlaybackDriveInput = { leftWheel: number; rightWheel: number }
 
 /** A single sampled frame of the simulation, captured while recording. */
-export interface PlaybackFrame {
+export type PlaybackFrame = {
 	/** Simulation clock in seconds at capture. */
 	time: number
 	/** Fixed-step counter at capture (monotonic). */
@@ -53,7 +53,7 @@ export interface PlaybackFrame {
 }
 
 /** The recording: an ordered list of frames + their capture cadence. */
-export interface Recording {
+export type Recording = {
 	/** Schema version so a future change to `PlaybackFrame` can migrate. */
 	version: 1
 	/** Source map name (saved with the run so the replay loads its world). */
@@ -68,7 +68,7 @@ export interface Recording {
 
 /** Replay player state machine. Pure: the loop summons `advancePlayback`
  *  on each tick and `seekPlayback` on a scrub. */
-export interface PlaybackState {
+export type PlaybackState = {
 	/** Whether the player is currently advancing through the timeline. */
 	playing: boolean
 	/** Index of the frame currently shown. `-1` means "before the first

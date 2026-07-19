@@ -116,7 +116,7 @@ const PANEL_CLEAR_CLASS: Record<DropEdge, string> = {
 /** The prioritized order in which edges appear in the overlay's DOM. */
 const EDGE_ORDER: DropEdge[] = ['top', 'right', 'bottom', 'left']
 
-export interface ViewportWidgetsLayerProps extends WidgetRenderProps {
+export type ViewportWidgetsLayerProps = WidgetRenderProps & {
 	controls: SimulationControls
 	onReset: () => void
 }

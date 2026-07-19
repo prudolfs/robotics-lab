@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils'
 import type { SimulationControls } from '@/sim/use-simulation-loop'
 import { useSimulatorStore } from '@/store'
 
-export interface TopAppBarProps {
+export type TopAppBarProps = {
 	controls: SimulationControls
 }
 

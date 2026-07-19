@@ -11,7 +11,7 @@ import { useSyncExternalStore } from 'react'
 
 export type LogLevel = 'info' | 'warn' | 'error'
 
-export interface LogEntry {
+export type LogEntry = {
 	/** Monotonic sequence number (also the React key). */
 	id: number
 	/** Wall-clock time of the capture (ms since epoch). */

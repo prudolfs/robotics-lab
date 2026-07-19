@@ -20,7 +20,7 @@ import { useSimulatorStore, type WidgetId } from '@/store'
 
 const WIDGET: WidgetId = 'sensors.camera.feed'
 
-export interface CameraFeedWidgetProps {
+export type CameraFeedWidgetProps = {
 	/** True when this is the popped copy docked on the viewport. (Unused now
 	 *  under the move model — one body everywhere — but kept for registry API
 	 *  symmetry.) */

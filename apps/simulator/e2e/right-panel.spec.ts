@@ -20,10 +20,10 @@ import { launchSimulator } from './fixtures'
 test.beforeEach(async ({ page }) => setupConsoleGuard(page))
 test.afterEach(async () => teardownConsoleGuard())
 
-const TAB_IDS = ['sensors', 'map', 'nav', 'teleop', 'utils', 'editor', 'playback'] as const
+const TAB_IDS = ['sensors', 'map', 'nav', 'teleop', 'utils', 'editor', 'playback', 'inspect'] as const
 
 test.describe('Phase 1 + 4 — Right panel shell', () => {
-	test('panel is visible by default with all seven tabs', async ({ page }) => {
+	test('panel is visible by default with all eight tabs', async ({ page }) => {
 		await launchSimulator(page)
 
 		const panel = page.getByTestId('right-panel')
@@ -116,8 +116,8 @@ test.describe('Phase 1 + 4 — Right panel shell', () => {
 		await sensors.focus()
 		await expect(sensors).toHaveAttribute('aria-selected', 'true')
 
-		// ArrowRight cycles through all seven tabs and wraps back to sensors.
-		for (const expected of ['map', 'nav', 'teleop', 'utils', 'editor', 'playback', 'sensors']) {
+		// ArrowRight cycles through all intermediate tabs and wraps back to sensors.
+		for (const expected of ['map', 'nav', 'teleop', 'utils', 'editor', 'playback', 'inspect', 'sensors']) {
 			await page.keyboard.press('ArrowRight')
 			await expect(page.getByTestId(`panel-tab-${expected}`)).toHaveAttribute(
 				'aria-selected',
@@ -125,14 +125,14 @@ test.describe('Phase 1 + 4 — Right panel shell', () => {
 			)
 		}
 
-		// ArrowLeft wraps the other way: sensors → playback (the new last tab).
+		// ArrowLeft wraps the other way: sensors → inspect (the new last tab).
 		await page.keyboard.press('ArrowLeft')
-		await expect(page.getByTestId('panel-tab-playback')).toHaveAttribute('aria-selected', 'true')
+		await expect(page.getByTestId('panel-tab-inspect')).toHaveAttribute('aria-selected', 'true')
 
-		// Home jumps to the first tab; End jumps to the last (playback now).
+		// Home jumps to the first tab; End jumps to the last (inspect now).
 		await page.keyboard.press('Home')
 		await expect(page.getByTestId('panel-tab-sensors')).toHaveAttribute('aria-selected', 'true')
 		await page.keyboard.press('End')
-		await expect(page.getByTestId('panel-tab-playback')).toHaveAttribute('aria-selected', 'true')
+		await expect(page.getByTestId('panel-tab-inspect')).toHaveAttribute('aria-selected', 'true')
 	})
 })

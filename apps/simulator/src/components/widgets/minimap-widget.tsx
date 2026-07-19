@@ -16,7 +16,7 @@ import { useSimulatorStore, type WidgetId } from '@/store'
 
 const WIDGET: WidgetId = 'map.minimap'
 
-export interface MinimapWidgetProps {
+export type MinimapWidgetProps = {
 	/** True when this is the popped copy docked on the viewport. (Unused now
 	 *  under the move model — but kept for registry API symmetry.) */
 	dockedOnViewport?: boolean

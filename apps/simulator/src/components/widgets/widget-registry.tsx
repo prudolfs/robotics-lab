@@ -28,7 +28,7 @@ import { WorldEditorWidget } from '@/components/widgets/world-editor-widget'
 import type { SimulationControls } from '@/sim/use-simulation-loop'
 import type { WidgetId } from '@/store'
 
-export interface WidgetRenderProps {
+export type WidgetRenderProps = {
 	controls: SimulationControls
 	onReset: () => void
 	/** True when this is a popped copy docked on the viewport. */
