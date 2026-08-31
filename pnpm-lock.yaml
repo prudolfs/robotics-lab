@@ -220,6 +220,85 @@ importers:
         specifier: ^4.1.9
         version: 4.1.9(@vitest/ui@4.1.9)(vite@8.1.2(esbuild@0.28.1)(jiti@2.7.0))
 
+  apps/drone-mission-planner:
+    dependencies:
+      '@fontsource-variable/geist':
+        specifier: ^5.2.9
+        version: 5.2.9
+      '@react-three/drei':
+        specifier: ^10.7.7
+        version: 10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.185.1))(@types/react@19.2.17)(@types/three@0.185.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.185.1)
+      '@react-three/fiber':
+        specifier: ^9.6.1
+        version: 9.6.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.185.1)
+      '@robotics-lab/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@robotics-lab/geometry':
+        specifier: workspace:*
+        version: link:../../packages/geometry
+      '@robotics-lab/math':
+        specifier: workspace:*
+        version: link:../../packages/math
+      '@robotics-lab/rendering':
+        specifier: workspace:*
+        version: link:../../packages/rendering
+      '@tailwindcss/vite':
+        specifier: ^4.3.2
+        version: 4.3.2(vite@8.1.2(esbuild@0.28.1)(jiti@2.7.0))
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      lucide-react:
+        specifier: ^1.23.0
+        version: 1.23.0(react@19.2.7)
+      radix-ui:
+        specifier: ^1.6.1
+        version: 1.6.1(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react:
+        specifier: ^19.2.7
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.2.7
+        version: 19.2.7(react@19.2.7)
+      shadcn:
+        specifier: ^4.12.0
+        version: 4.12.0(typescript@7.0.2)
+      tailwind-merge:
+        specifier: ^3.6.0
+        version: 3.6.0
+      tailwindcss:
+        specifier: ^4.3.2
+        version: 4.3.2
+      three:
+        specifier: ^0.185.1
+        version: 0.185.1
+      tw-animate-css:
+        specifier: ^1.4.0
+        version: 1.4.0
+      zustand:
+        specifier: ^5.0.14
+        version: 5.0.14(@types/react@19.2.17)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))
+    devDependencies:
+      '@types/react':
+        specifier: ^19.2.17
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.17)
+      '@types/three':
+        specifier: ^0.185.0
+        version: 0.185.0
+      '@vitejs/plugin-react-swc':
+        specifier: ^4.3.1
+        version: 4.3.1(vite@8.1.2(esbuild@0.28.1)(jiti@2.7.0))
+      vite:
+        specifier: ^8.1.2
+        version: 8.1.2(esbuild@0.28.1)(jiti@2.7.0)
+
   apps/simulator:
     dependencies:
       '@dnd-kit/core':
@@ -339,6 +418,8 @@ importers:
       '@robotics-lab/geometry':
         specifier: workspace:*
         version: link:../geometry
+
+  packages/math: {}
 
   packages/navigation:
     dependencies:

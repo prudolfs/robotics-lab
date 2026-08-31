@@ -88,28 +88,28 @@ Bootstrap the drone mission planner application.
 
 ## Application
 
-- [ ] Create drone-mission-planner app
-- [ ] Configure Vite
-- [ ] Configure TypeScript
-- [ ] Configure Biome
-- [ ] Configure Vitest
-- [ ] Reuse core, math, geometry, rendering, ui packages
+- [x] Create drone-mission-planner app
+- [x] Configure Vite
+- [x] Configure TypeScript
+- [x] Configure Biome
+- [x] Configure Vitest
+- [x] Reuse core, math, geometry and rendering packages; configure app-local shadcn/ui
 
 ## Rendering
 
-- [ ] React Three Fiber scene
-- [ ] Orbit controls
-- [ ] Camera
-- [ ] Lights
-- [ ] Infinite grid
-- [ ] Sky / horizon
+- [x] React Three Fiber scene
+- [x] Orbit controls
+- [x] Camera
+- [x] Lights
+- [x] Infinite grid
+- [x] Sky / horizon
 
 ## Shell
 
-- [ ] Top bar (mission name, save, load)
-- [ ] Side panel (mission settings)
-- [ ] Bottom bar (telemetry / status)
-- [ ] Theme support
+- [x] Top bar (mission name, save, load)
+- [x] Side panel (mission settings)
+- [x] Bottom bar (telemetry / status)
+- [x] Theme support
 
 ---
 
