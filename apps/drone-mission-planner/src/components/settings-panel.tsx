@@ -1,7 +1,17 @@
-import { ChevronDown, Gauge, MapPin, PlaneTakeoff, RotateCcw } from 'lucide-react'
+import { mapNames } from '@robotics-lab/maps'
+import {
+	ChevronDown,
+	Cuboid,
+	Gauge,
+	Map as MapIcon,
+	MapPin,
+	PlaneTakeoff,
+	RotateCcw,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { bootstrapWaypoints, missionDistance } from '@/mission'
 import { usePlannerStore } from '@/store'
+import { summarizeWorld, WORLD_SCALE_OPTIONS, type WorldScale } from '@/world'
 
 const sectionClass = 'border-border border-b p-[18px]'
 const headingClass =
@@ -14,6 +24,12 @@ export function SettingsPanel() {
 	const setAltitude = usePlannerStore((state) => state.setCruiseAltitude)
 	const setSpeed = usePlannerStore((state) => state.setCruiseSpeed)
 	const setReturnToHome = usePlannerStore((state) => state.setReturnToHome)
+	const selectedMap = usePlannerStore((state) => state.selectedMap)
+	const world = usePlannerStore((state) => state.world)
+	const worldScale = usePlannerStore((state) => state.worldScale)
+	const setSelectedMap = usePlannerStore((state) => state.setSelectedMap)
+	const setWorldScale = usePlannerStore((state) => state.setWorldScale)
+	const worldSummary = summarizeWorld(world)
 
 	return (
 		<aside
@@ -31,6 +47,61 @@ export function SettingsPanel() {
 					<ChevronDown />
 				</Button>
 			</div>
+
+			<section className={sectionClass}>
+				<h3 className={headingClass}>
+					<MapIcon aria-hidden="true" />
+					World
+				</h3>
+				<label className="grid gap-1.5">
+					<span className="font-medium text-xs">Environment map</span>
+					<select
+						className="h-8 w-full rounded-md border border-input bg-muted px-2.5 text-xs capitalize outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
+						value={selectedMap}
+						onChange={(event) => setSelectedMap(event.target.value)}
+					>
+						{mapNames().map((name) => (
+							<option key={name} value={name}>
+								{name}
+							</option>
+						))}
+					</select>
+				</label>
+				<div className="mt-3.5 flex items-center justify-between gap-3">
+					<span className="grid gap-[3px]">
+						<strong className="font-medium text-xs">World scale</strong>
+						<small className="text-[10px] text-muted-foreground">Display multiplier</small>
+					</span>
+					<fieldset className="flex gap-1">
+						<legend className="sr-only">World scale</legend>
+						{WORLD_SCALE_OPTIONS.map((scale) => (
+							<Button
+								aria-pressed={worldScale === scale}
+								key={scale}
+								size="xs"
+								variant={worldScale === scale ? 'default' : 'outline'}
+								onClick={() => setWorldScale(scale as WorldScale)}
+							>
+								{scale}×
+							</Button>
+						))}
+					</fieldset>
+				</div>
+				<div className="mt-3 grid grid-cols-2 gap-2">
+					<div className="flex items-center gap-2 rounded-md border border-border bg-muted/60 p-2 text-[10px] text-muted-foreground">
+						<Cuboid className="size-3.5 text-primary" />
+						<span>
+							<strong className="block text-foreground">{worldSummary.obstacles}</strong>Objects
+						</span>
+					</div>
+					<div className="flex items-center gap-2 rounded-md border border-border bg-muted/60 p-2 text-[10px] text-muted-foreground">
+						<MapPin className="size-3.5 text-primary" />
+						<span>
+							<strong className="block text-foreground">{worldSummary.area} m²</strong>Area
+						</span>
+					</div>
+				</div>
+			</section>
 
 			<section className={sectionClass}>
 				<h3 className={headingClass}>

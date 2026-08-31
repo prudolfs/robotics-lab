@@ -121,14 +121,14 @@ Reuse the simulator world representation and render it in 3D.
 
 ## Tasks
 
-- [ ] Import map loader from simulator
-- [ ] Floor
-- [ ] Walls
-- [ ] Boxes
-- [ ] Cylinders
-- [ ] Coordinate axes
-- [ ] Grid helper
-- [ ] World scale configuration
+- [x] Import map loader from simulator
+- [x] Floor
+- [x] Walls
+- [x] Boxes
+- [x] Cylinders
+- [x] Coordinate axes
+- [x] Grid helper
+- [x] World scale configuration
 
 ---
 

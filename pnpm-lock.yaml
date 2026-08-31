@@ -237,6 +237,9 @@ importers:
       '@robotics-lab/geometry':
         specifier: workspace:*
         version: link:../../packages/geometry
+      '@robotics-lab/maps':
+        specifier: workspace:*
+        version: link:../../packages/maps
       '@robotics-lab/math':
         specifier: workspace:*
         version: link:../../packages/math

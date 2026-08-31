@@ -1,7 +1,8 @@
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
-import { Lights, worldToScene } from '@robotics-lab/rendering'
+import { CoordinateAxes, Lights, WorldView, worldToScene } from '@robotics-lab/rendering'
 import { Quaternion, Vector3 } from 'three'
 import { bootstrapWaypoints } from '@/mission'
+import { usePlannerStore } from '@/store'
 
 const route = bootstrapWaypoints.map((waypoint) =>
 	worldToScene(waypoint.position, Math.max(0.06, waypoint.altitude / 8)),
@@ -30,11 +31,14 @@ function RouteSegment({
 	)
 }
 
-function WebGPUGrid() {
+function WebGPUGrid({ size }: { size: number }) {
+	const minorDivisions = Math.round(size * 2)
+	const majorDivisions = Math.max(1, Math.round(size / 2))
+
 	return (
 		<group position={[0, -0.015, 0]}>
-			<gridHelper args={[200, 200, '#68786f', '#87938b']} />
-			<gridHelper args={[200, 40, '#46564e', '#68786f']} position={[0, 0.004, 0]} />
+			<gridHelper args={[size, minorDivisions, '#68786f', '#87938b']} />
+			<gridHelper args={[size, majorDivisions, '#46564e', '#68786f']} position={[0, 0.004, 0]} />
 		</group>
 	)
 }
@@ -72,6 +76,10 @@ function StagingRoute() {
 }
 
 export function MissionScene() {
+	const world = usePlannerStore((state) => state.world)
+	const worldScale = usePlannerStore((state) => state.worldScale)
+	const gridSize = Math.max(world.width, world.depth) * 6
+
 	return (
 		<>
 			<PerspectiveCamera makeDefault position={[9, 7, 10]} fov={47} near={0.1} far={500} />
@@ -82,8 +90,12 @@ export function MissionScene() {
 				maxPolarAngle={Math.PI / 2.05}
 			/>
 			<Lights />
-			<WebGPUGrid />
-			<StagingRoute />
+			<group scale={worldScale}>
+				<WebGPUGrid size={gridSize} />
+				<WorldView world={world} />
+				<CoordinateAxes />
+				<StagingRoute />
+			</group>
 			<fog attach="fog" args={['#b9c1b6', 20, 68]} />
 		</>
 	)
