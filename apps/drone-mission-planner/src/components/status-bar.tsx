@@ -1,11 +1,12 @@
+import { PREVIEW_DRONE_STATE } from '@/drone-preview'
 import { formatHeading } from '@/mission'
 
 const telemetry = [
 	['LAT', '56.9496° N'],
 	['LON', '24.1052° E'],
-	['ALT', '0.0 m'],
+	['ALT', `${PREVIEW_DRONE_STATE.position.y.toFixed(1)} m`],
 	['HDG', formatHeading(0)],
-	['SATS', '—'],
+	['BAT', `${PREVIEW_DRONE_STATE.batteryLevel}%`],
 ] as const
 
 export function StatusBar({ webgpuSupported }: { webgpuSupported: boolean }) {
@@ -39,7 +40,8 @@ export function StatusBar({ webgpuSupported }: { webgpuSupported: boolean }) {
 				))}
 			</div>
 			<div className="justify-self-end max-[860px]:hidden">
-				DISARMED <span className="px-1.5 text-border">•</span> PLANNING
+				{PREVIEW_DRONE_STATE.missionState.toUpperCase()}{' '}
+				<span className="px-1.5 text-border">•</span> PLANNING
 			</div>
 		</footer>
 	)

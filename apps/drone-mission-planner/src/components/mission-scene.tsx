@@ -1,6 +1,8 @@
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import { CoordinateAxes, Lights, WorldView, worldToScene } from '@robotics-lab/rendering'
 import { Quaternion, Vector3 } from 'three'
+import { DroneView } from '@/components/drone-view'
+import { PREVIEW_DRONE_PARAMS, PREVIEW_DRONE_STATE } from '@/drone-preview'
 import { bootstrapWaypoints } from '@/mission'
 import { usePlannerStore } from '@/store'
 
@@ -95,6 +97,7 @@ export function MissionScene() {
 				<WorldView world={world} />
 				<CoordinateAxes />
 				<StagingRoute />
+				<DroneView state={PREVIEW_DRONE_STATE} params={PREVIEW_DRONE_PARAMS} />
 			</group>
 			<fog attach="fog" args={['#b9c1b6', 20, 68]} />
 		</>

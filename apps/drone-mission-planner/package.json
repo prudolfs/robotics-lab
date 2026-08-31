@@ -16,6 +16,7 @@
 		"@react-three/drei": "^10.7.7",
 		"@react-three/fiber": "^9.6.1",
 		"@robotics-lab/core": "workspace:*",
+		"@robotics-lab/drone": "workspace:*",
 		"@robotics-lab/geometry": "workspace:*",
 		"@robotics-lab/maps": "workspace:*",
 		"@robotics-lab/math": "workspace:*",

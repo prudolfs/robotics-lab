@@ -140,27 +140,27 @@ Define a quadcopter drone model.
 
 ## State
 
-- [ ] 3D position
-- [ ] Orientation (quaternion / euler)
-- [ ] Velocity
-- [ ] Battery level
-- [ ] Mission state (idle, armed, flying, landed)
+- [x] 3D position
+- [x] Orientation (quaternion / euler)
+- [x] Velocity
+- [x] Battery level
+- [x] Mission state (idle, armed, flying, landed)
 
 ## Kinematics
 
-- [ ] 4 rotor layout
-- [ ] Motor speed state
-- [ ] Thrust vector
-- [ ] Torque vector
-- [ ] Hover throttle
+- [x] 4 rotor layout
+- [x] Motor speed state
+- [x] Thrust vector
+- [x] Torque vector
+- [x] Hover throttle
 
 ## Rendering
 
-- [ ] Drone body
-- [ ] Arms
-- [ ] Propellers
-- [ ] Heading indicator
-- [ ] Spin animation
+- [x] Drone body
+- [x] Arms
+- [x] Propellers
+- [x] Heading indicator
+- [x] Spin animation
 
 ---
 

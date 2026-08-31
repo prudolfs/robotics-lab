@@ -234,6 +234,9 @@ importers:
       '@robotics-lab/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@robotics-lab/drone':
+        specifier: workspace:*
+        version: link:../../packages/drone
       '@robotics-lab/geometry':
         specifier: workspace:*
         version: link:../../packages/geometry
@@ -413,6 +416,12 @@ importers:
       '@robotics-lab/maps':
         specifier: workspace:*
         version: link:../maps
+
+  packages/drone:
+    dependencies:
+      '@robotics-lab/math':
+        specifier: workspace:*
+        version: link:../math
 
   packages/geometry: {}
 

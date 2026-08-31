@@ -1,6 +1,7 @@
 import { mapNames } from '@robotics-lab/maps'
 import {
 	ChevronDown,
+	Cpu,
 	Cuboid,
 	Gauge,
 	Map as MapIcon,
@@ -9,6 +10,7 @@ import {
 	RotateCcw,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { PREVIEW_DRONE_PARAMS, PREVIEW_DRONE_STATE } from '@/drone-preview'
 import { bootstrapWaypoints, missionDistance } from '@/mission'
 import { usePlannerStore } from '@/store'
 import { summarizeWorld, WORLD_SCALE_OPTIONS, type WorldScale } from '@/world'
@@ -47,6 +49,22 @@ export function SettingsPanel() {
 					<ChevronDown />
 				</Button>
 			</div>
+
+			<section className={sectionClass}>
+				<h3 className={headingClass}>
+					<Cpu aria-hidden="true" />
+					Vehicle
+				</h3>
+				<div className="grid grid-cols-2 gap-2">
+					<RouteStat value="X4" label="Rotor frame" />
+					<RouteStat
+						value={`${Math.round(PREVIEW_DRONE_PARAMS.hoverThrottle * 100)}%`}
+						label="Hover throttle"
+					/>
+					<RouteStat value={`${PREVIEW_DRONE_STATE.batteryLevel}%`} label="Battery" />
+					<RouteStat value={PREVIEW_DRONE_STATE.missionState} label="Vehicle state" />
+				</div>
+			</section>
 
 			<section className={sectionClass}>
 				<h3 className={headingClass}>
