@@ -172,13 +172,13 @@ Separate rendering from simulation.
 
 ## Tasks
 
-- [ ] Fixed timestep simulation
-- [ ] Variable render rate
-- [ ] Simulation clock
-- [ ] Pause
-- [ ] Resume
-- [ ] Reset
-- [ ] Time scaling (slow motion, fast forward)
+- [x] Fixed timestep simulation
+- [x] Variable render rate
+- [x] Simulation clock
+- [x] Pause
+- [x] Resume
+- [x] Reset
+- [x] Time scaling (slow motion, fast forward)
 
 ---
 

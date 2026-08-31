@@ -3,14 +3,17 @@ import { Compass, MousePointer2, Rotate3D } from 'lucide-react'
 import { useEffect } from 'react'
 import { MissionScene } from '@/components/mission-scene'
 import { SettingsPanel } from '@/components/settings-panel'
+import { SimulationControls } from '@/components/simulation-controls'
 import { StatusBar } from '@/components/status-bar'
 import { TopBar } from '@/components/top-bar'
+import { useDroneSimulation } from '@/simulation/use-drone-simulation'
 import { usePlannerStore } from '@/store'
 import { createWebGPURenderer, supportsWebGPU } from '@/webgpu'
 
 export default function App() {
 	const theme = usePlannerStore((state) => state.theme)
 	const webgpuSupported = supportsWebGPU()
+	const { simulation, controls } = useDroneSimulation()
 
 	useEffect(() => {
 		document.documentElement.classList.toggle('dark', theme === 'dark')
@@ -26,12 +29,13 @@ export default function App() {
 				>
 					{webgpuSupported ? (
 						<Canvas gl={createWebGPURenderer} dpr={[1, 2]} fallback={<WebGPUFallback />}>
-							<MissionScene />
+							<MissionScene droneState={simulation.drone} />
 						</Canvas>
 					) : (
 						<WebGPUFallback />
 					)}
 					<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_40%,rgb(2_10_7/0.2)_120%)]" />
+					<SimulationControls simulation={simulation} controls={controls} />
 					<div className="absolute top-[18px] left-[18px] z-[2] flex items-center gap-2 font-semibold text-[11px] text-white/85 uppercase tracking-[0.08em] drop-shadow-sm">
 						<span className="rounded border border-white/35 px-[5px] py-[3px] text-[9px]">3D</span>
 						Mission space
@@ -63,7 +67,7 @@ export default function App() {
 				</div>
 				<SettingsPanel />
 			</main>
-			<StatusBar webgpuSupported={webgpuSupported} />
+			<StatusBar webgpuSupported={webgpuSupported} simulation={simulation} />
 		</div>
 	)
 }

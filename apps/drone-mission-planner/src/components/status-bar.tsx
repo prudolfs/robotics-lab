@@ -1,15 +1,21 @@
-import { PREVIEW_DRONE_STATE } from '@/drone-preview'
+import type { DroneSimulation } from '@robotics-lab/drone'
 import { formatHeading } from '@/mission'
 
-const telemetry = [
-	['LAT', '56.9496° N'],
-	['LON', '24.1052° E'],
-	['ALT', `${PREVIEW_DRONE_STATE.position.y.toFixed(1)} m`],
-	['HDG', formatHeading(0)],
-	['BAT', `${PREVIEW_DRONE_STATE.batteryLevel}%`],
-] as const
+export function StatusBar({
+	webgpuSupported,
+	simulation,
+}: {
+	webgpuSupported: boolean
+	simulation: DroneSimulation
+}) {
+	const telemetry = [
+		['LAT', '56.9496° N'],
+		['LON', '24.1052° E'],
+		['ALT', `${simulation.drone.position.y.toFixed(1)} m`],
+		['HDG', formatHeading(0)],
+		['BAT', `${simulation.drone.batteryLevel}%`],
+	] as const
 
-export function StatusBar({ webgpuSupported }: { webgpuSupported: boolean }) {
 	return (
 		<footer className="relative z-10 grid h-[34px] grid-cols-[1fr_auto_1fr] items-center border-border border-t bg-background px-[15px] text-[9px] text-muted-foreground uppercase tracking-[0.07em] max-[860px]:grid-cols-[1fr_auto]">
 			<div
@@ -40,8 +46,8 @@ export function StatusBar({ webgpuSupported }: { webgpuSupported: boolean }) {
 				))}
 			</div>
 			<div className="justify-self-end max-[860px]:hidden">
-				{PREVIEW_DRONE_STATE.missionState.toUpperCase()}{' '}
-				<span className="px-1.5 text-border">•</span> PLANNING
+				{simulation.drone.missionState.toUpperCase()} <span className="px-1.5 text-border">•</span>{' '}
+				{simulation.clock.running ? 'RUNNING' : 'PAUSED'}
 			</div>
 		</footer>
 	)
