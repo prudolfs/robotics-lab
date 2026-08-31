@@ -14,6 +14,7 @@ describe('quadcopter model', () => {
 			position: { x: 0, y: 0, z: 0 },
 			orientation: { x: 0, y: 0, z: 0, w: 1 },
 			velocity: { x: 0, y: 0, z: 0 },
+			angularVelocity: { x: 0, y: 0, z: 0 },
 			batteryLevel: 100,
 			missionState: 'landed',
 			motorSpeeds: [0, 0, 0, 0],

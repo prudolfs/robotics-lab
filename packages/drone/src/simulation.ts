@@ -1,5 +1,6 @@
 import { clamp } from '@robotics-lab/math'
-import type { DroneState } from './index'
+import { DEFAULT_QUADCOPTER_PARAMS, type DroneState, type QuadcopterParams } from './index'
+import { DEFAULT_PHYSICS_CONFIG, type DronePhysicsConfig, stepDronePhysics } from './physics'
 
 export const DEFAULT_FIXED_DELTA_SECONDS = 1 / 120
 export const MAX_RENDER_DELTA_SECONDS = 0.25
@@ -22,11 +23,15 @@ export type SimulationClock = {
 export type DroneSimulation = {
 	drone: DroneState
 	initialDrone: DroneState
+	params: QuadcopterParams
+	physics: DronePhysicsConfig
 	clock: SimulationClock
 }
 
 export type SimulationOptions = {
 	fixedDeltaSeconds?: number
+	params?: QuadcopterParams
+	physics?: DronePhysicsConfig
 	running?: boolean
 	timeScale?: TimeScale
 }
@@ -37,6 +42,7 @@ function cloneDroneState(state: DroneState): DroneState {
 		position: { ...state.position },
 		orientation: { ...state.orientation },
 		velocity: { ...state.velocity },
+		angularVelocity: { ...state.angularVelocity },
 		motorSpeeds: [...state.motorSpeeds],
 	}
 }
@@ -53,6 +59,8 @@ export function createDroneSimulation(
 	return {
 		drone,
 		initialDrone: cloneDroneState(initialDrone),
+		params: options.params ?? DEFAULT_QUADCOPTER_PARAMS,
+		physics: options.physics ?? DEFAULT_PHYSICS_CONFIG,
 		clock: {
 			elapsedSeconds: 0,
 			accumulatorSeconds: 0,
@@ -63,11 +71,6 @@ export function createDroneSimulation(
 			timeScale: options.timeScale ?? 1,
 		},
 	}
-}
-
-/** Placeholder integration boundary. Milestone 4 will apply forces here. */
-function stepDrone(state: DroneState, _fixedDeltaSeconds: number): DroneState {
-	return state
 }
 
 /**
@@ -89,7 +92,7 @@ export function advanceDroneSimulation(
 	let substeps = 0
 
 	while (accumulator >= fixedDelta - STEP_EPSILON && substeps < MAX_SUBSTEPS) {
-		drone = stepDrone(drone, fixedDelta)
+		drone = stepDronePhysics(drone, simulation.params, fixedDelta, simulation.physics)
 		accumulator = Math.max(0, accumulator - fixedDelta)
 		elapsedSeconds += fixedDelta
 		stepCount += 1
@@ -128,6 +131,8 @@ export function resumeDroneSimulation(simulation: DroneSimulation): DroneSimulat
 export function resetDroneSimulation(simulation: DroneSimulation): DroneSimulation {
 	return createDroneSimulation(simulation.initialDrone, {
 		fixedDeltaSeconds: simulation.clock.fixedDeltaSeconds,
+		params: simulation.params,
+		physics: simulation.physics,
 		running: false,
 		timeScale: 1,
 	})

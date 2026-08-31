@@ -6,12 +6,15 @@ import {
 
 export const PREVIEW_DRONE_PARAMS = DEFAULT_QUADCOPTER_PARAMS
 
-const armedMotorSpeed = throttleToMotorSpeed(0.12, PREVIEW_DRONE_PARAMS)
+const hoverMotorSpeed = throttleToMotorSpeed(
+	PREVIEW_DRONE_PARAMS.hoverThrottle,
+	PREVIEW_DRONE_PARAMS,
+)
 
-/** Static planning-preview state. Milestone 3 will move this into the simulation clock. */
+/** Balanced hover gives the live physics loop a stable, inspectable starting state. */
 export const PREVIEW_DRONE_STATE = createDroneState({
-	position: { x: 0, y: 0.22, z: 0 },
+	position: { x: 0, y: 1.2, z: 0 },
 	batteryLevel: 96,
-	missionState: 'armed',
-	motorSpeeds: [armedMotorSpeed, armedMotorSpeed, armedMotorSpeed, armedMotorSpeed],
+	missionState: 'flying',
+	motorSpeeds: [hoverMotorSpeed, hoverMotorSpeed, hoverMotorSpeed, hoverMotorSpeed],
 })

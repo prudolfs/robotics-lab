@@ -1,4 +1,4 @@
-import type { DroneSimulation } from '@robotics-lab/drone'
+import { type DroneSimulation, quaternionYaw } from '@robotics-lab/drone'
 import { formatHeading } from '@/mission'
 
 export function StatusBar({
@@ -12,7 +12,7 @@ export function StatusBar({
 		['LAT', '56.9496° N'],
 		['LON', '24.1052° E'],
 		['ALT', `${simulation.drone.position.y.toFixed(1)} m`],
-		['HDG', formatHeading(0)],
+		['HDG', formatHeading(quaternionYaw(simulation.drone.orientation))],
 		['BAT', `${simulation.drone.batteryLevel}%`],
 	] as const
 

@@ -190,21 +190,21 @@ Implement a lightweight physics model for the drone.
 
 ## Forces
 
-- [ ] Gravity
-- [ ] Thrust
-- [ ] Drag
-- [ ] Ground reaction
+- [x] Gravity
+- [x] Thrust
+- [x] Drag
+- [x] Ground reaction
 
 ## Integration
 
-- [ ] Semi-implicit Euler
-- [ ] Velocity update
-- [ ] Position update
+- [x] Semi-implicit Euler
+- [x] Velocity update
+- [x] Position update
 
 ## Attitude
 
-- [ ] Yaw dynamics
-- [ ] Pitch / roll approximation (initially simplified)
+- [x] Yaw dynamics
+- [x] Pitch / roll approximation (initially simplified)
 
 ---
 

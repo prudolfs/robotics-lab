@@ -27,6 +27,7 @@ export type DroneState = {
 	position: Vector3State
 	orientation: QuaternionState
 	velocity: Vector3State
+	angularVelocity: Vector3State
 	batteryLevel: number
 	missionState: DroneMissionState
 	motorSpeeds: MotorSpeeds
@@ -79,6 +80,7 @@ export function createDroneState(overrides: Partial<DroneState> = {}): DroneStat
 		position: { x: 0, y: 0, z: 0 },
 		orientation: { x: 0, y: 0, z: 0, w: 1 },
 		velocity: { x: 0, y: 0, z: 0 },
+		angularVelocity: { x: 0, y: 0, z: 0 },
 		batteryLevel: 100,
 		missionState: 'landed',
 		motorSpeeds: [0, 0, 0, 0],
@@ -135,4 +137,5 @@ export function calculateTorqueVector(
 	)
 }
 
+export * from './physics'
 export * from './simulation'
