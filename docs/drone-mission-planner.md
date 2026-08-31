@@ -307,29 +307,29 @@ Allow the user to design flight missions.
 
 ## Mission Items
 
-- [ ] Takeoff
-- [ ] Land
-- [ ] Waypoint (position)
-- [ ] Waypoint (position + altitude)
-- [ ] Return to launch (RTL)
-- [ ] Hold / loiter
-- [ ] Speed change
-- [ ] Camera trigger (future)
+- [x] Takeoff
+- [x] Land
+- [x] Waypoint (position)
+- [x] Waypoint (position + altitude)
+- [x] Return to launch (RTL)
+- [x] Hold / loiter
+- [x] Speed change
+- [x] Camera trigger (future)
 
 ## Editor UI
 
-- [ ] Mission list panel
-- [ ] Drag to reorder
-- [ ] Edit altitude / speed
-- [ ] Delete item
-- [ ] Insert above / below
+- [x] Mission list panel
+- [x] Drag to reorder
+- [x] Edit altitude / speed
+- [x] Delete item
+- [x] Insert above / below
 
 ## Editing
 
-- [ ] Click on map to add waypoint
-- [ ] Click and drag to move waypoint
-- [ ] Snap to altitude
-- [ ] Undo / redo
+- [x] Click on map to add waypoint
+- [x] Click and drag to move waypoint
+- [x] Snap to altitude
+- [x] Undo / redo
 
 ---
 

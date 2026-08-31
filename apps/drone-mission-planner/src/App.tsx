@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import { createDroneSensorConfig, type DroneSensorConfig } from '@robotics-lab/sensors'
 import { Compass, Rotate3D } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { type CameraMode, DEFAULT_CAMERA_FOV } from '@/camera'
 import { CameraControls } from '@/components/camera-controls'
 import { ManualFlightHud } from '@/components/manual-flight-hud'
@@ -11,21 +11,16 @@ import { SettingsPanel } from '@/components/settings-panel'
 import { SimulationControls } from '@/components/simulation-controls'
 import { StatusBar } from '@/components/status-bar'
 import { TopBar } from '@/components/top-bar'
-import { bootstrapWaypoints } from '@/mission'
+import { missionWaypoints } from '@/mission-plan'
 import { useDroneSensors } from '@/simulation/use-drone-sensors'
 import { useDroneSimulation } from '@/simulation/use-drone-simulation'
 import { usePlannerStore } from '@/store'
 import { createWebGPURenderer, supportsWebGPU } from '@/webgpu'
 
-const sensorWaypoint = {
-	x: bootstrapWaypoints[1]?.position.x ?? 0,
-	y: bootstrapWaypoints[1]?.altitude ?? 0,
-	z: bootstrapWaypoints[1]?.position.y ?? 0,
-}
-
 export default function App() {
 	const theme = usePlannerStore((state) => state.theme)
 	const world = usePlannerStore((state) => state.world)
+	const missionItems = usePlannerStore((state) => state.missionItems)
 	const webgpuSupported = supportsWebGPU()
 	const { simulation, controls, flightControl } = useDroneSimulation()
 	const [cameraMode, setCameraMode] = useState<CameraMode>('orbit')
@@ -35,6 +30,12 @@ export default function App() {
 	)
 	const [showLidarRays, setShowLidarRays] = useState(true)
 	const [showLidarHits, setShowLidarHits] = useState(true)
+	const sensorWaypoint = useMemo(() => {
+		const waypoint = missionWaypoints(missionItems)[0]
+		return waypoint
+			? { x: waypoint.position.x, y: waypoint.altitude ?? 0, z: waypoint.position.y }
+			: null
+	}, [missionItems])
 	const sensorReadings = useDroneSensors(simulation, world, sensorConfig, sensorWaypoint)
 
 	useEffect(() => {

@@ -9,9 +9,11 @@ import {
 	PlaneTakeoff,
 	RotateCcw,
 } from 'lucide-react'
+import { MissionEditorPanel } from '@/components/mission-editor-panel'
 import { Button } from '@/components/ui/button'
 import { PREVIEW_DRONE_PARAMS, PREVIEW_DRONE_STATE } from '@/drone-preview'
-import { bootstrapWaypoints, missionDistance } from '@/mission'
+import { missionDistance } from '@/mission'
+import { missionWaypoints } from '@/mission-plan'
 import { usePlannerStore } from '@/store'
 import { summarizeWorld, WORLD_SCALE_OPTIONS, type WorldScale } from '@/world'
 
@@ -32,6 +34,12 @@ export function SettingsPanel() {
 	const setSelectedMap = usePlannerStore((state) => state.setSelectedMap)
 	const setWorldScale = usePlannerStore((state) => state.setWorldScale)
 	const worldSummary = summarizeWorld(world)
+	const missionItems = usePlannerStore((state) => state.missionItems)
+	const routeWaypoints = missionWaypoints(missionItems).map((waypoint) => ({
+		id: waypoint.id,
+		position: waypoint.position,
+		altitude: waypoint.altitude ?? 0,
+	}))
 
 	return (
 		<aside
@@ -49,6 +57,7 @@ export function SettingsPanel() {
 					<ChevronDown />
 				</Button>
 			</div>
+			<MissionEditorPanel />
 
 			<section className={sectionClass}>
 				<h3 className={headingClass}>
@@ -152,11 +161,8 @@ export function SettingsPanel() {
 					Route summary
 				</h3>
 				<div className="grid grid-cols-2 gap-2">
-					<RouteStat value={String(bootstrapWaypoints.length)} label="Waypoints" />
-					<RouteStat
-						value={`${missionDistance(bootstrapWaypoints).toFixed(1)} m`}
-						label="Distance"
-					/>
+					<RouteStat value={String(routeWaypoints.length)} label="Waypoints" />
+					<RouteStat value={`${missionDistance(routeWaypoints).toFixed(1)} m`} label="Distance" />
 				</div>
 			</section>
 

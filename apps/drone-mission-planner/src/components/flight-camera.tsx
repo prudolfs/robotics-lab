@@ -4,6 +4,7 @@ import type { DroneState } from '@robotics-lab/drone'
 import { useRef } from 'react'
 import { Quaternion, type PerspectiveCamera as ThreePerspectiveCamera, Vector3 } from 'three'
 import type { CameraMode } from '@/camera'
+import { usePlannerStore } from '@/store'
 
 const dronePosition = new Vector3()
 const droneOrientation = new Quaternion()
@@ -26,6 +27,7 @@ export function FlightCamera({
 	const cameraRef = useRef<ThreePerspectiveCamera>(null)
 	const smoothTarget = useRef(new Vector3())
 	const cinematicAngle = useRef(0)
+	const missionEditMode = usePlannerStore((state) => state.missionEditMode)
 
 	useFrame((_, delta) => {
 		const camera = cameraRef.current
@@ -90,7 +92,7 @@ export function FlightCamera({
 			/>
 			<OrbitControls
 				makeDefault
-				enabled={mode === 'orbit'}
+				enabled={mode === 'orbit' && missionEditMode !== 'add-waypoint'}
 				enableDamping
 				dampingFactor={0.08}
 				maxPolarAngle={Math.PI / 2.05}
