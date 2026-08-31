@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber'
-import { Compass, MousePointer2, Rotate3D } from 'lucide-react'
+import { Compass, Rotate3D } from 'lucide-react'
 import { useEffect } from 'react'
+import { ManualFlightHud } from '@/components/manual-flight-hud'
 import { MissionScene } from '@/components/mission-scene'
 import { SettingsPanel } from '@/components/settings-panel'
 import { SimulationControls } from '@/components/simulation-controls'
@@ -13,7 +14,7 @@ import { createWebGPURenderer, supportsWebGPU } from '@/webgpu'
 export default function App() {
 	const theme = usePlannerStore((state) => state.theme)
 	const webgpuSupported = supportsWebGPU()
-	const { simulation, controls } = useDroneSimulation()
+	const { simulation, controls, flightControl } = useDroneSimulation()
 
 	useEffect(() => {
 		document.documentElement.classList.toggle('dark', theme === 'dark')
@@ -36,6 +37,11 @@ export default function App() {
 					)}
 					<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_40%,rgb(2_10_7/0.2)_120%)]" />
 					<SimulationControls simulation={simulation} controls={controls} />
+					<ManualFlightHud
+						simulation={simulation}
+						flightControl={flightControl}
+						controls={controls}
+					/>
 					<div className="absolute top-[18px] left-[18px] z-[2] flex items-center gap-2 font-semibold text-[11px] text-white/85 uppercase tracking-[0.08em] drop-shadow-sm">
 						<span className="rounded border border-white/35 px-[5px] py-[3px] text-[9px]">3D</span>
 						Mission space
@@ -48,17 +54,6 @@ export default function App() {
 						<span className="absolute -top-[7px] -right-[5px] grid size-[17px] place-items-center rounded-full bg-primary font-extrabold text-[8px] text-primary-foreground">
 							N
 						</span>
-					</div>
-					<div className="absolute bottom-[18px] left-[18px] z-[2] flex gap-3.5 rounded-lg border border-white/15 bg-[#08100d]/35 px-2.5 py-2 text-[11px] text-white/85 backdrop-blur-sm max-[620px]:hidden [&_span]:flex [&_span]:items-center [&_span]:gap-[5px] [&_svg]:size-[13px]">
-						<span>
-							<MousePointer2 />
-							Select
-						</span>
-						<span>
-							<Rotate3D />
-							Orbit
-						</span>
-						<span>Scroll to zoom</span>
 					</div>
 					<div className="absolute right-5 bottom-[21px] z-[2] grid justify-items-center gap-[5px] text-[11px] text-white/85 drop-shadow-sm">
 						<i className="block h-[7px] w-[72px] border-white/80 border-r border-b border-l" />

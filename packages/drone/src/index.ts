@@ -137,5 +137,6 @@ export function calculateTorqueVector(
 	)
 }
 
+export * from './controls'
 export * from './physics'
 export * from './simulation'

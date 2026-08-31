@@ -210,7 +210,7 @@ export function stepDronePhysics(
 	if (position.y < groundLevel) {
 		position.y = groundLevel
 		if (velocity.y < 0) velocity.y = -velocity.y * config.groundRestitution
-		if (state.missionState === 'flying') missionState = 'landed'
+		if (state.missionState !== 'landed') missionState = 'landed'
 	}
 
 	return { ...state, position, velocity, angularVelocity, orientation, missionState }

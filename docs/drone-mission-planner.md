@@ -216,18 +216,18 @@ Fly the drone manually.
 
 ## Input
 
-- [ ] Keyboard controls (throttle, yaw, pitch, roll)
-- [ ] Joystick / gamepad support
-- [ ] Speed adjustment
-- [ ] Emergency stop / kill switch
-- [ ] Arm / disarm
+- [x] Keyboard controls (throttle, yaw, pitch, roll)
+- [x] Joystick / gamepad support
+- [x] Speed adjustment
+- [x] Emergency stop / kill switch
+- [x] Arm / disarm
 
 ## UI
 
-- [ ] HUD
-- [ ] Control hints
-- [ ] Drone status
-- [ ] Battery indicator
+- [x] HUD
+- [x] Control hints
+- [x] Drone status
+- [x] Battery indicator
 
 ---
 
