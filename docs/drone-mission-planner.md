@@ -263,39 +263,39 @@ Add virtual sensors to the drone.
 
 ## Lidar
 
-- [ ] 360° lidar
-- [ ] Raycasting
-- [ ] Distance measurements
-- [ ] Configurable range
-- [ ] Configurable resolution
+- [x] 360° lidar
+- [x] Raycasting
+- [x] Distance measurements
+- [x] Configurable range
+- [x] Configurable resolution
 
 ### Visualization
 
-- [ ] Laser rays
-- [ ] Hit points
+- [x] Laser rays
+- [x] Hit points
 
 ---
 
 ## Altimeter
 
-- [ ] Ground height sampling
-- [ ] AGL altitude output
+- [x] Ground height sampling
+- [x] AGL altitude output
 
 ---
 
 ## GPS
 
-- [ ] Global position output
-- [ ] Configurable noise
-- [ ] Waypoint distance
+- [x] Global position output
+- [x] Configurable noise
+- [x] Waypoint distance
 
 ---
 
 ## IMU
 
-- [ ] Acceleration
-- [ ] Angular velocity
-- [ ] Heading
+- [x] Acceleration
+- [x] Angular velocity
+- [x] Heading
 
 ---
 

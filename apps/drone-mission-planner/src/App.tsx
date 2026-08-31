@@ -1,24 +1,41 @@
 import { Canvas } from '@react-three/fiber'
+import { createDroneSensorConfig, type DroneSensorConfig } from '@robotics-lab/sensors'
 import { Compass, Rotate3D } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { type CameraMode, DEFAULT_CAMERA_FOV } from '@/camera'
 import { CameraControls } from '@/components/camera-controls'
 import { ManualFlightHud } from '@/components/manual-flight-hud'
 import { MissionScene } from '@/components/mission-scene'
+import { SensorHud } from '@/components/sensor-hud'
 import { SettingsPanel } from '@/components/settings-panel'
 import { SimulationControls } from '@/components/simulation-controls'
 import { StatusBar } from '@/components/status-bar'
 import { TopBar } from '@/components/top-bar'
+import { bootstrapWaypoints } from '@/mission'
+import { useDroneSensors } from '@/simulation/use-drone-sensors'
 import { useDroneSimulation } from '@/simulation/use-drone-simulation'
 import { usePlannerStore } from '@/store'
 import { createWebGPURenderer, supportsWebGPU } from '@/webgpu'
 
+const sensorWaypoint = {
+	x: bootstrapWaypoints[1]?.position.x ?? 0,
+	y: bootstrapWaypoints[1]?.altitude ?? 0,
+	z: bootstrapWaypoints[1]?.position.y ?? 0,
+}
+
 export default function App() {
 	const theme = usePlannerStore((state) => state.theme)
+	const world = usePlannerStore((state) => state.world)
 	const webgpuSupported = supportsWebGPU()
 	const { simulation, controls, flightControl } = useDroneSimulation()
 	const [cameraMode, setCameraMode] = useState<CameraMode>('orbit')
 	const [cameraFov, setCameraFov] = useState(DEFAULT_CAMERA_FOV)
+	const [sensorConfig, setSensorConfig] = useState<DroneSensorConfig>(() =>
+		createDroneSensorConfig(),
+	)
+	const [showLidarRays, setShowLidarRays] = useState(true)
+	const [showLidarHits, setShowLidarHits] = useState(true)
+	const sensorReadings = useDroneSensors(simulation, world, sensorConfig, sensorWaypoint)
 
 	useEffect(() => {
 		document.documentElement.classList.toggle('dark', theme === 'dark')
@@ -38,6 +55,9 @@ export default function App() {
 								droneState={simulation.drone}
 								cameraMode={cameraMode}
 								cameraFov={cameraFov}
+								sensorReadings={sensorReadings}
+								showLidarRays={showLidarRays}
+								showLidarHits={showLidarHits}
 							/>
 						</Canvas>
 					) : (
@@ -55,6 +75,15 @@ export default function App() {
 						simulation={simulation}
 						flightControl={flightControl}
 						controls={controls}
+					/>
+					<SensorHud
+						readings={sensorReadings}
+						config={sensorConfig}
+						showRays={showLidarRays}
+						showHits={showLidarHits}
+						onConfigChange={setSensorConfig}
+						onShowRaysChange={setShowLidarRays}
+						onShowHitsChange={setShowLidarHits}
 					/>
 					<div className="absolute top-[18px] left-[18px] z-[2] flex items-center gap-2 font-semibold text-[11px] text-white/85 uppercase tracking-[0.08em] drop-shadow-sm">
 						<span className="rounded border border-white/35 px-[5px] py-[3px] text-[9px]">3D</span>
@@ -76,7 +105,11 @@ export default function App() {
 				</div>
 				<SettingsPanel />
 			</main>
-			<StatusBar webgpuSupported={webgpuSupported} simulation={simulation} />
+			<StatusBar
+				webgpuSupported={webgpuSupported}
+				simulation={simulation}
+				sensorReadings={sensorReadings}
+			/>
 		</div>
 	)
 }

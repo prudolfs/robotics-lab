@@ -1,18 +1,21 @@
-import { type DroneSimulation, quaternionYaw } from '@robotics-lab/drone'
+import type { DroneSimulation } from '@robotics-lab/drone'
+import type { DroneSensorReadings } from '@robotics-lab/sensors'
 import { formatHeading } from '@/mission'
 
 export function StatusBar({
 	webgpuSupported,
 	simulation,
+	sensorReadings,
 }: {
 	webgpuSupported: boolean
 	simulation: DroneSimulation
+	sensorReadings: DroneSensorReadings
 }) {
 	const telemetry = [
-		['LAT', '56.9496° N'],
-		['LON', '24.1052° E'],
-		['ALT', `${simulation.drone.position.y.toFixed(1)} m`],
-		['HDG', formatHeading(quaternionYaw(simulation.drone.orientation))],
+		['LAT', `${Math.abs(sensorReadings.gps.latitude).toFixed(5)}° N`],
+		['LON', `${Math.abs(sensorReadings.gps.longitude).toFixed(5)}° E`],
+		['AGL', `${sensorReadings.altimeter.altitudeAgl.toFixed(1)} m`],
+		['HDG', formatHeading(sensorReadings.imu.heading)],
 		['BAT', `${simulation.drone.batteryLevel}%`],
 	] as const
 

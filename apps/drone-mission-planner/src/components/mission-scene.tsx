@@ -1,5 +1,6 @@
 import type { DroneState } from '@robotics-lab/drone'
-import { CoordinateAxes, Lights, WorldView, worldToScene } from '@robotics-lab/rendering'
+import { CoordinateAxes, LidarView, Lights, WorldView, worldToScene } from '@robotics-lab/rendering'
+import type { DroneSensorReadings } from '@robotics-lab/sensors'
 import { Quaternion, Vector3 } from 'three'
 import type { CameraMode } from '@/camera'
 import { DroneView } from '@/components/drone-view'
@@ -83,10 +84,16 @@ export function MissionScene({
 	droneState,
 	cameraMode,
 	cameraFov,
+	sensorReadings,
+	showLidarRays,
+	showLidarHits,
 }: {
 	droneState: DroneState
 	cameraMode: CameraMode
 	cameraFov: number
+	sensorReadings: DroneSensorReadings
+	showLidarRays: boolean
+	showLidarHits: boolean
 }) {
 	const world = usePlannerStore((state) => state.world)
 	const worldScale = usePlannerStore((state) => state.worldScale)
@@ -101,6 +108,12 @@ export function MissionScene({
 				<WorldView world={world} />
 				<CoordinateAxes />
 				<StagingRoute />
+				<LidarView
+					scan={sensorReadings.lidar}
+					elevation={droneState.position.y}
+					showRays={showLidarRays}
+					showHits={showLidarHits}
+				/>
 				<DroneView state={droneState} params={PREVIEW_DRONE_PARAMS} />
 			</group>
 			<fog attach="fog" args={['#b9c1b6', 20, 68]} />

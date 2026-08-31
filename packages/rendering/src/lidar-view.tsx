@@ -20,6 +20,8 @@ const HIT_RADIUS = 0.03
 
 export type LidarViewProps = {
 	scan: LidarScan | null
+	/** Scene elevation for the sensor plane. Defaults to a ground robot height. */
+	elevation?: number
 	/** Show laser rays. Defaults to true. */
 	showRays?: boolean
 	/** Show hit-point markers. Defaults to true. */
@@ -31,19 +33,24 @@ export type LidarViewProps = {
  * keyed on the scan's sample array length, so FOV/resolution changes are
  * reflected immediately while the per-frame vertex data is rewritten cheaply.
  */
-export function LidarView({ scan, showRays = true, showHits = true }: LidarViewProps) {
+export function LidarView({
+	scan,
+	elevation = RAY_ELEVATION,
+	showRays = true,
+	showHits = true,
+}: LidarViewProps) {
 	if (!scan) return null
 	return (
 		<group>
-			{showRays && <Rays scan={scan} />}
-			{showHits && <Hits scan={scan} />}
+			{showRays && <Rays scan={scan} elevation={elevation} />}
+			{showHits && <Hits scan={scan} elevation={elevation} />}
 		</group>
 	)
 }
 
 /** Laser rays from the sensor origin to each sample's endpoint. */
-function Rays({ scan }: { scan: LidarScan }) {
-	const positions = useMemo(() => buildRayPositions(scan), [scan])
+function Rays({ scan, elevation }: { scan: LidarScan; elevation: number }) {
+	const positions = useMemo(() => buildRayPositions(scan, elevation), [scan, elevation])
 	// Force a fresh geometry object whenever the vertex buffer identity changes
 	// so R3F re-uploads it; alternation between scans hits the same pool.
 	const geometry = useMemo(
@@ -59,8 +66,8 @@ function Rays({ scan }: { scan: LidarScan }) {
 }
 
 /** Hit-point markers, drawn as gold dots. */
-function Hits({ scan }: { scan: LidarScan }) {
-	const positions = useMemo(() => buildHitPositions(scan), [scan])
+function Hits({ scan, elevation }: { scan: LidarScan; elevation: number }) {
+	const positions = useMemo(() => buildHitPositions(scan, elevation), [scan, elevation])
 	const geometry = useMemo(
 		() =>
 			new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(positions, 3)),
@@ -78,15 +85,15 @@ function Hits({ scan }: { scan: LidarScan }) {
  * sample. Endpoints are the hit point for hits and the ray's range extent for
  * misses so the FOV outline stays visible.
  */
-function buildRayPositions(scan: LidarScan): Float32Array {
-	const [ox, oy, oz] = worldToScene(scan.origin, RAY_ELEVATION)
+function buildRayPositions(scan: LidarScan, elevation: number): Float32Array {
+	const [ox, oy, oz] = worldToScene(scan.origin, elevation)
 	const positions = new Float32Array(scan.samples.length * 6)
 	scan.samples.forEach((sample, idx) => {
 		const base = idx * 6
 		positions[base + 0] = ox
 		positions[base + 1] = oy
 		positions[base + 2] = oz
-		const [ex, ey, ez] = worldToScene(rayEndpoint(scan, sample), RAY_ELEVATION)
+		const [ex, ey, ez] = worldToScene(rayEndpoint(scan, sample), elevation)
 		positions[base + 3] = ex
 		positions[base + 4] = ey
 		positions[base + 5] = ez
@@ -102,7 +109,7 @@ function rayEndpoint(scan: LidarScan, sample: LidarSample) {
 }
 
 /** Vertex buffer for hit points: one vertex per hit sample, in scene coords. */
-function buildHitPositions(scan: LidarScan): Float32Array {
+function buildHitPositions(scan: LidarScan, elevation: number): Float32Array {
 	const hits = scan.samples.filter((s) => s.hit !== null)
 	const positions = new Float32Array(hits.length * 3)
 	hits.forEach((s, idx) => {
@@ -111,7 +118,7 @@ function buildHitPositions(scan: LidarScan): Float32Array {
 			x: scan.origin.x + Math.cos(a) * s.distance,
 			y: scan.origin.y + Math.sin(a) * s.distance,
 		}
-		const [x, y, z] = worldToScene(world, RAY_ELEVATION)
+		const [x, y, z] = worldToScene(world, elevation)
 		const base = idx * 3
 		positions[base + 0] = x
 		positions[base + 1] = y

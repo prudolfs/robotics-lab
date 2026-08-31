@@ -45,6 +45,19 @@ export function generateRays(config: LidarConfig, origin: Pose): LidarRay[] {
 	return rays
 }
 
+export type {
+	DroneSensorConfig,
+	DroneSensorInput,
+	DroneSensorReadings,
+	GpsOrigin,
+	SensorVector3,
+} from './drone'
+export {
+	createDroneSensorConfig,
+	DEFAULT_GPS_ORIGIN,
+	sampleDroneSensors,
+	sampleGroundHeight,
+} from './drone'
 export type { ObstacleKind, RayHit } from './raycast'
 export { castRayAgainstWorld, castRaysAgainst } from './raycast'
 export type { LidarSample, LidarScan, Rng } from './scan'

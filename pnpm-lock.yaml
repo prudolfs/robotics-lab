@@ -249,6 +249,9 @@ importers:
       '@robotics-lab/rendering':
         specifier: workspace:*
         version: link:../../packages/rendering
+      '@robotics-lab/sensors':
+        specifier: workspace:*
+        version: link:../../packages/sensors
       '@tailwindcss/vite':
         specifier: ^4.3.2
         version: 4.3.2(vite@8.1.2(esbuild@0.28.1)(jiti@2.7.0))
