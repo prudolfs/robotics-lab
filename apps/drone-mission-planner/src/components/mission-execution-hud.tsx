@@ -1,17 +1,21 @@
 import type { MissionExecution } from '@robotics-lab/drone'
-import { CircleStop, House, Pause, PlaneLanding, Play, Power } from 'lucide-react'
+import { CircleStop, House, Pause, PlaneLanding, Play, Power, ShieldAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import type { MissionValidationResult } from '@/mission-validation'
 import type { DroneSimulationControls } from '@/simulation/use-drone-simulation'
 
 export function MissionExecutionHud({
 	execution,
 	controls,
+	validation,
 }: {
 	execution: MissionExecution
 	controls: DroneSimulationControls
+	validation: MissionValidationResult
 }) {
 	const currentItem = execution.items[execution.currentIndex]
-	const canStart = execution.phase === 'armed' && execution.items.length > 0
+	const canStart = execution.phase === 'armed' && execution.items.length > 0 && validation.isValid
+	const blockingMessage = validation.errors[0]?.message
 
 	return (
 		<section
@@ -44,6 +48,7 @@ export function MissionExecutionHud({
 
 			<ol className="mt-2 flex list-none items-center gap-1" aria-label="Mission timeline">
 				{execution.items.map((item, index) => {
+					const invalid = validation.invalidItemIds.includes(item.id)
 					const state =
 						index < execution.currentIndex
 							? 'complete'
@@ -55,11 +60,13 @@ export function MissionExecutionHud({
 							key={item.id}
 							title={`${index + 1}. ${missionItemLabel(item.type)}`}
 							className={`h-1.5 min-w-1 flex-1 rounded-full ${
-								state === 'complete'
-									? 'bg-emerald-300'
-									: state === 'current'
-										? 'bg-amber-300 shadow-[0_0_6px_currentColor]'
-										: 'bg-white/15'
+								invalid
+									? 'bg-red-400'
+									: state === 'complete'
+										? 'bg-emerald-300'
+										: state === 'current'
+											? 'bg-amber-300 shadow-[0_0_6px_currentColor]'
+											: 'bg-white/15'
 							}`}
 						/>
 					)
@@ -91,12 +98,24 @@ export function MissionExecutionHud({
 						{execution.paused ? 'Resume' : 'Pause'}
 					</Button>
 				) : execution.phase === 'armed' ? (
-					<Button size="sm" disabled={!canStart} onClick={controls.startMission}>
-						<Play /> Start
+					<Button
+						size="sm"
+						disabled={!canStart}
+						title={blockingMessage}
+						onClick={controls.startMission}
+					>
+						{validation.isValid ? <Play /> : <ShieldAlert />}
+						{validation.isValid ? 'Start' : 'Blocked'}
 					</Button>
 				) : (
-					<Button size="sm" onClick={controls.armMission}>
-						<Power /> Arm
+					<Button
+						size="sm"
+						disabled={!validation.isValid}
+						title={blockingMessage}
+						onClick={controls.armMission}
+					>
+						{validation.isValid ? <Power /> : <ShieldAlert />}
+						{validation.isValid ? 'Arm' : 'Fix mission'}
 					</Button>
 				)}
 				<Button

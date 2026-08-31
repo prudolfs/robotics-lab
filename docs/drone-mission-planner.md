@@ -32,27 +32,27 @@
 
 ## Package manager
 
-- [ ] Pnpm
+- [x] Pnpm
 
 ## Frontend
 
-- [ ] React
-- [ ] TypeScript
-- [ ] Vite
+- [x] React
+- [x] TypeScript
+- [x] Vite
 
 ## Rendering
 
-- [ ] Three.js
-- [ ] React Three Fiber
-- [ ] Drei
+- [x] Three.js
+- [x] React Three Fiber
+- [x] Drei
 
 ## State
 
-- [ ] Zustand (UI only)
+- [x] Zustand (UI only)
 
 ## Testing
 
-- [ ] Vitest
+- [x] Vitest
 
 ---
 
@@ -382,20 +382,20 @@ Prevent unsafe or impossible missions.
 
 ## Checks
 
-- [ ] Takeoff altitude reachable
-- [ ] Waypoint order valid
-- [ ] Altitude bounds
-- [ ] Speed bounds
-- [ ] Distance bounds
-- [ ] Battery feasibility estimate
-- [ ] Collision check vs map
+- [x] Takeoff altitude reachable
+- [x] Waypoint order valid
+- [x] Altitude bounds
+- [x] Speed bounds
+- [x] Distance bounds
+- [x] Battery feasibility estimate
+- [x] Collision check vs map
 
 ## UI
 
-- [ ] Validation panel
-- [ ] Warnings
-- [ ] Errors
-- [ ] Highlight invalid items
+- [x] Validation panel
+- [x] Warnings
+- [x] Errors
+- [x] Highlight invalid items
 
 ---
 

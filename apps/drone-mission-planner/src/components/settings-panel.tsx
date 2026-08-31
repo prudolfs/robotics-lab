@@ -10,10 +10,12 @@ import {
 	RotateCcw,
 } from 'lucide-react'
 import { MissionEditorPanel } from '@/components/mission-editor-panel'
+import { MissionValidationPanel } from '@/components/mission-validation-panel'
 import { Button } from '@/components/ui/button'
 import { PREVIEW_DRONE_PARAMS, PREVIEW_DRONE_STATE } from '@/drone-preview'
 import { missionDistance } from '@/mission'
 import { missionWaypoints } from '@/mission-plan'
+import type { MissionValidationResult } from '@/mission-validation'
 import { usePlannerStore } from '@/store'
 import { summarizeWorld, WORLD_SCALE_OPTIONS, type WorldScale } from '@/world'
 
@@ -21,7 +23,7 @@ const sectionClass = 'border-border border-b p-[18px]'
 const headingClass =
 	'mb-4 flex items-center gap-2 text-[10px] text-muted-foreground uppercase tracking-[0.1em] [&_svg]:size-3.5 [&_svg]:text-primary'
 
-export function SettingsPanel() {
+export function SettingsPanel({ validation }: { validation: MissionValidationResult }) {
 	const altitude = usePlannerStore((state) => state.cruiseAltitude)
 	const speed = usePlannerStore((state) => state.cruiseSpeed)
 	const returnToHome = usePlannerStore((state) => state.returnToHome)
@@ -57,7 +59,8 @@ export function SettingsPanel() {
 					<ChevronDown />
 				</Button>
 			</div>
-			<MissionEditorPanel />
+			<MissionEditorPanel validation={validation} />
+			<MissionValidationPanel validation={validation} />
 
 			<section className={sectionClass}>
 				<h3 className={headingClass}>
@@ -189,12 +192,22 @@ export function SettingsPanel() {
 				</label>
 			</section>
 
-			<div className="m-[18px] flex gap-[11px] rounded-[10px] border border-emerald-400/25 bg-emerald-400/10 p-[13px] text-emerald-400">
+			<div
+				className={`m-[18px] flex gap-[11px] rounded-[10px] border p-[13px] ${
+					validation.isValid
+						? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-400'
+						: 'border-destructive/25 bg-destructive/10 text-destructive'
+				}`}
+			>
 				<Gauge className="size-[17px]" aria-hidden="true" />
 				<span className="grid gap-[3px]">
-					<strong className="text-[11px]">Ready for route planning</strong>
+					<strong className="text-[11px]">
+						{validation.isValid ? 'Ready for mission execution' : 'Mission execution blocked'}
+					</strong>
 					<small className="text-[9px] text-muted-foreground">
-						Vehicle profile and home point set
+						{validation.isValid
+							? 'Vehicle, route, and safety checks passed'
+							: `Resolve ${validation.errors.length} validation ${validation.errors.length === 1 ? 'error' : 'errors'}`}
 					</small>
 				</span>
 			</div>

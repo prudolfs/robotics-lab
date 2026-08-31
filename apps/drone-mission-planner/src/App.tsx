@@ -13,6 +13,7 @@ import { SimulationControls } from '@/components/simulation-controls'
 import { StatusBar } from '@/components/status-bar'
 import { TopBar } from '@/components/top-bar'
 import { executableMissionItems, missionWaypoints } from '@/mission-plan'
+import { validateMission } from '@/mission-validation'
 import { useDroneSensors } from '@/simulation/use-drone-sensors'
 import { useDroneSimulation } from '@/simulation/use-drone-simulation'
 import { usePlannerStore } from '@/store'
@@ -26,6 +27,10 @@ export default function App() {
 	const executableMission = useMemo(() => executableMissionItems(missionItems), [missionItems])
 	const { simulation, missionExecution, controls, flightControl } =
 		useDroneSimulation(executableMission)
+	const validation = useMemo(
+		() => validateMission(missionItems, world, simulation.drone.batteryLevel),
+		[missionItems, simulation.drone.batteryLevel, world],
+	)
 	const [cameraMode, setCameraMode] = useState<CameraMode>('orbit')
 	const [cameraFov, setCameraFov] = useState(DEFAULT_CAMERA_FOV)
 	const [sensorConfig, setSensorConfig] = useState<DroneSensorConfig>(() =>
@@ -85,7 +90,11 @@ export default function App() {
 						flightControl={flightControl}
 						controls={controls}
 					/>
-					<MissionExecutionHud execution={missionExecution} controls={controls} />
+					<MissionExecutionHud
+						execution={missionExecution}
+						controls={controls}
+						validation={validation}
+					/>
 					<SensorHud
 						readings={sensorReadings}
 						config={sensorConfig}
@@ -113,7 +122,7 @@ export default function App() {
 						<span>10 m</span>
 					</div>
 				</div>
-				<SettingsPanel />
+				<SettingsPanel validation={validation} />
 			</main>
 			<StatusBar
 				webgpuSupported={webgpuSupported}

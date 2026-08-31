@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
 import {
+	AlertTriangle,
 	Camera,
 	Clock3,
 	Gauge,
@@ -17,6 +18,7 @@ import {
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { type MissionItem, type MissionItemTemplate, missionWaypoints } from '@/mission-plan'
+import type { MissionValidationResult, MissionValidationSeverity } from '@/mission-validation'
 import { usePlannerStore } from '@/store'
 
 const templates: Array<{ value: MissionItemTemplate; label: string }> = [
@@ -30,7 +32,7 @@ const templates: Array<{ value: MissionItemTemplate; label: string }> = [
 	{ value: 'camera', label: 'Camera trigger' },
 ]
 
-export function MissionEditorPanel() {
+export function MissionEditorPanel({ validation }: { validation: MissionValidationResult }) {
 	const missionItems = usePlannerStore((state) => state.missionItems)
 	const selectedId = usePlannerStore((state) => state.selectedMissionItemId)
 	const editMode = usePlannerStore((state) => state.missionEditMode)
@@ -133,6 +135,7 @@ export function MissionEditorPanel() {
 						item={item}
 						key={item.id}
 						selected={selectedId === item.id}
+						validationSeverity={itemValidationSeverity(item.id, validation)}
 						onDelete={() => deleteMissionItem(item.id)}
 						onDragStart={() => setDraggedId(item.id)}
 						onDrop={() => {
@@ -153,6 +156,7 @@ function MissionItemRow({
 	item,
 	index,
 	selected,
+	validationSeverity,
 	onDelete,
 	onDragStart,
 	onDrop,
@@ -163,6 +167,7 @@ function MissionItemRow({
 	item: MissionItem
 	index: number
 	selected: boolean
+	validationSeverity: MissionValidationSeverity | null
 	onDelete: () => void
 	onDragStart: () => void
 	onDrop: () => void
@@ -178,7 +183,16 @@ function MissionItemRow({
 	const { icon: Icon, label, detail } = describeMissionItem(item)
 	return (
 		<li
-			className={`rounded-lg border ${selected ? 'border-primary/45 bg-primary/8' : 'border-border bg-muted/35'}`}
+			aria-invalid={validationSeverity === 'error' || undefined}
+			className={`rounded-lg border ${
+				validationSeverity === 'error'
+					? 'border-destructive/55 bg-destructive/8'
+					: validationSeverity === 'warning'
+						? 'border-amber-500/55 bg-amber-500/8'
+						: selected
+							? 'border-primary/45 bg-primary/8'
+							: 'border-border bg-muted/35'
+			}`}
 			draggable
 			onDragOver={(event) => event.preventDefault()}
 			onDragStart={(event) => {
@@ -205,6 +219,15 @@ function MissionItemRow({
 					</strong>
 					<small className="block truncate text-[9px] text-muted-foreground">{detail}</small>
 				</span>
+				{validationSeverity ? (
+					<span
+						className={validationSeverity === 'error' ? 'text-destructive' : 'text-amber-500'}
+						title={`${validationSeverity} in this mission item`}
+					>
+						<AlertTriangle className="size-3.5" aria-hidden="true" />
+						<span className="sr-only">{validationSeverity}</span>
+					</span>
+				) : null}
 			</button>
 			{selected && (
 				<div className="grid gap-2 border-border border-t p-2">
@@ -239,6 +262,15 @@ function MissionItemRow({
 			)}
 		</li>
 	)
+}
+
+function itemValidationSeverity(
+	itemId: string,
+	validation: MissionValidationResult,
+): MissionValidationSeverity | null {
+	const issues = validation.issues.filter((issue) => issue.itemId === itemId)
+	if (issues.some((issue) => issue.severity === 'error')) return 'error'
+	return issues.some((issue) => issue.severity === 'warning') ? 'warning' : null
 }
 
 function MissionItemFields({
