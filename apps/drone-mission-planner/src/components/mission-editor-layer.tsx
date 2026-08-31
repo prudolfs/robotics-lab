@@ -1,51 +1,51 @@
 import { useThree } from '@react-three/fiber'
+import type { MissionExecution } from '@robotics-lab/drone'
 import { useEffect, useMemo, useRef } from 'react'
 import { Plane, Quaternion, Raycaster, Vector2, Vector3 } from 'three'
-import { missionWaypoints } from '@/mission-plan'
+import { missionRoutePoints, missionWaypoints } from '@/mission-plan'
 import { usePlannerStore } from '@/store'
 
 const up = new Vector3(0, 1, 0)
 
-function waypointHeight(altitude: number | null): number {
-	return altitude === null ? 0.18 : Math.max(0.18, altitude / 8)
-}
-
-export function MissionEditorLayer({ worldScale }: { worldScale: number }) {
+export function MissionEditorLayer({
+	worldScale,
+	missionExecution,
+}: {
+	worldScale: number
+	missionExecution: MissionExecution
+}) {
 	const items = usePlannerStore((state) => state.missionItems)
 	const selectedId = usePlannerStore((state) => state.selectedMissionItemId)
 	const setSelected = usePlannerStore((state) => state.setSelectedMissionItem)
 	const waypoints = missionWaypoints(items)
-	const route = useMemo(
-		() => [
-			[0, 0.06, 0] as [number, number, number],
-			...waypoints.map(
-				(waypoint) =>
-					[waypoint.position.x, waypointHeight(waypoint.altitude), waypoint.position.y] as [
-						number,
-						number,
-						number,
-					],
-			),
-		],
-		[waypoints],
+	const routePoints = useMemo(() => missionRoutePoints(items), [items])
+	const route = routePoints.map(
+		(point) =>
+			[point.position.x, Math.max(0.06, point.position.y), point.position.z] as [
+				number,
+				number,
+				number,
+			],
 	)
+	const waypointAltitudes = new Map(routePoints.map((point) => [point.id, point.position.y]))
 
 	return (
 		<group>
 			<MissionPointerController worldScale={worldScale} />
 			{route.slice(1).map((point, index) => (
 				<RouteSegment
-					key={`mission-route-${waypoints[index]?.id}`}
+					key={`mission-route-${routePoints[index + 1]?.id}`}
 					start={route[index] ?? point}
 					end={point}
 				/>
 			))}
+			{missionExecution.target ? <CurrentTarget target={missionExecution.target} /> : null}
 			<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.025, 0]}>
 				<ringGeometry args={[0.42, 0.48, 48]} />
 				<meshBasicMaterial color="#ffbd6a" />
 			</mesh>
 			{waypoints.map((waypoint, index) => {
-				const height = waypointHeight(waypoint.altitude)
+				const height = Math.max(0.18, waypointAltitudes.get(waypoint.id) ?? 0)
 				const selected = selectedId === waypoint.id
 				return (
 					<group key={waypoint.id} position={[waypoint.position.x, height, waypoint.position.y]}>
@@ -86,6 +86,21 @@ export function MissionEditorLayer({ worldScale }: { worldScale: number }) {
 					</group>
 				)
 			})}
+		</group>
+	)
+}
+
+function CurrentTarget({ target }: { target: { x: number; y: number; z: number } }) {
+	return (
+		<group position={[target.x, target.y, target.z]}>
+			<mesh rotation={[-Math.PI / 2, 0, 0]}>
+				<torusGeometry args={[0.28, 0.035, 12, 36]} />
+				<meshBasicMaterial color="#67e8f9" />
+			</mesh>
+			<mesh>
+				<sphereGeometry args={[0.07, 16, 16]} />
+				<meshBasicMaterial color="#ecfeff" />
+			</mesh>
 		</group>
 	)
 }
@@ -179,6 +194,7 @@ function RouteSegment({
 	const startVector = new Vector3(...start)
 	const endVector = new Vector3(...end)
 	const direction = endVector.clone().sub(startVector)
+	if (direction.lengthSq() === 0) return null
 	const midpoint = startVector.clone().add(endVector).multiplyScalar(0.5)
 	const quaternion = new Quaternion().setFromUnitVectors(up, direction.clone().normalize())
 	return (

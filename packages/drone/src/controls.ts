@@ -24,7 +24,7 @@ export const NEUTRAL_MANUAL_CONTROL: ManualControlInput = {
 }
 
 export function isDroneArmed(state: DroneState): boolean {
-	return state.missionState === 'armed' || state.missionState === 'flying'
+	return ['armed', 'taking-off', 'flying', 'holding', 'landing'].includes(state.missionState)
 }
 
 /** Mix hover-centered pilot commands into an X-frame quadcopter motor layout. */
@@ -82,5 +82,5 @@ export function armDrone(state: DroneState, params: QuadcopterParams): DroneStat
 
 export function disarmDrone(state: DroneState): DroneState {
 	if (!isDroneArmed(state) && state.motorSpeeds.every((speed) => speed === 0)) return state
-	return { ...state, missionState: 'idle', motorSpeeds: [0, 0, 0, 0] }
+	return { ...state, missionState: 'disarmed', motorSpeeds: [0, 0, 0, 0] }
 }

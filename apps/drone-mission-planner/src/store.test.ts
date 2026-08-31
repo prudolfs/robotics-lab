@@ -4,13 +4,13 @@ import { usePlannerStore } from './store'
 
 function resetMissionState() {
 	usePlannerStore.setState({
-		cruiseAltitude: 24,
+		cruiseAltitude: 2.5,
 		missionItems: structuredClone(DEFAULT_MISSION_ITEMS),
 		missionPast: [],
 		missionFuture: [],
 		selectedMissionItemId: DEFAULT_MISSION_ITEMS[1]?.id ?? null,
 		missionEditMode: 'select',
-		altitudeSnap: 5,
+		altitudeSnap: 0.5,
 	})
 }
 
@@ -21,7 +21,7 @@ describe('mission editor store', () => {
 		const store = usePlannerStore.getState()
 		store.addWaypointAt({ x: 1.25, y: -2.5 })
 		let waypoint = missionWaypoints(usePlannerStore.getState().missionItems).at(-1)
-		expect(waypoint).toMatchObject({ position: { x: 1.25, y: -2.5 }, altitude: 25 })
+		expect(waypoint).toMatchObject({ position: { x: 1.25, y: -2.5 }, altitude: 2.5 })
 
 		usePlannerStore.getState().moveMissionWaypoint(waypoint?.id ?? '', { x: 3, y: 4 })
 		waypoint = missionWaypoints(usePlannerStore.getState().missionItems).at(-1)

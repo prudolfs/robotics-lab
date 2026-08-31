@@ -64,7 +64,7 @@ type PlannerState = {
 export const usePlannerStore = create<PlannerState>((set) => ({
 	missionName: 'Riverside survey',
 	theme: 'dark',
-	cruiseAltitude: 24,
+	cruiseAltitude: 2.5,
 	cruiseSpeed: 8,
 	returnToHome: true,
 	selectedMap: DEFAULT_MAP_NAME,
@@ -75,7 +75,7 @@ export const usePlannerStore = create<PlannerState>((set) => ({
 	missionFuture: [],
 	selectedMissionItemId: DEFAULT_MISSION_ITEMS[1]?.id ?? null,
 	missionEditMode: 'select',
-	altitudeSnap: 5,
+	altitudeSnap: 0.5,
 	setMissionName: (missionName) => set({ missionName }),
 	toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
 	setCruiseAltitude: (cruiseAltitude) => set({ cruiseAltitude }),

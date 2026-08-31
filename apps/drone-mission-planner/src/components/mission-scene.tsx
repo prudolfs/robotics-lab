@@ -1,4 +1,4 @@
-import type { DroneState } from '@robotics-lab/drone'
+import type { DroneState, MissionExecution } from '@robotics-lab/drone'
 import { CoordinateAxes, LidarView, Lights, WorldView } from '@robotics-lab/rendering'
 import type { DroneSensorReadings } from '@robotics-lab/sensors'
 import type { CameraMode } from '@/camera'
@@ -27,6 +27,7 @@ export function MissionScene({
 	sensorReadings,
 	showLidarRays,
 	showLidarHits,
+	missionExecution,
 }: {
 	droneState: DroneState
 	cameraMode: CameraMode
@@ -34,6 +35,7 @@ export function MissionScene({
 	sensorReadings: DroneSensorReadings
 	showLidarRays: boolean
 	showLidarHits: boolean
+	missionExecution: MissionExecution
 }) {
 	const world = usePlannerStore((state) => state.world)
 	const worldScale = usePlannerStore((state) => state.worldScale)
@@ -47,7 +49,7 @@ export function MissionScene({
 				<WebGPUGrid size={gridSize} />
 				<WorldView world={world} />
 				<CoordinateAxes />
-				<MissionEditorLayer worldScale={worldScale} />
+				<MissionEditorLayer worldScale={worldScale} missionExecution={missionExecution} />
 				<LidarView
 					scan={sensorReadings.lidar}
 					elevation={droneState.position.y}

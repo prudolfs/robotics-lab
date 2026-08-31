@@ -2,7 +2,9 @@ import {
 	createMissionItem,
 	DEFAULT_MISSION_ITEMS,
 	deleteMissionItem,
+	executableMissionItems,
 	insertMissionItem,
+	missionRoutePoints,
 	missionWaypoints,
 	reorderMissionItems,
 	snapMissionAltitude,
@@ -47,5 +49,17 @@ describe('mission plan editing', () => {
 		expect(snapMissionAltitude(17, 5)).toBe(15)
 		expect(snapMissionAltitude(17, null)).toBe(17)
 		expect(snapMissionAltitude(-3, 5)).toBe(0)
+	})
+
+	it('converts editor coordinates and resolves the executable route', () => {
+		const executable = executableMissionItems(DEFAULT_MISSION_ITEMS)
+		const positionWaypoint = executable.find((item) => item.id === 'mission-waypoint-position')
+		const route = missionRoutePoints(DEFAULT_MISSION_ITEMS)
+
+		expect(positionWaypoint).toMatchObject({ position: { x: -2.5, z: -1.5 } })
+		expect(executable[0]).toMatchObject({ type: 'takeoff', altitude: 1.25 })
+		expect(route.find((point) => point.id === 'mission-waypoint-position')?.position.y).toBe(1.25)
+		expect(route.find((point) => point.id === 'mission-waypoint-altitude')?.position.y).toBe(2.5)
+		expect(route.at(-1)?.position).toEqual({ x: 0, y: 0, z: 0 })
 	})
 })

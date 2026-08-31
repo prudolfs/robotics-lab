@@ -5,13 +5,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { type CameraMode, DEFAULT_CAMERA_FOV } from '@/camera'
 import { CameraControls } from '@/components/camera-controls'
 import { ManualFlightHud } from '@/components/manual-flight-hud'
+import { MissionExecutionHud } from '@/components/mission-execution-hud'
 import { MissionScene } from '@/components/mission-scene'
 import { SensorHud } from '@/components/sensor-hud'
 import { SettingsPanel } from '@/components/settings-panel'
 import { SimulationControls } from '@/components/simulation-controls'
 import { StatusBar } from '@/components/status-bar'
 import { TopBar } from '@/components/top-bar'
-import { missionWaypoints } from '@/mission-plan'
+import { executableMissionItems, missionWaypoints } from '@/mission-plan'
 import { useDroneSensors } from '@/simulation/use-drone-sensors'
 import { useDroneSimulation } from '@/simulation/use-drone-simulation'
 import { usePlannerStore } from '@/store'
@@ -22,7 +23,9 @@ export default function App() {
 	const world = usePlannerStore((state) => state.world)
 	const missionItems = usePlannerStore((state) => state.missionItems)
 	const webgpuSupported = supportsWebGPU()
-	const { simulation, controls, flightControl } = useDroneSimulation()
+	const executableMission = useMemo(() => executableMissionItems(missionItems), [missionItems])
+	const { simulation, missionExecution, controls, flightControl } =
+		useDroneSimulation(executableMission)
 	const [cameraMode, setCameraMode] = useState<CameraMode>('orbit')
 	const [cameraFov, setCameraFov] = useState(DEFAULT_CAMERA_FOV)
 	const [sensorConfig, setSensorConfig] = useState<DroneSensorConfig>(() =>
@@ -33,7 +36,11 @@ export default function App() {
 	const sensorWaypoint = useMemo(() => {
 		const waypoint = missionWaypoints(missionItems)[0]
 		return waypoint
-			? { x: waypoint.position.x, y: waypoint.altitude ?? 0, z: waypoint.position.y }
+			? {
+					x: waypoint.position.x,
+					y: waypoint.altitude ?? 0,
+					z: waypoint.position.y,
+				}
 			: null
 	}, [missionItems])
 	const sensorReadings = useDroneSensors(simulation, world, sensorConfig, sensorWaypoint)
@@ -59,6 +66,7 @@ export default function App() {
 								sensorReadings={sensorReadings}
 								showLidarRays={showLidarRays}
 								showLidarHits={showLidarHits}
+								missionExecution={missionExecution}
 							/>
 						</Canvas>
 					) : (
@@ -77,6 +85,7 @@ export default function App() {
 						flightControl={flightControl}
 						controls={controls}
 					/>
+					<MissionExecutionHud execution={missionExecution} controls={controls} />
 					<SensorHud
 						readings={sensorReadings}
 						config={sensorConfig}

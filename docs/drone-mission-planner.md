@@ -341,36 +341,36 @@ Execute the mission in the simulator.
 
 ## State Machine
 
-- [ ] Idle
-- [ ] Armed
-- [ ] Taking off
-- [ ] Flying
-- [ ] Holding
-- [ ] Landing
-- [ ] Disarmed
+- [x] Idle
+- [x] Armed
+- [x] Taking off
+- [x] Flying
+- [x] Holding
+- [x] Landing
+- [x] Disarmed
 
 ## Transitions
 
-- [ ] Arm command
-- [ ] Auto takeoff
-- [ ] Auto land
-- [ ] RTL
-- [ ] Mission start / pause / resume
-- [ ] Emergency stop
+- [x] Arm command
+- [x] Auto takeoff
+- [x] Auto land
+- [x] RTL
+- [x] Mission start / pause / resume
+- [x] Emergency stop
 
 ## Trajectory
 
-- [ ] Smooth path between waypoints
-- [ ] Arrival detection
-- [ ] Yaw alignment with heading
-- [ ] Mission completion detection
+- [x] Smooth path between waypoints
+- [x] Arrival detection
+- [x] Yaw alignment with heading
+- [x] Mission completion detection
 
 ## Visualization
 
-- [ ] Planned path
-- [ ] Current target
-- [ ] Mission progress
-- [ ] Mission timeline
+- [x] Planned path
+- [x] Current target
+- [x] Mission progress
+- [x] Mission timeline
 
 ---
 

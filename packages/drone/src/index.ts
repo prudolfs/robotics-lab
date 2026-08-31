@@ -13,7 +13,15 @@ export type QuaternionState = {
 	w: number
 }
 
-export type DroneMissionState = 'idle' | 'armed' | 'flying' | 'landed'
+export type DroneMissionState =
+	| 'idle'
+	| 'armed'
+	| 'taking-off'
+	| 'flying'
+	| 'holding'
+	| 'landing'
+	| 'landed'
+	| 'disarmed'
 export type MotorSpeeds = [
 	frontLeft: number,
 	frontRight: number,
@@ -138,5 +146,6 @@ export function calculateTorqueVector(
 }
 
 export * from './controls'
+export * from './mission'
 export * from './physics'
 export * from './simulation'

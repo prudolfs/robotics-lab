@@ -139,7 +139,7 @@ export function SettingsPanel() {
 					label="Cruise altitude"
 					description="Above launch point"
 					unit="m"
-					min={5}
+					min={0.5}
 					max={120}
 					value={altitude}
 					onChange={setAltitude}
@@ -231,6 +231,7 @@ function SettingField({
 					type="number"
 					min={min}
 					max={max}
+					step="any"
 					value={value}
 					onChange={(event) => onChange(event.target.valueAsNumber)}
 				/>

@@ -1,3 +1,4 @@
+import type { ExecutableMissionItem } from '@robotics-lab/drone'
 import type { Vec2 } from '@robotics-lab/geometry'
 
 type MissionItemBase = {
@@ -57,14 +58,14 @@ export type MissionItemChanges = {
 }
 
 export const DEFAULT_MISSION_ITEMS: MissionItem[] = [
-	{ id: 'mission-takeoff', type: 'takeoff', altitude: 10 },
+	{ id: 'mission-takeoff', type: 'takeoff', altitude: 1.25 },
 	{
 		id: 'mission-waypoint-position',
 		type: 'waypoint',
 		position: { x: -2.5, y: -1.5 },
 		altitude: null,
 	},
-	{ id: 'mission-waypoint-altitude', type: 'waypoint', position: { x: 3, y: -2.5 }, altitude: 20 },
+	{ id: 'mission-waypoint-altitude', type: 'waypoint', position: { x: 3, y: -2.5 }, altitude: 2.5 },
 	{ id: 'mission-hold', type: 'hold', duration: 5 },
 	{ id: 'mission-speed', type: 'speed', speed: 8 },
 	{ id: 'mission-camera', type: 'camera', action: 'photo' },
@@ -81,7 +82,7 @@ export function createMissionItem(
 	template: MissionItemTemplate,
 	id: string,
 	position: Vec2 = { x: 0, y: 0 },
-	defaultAltitude = 20,
+	defaultAltitude = 2.5,
 ): MissionItem {
 	switch (template) {
 		case 'takeoff':
@@ -145,4 +146,41 @@ export function deleteMissionItem(items: MissionItem[], id: string): MissionItem
 
 export function missionWaypoints(items: MissionItem[]): WaypointMissionItem[] {
 	return items.filter((item): item is WaypointMissionItem => item.type === 'waypoint')
+}
+
+export function executableMissionItems(items: MissionItem[]): ExecutableMissionItem[] {
+	return items.map((item) =>
+		item.type === 'waypoint'
+			? { ...item, position: { x: item.position.x, z: item.position.y } }
+			: { ...item },
+	)
+}
+
+export type MissionRoutePoint = {
+	id: string
+	position: { x: number; y: number; z: number }
+}
+
+/** Resolve inherited waypoint altitudes into the same world-space path the vehicle executes. */
+export function missionRoutePoints(items: MissionItem[]): MissionRoutePoint[] {
+	let altitude = 0
+	const points: MissionRoutePoint[] = [{ id: 'mission-home', position: { x: 0, y: 0, z: 0 } }]
+	for (const item of items) {
+		if (item.type === 'takeoff') {
+			altitude = item.altitude
+			points.push({ id: item.id, position: { x: 0, y: altitude, z: 0 } })
+		} else if (item.type === 'waypoint') {
+			altitude = item.altitude ?? altitude
+			points.push({
+				id: item.id,
+				position: { x: item.position.x, y: altitude, z: item.position.y },
+			})
+		} else if (item.type === 'rtl') {
+			points.push({ id: item.id, position: { x: 0, y: altitude, z: 0 } })
+		} else if (item.type === 'land') {
+			altitude = 0
+			points.push({ id: item.id, position: { x: 0, y: 0, z: 0 } })
+		}
+	}
+	return points
 }

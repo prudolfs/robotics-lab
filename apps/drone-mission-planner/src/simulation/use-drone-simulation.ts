@@ -2,17 +2,29 @@ import {
 	advanceDroneSimulation,
 	applyManualControl,
 	armDrone,
+	armMissionExecution,
 	type ControlResponse,
 	createDroneSimulation,
+	createMissionExecution,
 	type DroneSimulation,
 	disarmDrone,
+	disarmMissionExecution,
+	type ExecutableMissionItem,
+	emergencyStopMission,
 	isDroneArmed,
 	type ManualControlInput,
+	type MissionExecution,
 	NEUTRAL_MANUAL_CONTROL,
 	pauseDroneSimulation,
+	pauseMissionExecution,
+	requestMissionLand,
+	requestMissionRtl,
 	resetDroneSimulation,
 	resumeDroneSimulation,
+	resumeMissionExecution,
 	setDroneSimulationTimeScale,
+	startMissionExecution,
+	stepMissionExecution,
 	type TimeScale,
 } from '@robotics-lab/drone'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -41,12 +53,19 @@ export type DroneSimulationControls = {
 	resume: () => void
 	setControlResponse: (response: ControlResponse) => void
 	setTimeScale: (timeScale: TimeScale) => void
+	armMission: () => void
+	startMission: () => void
+	pauseMission: () => void
+	resumeMission: () => void
+	rtlMission: () => void
+	landMission: () => void
 	toggleArm: () => void
 	togglePause: () => void
 }
 
-export function useDroneSimulation(): {
+export function useDroneSimulation(missionItems: ExecutableMissionItem[]): {
 	simulation: DroneSimulation
+	missionExecution: MissionExecution
 	controls: DroneSimulationControls
 	flightControl: FlightControlState
 } {
@@ -55,6 +74,18 @@ export function useDroneSimulation(): {
 		simulationRef.current = createDroneSimulation(PREVIEW_DRONE_STATE)
 	}
 	const [simulation, setSimulation] = useState(simulationRef.current)
+	const missionExecutionRef = useRef<MissionExecution | null>(null)
+	if (missionExecutionRef.current === null) {
+		missionExecutionRef.current = createMissionExecution(
+			missionItems,
+			simulationRef.current.drone,
+			simulationRef.current.params,
+		)
+	}
+	const [missionExecution, setMissionExecution] = useState<MissionExecution>(
+		missionExecutionRef.current,
+	)
+	const publishedMissionExecutionRef = useRef(missionExecutionRef.current)
 	const [controlResponse, setControlResponseState] = useState<ControlResponse>(1)
 	const [emergencyStopped, setEmergencyStopped] = useState(false)
 	const [gamepadConnected, setGamepadConnected] = useState(false)
@@ -69,6 +100,12 @@ export function useDroneSimulation(): {
 		const next = updater(simulationRef.current as DroneSimulation)
 		simulationRef.current = next
 		setSimulation(next)
+	}, [])
+	const updateMission = useCallback((updater: (current: MissionExecution) => MissionExecution) => {
+		const next = updater(missionExecutionRef.current as MissionExecution)
+		missionExecutionRef.current = next
+		publishedMissionExecutionRef.current = next
+		setMissionExecution(next)
 	}, [])
 
 	const pause = useCallback(() => update(pauseDroneSimulation), [update])
@@ -89,19 +126,22 @@ export function useDroneSimulation(): {
 	const arm = useCallback(() => {
 		emergencyStoppedRef.current = false
 		setEmergencyStopped(false)
+		updateMission(armMissionExecution)
 		update((current) => ({ ...current, drone: armDrone(current.drone, current.params) }))
-	}, [update])
+	}, [update, updateMission])
 	const disarm = useCallback(() => {
 		emergencyStoppedRef.current = false
 		setEmergencyStopped(false)
+		updateMission(disarmMissionExecution)
 		update((current) => ({ ...current, drone: disarmDrone(current.drone) }))
-	}, [update])
+	}, [update, updateMission])
 	const emergencyStop = useCallback(() => {
 		emergencyStoppedRef.current = true
 		pressedKeysRef.current.clear()
 		setEmergencyStopped(true)
+		updateMission(emergencyStopMission)
 		update((current) => ({ ...current, drone: disarmDrone(current.drone) }))
-	}, [update])
+	}, [update, updateMission])
 	const toggleArm = useCallback(() => {
 		const current = simulationRef.current as DroneSimulation
 		if (isDroneArmed(current.drone)) disarm()
@@ -113,8 +153,55 @@ export function useDroneSimulation(): {
 		manualInputRef.current = NEUTRAL_MANUAL_CONTROL
 		setEmergencyStopped(false)
 		setManualInput(NEUTRAL_MANUAL_CONTROL)
-		update(resetDroneSimulation)
-	}, [update])
+		update((current) => {
+			const next = resetDroneSimulation(current)
+			const nextMission = createMissionExecution(missionItems, next.drone, next.params)
+			missionExecutionRef.current = nextMission
+			publishedMissionExecutionRef.current = nextMission
+			setMissionExecution(nextMission)
+			return next
+		})
+	}, [missionItems, update])
+	const armMission = arm
+	const startMission = useCallback(() => {
+		emergencyStoppedRef.current = false
+		setEmergencyStopped(false)
+		updateMission(startMissionExecution)
+		update((current) => ({
+			...resumeDroneSimulation(current),
+			drone: armDrone(current.drone, current.params),
+		}))
+	}, [update, updateMission])
+	const pauseMission = useCallback(() => updateMission(pauseMissionExecution), [updateMission])
+	const resumeMission = useCallback(() => updateMission(resumeMissionExecution), [updateMission])
+	const rtlMission = useCallback(() => {
+		updateMission(requestMissionRtl)
+		update((current) => ({
+			...resumeDroneSimulation(current),
+			drone: armDrone(current.drone, current.params),
+		}))
+	}, [update, updateMission])
+	const landMission = useCallback(() => {
+		updateMission(requestMissionLand)
+		update((current) => ({
+			...resumeDroneSimulation(current),
+			drone: armDrone(current.drone, current.params),
+		}))
+	}, [update, updateMission])
+
+	useEffect(() => {
+		const current = missionExecutionRef.current as MissionExecution
+		if (current.running) return
+		const currentSimulation = simulationRef.current as DroneSimulation
+		const next = createMissionExecution(
+			missionItems,
+			currentSimulation.drone,
+			currentSimulation.params,
+		)
+		missionExecutionRef.current = next
+		publishedMissionExecutionRef.current = next
+		setMissionExecution(next)
+	}, [missionItems])
 
 	useEffect(() => {
 		const isEditableTarget = (target: EventTarget | null) =>
@@ -174,12 +261,14 @@ export function useDroneSimulation(): {
 				gamepadConnectedRef.current = connected
 				setGamepadConnected(connected)
 			}
-			const input = emergencyStoppedRef.current
-				? NEUTRAL_MANUAL_CONTROL
-				: combineFlightInputs(
-						keyboardFlightInput(pressedKeysRef.current),
-						gamepad ? gamepadFlightInput(gamepad.axes) : NEUTRAL_MANUAL_CONTROL,
-					)
+			const missionActive = (missionExecutionRef.current as MissionExecution).running
+			const input =
+				emergencyStoppedRef.current || missionActive
+					? NEUTRAL_MANUAL_CONTROL
+					: combineFlightInputs(
+							keyboardFlightInput(pressedKeysRef.current),
+							gamepad ? gamepadFlightInput(gamepad.axes) : NEUTRAL_MANUAL_CONTROL,
+						)
 			if (!sameFlightInput(input, manualInputRef.current)) {
 				manualInputRef.current = input
 				setManualInput(input)
@@ -192,7 +281,28 @@ export function useDroneSimulation(): {
 				controlResponseRef.current,
 			)
 			const controlled = drone === current.drone ? current : { ...current, drone }
-			const next = advanceDroneSimulation(controlled, deltaSeconds)
+			let nextMission = missionExecutionRef.current as MissionExecution
+			const next = advanceDroneSimulation(
+				controlled,
+				deltaSeconds,
+				missionActive
+					? (stepDrone, fixedDeltaSeconds) => {
+							const result = stepMissionExecution(
+								missionExecutionRef.current as MissionExecution,
+								stepDrone,
+								current.params,
+								fixedDeltaSeconds,
+							)
+							missionExecutionRef.current = result.execution
+							nextMission = result.execution
+							return result.drone
+						}
+					: undefined,
+			)
+			if (nextMission !== publishedMissionExecutionRef.current) {
+				publishedMissionExecutionRef.current = nextMission
+				setMissionExecution(nextMission)
+			}
 			if (next !== current) {
 				simulationRef.current = next
 				setSimulation(next)
@@ -206,15 +316,22 @@ export function useDroneSimulation(): {
 
 	return {
 		simulation,
+		missionExecution,
 		controls: {
 			arm,
+			armMission,
 			disarm,
 			emergencyStop,
+			landMission,
 			pause,
+			pauseMission,
 			reset,
 			resume,
+			resumeMission,
+			rtlMission,
 			setControlResponse,
 			setTimeScale,
+			startMission,
 			toggleArm,
 			togglePause,
 		},

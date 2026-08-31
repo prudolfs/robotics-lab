@@ -40,7 +40,7 @@ describe('manual flight controls', () => {
 
 		expect(armed.missionState).toBe('armed')
 		expect(flying.missionState).toBe('flying')
-		expect(disarmed.missionState).toBe('idle')
+		expect(disarmed.missionState).toBe('disarmed')
 		expect(disarmed.motorSpeeds).toEqual([0, 0, 0, 0])
 	})
 })

@@ -93,13 +93,13 @@ export function MissionEditorPanel() {
 					<MapPinPlus /> Map waypoint
 				</Button>
 				<Button
-					aria-label="Snap altitude to 5 metres"
-					aria-pressed={altitudeSnap === 5}
+					aria-label="Snap altitude to half a metre"
+					aria-pressed={altitudeSnap === 0.5}
 					size="sm"
-					variant={altitudeSnap === 5 ? 'secondary' : 'outline'}
-					onClick={() => setAltitudeSnap(altitudeSnap === 5 ? null : 5)}
+					variant={altitudeSnap === 0.5 ? 'secondary' : 'outline'}
+					onClick={() => setAltitudeSnap(altitudeSnap === 0.5 ? null : 0.5)}
 				>
-					Snap 5m
+					Snap 0.5m
 				</Button>
 			</div>
 			{editMode === 'add-waypoint' && (
@@ -267,7 +267,7 @@ function MissionItemFields({
 					onChange={(y) => onUpdate({ position: { ...item.position, y } })}
 				/>
 				{item.altitude === null ? (
-					<Button size="xs" variant="outline" onClick={() => onUpdate({ altitude: 20 })}>
+					<Button size="xs" variant="outline" onClick={() => onUpdate({ altitude: 2.5 })}>
 						+ Altitude
 					</Button>
 				) : (

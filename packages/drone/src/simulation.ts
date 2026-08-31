@@ -36,6 +36,8 @@ export type SimulationOptions = {
 	timeScale?: TimeScale
 }
 
+export type DroneStepController = (drone: DroneState, fixedDeltaSeconds: number) => DroneState
+
 function cloneDroneState(state: DroneState): DroneState {
 	return {
 		...state,
@@ -80,6 +82,7 @@ export function createDroneSimulation(
 export function advanceDroneSimulation(
 	simulation: DroneSimulation,
 	renderDeltaSeconds: number,
+	stepController?: DroneStepController,
 ): DroneSimulation {
 	if (!simulation.clock.running || renderDeltaSeconds <= 0) return simulation
 
@@ -92,7 +95,9 @@ export function advanceDroneSimulation(
 	let substeps = 0
 
 	while (accumulator >= fixedDelta - STEP_EPSILON && substeps < MAX_SUBSTEPS) {
-		drone = stepDronePhysics(drone, simulation.params, fixedDelta, simulation.physics)
+		drone = stepController
+			? stepController(drone, fixedDelta)
+			: stepDronePhysics(drone, simulation.params, fixedDelta, simulation.physics)
 		accumulator = Math.max(0, accumulator - fixedDelta)
 		elapsedSeconds += fixedDelta
 		stepCount += 1
