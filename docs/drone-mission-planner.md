@@ -239,17 +239,17 @@ Provide intuitive camera views.
 
 ## Modes
 
-- [ ] Free orbit camera
-- [ ] Follow camera
-- [ ] Chase camera
-- [ ] First-person view (FPV)
-- [ ] Cinematic camera
+- [x] Free orbit camera
+- [x] Follow camera
+- [x] Chase camera
+- [x] First-person view (FPV)
+- [x] Cinematic camera
 
 ## Smoothness
 
-- [ ] Camera damping
-- [ ] Smooth look-at
-- [ ] FOV adjustment
+- [x] Camera damping
+- [x] Smooth look-at
+- [x] FOV adjustment
 
 ---
 

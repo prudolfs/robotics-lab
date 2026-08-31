@@ -1,8 +1,9 @@
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import type { DroneState } from '@robotics-lab/drone'
 import { CoordinateAxes, Lights, WorldView, worldToScene } from '@robotics-lab/rendering'
 import { Quaternion, Vector3 } from 'three'
+import type { CameraMode } from '@/camera'
 import { DroneView } from '@/components/drone-view'
+import { FlightCamera } from '@/components/flight-camera'
 import { PREVIEW_DRONE_PARAMS } from '@/drone-preview'
 import { bootstrapWaypoints } from '@/mission'
 import { usePlannerStore } from '@/store'
@@ -78,20 +79,22 @@ function StagingRoute() {
 	)
 }
 
-export function MissionScene({ droneState }: { droneState: DroneState }) {
+export function MissionScene({
+	droneState,
+	cameraMode,
+	cameraFov,
+}: {
+	droneState: DroneState
+	cameraMode: CameraMode
+	cameraFov: number
+}) {
 	const world = usePlannerStore((state) => state.world)
 	const worldScale = usePlannerStore((state) => state.worldScale)
 	const gridSize = Math.max(world.width, world.depth) * 6
 
 	return (
 		<>
-			<PerspectiveCamera makeDefault position={[9, 7, 10]} fov={47} near={0.1} far={500} />
-			<OrbitControls
-				makeDefault
-				enableDamping
-				dampingFactor={0.08}
-				maxPolarAngle={Math.PI / 2.05}
-			/>
+			<FlightCamera drone={droneState} mode={cameraMode} fov={cameraFov} worldScale={worldScale} />
 			<Lights />
 			<group scale={worldScale}>
 				<WebGPUGrid size={gridSize} />

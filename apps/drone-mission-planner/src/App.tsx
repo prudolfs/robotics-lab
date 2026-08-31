@@ -1,6 +1,8 @@
 import { Canvas } from '@react-three/fiber'
 import { Compass, Rotate3D } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { type CameraMode, DEFAULT_CAMERA_FOV } from '@/camera'
+import { CameraControls } from '@/components/camera-controls'
 import { ManualFlightHud } from '@/components/manual-flight-hud'
 import { MissionScene } from '@/components/mission-scene'
 import { SettingsPanel } from '@/components/settings-panel'
@@ -15,6 +17,8 @@ export default function App() {
 	const theme = usePlannerStore((state) => state.theme)
 	const webgpuSupported = supportsWebGPU()
 	const { simulation, controls, flightControl } = useDroneSimulation()
+	const [cameraMode, setCameraMode] = useState<CameraMode>('orbit')
+	const [cameraFov, setCameraFov] = useState(DEFAULT_CAMERA_FOV)
 
 	useEffect(() => {
 		document.documentElement.classList.toggle('dark', theme === 'dark')
@@ -30,13 +34,23 @@ export default function App() {
 				>
 					{webgpuSupported ? (
 						<Canvas gl={createWebGPURenderer} dpr={[1, 2]} fallback={<WebGPUFallback />}>
-							<MissionScene droneState={simulation.drone} />
+							<MissionScene
+								droneState={simulation.drone}
+								cameraMode={cameraMode}
+								cameraFov={cameraFov}
+							/>
 						</Canvas>
 					) : (
 						<WebGPUFallback />
 					)}
 					<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_40%,rgb(2_10_7/0.2)_120%)]" />
 					<SimulationControls simulation={simulation} controls={controls} />
+					<CameraControls
+						mode={cameraMode}
+						fov={cameraFov}
+						onModeChange={setCameraMode}
+						onFovChange={setCameraFov}
+					/>
 					<ManualFlightHud
 						simulation={simulation}
 						flightControl={flightControl}
