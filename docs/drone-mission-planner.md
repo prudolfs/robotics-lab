@@ -407,21 +407,21 @@ Save and load missions.
 
 ## Format
 
-- [ ] JSON mission format
-- [ ] Schema versioning
-- [ ] Version migration
+- [x] JSON mission format
+- [x] Schema versioning
+- [x] Version migration
 
 ## Storage
 
-- [ ] Save to file
-- [ ] Load from file
-- [ ] Local storage of recent missions
+- [x] Save to file
+- [x] Load from file
+- [x] Local storage of recent missions
 
 ## Examples
 
-- [ ] Sample mission 1 — simple waypoint tour
-- [ ] Sample mission 2 — survey grid
-- [ ] Sample mission 3 — inspection loop
+- [x] Sample mission 1 — simple waypoint tour
+- [x] Sample mission 2 — survey grid
+- [x] Sample mission 3 — inspection loop
 
 ---
 

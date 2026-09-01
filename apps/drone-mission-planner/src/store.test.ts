@@ -67,4 +67,31 @@ describe('mission editor store', () => {
 			false,
 		)
 	})
+
+	it('replaces the active mission from persistence and resets edit history', () => {
+		usePlannerStore.getState().updateMissionItem('mission-speed', { speed: 10 })
+		usePlannerStore.getState().loadMission({
+			name: 'Loaded survey',
+			map: 'empty',
+			settings: { cruiseAltitude: 2, cruiseSpeed: 3, returnToHome: false },
+			items: [
+				{ id: 'loaded-takeoff', type: 'takeoff', altitude: 2 },
+				{ id: 'loaded-waypoint', type: 'waypoint', position: { x: 1, y: 1 }, altitude: 2 },
+				{ id: 'loaded-land', type: 'land' },
+			],
+		})
+		const state = usePlannerStore.getState()
+
+		expect(state).toMatchObject({
+			missionName: 'Loaded survey',
+			selectedMap: 'empty',
+			cruiseAltitude: 2,
+			cruiseSpeed: 3,
+			returnToHome: false,
+			selectedMissionItemId: 'loaded-waypoint',
+			missionPast: [],
+			missionFuture: [],
+		})
+		expect(state.world.name).toBe('empty')
+	})
 })

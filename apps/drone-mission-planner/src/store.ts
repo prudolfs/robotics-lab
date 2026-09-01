@@ -1,6 +1,7 @@
 import type { World } from '@robotics-lab/core'
 import type { Vec2 } from '@robotics-lab/geometry'
 import { create } from 'zustand'
+import type { MissionSnapshot } from '@/mission-persistence'
 import {
 	createMissionItem,
 	DEFAULT_MISSION_ITEMS,
@@ -44,6 +45,7 @@ type PlannerState = {
 	setReturnToHome: (returnToHome: boolean) => void
 	setSelectedMap: (selectedMap: string) => void
 	setWorldScale: (worldScale: WorldScale) => void
+	loadMission: (mission: MissionSnapshot) => void
 	addMissionItem: (
 		template: MissionItemTemplate,
 		referenceId?: string | null,
@@ -83,6 +85,21 @@ export const usePlannerStore = create<PlannerState>((set) => ({
 	setReturnToHome: (returnToHome) => set({ returnToHome }),
 	setSelectedMap: (selectedMap) => set({ selectedMap, world: loadPlannerWorld(selectedMap) }),
 	setWorldScale: (worldScale) => set({ worldScale }),
+	loadMission: (mission) =>
+		set({
+			missionName: mission.name,
+			cruiseAltitude: mission.settings.cruiseAltitude,
+			cruiseSpeed: mission.settings.cruiseSpeed,
+			returnToHome: mission.settings.returnToHome,
+			selectedMap: mission.map,
+			world: loadPlannerWorld(mission.map),
+			missionItems: structuredClone(mission.items),
+			missionPast: [],
+			missionFuture: [],
+			selectedMissionItemId:
+				mission.items.find((item) => item.type === 'waypoint')?.id ?? mission.items[0]?.id ?? null,
+			missionEditMode: 'select',
+		}),
 	addMissionItem: (template, referenceId = null, placement = 'below') =>
 		set((state) => {
 			const id = nextMissionItemId()
