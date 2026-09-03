@@ -12,8 +12,9 @@ Tauri) will only be introduced once native hardware access (ROS2, USB, Serial)
 becomes necessary.
 
 See [`docs/project.md`](./docs/project.md) for the philosophy and long-term
-roadmap, and [`docs/simulator.md`](./docs/simulator.md) for the first
-application's milestone-by-milestone plan.
+roadmap. The application plans live in
+[`docs/simulator.md`](./docs/simulator.md) and
+[`docs/drone-mission-planner.md`](./docs/drone-mission-planner.md).
 
 ---
 
@@ -23,8 +24,11 @@ application's milestone-by-milestone plan.
 robotics-lab/
   apps/
     simulator/          differential-drive robotics playground (React Three Fiber)
+    drone-mission-planner/
+                        3D planning and simulation for autonomous drone missions
   packages/
     core/               shared types
+    drone/              framework-independent drone dynamics and mission logic
     geometry/           geometry primitives
     maps/               JSON world format, loader, serializer
     noise/              deterministic sensor / motion noise
@@ -39,6 +43,20 @@ Applications compose packages. Packages never depend on applications. The
 simulation itself is deterministic and framework independent (no React, no
 Zustand, no browser APIs), so it runs identically in the browser, in Node and
 in tests.
+
+## Applications
+
+### [Robot Simulator](./apps/simulator)
+
+A differential-drive robotics playground with lidar, occupancy-grid mapping,
+A* navigation, coverage planning, localization, editing and playback.
+
+### [Drone Mission Planner](./apps/drone-mission-planner)
+
+A WebGPU-powered 3D planner for composing, validating, simulating and saving
+autonomous drone missions. It includes manual flight, virtual lidar/GPS/IMU,
+multiple camera modes, route execution and versioned JSON persistence. See the
+[full development plan](./docs/drone-mission-planner.md).
 
 ---
 
@@ -58,7 +76,8 @@ in tests.
 
 ## Getting started
 
-Prerequisites: Node, pnpm, and a browser with WebGL.
+Prerequisites: Node, pnpm, and a current browser with WebGL (simulator) or
+WebGPU (drone mission planner).
 
 ```sh
 pnpm install
@@ -70,10 +89,17 @@ Run the simulator app in dev:
 pnpm -C apps/simulator dev
 ```
 
+Run the drone mission planner (requires WebGPU):
+
+```sh
+pnpm -C apps/drone-mission-planner dev
+```
+
 Build it:
 
 ```sh
 pnpm -C apps/simulator build
+pnpm -C apps/drone-mission-planner build
 ```
 
 ### Testing
@@ -102,20 +128,22 @@ scripts/build-readme-header.sh
 ```
 
 It writes `docs/readme-header.gif`. See the script header for the available
-knobs (`WIDTH`, `E2E_FRAME_COUNT`, `E2E_FRAME_MS`, `FRAMERATE`). The same GIF
-is reused by the simulator app README for now; as more apps land, each one
-will capture its own.
+knobs (`WIDTH`, `E2E_FRAME_COUNT`, `E2E_FRAME_MS`, `FRAMERATE`). The simulator
+README shares this GIF; the drone mission planner has its own static capture
+and regeneration instructions in its app README.
 
 ---
 
 ## Roadmap
 
-The first application, the [simulator](./apps/simulator), is the proving
-ground for the shared packages. Long-term targets:
+The [simulator](./apps/simulator) established the shared packages, and the
+[drone mission planner](./apps/drone-mission-planner) now applies them to
+aerial robotics. Long-term targets:
 
 - **Robot Simulator** — in progress (world, teleop, sensors, mapping,
   A* navigation, coverage, localization, editor, playback)
-- **Drone Mission Planner**
+- **Drone Mission Planner** — in progress (3D editing, validation, execution,
+  sensors and persistence implemented; external formats and replay next)
 - **Visual SLAM Demo**
 - **ROS2 Browser Visualization** (and a ROS bridge package)
 

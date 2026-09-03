@@ -227,8 +227,6 @@ packages/
 
     rendering/
 
-    ui/
-
     maps/
 ```
 
