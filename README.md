@@ -13,8 +13,9 @@ becomes necessary.
 
 See [`docs/project.md`](./docs/project.md) for the philosophy and long-term
 roadmap. The application plans live in
-[`docs/simulator.md`](./docs/simulator.md) and
-[`docs/drone-mission-planner.md`](./docs/drone-mission-planner.md).
+[`docs/simulator.md`](./docs/simulator.md),
+[`docs/drone-mission-planner.md`](./docs/drone-mission-planner.md) and
+[`docs/slam-demo.md`](./docs/slam-demo.md).
 
 ---
 
@@ -144,7 +145,8 @@ aerial robotics. Long-term targets:
   A* navigation, coverage, localization, editor, playback)
 - **Drone Mission Planner** — in progress (3D editing, validation, execution,
   sensors and persistence implemented; external formats and replay next)
-- **Visual SLAM Demo**
+- **Visual SLAM Demo** — [phased implementation plan](./docs/slam-demo.md)
+  (stereo tracking, sparse mapping, loop closure and a Blender-authored lab)
 - **ROS2 Browser Visualization** (and a ROS bridge package)
 
 Every application contributes reusable pieces back into the shared packages so
