@@ -1,8 +1,9 @@
-import type { ProcessedFrame, StereoFrame } from '@robotics-lab/sensors'
+import type { StereoFrame } from '@robotics-lab/sensors'
+import type { VisionFrame } from './visual'
 export type WorkerPort = {
 	postMessage: (message: StereoFrame, transfer: ArrayBuffer[]) => void
 	terminate: () => void
-	onmessage: ((event: { data: ProcessedFrame | { error: string } }) => void) | null
+	onmessage: ((event: { data: VisionFrame | { error: string } }) => void) | null
 	onerror: ((event: { message: string }) => void) | null
 }
 /** Ownership: active buffers belong to the worker; pending buffers belong to this queue.
@@ -16,7 +17,7 @@ export class FramePipeline {
 	dropped = 0
 	constructor(
 		private factory: () => WorkerPort,
-		private result: (frame: ProcessedFrame) => void,
+		private result: (frame: VisionFrame) => void,
 		private release: (frame: StereoFrame) => void,
 		private failure: (message: string) => void,
 	) {}

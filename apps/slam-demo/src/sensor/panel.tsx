@@ -64,11 +64,51 @@ export function SensorPanel({ acquisition }: { acquisition: Acquisition }) {
 							className="epipolar-line"
 							style={{ top: `${(100 * (k?.cy ?? 240)) / (k?.height ?? 480)}%` }}
 						/>
+						{eye === 'left' && s.latest.vo && (
+							<svg
+								className="vo-overlay"
+								viewBox={`0 0 ${k?.width ?? 640} ${k?.height ?? 480}`}
+								aria-label="Visual odometry feature overlay"
+							>
+								{s.latest.vo.overlays.map((feature) => (
+									<g
+										key={`${s.latest?.frameId}-${feature.u}-${feature.v}`}
+										stroke={feature.accepted ? '#69f4be' : '#ffad78'}
+										fill="none"
+										strokeWidth="1.1"
+									>
+										{feature.from && (
+											<line
+												x1={feature.from[0]}
+												y1={feature.from[1]}
+												x2={feature.u}
+												y2={feature.v}
+											/>
+										)}
+										{feature.prediction && (
+											<line
+												stroke="#f9e177"
+												strokeWidth="1.6"
+												x1={feature.prediction[0]}
+												y1={feature.prediction[1]}
+												x2={feature.u}
+												y2={feature.v}
+											/>
+										)}
+										{feature.accepted ? (
+											<circle cx={feature.u} cy={feature.v} r="2.5" />
+										) : (
+											<path d={`M ${feature.u - 2} ${feature.v - 2} l 4 4 m -4 0 l 4 -4`} />
+										)}
+									</g>
+								))}
+							</svg>
+						)}
 						<span className="image-caption">
 							Center row ·{' '}
 							{s.options.mode === 'synthetic' && !s.replaying
 								? 'oracle observations'
-								: 'grayscale input'}
+								: 'processed image + VO overlay'}
 						</span>
 					</>
 				) : (
@@ -93,7 +133,9 @@ export function SensorPanel({ acquisition }: { acquisition: Acquisition }) {
 				Exact worker-processed image.{' '}
 				{s.latest?.kind === 'synthetic'
 					? `${s.latest.observations?.length ?? 0} known correspondences; no image tracking.`
-					: 'Feature tracking is not connected yet.'}
+					: s.latest?.vo
+						? `${s.latest.vo.status} · ${s.latest.vo.inliers} inliers · ${s.latest.vo.rmse?.toFixed(2) ?? '—'} px residual`
+						: 'Visual odometry initializes from rendered pixels.'}
 			</p>
 		</section>
 	)
@@ -185,7 +227,7 @@ export function SensorControls({
 					<dd>{s.captureMs.toFixed(1)} ms</dd>
 				</div>
 				<div>
-					<dt>Worker preprocessing</dt>
+					<dt>Worker vision processing</dt>
 					<dd>{(s.latest?.processingMs ?? 0).toFixed(1)} ms</dd>
 				</div>
 				<div>
@@ -255,6 +297,72 @@ export function SensorControls({
 			<p>
 				Stores at most six processed stereo pairs. Replay preserves their timestamps and pixels; it
 				does not restore a robot run.
+			</p>
+		</section>
+	)
+}
+
+export function VisualInspector({ acquisition }: { acquisition: Acquisition }) {
+	const s = useAcquisition(acquisition),
+		vo = s.latest?.vo,
+		oracle = s.options.mode === 'synthetic' || Boolean(s.latest?.observations)
+	return (
+		<section className="inspector-section estimator-section" aria-label="Visual odometry">
+			<div className="section-heading">
+				<h2>Visual odometry</h2>
+				<span className="tiny-badge">NO MAP / LOOP CLOSURE</span>
+			</div>
+			<div className={`estimator-status vo-${vo?.status ?? 'initializing'}`}>
+				<span className="hollow-dot" />
+				<strong data-testid="vo-status">
+					{vo?.status ?? (oracle ? 'Oracle input — VO disabled' : 'initializing')}
+				</strong>
+			</div>
+			<p className="section-description" data-testid="vo-reason">
+				{vo?.reason ?? 'Waiting for calibrated stereo pixels. Synthetic IDs are not visual tracks.'}
+			</p>
+			<dl className="sensor-stats">
+				<div>
+					<dt>Corners / stereo points</dt>
+					<dd>
+						{vo?.detected ?? 0} / {vo?.stereo ?? 0}
+					</dd>
+				</div>
+				<div>
+					<dt>Tracks / PnP inliers</dt>
+					<dd>
+						{vo?.matches ?? 0} / {vo?.inliers ?? 0}
+					</dd>
+				</div>
+				<div>
+					<dt>Reprojection RMS</dt>
+					<dd>{vo?.rmse?.toFixed(2) ?? '—'} px</dd>
+				</div>
+				<div>
+					<dt>Local optical X / Y / Z</dt>
+					<dd>{vo?.pose?.position.map((v) => v.toFixed(2)).join(' / ') ?? '—'} m</dd>
+				</div>
+				<div>
+					<dt>Last accepted frame</dt>
+					<dd>{vo?.acceptedFrameId ?? '—'}</dd>
+				</div>
+				<div>
+					<dt>Aligned position error</dt>
+					<dd data-testid="vo-error">{s.visual.error?.toFixed(3) ?? '—'} m</dd>
+				</div>
+				<div>
+					<dt>Aligned trajectory RMS</dt>
+					<dd>{s.visual.rms?.toFixed(3) ?? '—'} m</dd>
+				</div>
+			</dl>
+			<p className="section-description">
+				Mint: image-derived VO. Amber: wheel odometry. Error uses one initial alignment and
+				synchronized truth only for evaluation. A lost pose is the last accepted pose; reset to
+				start a new origin.
+			</p>
+			<p className="section-description">
+				Image overlay: circles = accepted; crosses = rejected; lines = tracks; yellow = reprojection
+				residual. No persistent landmarks yet.
 			</p>
 		</section>
 	)

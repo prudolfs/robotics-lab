@@ -35,7 +35,7 @@ test('calibrated frame zero is independent of presentation, and seeded noise cha
 	await expect(image).toHaveAttribute('data-checksum', noisy ?? '')
 	await page.getByRole('button', { name: 'Right image', exact: true }).click()
 	await expect(page.getByLabel('Processed right image')).toBeVisible()
-	await expect(page.getByText('Not connected', { exact: true })).toBeVisible()
+	await expect(page.getByTestId('vo-status')).toBeVisible()
 	expect(errors).toEqual([])
 })
 

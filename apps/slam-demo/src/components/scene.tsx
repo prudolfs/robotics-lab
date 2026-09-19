@@ -12,6 +12,7 @@ import {
 import { Vector3 } from 'three'
 import manifest from '../../../../assets/slam-demo/manifest.json'
 import type { Acquisition } from '../sensor/runtime'
+import type { VisualPoint } from '../sensor/visual'
 import type { SimulationController } from '../sim/controller'
 import { createSimulation, type Simulation, setStatus, stepSimulation } from '../sim/simulation'
 import { scenePosition } from '../sim/world'
@@ -108,8 +109,8 @@ function CameraRig({ controller }: { controller: SimulationController }) {
 		/>
 	)
 }
-function Paths({ state }: { state: Simulation }) {
-	const { showTruth, showOdometry, showRoute } = usePresentation()
+function Paths({ state, visualTrail }: { state: Simulation; visualTrail: VisualPoint[] }) {
+	const { showTruth, showOdometry, showRoute, showVisual } = usePresentation()
 	const route = useMemo(() => {
 		let s = setStatus(createSimulation({ noise: false }), 'running')
 		while (s.status === 'running') s = stepSimulation(s)
@@ -125,6 +126,9 @@ function Paths({ state }: { state: Simulation }) {
 	)
 	return (
 		<>
+			{showVisual && visualTrail.length > 1 && (
+				<Line points={visualTrail.map((p) => [p.x, 0.075, -p.y])} color="#83dece" lineWidth={2.5} />
+			)}
 			{showRoute && (
 				<Line
 					points={route}
@@ -163,12 +167,14 @@ export function Scene({
 	onReady,
 	onFailure,
 	acquisition,
+	visualTrail,
 }: {
 	state: Simulation
 	controller: SimulationController
 	onReady: () => void
 	onFailure: () => void
 	acquisition: Acquisition
+	visualTrail: VisualPoint[]
 }) {
 	const quality = usePresentation((s) => s.quality)
 	return (
@@ -213,7 +219,7 @@ export function Scene({
 				<Suspense fallback={null}>
 					<AuthoredAssets controller={controller} onReady={onReady} acquisition={acquisition} />
 				</Suspense>
-				<Paths state={state} />
+				<Paths state={state} visualTrail={visualTrail} />
 				<RenderMetrics controller={controller} />
 
 				<CameraRig controller={controller} />

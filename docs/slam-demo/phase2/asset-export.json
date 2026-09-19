@@ -42,22 +42,22 @@
   },
   "bundles": {
     "lab": {
-      "bytes": 573652,
-      "triangles": 52400,
+      "bytes": 1010584,
+      "triangles": 142448,
       "meshNodes": 12,
-      "sha256": "759447f9b7fe8e4c7ff2dead6987d844ffb517292736a772df1b943da1ca541e"
+      "sha256": "7c1da2a1da368d8eee70f359e67fb611de4648070bb89fb8724616757c8bce03"
     },
     "cutaway": {
-      "bytes": 191320,
-      "triangles": 3608,
-      "meshNodes": 3,
-      "sha256": "46688efaae88f61341f1fc9702cd0a3e88eb7c2598a1eafdf4bc4b68ed0e5f70"
+      "bytes": 569064,
+      "triangles": 84252,
+      "meshNodes": 6,
+      "sha256": "7293bdd5dc1d5fb701e622ee6c6910d67ff3e6e26016651f00998d2a464d4263"
     },
     "rover": {
-      "bytes": 246532,
+      "bytes": 246540,
       "triangles": 7140,
       "meshNodes": 16,
-      "sha256": "43dbdd15cbf5307ec2f136e796081920b33e6d72674c51f54a55ee807a1f515b"
+      "sha256": "705aaa0899ec6c59ede78a6501e68e3744acc7177d0c6bb7caadd7b254a48302"
     }
   }
 }

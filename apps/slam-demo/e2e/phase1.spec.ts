@@ -28,7 +28,7 @@ test('guided inspection starts, pauses, resumes and resets through the UI', asyn
 	await expect(page.getByTestId('truth-x')).toHaveText('0.000')
 	await expect(page.getByTestId('truth-y')).toHaveText('-2.500')
 	await expect(page.getByTestId('position-difference')).toHaveText('0.000 m')
-	await expect(page.getByText('Not connected', { exact: true })).toBeVisible()
+	await expect(page.getByTestId('vo-status')).toBeVisible()
 	expect(errors).toEqual([])
 })
 test('manual keyboard input moves the rover and releases on pause', async ({ page }) => {

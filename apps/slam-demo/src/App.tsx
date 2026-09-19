@@ -21,11 +21,10 @@ import {
 	Settings2,
 	SlidersHorizontal,
 	Square,
-	Target,
 } from 'lucide-react'
 import { type ReactNode, useCallback, useState, useSyncExternalStore } from 'react'
 import { Scene } from './components/scene'
-import { SensorControls, SensorPanel } from './sensor/panel'
+import { SensorControls, SensorPanel, VisualInspector } from './sensor/panel'
 import { createAcquisition } from './sensor/runtime'
 import { ROUTE_DURATION, ROUTE_LENGTH } from './sim/route'
 import type { Simulation } from './sim/simulation'
@@ -105,8 +104,17 @@ export default function App() {
 		setAssetFailed(true)
 	}, [])
 	const press = useManualInput(controller)
-	const { camera, setCamera, showTruth, showOdometry, showRoute, toggle, quality, setQuality } =
-		usePresentation()
+	const {
+		camera,
+		setCamera,
+		showTruth,
+		showOdometry,
+		showRoute,
+		showVisual,
+		toggle,
+		quality,
+		setQuality,
+	} = usePresentation()
 	const running = state.status === 'running',
 		complete = state.status === 'complete',
 		configLocked = state.tick > 0 || running || sensor.replaying
@@ -152,6 +160,7 @@ export default function App() {
 				<section className="viewport" aria-label="Simulation workspace">
 					<Scene
 						acquisition={acquisition}
+						visualTrail={sensor.visual.trail}
 						state={state}
 						controller={controller}
 						onReady={handleReady}
@@ -207,6 +216,10 @@ export default function App() {
 					</fieldset>
 					<fieldset className="scene-legend" aria-label="Scene layers">
 						<span className="eyebrow">LAYERS</span>
+						<button type="button" aria-pressed={showVisual} onClick={() => toggle('showVisual')}>
+							<span className="line-swatch visual" />
+							Visual odometry
+						</button>
 						<button type="button" aria-pressed={showRoute} onClick={() => toggle('showRoute')}>
 							<span className="line-swatch planned" />
 							Planned loop
@@ -369,28 +382,7 @@ export default function App() {
 							true position.
 						</p>
 					</section>
-					<section className="inspector-section estimator-section">
-						<div className="section-heading">
-							<h2>
-								<Target size={15} />
-								Visual estimator
-							</h2>
-							<span className="section-number">03</span>
-						</div>
-						<div className="estimator-status">
-							<span className="hollow-dot" />
-							<span>Not connected</span>
-							<span className="tiny-badge">NO ESTIMATE</span>
-						</div>
-						<p className="section-description">
-							Visual tracking is not available yet. The trails above compare simulation truth with
-							encoder odometry.
-						</p>
-						<div className="estimator-stats">
-							<Stat label="Keyframes">—</Stat>
-							<Stat label="Landmarks">—</Stat>
-						</div>
-					</section>
+					<VisualInspector acquisition={acquisition} />
 					<section className="drive-section" aria-label="Manual driving controls">
 						<div className="section-heading">
 							<h2>
@@ -456,7 +448,13 @@ export default function App() {
 					<button
 						type="button"
 						className="run-button"
-						disabled={complete || !assetsReady || sensor.replaying || Boolean(sensor.error)}
+						disabled={
+							complete ||
+							!assetsReady ||
+							sensor.replaying ||
+							Boolean(sensor.error) ||
+							(!sensor.latest && sensor.sensorDrops === 0)
+						}
 						onClick={() => (running ? controller.pause() : controller.play())}
 					>
 						{running ? (

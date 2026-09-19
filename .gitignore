@@ -45,3 +45,6 @@ apps/simulator/screenshots/.results
 # SLAM demo browser test output
 apps/slam-demo/e2e/.report
 apps/slam-demo/e2e/.results
+
+# Rebuilt by scripts/slam-vision/build.mjs before SLAM dev/build.
+apps/slam-demo/public/vision/worker.js

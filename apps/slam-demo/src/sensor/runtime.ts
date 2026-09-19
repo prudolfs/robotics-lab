@@ -1,8 +1,8 @@
+import type { CameraPose } from '@robotics-lab/sensors'
 import {
 	drawObservations,
 	dropped,
 	frameSeed,
-	type ProcessedFrame,
 	pixelNoise,
 	type StereoFrame,
 	syntheticObservations,
@@ -14,6 +14,7 @@ import type { Simulation } from '../sim/simulation'
 import type { CaptureAdapter } from './capture'
 import { FramePipeline, type WorkerPort } from './pipeline'
 import { cloneFrame, decodeRecording, encodeRecording, RECORDING_LIMIT } from './recording'
+import { createVisualEvaluation, type VisionFrame } from './visual'
 export type SensorOptions = {
 	mode: 'rendered' | 'synthetic'
 	timing: 'realtime' | 'lockstep'
@@ -37,7 +38,7 @@ export function createAcquisition(
 	const listeners = new Set<() => void>(),
 		pool: ArrayBuffer[] = []
 	let options: SensorOptions = { mode: 'rendered', timing: 'realtime', noise: 0, dropout: 0 }
-	let latest: ProcessedFrame | null = null,
+	let latest: VisionFrame | null = null,
 		records: StereoFrame[] = [],
 		adapter: CaptureAdapter | null = null
 	let replay: StereoFrame[] | null = null,
@@ -55,21 +56,22 @@ export function createAcquisition(
 		lastReceivedAt = 0,
 		ready = false
 	const starts = new Map<number, number>()
+	const evaluator = createVisualEvaluation(),
+		truthAtFrame = new Map<number, CameraPose>()
 	const release = (f: StereoFrame) => {
 		starts.delete(f.frameId)
+		truthAtFrame.delete(f.frameId)
 		for (const b of [f.left, f.right])
 			if (b.byteLength === calibration.width * calibration.height * 4 && pool.length < 4)
 				pool.push(b)
 	}
 	const pipeline = new FramePipeline(
-		workerFactory ??
-			(() =>
-				new Worker(new URL('./processing.worker.ts', import.meta.url), {
-					type: 'module',
-				}) as unknown as WorkerPort),
+		workerFactory ?? (() => new Worker('/vision/worker.js') as unknown as WorkerPort),
 		(frame) => {
 			if (latest) release(latest)
 			latest = frame
+			evaluator.accept(frame.vo, truthAtFrame.get(frame.frameId))
+			truthAtFrame.delete(frame.frameId)
 			latency = performance.now() - (starts.get(frame.frameId) ?? performance.now())
 			starts.delete(frame.frameId)
 			if (received === 0) {
@@ -103,6 +105,7 @@ export function createAcquisition(
 		return {
 			options,
 			latest,
+			visual: evaluator.snapshot(),
 			status,
 			error,
 			latency,
@@ -140,6 +143,8 @@ export function createAcquisition(
 		captureMs = 0
 		error = ''
 		starts.clear()
+		truthAtFrame.clear()
+		evaluator.reset()
 	}
 	function submit(frame: StereoFrame) {
 		starts.set(frame.frameId, performance.now())
@@ -210,6 +215,7 @@ export function createAcquisition(
 				options.noise,
 				frameSeed(state.config.seed, frameId, 1),
 			)
+			if (options.mode === 'rendered') truthAtFrame.set(frameId, { ...state.truth.pose })
 			captureMs = performance.now() - start
 			submit(frame)
 		} catch (reason) {

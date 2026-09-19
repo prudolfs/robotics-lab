@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first stereo visual SLAM explorer with a Blender-authored robotics lab, live feature tracking, sparse reconstruction and visible loop closure.
 >
-> Status: Phases 0–3 implemented and verified; Phase 3 awaits user review. Phases 4–10 remain planned.
+> Status: Phases 0–4 implemented and verified; Phase 4 awaits user review. Phases 5–10 remain planned. Phase 4 processing exceeds the initial 30 ms/pair target; measured limits are documented in its review.
 
 ## Goal and experience
 
@@ -138,15 +138,17 @@ Review evidence: [Phase 3 screenshots, calibration checks and ownership contract
 
 ### Phase 4 — Feature tracking and stereo visual odometry
 
-- [ ] Implement the selected corner/descriptor frontend, spatial feature coverage and frame-to-frame matching.
-- [ ] Match stereo features with epipolar/disparity checks, reject ambiguity and triangulate only well-conditioned positive-depth points.
-- [ ] Estimate camera motion from tracked 3D-to-2D correspondences using robust outlier rejection and pose refinement.
-- [ ] Add initializing/tracking/degraded/lost states based on observable inlier and residual checks; never replace failed estimates with truth.
-- [ ] Bound feature counts and reuse buffers; dispose of native/WASM allocations explicitly if applicable.
-- [ ] Render tracked features, rejected matches and reprojection residuals in the camera pane; show visual and encoder odometry separately.
-- [ ] Test known motion, outliers, low disparity, pure rotation, blank frames and insufficient features on fixed fixtures.
+- [x] Implement the selected corner/descriptor frontend, spatial feature coverage and frame-to-frame matching.
+- [x] Match stereo features with epipolar/disparity checks, reject ambiguity and triangulate only well-conditioned positive-depth points.
+- [x] Estimate camera motion from tracked 3D-to-2D correspondences using robust outlier rejection and pose refinement.
+- [x] Add initializing/tracking/degraded/lost states based on observable inlier and residual checks; never replace failed estimates with truth.
+- [x] Bound feature counts and reuse buffers; dispose of native/WASM allocations explicitly if applicable.
+- [x] Render tracked features, rejected matches and reprojection residuals in the camera pane; show visual and encoder odometry separately.
+- [x] Test known motion, outliers, low disparity, pure rotation, blank frames and insufficient features on fixed fixtures.
 
-Exit: image-derived visual odometry follows the route with measured error and honest tracking failures. Label this milestone as visual odometry until mapping and loop closure exist.
+Exit verified: image-derived visual odometry follows the route with measured error and honest tracking failures. Label this milestone as visual odometry until mapping and loop closure exist.
+
+Review evidence: [Phase 4 screenshots, fixed fixtures, full-route error and processing limits](slam-demo/phase4/README.md). Stop for user review before Phase 5.
 
 ### Phase 5 — Keyframes and persistent sparse mapping
 

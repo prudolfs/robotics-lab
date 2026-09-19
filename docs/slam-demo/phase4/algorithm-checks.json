@@ -1,0 +1,162 @@
+{
+  "known motion": {
+    "translationError": 5.490947237478212e-8,
+    "inliers": 80,
+    "rmse": 0.000001873424827743986,
+    "nativeObjectsAfterDispose": 0
+  },
+  "outliers": {
+    "translationError": 7.011252161247623e-8,
+    "inliers": 60,
+    "rmse": 0.0000024491844049906706,
+    "nativeObjectsAfterDispose": 0
+  },
+  "pure rotation": {
+    "translationError": 6.265703972804304e-8,
+    "inliers": 80,
+    "rmse": 0.0000026052413788389146,
+    "nativeObjectsAfterDispose": 0
+  },
+  "invalid stereo": "low/negative disparity and epipolar mismatch rejected",
+  "blank/insufficient": "lost without any fabricated pose; native objects released",
+  "loss freezes last estimate": "No truth substitution or fabricated recovery",
+  "zero-disparity images": "Textured identical eyes rejected; no metric depth/pose",
+  "insufficient image features": "Single-corner-patch fixture cannot initialize",
+  "fixed rendered images": [
+    {
+      "frameId": 0,
+      "status": "initializing",
+      "pose": {
+        "rotation": [
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1
+        ],
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      "stereo": 354,
+      "inliers": 0,
+      "rmse": null,
+      "nativeObjects": 3,
+      "peakNativeObjects": 12
+    },
+    {
+      "frameId": 1,
+      "status": "tracking",
+      "pose": {
+        "rotation": [
+          0.9999978314932269,
+          -0.0000037085820787545873,
+          -0.0020825453392947293,
+          0.000003789041769396415,
+          0.9999999992466321,
+          0.000038631320698315644,
+          0.0020825451944583833,
+          -0.00003863912777731249,
+          0.9999978307539126
+        ],
+        "position": [
+          0.012398430351411716,
+          -0.0000911673949268989,
+          0.01991828958098505
+        ]
+      },
+      "stereo": 349,
+      "inliers": 354,
+      "rmse": 0.10281095174348762,
+      "nativeObjects": 3,
+      "peakNativeObjects": 29
+    },
+    {
+      "frameId": 2,
+      "status": "tracking",
+      "pose": {
+        "rotation": [
+          0.9999919987858414,
+          -0.0000885255619593791,
+          -0.003999315881813438,
+          0.00008861525353907615,
+          0.9999999958261475,
+          0.00002224953521958447,
+          0.003999313895468275,
+          -0.000022603757587139252,
+          0.9999920024567374
+        ],
+        "position": [
+          0.023994830467235058,
+          -0.00007183930232826438,
+          0.039765005063210415
+        ]
+      },
+      "stereo": 354,
+      "inliers": 349,
+      "rmse": 0.11195127229201386,
+      "nativeObjects": 3,
+      "peakNativeObjects": 29
+    },
+    {
+      "frameId": 3,
+      "status": "tracking",
+      "pose": {
+        "rotation": [
+          0.9999823014485762,
+          -0.00002181834450102639,
+          -0.005949480109111241,
+          0.000022780970489647492,
+          0.9999999866618455,
+          0.00016173229791683336,
+          0.005949476501025163,
+          -0.00016186497042023696,
+          0.9999822886077008
+        ],
+        "position": [
+          0.03588114931167937,
+          -0.0006167558892001658,
+          0.059697429616651816
+        ]
+      },
+      "stereo": 360,
+      "inliers": 354,
+      "rmse": 0.11955635470648751,
+      "nativeObjects": 3,
+      "peakNativeObjects": 29
+    },
+    {
+      "frameId": 4,
+      "status": "tracking",
+      "pose": {
+        "rotation": [
+          0.999969192363176,
+          -0.00011300195036775212,
+          -0.007848665816345461,
+          0.00011585004301679348,
+          0.999999927614408,
+          0.00036242233129453287,
+          0.007848624293784846,
+          -0.0003633204341914171,
+          0.9999691330710948
+        ],
+        "position": [
+          0.047397547933885904,
+          -0.0015033422978576192,
+          0.07982248753648118
+        ]
+      },
+      "stereo": 369,
+      "inliers": 359,
+      "rmse": 0.11073069357747525,
+      "nativeObjects": 3,
+      "peakNativeObjects": 29
+    }
+  ]
+}

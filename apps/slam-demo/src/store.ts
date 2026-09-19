@@ -7,8 +7,9 @@ type PresentationState = {
 	showTruth: boolean
 	showOdometry: boolean
 	showRoute: boolean
+	showVisual: boolean
 	setCamera: (camera: 'overview' | 'follow' | 'robot' | 'bench') => void
-	toggle: (key: 'showTruth' | 'showOdometry' | 'showRoute') => void
+	toggle: (key: 'showTruth' | 'showOdometry' | 'showRoute' | 'showVisual') => void
 }
 export const usePresentation = create<PresentationState>((set) => ({
 	camera: 'overview',
@@ -17,6 +18,7 @@ export const usePresentation = create<PresentationState>((set) => ({
 	showTruth: true,
 	showOdometry: true,
 	showRoute: true,
+	showVisual: true,
 	setCamera: (camera) => set({ camera }),
 	toggle: (key) => set((state) => ({ [key]: !state[key] })),
 }))

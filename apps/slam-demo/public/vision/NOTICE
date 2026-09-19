@@ -1,0 +1,7 @@
+OpenCV.js 4.13.0, Copyright (C) 2000-2026, OpenCV team and contributors.
+Apache License 2.0; see LICENSE and the copyright notices retained in opencv.js.
+Source/build distribution: https://docs.opencv.org/4.13.0/opencv.js
+Project: https://github.com/opencv/opencv/tree/4.13.0
+Unmodified distribution; exact SHA-256 and size are in provenance.json.
+The generated worker.js is original repository code bundled from src/sensor/processing.worker.ts
+and packages/vision (repository ISC license); it loads OpenCV locally, without a CDN.

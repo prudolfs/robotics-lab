@@ -1,0 +1,5 @@
+{
+  "browser": "152.0.7977.83",
+  "tracking": "Visual odometry\nNO MAP / LOOP CLOSURE\ntracking\n\nImage-derived stereo visual odometry\n\nCorners / stereo points\n308 / 177\nTracks / PnP inliers\n94 / 94\nReprojection RMS\n0.38 px\nLocal optical X / Y / Z\n0.05 / 0.00 / 2.17 m\nLast accepted frame\n72\nAligned position error\n0.055 m\nAligned trajectory RMS\n0.026 m\n\nMint: image-derived VO. Amber: wheel odometry. Error uses one initial alignment and synchronized truth only for evaluation. A lost pose is the last accepted pose; reset to start a new origin.\n\nImage overlay: circles = accepted; crosses = rejected; lines = tracks; yellow = reprojection residual. No persistent landmarks yet.",
+  "errors": []
+}

@@ -156,6 +156,30 @@ def bench():
     text('bench-mark','01 / INSTRUMENTS',(cx-1.3,cy+.21,1.87),.065,'white')
     fit_module(before,'workbench',(cx,cy),(3,.7,.9))
 
+def service_panel(label, location, angle, seed):
+    # Physical maintenance-panel artwork, visible to people and both cameras.
+    # The vision worker receives only rendered pixels, never these identifiers/geometry.
+    before=set(bpy.context.scene.objects.keys());rng=np.random.default_rng(seed)
+    box('service-plate',(0,0,.73),(1.5,.018,1.16),'paint-slate',.004)
+    text('service-title',label,(-.68,-.013,1.19),.07,'white')
+    text('service-rating','48 V / 05 A',(-.68,-.013,1.07),.045,'amber')
+    for j in range(4):
+        x=-.57+j*.35
+        text('service-channel',f'{seed%97:02}-{j+1}',(x-.08,-.014,.29),.042,'white')
+        for row in range(4):
+            z=.45+row*.14
+            box('circuit-node',(x,-.013,z),(.075,.008,.048),'white',.002)
+            length=float(rng.uniform(.06,.22))
+            box('circuit-wire',(x+length/2,-.014,z), (length,.006,.012),'white',0)
+            box('circuit-branch',(x+length,-.014,z+.035),(.012,.006,.082),'white',0)
+            if rng.random()>.5:box('circuit-terminal',(x+length,-.016,z+.07),(.04,.006,.032),'amber',0)
+    for x in [-.70,.70]:
+        for z in [.20,1.23]:cyl('service-fastener',(x,-.014,z),.014,.008,'alloy','Y',vertices=8)
+    transform=Matrix.Translation(location) @ Matrix.Rotation(angle,4,'Z')
+    bpy.context.view_layer.update()
+    for ob in bpy.context.scene.objects:
+        if ob.name not in before:ob.matrix_world=transform @ ob.matrix_world
+
 bench()
 if not SAMPLE:
     # Floor, modular wall bays and service infrastructure.
@@ -232,12 +256,16 @@ if not SAMPLE:
     for obstacle in M['obstacles']:
         node=empty('Collision_'+obstacle['id'],[obstacle['x'],obstacle['y'],obstacle['height']/2]);node['collision_footprint']=json.dumps(obstacle)
     for anchor in M['anchors']:empty(anchor['id'],anchor['position'])
+    for i,x in enumerate([-4,-2,0,2,4]):service_panel(f'N / SERVICE {i+1:02}',(x,3.947,0),0,100+i)
+    for i,y in enumerate([-3,-1,1,3]):service_panel(f'W / POWER {i+1:02}',(-4.955,y,0),math.pi/2,200+i)
     # Separate near-wall bundle is visible from robot eye, cut away in the overview.
     COLLECTION='cutaway'
     for y in [-3,-1,1,3]:box('east-bay',(5.08,y,1.4),(.16,1.96,2.8),'wall-ivory')
     for x in [-4,-2,0,2,4]:box('south-bay',(x,-4.08,1.4),(1.96,.16,2.8),'wall-ivory')
     for y in [-3,-1,1,3]:box('east-lower',(4.987,y,.45),(.02,1.95,.9),'panel-light')
     text('east-number','B / STORAGE',(4.975,-1.5,2.1),.2,'paint-slate','east')
+    for i,y in enumerate([-3,-1,1,3]):service_panel(f'E / CONTROL {i+1:02}',(4.955,y,0),-math.pi/2,300+i)
+    for i,x in enumerate([-4,-2,0,2,4]):service_panel(f'S / SYSTEM {i+1:02}',(x,-3.955,0),math.pi,400+i)
     COLLECTION='rover'
     box('rover-chassis',(0,0,.18),(M['robot']['bodyLength'],M['robot']['bodyWidth'],.16),'paint-teal',.028)
     box('rover-skid',(0,0,.105),(.4,.3,.035),'rubber')
