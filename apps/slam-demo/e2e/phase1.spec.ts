@@ -1,0 +1,62 @@
+import { expect, test } from '@playwright/test'
+
+test('guided inspection starts, pauses, resumes and resets through the UI', async ({ page }) => {
+	const errors: string[] = []
+	page.on('pageerror', (e) => errors.push(e.message))
+	await page.goto('/')
+	await expect(page.getByRole('heading', { name: 'Inspection lab.' })).toBeVisible()
+	await expect(page.locator('canvas')).toBeVisible()
+	await expect(page.getByTestId('run-status')).toHaveText('Ready to explore')
+	await page.getByRole('button', { name: 'Run inspection', exact: true }).click()
+	await expect(page.getByTestId('truth-x')).not.toHaveText('0.000')
+	await expect(page.getByLabel('Random seed')).toBeDisabled()
+	await page.getByRole('button', { name: 'Pause', exact: true }).click()
+	await expect(page.getByTestId('run-status')).toHaveText('Paused')
+	const paused = await page.getByTestId('elapsed-time').textContent()
+	await page.waitForTimeout(250)
+	await expect(page.getByTestId('elapsed-time')).toHaveText(paused ?? '')
+	await page.getByRole('button', { name: 'Resume', exact: true }).click()
+	await expect(page.getByTestId('elapsed-time')).not.toHaveText(paused ?? '')
+	await page.getByRole('button', { name: 'Follow robot', exact: true }).click()
+	await expect(page.getByRole('button', { name: 'Follow robot', exact: true })).toHaveAttribute(
+		'aria-pressed',
+		'true',
+	)
+	await page.getByRole('button', { name: 'Reset simulation' }).click()
+	await expect(page.getByTestId('run-status')).toHaveText('Ready to explore')
+	await expect(page.getByTestId('elapsed-time')).toHaveText('00:00.0')
+	await expect(page.getByTestId('truth-x')).toHaveText('0.000')
+	await expect(page.getByTestId('truth-y')).toHaveText('-2.500')
+	await expect(page.getByTestId('position-difference')).toHaveText('0.000 m')
+	await expect(page.getByText('Not connected', { exact: true })).toBeVisible()
+	expect(errors).toEqual([])
+})
+test('manual keyboard input moves the rover and releases on pause', async ({ page }) => {
+	await page.goto('/')
+	await page.getByRole('button', { name: 'Manual drive', exact: true }).click()
+	await page.getByRole('button', { name: 'Start drive', exact: true }).click()
+	await page.keyboard.down('w')
+	await expect(page.getByTestId('truth-x')).not.toHaveText('0.000')
+	await page.keyboard.up('w')
+	await page.keyboard.press('Space')
+	await expect(page.getByTestId('run-status')).toHaveText('Paused')
+	const pose = await page.getByTestId('truth-x').textContent()
+	await page.getByRole('button', { name: 'Resume', exact: true }).click()
+	await expect(page.getByTestId('run-status')).toHaveText('Running')
+	await page.waitForTimeout(250)
+	await expect(page.getByTestId('truth-x')).toHaveText(pose ?? '')
+	await page.getByRole('button', { name: 'Reset simulation' }).click()
+	await expect(page.getByTestId('truth-x')).toHaveText('0.000')
+})
+test('small screens retain transport, inspector and honest camera state', async ({ page }) => {
+	await page.setViewportSize({ width: 390, height: 844 })
+	await page.goto('/')
+	await expect(page.getByRole('button', { name: 'Run inspection', exact: true })).toBeInViewport()
+	await expect(page.getByRole('region', { name: 'Stereo camera preview' })).toBeVisible()
+	await expect(page.getByText('NOT CAPTURING', { exact: true })).toBeVisible()
+	await page.getByRole('heading', { name: 'Pose comparison' }).scrollIntoViewIfNeeded()
+	await expect(page.getByRole('heading', { name: 'Pose comparison' })).toBeVisible()
+	expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+		true,
+	)
+})

@@ -16,7 +16,10 @@
 		"test:e2e": "pnpm -C apps/simulator test:e2e",
 		"test:e2e:soak": "pnpm -C apps/simulator test:e2e:soak",
 		"test:watch": "vitest",
-		"test:ui": "vitest --ui"
+		"test:ui": "vitest --ui",
+		"dev:slam": "pnpm -C apps/slam-demo dev",
+		"build:slam": "pnpm -C apps/slam-demo build",
+		"test:e2e:slam": "pnpm -C apps/slam-demo test:e2e"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.2",

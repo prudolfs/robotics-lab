@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first stereo visual SLAM explorer with a Blender-authored robotics lab, live feature tracking, sparse reconstruction and visible loop closure.
 >
-> Status: Phase 0 implemented and verified; awaiting user review. Phases 1–10 remain planned.
+> Status: Phases 0 and 1 implemented and verified; Phase 1 awaits user review. Phases 2–10 remain planned.
 
 ## Goal and experience
 
@@ -25,7 +25,7 @@ Graphics are a core deliverable from the beginning. Aim for a polished real-time
 | [HUD plan](hud.md) | Reuse panel/widget lessons and app-local shadcn components without making the new app depend on another app. |
 | [E2E strategy](e2e.md), [world clicks](e2e-world-click.md), [CI notes](playwright-on-github-actions.md) | Vitest for algorithms; a small Playwright suite using public controls and renderer-projected clicks. |
 
-There is currently no `apps/slam-demo` or shared visual SLAM package. Existing milestone checkboxes are historical planning records; verify relevant code before reuse.
+`apps/slam-demo` now contains the Phase 1 motion prototype. Shared vision and visual SLAM packages have not been created. Existing milestone checkboxes are historical planning records; verify relevant code before reuse.
 
 ## Scope and technical direction
 
@@ -51,7 +51,7 @@ assets/slam-demo/           Blender sources, export scripts, asset manifest and 
 apps/slam-demo/public/      optimized runtime models, textures and environment assets
 ```
 
-These are proposed additions, not existing paths. Browser workers adapt the pure packages; simulation and estimator state stay outside Zustand. Do not generalize every app component into a package before it has a clear reusable interface.
+The application path exists after Phase 1; the vision/SLAM packages and production asset paths remain proposed additions. Browser workers adapt the pure packages; simulation and estimator state stay outside Zustand. Do not generalize every app component into a package before it has a clear reusable interface.
 
 ## Visual direction and Blender workflow
 
@@ -95,15 +95,15 @@ Exit verified: a recorded stereo fixture yields measured pose estimates, the Ble
 
 ### Phase 1 — App shell and deterministic simulation
 
-- [ ] Scaffold `apps/slam-demo` with Vite, React, TypeScript, workspace scripts, UI tokens and a dedicated Playwright configuration.
-- [ ] Build the main scene, camera-feed slot, compact inspector and bottom playback/status strip.
-- [ ] Reuse robot kinematics with a fixed timestep, seeded noise, pause/resume/reset and manual control.
-- [ ] Create a simple collision world and scripted inspection loop with repeatable input commands.
-- [ ] Introduce separate simulator truth, encoder-odometry baseline and estimator snapshots; use Zustand only for controls and presentation preferences.
-- [ ] Show truth and odometry trails with a labeled legend and a camera-follow mode.
-- [ ] Verify deterministic motion in Vitest and start/pause/reset through the UI in Playwright.
+- [x] Scaffold `apps/slam-demo` with Vite, React, TypeScript, workspace scripts, UI tokens and a dedicated Playwright configuration.
+- [x] Build the main scene, camera-feed slot, compact inspector and bottom playback/status strip.
+- [x] Reuse robot kinematics with a fixed timestep, seeded noise, pause/resume/reset and manual control.
+- [x] Create a simple collision world and scripted inspection loop with repeatable input commands.
+- [x] Introduce separate simulator truth, encoder-odometry baseline and estimator snapshots; use Zustand only for controls and presentation preferences.
+- [x] Show truth and odometry trails with a labeled legend and a camera-follow mode.
+- [x] Verify deterministic motion in Vitest and start/pause/reset through the UI in Playwright.
 
-Exit: a repeatable robot run works with placeholder geometry and responsive controls.
+Exit verified: a repeatable robot run works with placeholder geometry and responsive controls. See the [Phase 1 review](slam-demo/phase1/README.md), [app instructions](../apps/slam-demo/README.md), and [desktop screenshot](slam-demo/phase1/desktop.png). Stop for user review before Phase 2.
 
 ### Phase 2 — Blender assets and the first polished scene
 

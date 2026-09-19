@@ -27,6 +27,7 @@ robotics-lab/
     simulator/          differential-drive robotics playground (React Three Fiber)
     drone-mission-planner/
                         3D planning and simulation for autonomous drone missions
+    slam-demo/          visual SLAM explorer (motion foundation implemented)
   packages/
     core/               shared types
     drone/              framework-independent drone dynamics and mission logic
@@ -58,6 +59,13 @@ A WebGPU-powered 3D planner for composing, validating, simulating and saving
 autonomous drone missions. It includes manual flight, virtual lidar/GPS/IMU,
 multiple camera modes, route execution and versioned JSON persistence. See the
 [full development plan](./docs/drone-mission-planner.md).
+
+### [SLAM Studio](./apps/slam-demo)
+
+A visual SLAM explorer in development. Phase 1 provides a deterministic rover,
+guided inspection loop, manual driving, collision handling and encoder-odometry
+comparison. Camera acquisition and visual SLAM are planned in later phases.
+See the [implementation plan](./docs/slam-demo.md).
 
 ---
 
@@ -96,11 +104,19 @@ Run the drone mission planner (requires WebGPU):
 pnpm -C apps/drone-mission-planner dev
 ```
 
+Run SLAM Studio (WebGL2):
+
+```sh
+pnpm dev:slam           # http://127.0.0.1:8082
+pnpm test:e2e:slam      # dedicated browser tests
+```
+
 Build it:
 
 ```sh
 pnpm -C apps/simulator build
 pnpm -C apps/drone-mission-planner build
+pnpm build:slam
 ```
 
 ### Testing
@@ -145,8 +161,8 @@ aerial robotics. Long-term targets:
   A* navigation, coverage, localization, editor, playback)
 - **Drone Mission Planner** — in progress (3D editing, validation, execution,
   sensors and persistence implemented; external formats and replay next)
-- **Visual SLAM Demo** — [phased implementation plan](./docs/slam-demo.md)
-  (stereo tracking, sparse mapping, loop closure and a Blender-authored lab)
+- **Visual SLAM Demo** — Phase 1 implemented (motion and odometry);
+  [stereo tracking, mapping and Blender environment planned](./docs/slam-demo.md)
 - **ROS2 Browser Visualization** (and a ROS bridge package)
 
 Every application contributes reusable pieces back into the shared packages so
