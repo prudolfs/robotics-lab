@@ -1,8 +1,8 @@
 # SLAM Studio
 
-A browser-first visual SLAM explorer. **Phases 1–2 implement the motion and visual foundation:** a deterministic differential-drive rover, inspection route, manual control, collision handling and encoder-odometry comparison. Camera acquisition and visual SLAM are not connected yet.
+A browser-first visual SLAM explorer. **Phases 1–3 implement motion, authored graphics and stereo acquisition:** a deterministic differential-drive rover, inspection route, manual control, collision handling and encoder-odometry comparison. Calibrated stereo capture and grayscale preprocessing run in a worker. Feature tracking and visual SLAM are not connected yet.
 
-![Phase 2 inspection lab](../../docs/slam-demo/phase2/overview.png)
+![Phase 3 stereo acquisition](../../docs/slam-demo/phase3/capturing.png)
 
 From the repository root:
 
@@ -21,7 +21,7 @@ Choose **Guided loop**, then **Run inspection** for the 22.7 m / 75.7 s inspecti
 
 For manual control, choose **Manual drive**, then **Start drive**. Use WASD, arrow keys, or hold the on-screen direction buttons. The maximum linear command is 0.45 m/s and turn command is 1.2 rad/s. Space pauses a running session; moving focus into an editable field suspends keyboard shortcuts. Switching tabs or moving focus outside the window pauses the run. The inspector scrolls independently on desktop; smaller screens place it below the scene.
 
-Use **Overview** to orbit/zoom, **Follow robot** for a moving camera, **Robot eye** for the left camera mount’s presentation view, and **Workbench** for a material close-up. Choose standard or low graphics in the inspector. Assets load before driving is enabled; failed loads show recovery guidance. The layer buttons independently show the planned loop, ground truth and encoder odometry. The amber ring marks the encoder position. The camera slot and visual estimator remain explicitly inactive; they do not display fabricated images or pose estimates.
+Use **Overview** to orbit/zoom, **Follow robot** for a moving camera, **Robot eye** for the left camera mount’s presentation view, and **Workbench** for a material close-up. Choose standard or low graphics in the inspector. Assets load before driving is enabled; failed loads show recovery guidance. The layer buttons independently show the planned loop, ground truth and encoder odometry. The amber ring marks the encoder position. The stereo panel shows real processed images; the visual estimator remains explicitly inactive.
 
 Architecture:
 
@@ -42,4 +42,6 @@ Regenerate the review screenshots while the dev app is running:
 node scripts/capture-slam-demo.mjs
 ```
 
-Phase 2 sources, export instructions and licenses are in [assets/slam-demo](../../assets/slam-demo/README.md). See the [Phase 2 review](../../docs/slam-demo/phase2/README.md) for screenshots, budget measurements and asset validation. Robot eye is a presentation camera; synchronized calibrated stereo capture is Phase 3.
+Phase 2 sources, export instructions and licenses are in [assets/slam-demo](../../assets/slam-demo/README.md). See the [Phase 2 review](../../docs/slam-demo/phase2/README.md) for screenshots, budget measurements and asset validation. Robot eye remains a presentation camera; sensor capture uses independent calibrated cameras.
+
+Phase 3 adds **Stereo acquisition** settings: rendered pixels or synthetic oracle observations, real-time or lockstep timing, seeded pixel noise and dropout. Use **Left image / Right image** to inspect the exact processed pair. **Save last 6 pairs** exports a bounded pixel fixture; **Replay pixels** processes it without rendering. See the [Phase 3 review](../../docs/slam-demo/phase3/README.md) for tests, ownership/timing contracts, GPU calibration evidence and offline replay instructions.

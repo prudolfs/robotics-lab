@@ -1,0 +1,261 @@
+import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
+import type { Acquisition, SensorOptions } from './runtime'
+
+function useAcquisition(acquisition: Acquisition) {
+	return useSyncExternalStore(
+		acquisition.subscribe,
+		acquisition.getSnapshot,
+		acquisition.getSnapshot,
+	)
+}
+export function SensorPanel({ acquisition }: { acquisition: Acquisition }) {
+	const s = useAcquisition(acquisition),
+		canvas = useRef<HTMLCanvasElement>(null)
+	const [eye, setEye] = useState<'left' | 'right'>('left')
+	useLayoutEffect(() => {
+		const node = canvas.current,
+			frame = s.latest
+		if (!node) return
+		const context = node.getContext('2d')
+		if (!context) return
+		if (!frame) {
+			context.clearRect(0, 0, node.width, node.height)
+			return
+		}
+		node.width = frame.calibration.width
+		node.height = frame.calibration.height
+		context.putImageData(
+			new ImageData(new Uint8ClampedArray(frame[eye]), node.width, node.height),
+			0,
+			0,
+		)
+	}, [s.latest, eye])
+	const k = s.latest?.calibration
+	return (
+		<section className="camera-slot sensor-panel" aria-label="Stereo camera preview">
+			<div className="camera-slot-header">
+				<strong>Stereo input</strong>
+				<span className="tiny-badge">
+					{s.replaying
+						? 'RECORDED PIXELS'
+						: s.options.mode === 'rendered'
+							? 'RENDERED STEREO'
+							: 'SYNTHETIC · ORACLE'}
+				</span>
+			</div>
+			<div className="sensor-eye-tabs">
+				{(['left', 'right'] as const).map((side) => (
+					<button type="button" key={side} aria-pressed={eye === side} onClick={() => setEye(side)}>
+						{side === 'left' ? 'Left image' : 'Right image'}
+					</button>
+				))}
+			</div>
+			<div className="sensor-image">
+				<canvas
+					ref={canvas}
+					width={640}
+					height={480}
+					aria-label={`Processed ${eye} image`}
+					data-checksum={s.latest?.checksum ?? ''}
+				/>
+				{s.latest ? (
+					<>
+						<div
+							className="epipolar-line"
+							style={{ top: `${(100 * (k?.cy ?? 240)) / (k?.height ?? 480)}%` }}
+						/>
+						<span className="image-caption">
+							Center row ·{' '}
+							{s.options.mode === 'synthetic' && !s.replaying
+								? 'oracle observations'
+								: 'grayscale input'}
+						</span>
+					</>
+				) : (
+					<div className="sensor-empty">{s.error || s.status}</div>
+				)}
+			</div>
+			<div className="sensor-frame-meta" aria-live="off">
+				<span data-testid="sensor-frame">
+					{s.latest
+						? `Pair ${s.latest.frameId} · ${s.latest.timestamp.toFixed(3)} s`
+						: 'Waiting for pixels'}
+				</span>
+				<span data-testid="sensor-generation">Run {s.generation < 0 ? 0 : s.generation}</span>
+			</div>
+			<div className="camera-slot-footer">
+				<span>
+					{k?.width ?? 640} × {k?.height ?? 480} · {((k?.baseline ?? 0.12) * 1000).toFixed(0)} mm
+				</span>
+				<span>10 Hz target · {s.latency.toFixed(1)} ms latency</span>
+			</div>
+			<p className="sensor-disclosure">
+				Exact worker-processed image.{' '}
+				{s.latest?.kind === 'synthetic'
+					? `${s.latest.observations?.length ?? 0} known correspondences; no image tracking.`
+					: 'Feature tracking is not connected yet.'}
+			</p>
+		</section>
+	)
+}
+export function SensorControls({
+	acquisition,
+	locked,
+}: {
+	acquisition: Acquisition
+	locked: boolean
+}) {
+	const s = useAcquisition(acquisition),
+		[fileError, setFileError] = useState('')
+	const change = (next: Partial<SensorOptions>) => {
+		setFileError('')
+		acquisition.configure(next)
+	}
+	return (
+		<section className="inspector-section sensor-controls" aria-label="Stereo acquisition settings">
+			<div className="section-heading">
+				<h2>Stereo acquisition</h2>
+				<span className="section-number">02</span>
+			</div>
+			<label>
+				Input mode
+				<select
+					aria-label="Sensor input mode"
+					disabled={locked || s.replaying}
+					value={s.options.mode}
+					onChange={(e) => change({ mode: e.target.value as SensorOptions['mode'] })}
+				>
+					<option value="rendered">Rendered stereo pixels</option>
+					<option value="synthetic">Synthetic observations (oracle)</option>
+				</select>
+			</label>
+			<label>
+				Timing
+				<select
+					aria-label="Sensor timing"
+					disabled={locked || s.replaying}
+					value={s.options.timing}
+					onChange={(e) => change({ timing: e.target.value as SensorOptions['timing'] })}
+				>
+					<option value="realtime">Real time · drop backlog</option>
+					<option value="lockstep">Lockstep · wait for worker</option>
+				</select>
+			</label>
+			<label>
+				Pixel noise ±{s.options.noise} levels
+				<input
+					aria-label="Pixel noise amplitude"
+					type="range"
+					min={0}
+					max={64}
+					step={8}
+					value={s.options.noise}
+					disabled={locked || s.replaying}
+					onChange={(e) => change({ noise: Number(e.target.value) })}
+				/>
+			</label>
+			<label>
+				Dropout {Math.round(s.options.dropout * 100)}%
+				<input
+					aria-label="Sensor dropout"
+					type="range"
+					min={0}
+					max={0.75}
+					step={0.25}
+					value={s.options.dropout}
+					disabled={locked || s.replaying}
+					onChange={(e) => change({ dropout: Number(e.target.value) })}
+				/>
+			</label>
+			<p>
+				Seeded noise changes the input pixels. Synthetic mode also perturbs projected observations
+				and exposes known IDs.
+			</p>
+			<dl className="sensor-stats">
+				<div>
+					<dt>Delivered / real second</dt>
+					<dd>{s.wallRate.toFixed(1)} Hz</dd>
+				</div>
+				<div>
+					<dt>Delivered / sim second</dt>
+					<dd>{s.rate.toFixed(1)} Hz</dd>
+				</div>
+				<div>
+					<dt>Capture + noise</dt>
+					<dd>{s.captureMs.toFixed(1)} ms</dd>
+				</div>
+				<div>
+					<dt>Worker preprocessing</dt>
+					<dd>{(s.latest?.processingMs ?? 0).toFixed(1)} ms</dd>
+				</div>
+				<div>
+					<dt>Active + pending</dt>
+					<dd data-testid="sensor-queue">{s.queueDepth} / 2</dd>
+				</div>
+				<div>
+					<dt>Sensor / backlog drops</dt>
+					<dd data-testid="sensor-drops">
+						{s.sensorDrops} / {s.backlogDrops}
+					</dd>
+				</div>
+			</dl>
+			<div className="sensor-actions">
+				<button
+					type="button"
+					disabled={!s.recorded}
+					onClick={() => {
+						const url = URL.createObjectURL(
+							new Blob([acquisition.download()], { type: 'application/octet-stream' }),
+						)
+						const a = document.createElement('a')
+						a.href = url
+						a.download = 'slam-stereo.slamframes'
+						a.click()
+						setTimeout(() => URL.revokeObjectURL(url), 1000)
+					}}
+				>
+					Save last {s.recorded} pairs
+				</button>
+				<label className="upload-fixture">
+					Replay pixels
+					<input
+						aria-label="Replay stereo recording"
+						type="file"
+						accept=".slamframes"
+						onChange={async (e) => {
+							const file = e.target.files?.[0]
+							e.target.value = ''
+							if (!file) return
+							try {
+								if (file.size > 52 * 1024 * 1024) throw Error('Fixture exceeds 52 MB')
+								acquisition.replay(await file.arrayBuffer())
+								setFileError('')
+							} catch (error) {
+								setFileError(String(error))
+							}
+						}}
+					/>
+				</label>
+			</div>
+			{s.replaying && (
+				<button type="button" onClick={() => acquisition.live()}>
+					Return to live sensor
+				</button>
+			)}
+			<p data-testid="sensor-status">
+				{s.status}
+				{s.replaying ? ' · lockstep, no rendering' : ''}
+			</p>
+			{(s.error || fileError) && <p role="alert">{s.error || fileError}</p>}
+			{s.error && (
+				<button type="button" onClick={() => acquisition.retry()}>
+					Retry sensor
+				</button>
+			)}
+			<p>
+				Stores at most six processed stereo pairs. Replay preserves their timestamps and pixels; it
+				does not restore a robot run.
+			</p>
+		</section>
+	)
+}

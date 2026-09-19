@@ -12,6 +12,12 @@ export function createController(config: Partial<Config> = {}) {
 		accumulator = 0
 	let command: ManualCommand = { forward: 0, turn: 0 }
 	const listeners = new Set<() => void>()
+	let generation = 0
+	let guard = () => true
+	const ticks = new Set<(state: typeof live, generation: number) => void>()
+	function emitTick() {
+		for (const listener of ticks) listener(live, generation)
+	}
 	function publish() {
 		published = live
 		for (const listener of listeners) listener()
@@ -21,6 +27,16 @@ export function createController(config: Partial<Config> = {}) {
 	}
 	return {
 		read: () => live,
+		getGeneration: () => generation,
+		subscribeTicks(listener: (state: typeof live, generation: number) => void) {
+			ticks.add(listener)
+			return () => {
+				ticks.delete(listener)
+			}
+		},
+		setAdvanceGuard(next: () => boolean) {
+			guard = next
+		},
 		getSnapshot: () => published,
 		subscribe(listener: () => void) {
 			listeners.add(listener)
@@ -42,8 +58,10 @@ export function createController(config: Partial<Config> = {}) {
 		},
 		reset(next: Partial<Config> = {}) {
 			live = createSimulation({ ...live.config, ...next })
+			generation++
 			accumulator = 0
 			clearInput()
+			emitTick()
 			publish()
 		},
 		command(next: ManualCommand) {
@@ -52,11 +70,16 @@ export function createController(config: Partial<Config> = {}) {
 		clearInput,
 		advance(seconds: number) {
 			if (live.status !== 'running' || !Number.isFinite(seconds) || seconds <= 0) return
+			if (!guard()) {
+				accumulator = 0
+				return
+			}
 			// Discard excess wall time after suspended tabs; never integrate one giant physics step.
 			accumulator += Math.min(seconds, 0.1)
-			while (accumulator + 1e-12 >= FIXED_DT && live.status === 'running') {
+			while (accumulator + 1e-12 >= FIXED_DT && live.status === 'running' && guard()) {
 				live = stepSimulation(live, command)
 				accumulator -= FIXED_DT
+				emitTick()
 			}
 			if (
 				Math.floor(live.tick / 6) !== Math.floor(published.tick / 6) ||

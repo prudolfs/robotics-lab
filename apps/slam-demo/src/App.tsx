@@ -23,8 +23,10 @@ import {
 	Square,
 	Target,
 } from 'lucide-react'
-import { type ReactNode, useCallback, useState } from 'react'
+import { type ReactNode, useCallback, useState, useSyncExternalStore } from 'react'
 import { Scene } from './components/scene'
+import { SensorControls, SensorPanel } from './sensor/panel'
+import { createAcquisition } from './sensor/runtime'
 import { ROUTE_DURATION, ROUTE_LENGTH } from './sim/route'
 import type { Simulation } from './sim/simulation'
 import { useManualInput, useSimulation } from './sim/use-simulation'
@@ -89,6 +91,12 @@ function PoseTable({ state }: { state: Simulation }) {
 }
 export default function App() {
 	const { controller, state } = useSimulation()
+	const [acquisition] = useState(() => createAcquisition(controller))
+	const sensor = useSyncExternalStore(
+		acquisition.subscribe,
+		acquisition.getSnapshot,
+		acquisition.getSnapshot,
+	)
 	const [assetsReady, setAssetsReady] = useState(false)
 	const [assetFailed, setAssetFailed] = useState(false)
 	const handleReady = useCallback(() => setAssetsReady(true), [])
@@ -101,7 +109,7 @@ export default function App() {
 		usePresentation()
 	const running = state.status === 'running',
 		complete = state.status === 'complete',
-		configLocked = state.tick > 0 || running
+		configLocked = state.tick > 0 || running || sensor.replaying
 	const drift = Math.hypot(
 		state.truth.pose.x - state.odometry.pose.x,
 		state.truth.pose.y - state.odometry.pose.y,
@@ -143,6 +151,7 @@ export default function App() {
 			<main className="workspace">
 				<section className="viewport" aria-label="Simulation workspace">
 					<Scene
+						acquisition={acquisition}
 						state={state}
 						controller={controller}
 						onReady={handleReady}
@@ -231,26 +240,7 @@ export default function App() {
 								</span>
 							</div>
 						</div>
-						<section className="camera-slot" aria-label="Stereo camera preview">
-							<div className="camera-slot-header">
-								<span>
-									<Camera size={14} />
-									Stereo camera
-								</span>
-								<span className="tiny-badge">NOT CAPTURING</span>
-							</div>
-							<div className="camera-placeholder">
-								<span className="camera-reticle">
-									<Camera size={23} />
-								</span>
-								<strong>Camera preview</strong>
-								<p>Image acquisition is not connected yet.</p>
-							</div>
-							<div className="camera-slot-footer">
-								<span>640 × 480</span>
-								<span>120 mm baseline</span>
-							</div>
-						</section>
+						<SensorPanel acquisition={acquisition} />
 					</div>
 				</section>
 				<aside className="inspector" aria-label="Simulation inspector">
@@ -269,6 +259,7 @@ export default function App() {
 							<option value="low">Low graphics</option>
 						</select>
 					</div>
+
 					<section className="inspector-section">
 						<div className="section-heading">
 							<h2>
@@ -356,6 +347,7 @@ export default function App() {
 						</label>
 						{configLocked && <p className="config-hint">Reset to change the run configuration.</p>}
 					</section>
+					<SensorControls acquisition={acquisition} locked={configLocked} />
 					<section className="inspector-section">
 						<div className="section-heading">
 							<h2>
@@ -464,7 +456,7 @@ export default function App() {
 					<button
 						type="button"
 						className="run-button"
-						disabled={complete || !assetsReady}
+						disabled={complete || !assetsReady || sensor.replaying || Boolean(sensor.error)}
 						onClick={() => (running ? controller.pause() : controller.play())}
 					>
 						{running ? (

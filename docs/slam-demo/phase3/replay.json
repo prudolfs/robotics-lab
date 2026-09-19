@@ -1,0 +1,36 @@
+{
+  "pairs": 6,
+  "exact": true,
+  "frames": [
+    {
+      "frameId": 76,
+      "timestamp": 7.6,
+      "checksum": "0a245ec1"
+    },
+    {
+      "frameId": 77,
+      "timestamp": 7.7,
+      "checksum": "421d41d0"
+    },
+    {
+      "frameId": 78,
+      "timestamp": 7.8,
+      "checksum": "b3d48814"
+    },
+    {
+      "frameId": 79,
+      "timestamp": 7.9,
+      "checksum": "d83cc30a"
+    },
+    {
+      "frameId": 80,
+      "timestamp": 8,
+      "checksum": "c8513c3a"
+    },
+    {
+      "frameId": 81,
+      "timestamp": 8.1,
+      "checksum": "c6b8594e"
+    }
+  ]
+}

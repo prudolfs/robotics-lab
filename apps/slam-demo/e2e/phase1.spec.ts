@@ -5,7 +5,7 @@ test('guided inspection starts, pauses, resumes and resets through the UI', asyn
 	page.on('pageerror', (e) => errors.push(e.message))
 	await page.goto('/')
 	await expect(page.getByRole('heading', { name: 'Inspection lab.' })).toBeVisible()
-	await expect(page.locator('canvas')).toBeVisible()
+	await expect(page.locator('canvas').first()).toBeVisible()
 	await expect(page.getByTestId('run-status')).toHaveText('Ready to explore')
 	await page.getByRole('button', { name: 'Run inspection', exact: true }).click()
 	await expect(page.getByTestId('truth-x')).not.toHaveText('0.000')
@@ -53,7 +53,7 @@ test('small screens retain transport, inspector and honest camera state', async 
 	await page.goto('/')
 	await expect(page.getByRole('button', { name: 'Run inspection', exact: true })).toBeInViewport()
 	await expect(page.getByRole('region', { name: 'Stereo camera preview' })).toBeVisible()
-	await expect(page.getByText('NOT CAPTURING', { exact: true })).toBeVisible()
+	await expect(page.getByText('RENDERED STEREO', { exact: true })).toBeVisible()
 	await page.getByRole('heading', { name: 'Pose comparison' }).scrollIntoViewIfNeeded()
 	await expect(page.getByRole('heading', { name: 'Pose comparison' })).toBeVisible()
 	expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(

@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef } from 'react'
 import { type Group, type Mesh, PMREMGenerator, type Texture } from 'three'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import manifest from '../../../../assets/slam-demo/manifest.json'
+import { SensorBridge } from '../sensor/bridge'
+import type { Acquisition } from '../sensor/runtime'
 import type { SimulationController } from '../sim/controller'
 import { usePresentation } from '../store'
 
@@ -21,15 +23,18 @@ function prepare(group: Group) {
 export function AuthoredAssets({
 	controller,
 	onReady,
+	acquisition,
 }: {
 	controller: SimulationController
 	onReady: () => void
+	acquisition: Acquisition
 }) {
 	const models = useGLTF(
 		[manifest.assets.lab, manifest.assets.cutaway, manifest.assets.rover],
 		'/assets/slam/draco/',
 	)
 	const [lab, cutaway, rover] = useMemo(() => models.map((model) => prepare(model.scene)), [models])
+	const sensorModels = useMemo(() => models.map((model) => model.scene), [models])
 	const root = useRef<Group>(null)
 	const cameraMode = usePresentation((s) => s.camera),
 		quality = usePresentation((s) => s.quality)
@@ -68,6 +73,7 @@ export function AuthoredAssets({
 	})
 	return (
 		<>
+			<SensorBridge models={sensorModels} acquisition={acquisition} />
 			<primitive object={lab} />
 			<primitive object={cutaway} visible={cameraMode === 'robot'} />
 			<group ref={root}>

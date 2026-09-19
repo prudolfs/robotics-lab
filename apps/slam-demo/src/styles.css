@@ -1091,3 +1091,146 @@ fieldset {
 	padding: 9px 12px;
 	border-radius: 6px;
 }
+.sensor-panel {
+	width: 310px;
+}
+.sensor-eye-tabs {
+	display: flex;
+	padding: 6px 12px;
+	gap: 6px;
+}
+.sensor-eye-tabs button,
+.sensor-actions button,
+.sensor-controls > button,
+.upload-fixture {
+	border: 1px solid #354b55;
+	background: #17272f;
+	border-radius: 5px;
+	color: #c8dbdf;
+	padding: 6px 9px;
+	font-size: 10px;
+	cursor: pointer;
+}
+.sensor-eye-tabs button[aria-pressed="true"] {
+	color: #8ed6c5;
+	border-color: #77c5b0;
+}
+.sensor-image {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 4 / 3;
+	overflow: hidden;
+	background: #091318;
+}
+.sensor-image canvas {
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+.epipolar-line {
+	position: absolute;
+	left: 0;
+	right: 0;
+	border-top: 1px dashed #7be0cb99;
+	pointer-events: none;
+}
+.image-caption {
+	position: absolute;
+	bottom: 6px;
+	left: 6px;
+	background: #10232adf;
+	color: #bcd8da;
+	padding: 3px 5px;
+	font-size: 9px;
+}
+.sensor-empty {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-content: center;
+	padding: 16px;
+	font-size: 11px;
+}
+.sensor-frame-meta {
+	display: flex;
+	justify-content: space-between;
+	padding: 8px 12px;
+	font: 10px var(--font-mono, monospace);
+	color: #b6d4d9;
+}
+.sensor-disclosure {
+	font-size: 9px;
+	line-height: 1.5;
+	color: #9cb0ba;
+	margin: 0;
+	padding: 8px 12px;
+	border-top: 1px solid #30424b;
+}
+.sensor-controls label {
+	display: flex;
+	flex-direction: column;
+	gap: 7px;
+	font-size: 11px;
+	margin: 12px 0;
+	color: #b1cbd1;
+}
+.sensor-controls select {
+	width: 100%;
+	background: #112028;
+	border: 1px solid #354b55;
+	border-radius: 5px;
+	color: #d8e8ea;
+	padding: 8px;
+	font: inherit;
+}
+.sensor-controls input[type="range"] {
+	width: 100%;
+	accent-color: #8bd6c2;
+}
+.sensor-controls p {
+	font-size: 10px;
+	line-height: 1.6;
+	color: #9aaeb9;
+}
+.sensor-stats {
+	font-size: 10px;
+}
+.sensor-stats div {
+	display: flex;
+	justify-content: space-between;
+	padding: 5px 0;
+}
+.sensor-stats dd {
+	color: #c5e8e2;
+	margin: 0;
+	font-variant-numeric: tabular-nums;
+}
+.sensor-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.sensor-actions label {
+	margin: 0;
+	font-size: 10px;
+}
+.upload-fixture input {
+	width: 100%;
+	max-width: 140px;
+	font-size: 9px;
+}
+@media (max-width: 650px) {
+	.sensor-panel {
+		width: 240px;
+	}
+	.viewport {
+		min-height: 760px;
+	}
+	.sensor-disclosure {
+		font-size: 8px;
+	}
+}
+/* The preview is now interactive; the surrounding world annotations remain click-through. */
+.sensor-panel {
+	pointer-events: auto;
+}

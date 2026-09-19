@@ -1,0 +1,30 @@
+{
+  "browser": "152.0.7977.83",
+  "gpu": {
+    "left": {
+      "u": 300,
+      "v": 162,
+      "pixels": 112
+    },
+    "right": {
+      "u": 271.11739130434785,
+      "v": 162.04782608695652,
+      "pixels": 115
+    },
+    "disparity": 28.882608695652152,
+    "expected": {
+      "left": [
+        300,
+        162
+      ],
+      "right": [
+        271.2,
+        162
+      ],
+      "disparity": 28.8
+    },
+    "renderTargetRestored": true
+  },
+  "sensor": "Stereo acquisition\n02\nInput mode\nRendered stereo pixels\nSynthetic observations (oracle)\nTiming\nReal time · drop backlog\nLockstep · wait for worker\nPixel noise ±0 levels\nDropout 0%\n\nSeeded noise changes the input pixels. Synthetic mode also perturbs projected observations and exposes known IDs.\n\nDelivered / real second\n9.3 Hz\nDelivered / sim second\n10.0 Hz\nCapture + noise\n4.4 ms\nWorker preprocessing\n1.1 ms\nActive + pending\n0 / 2\nSensor / backlog drops\n0 / 0\nSave last 6 pairs\nReplay pixels\n\nReady\n\nStores at most six processed stereo pairs. Replay preserves their timestamps and pixels; it does not restore a robot run.",
+  "errors": []
+}

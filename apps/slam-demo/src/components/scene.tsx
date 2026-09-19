@@ -11,6 +11,7 @@ import {
 } from 'react'
 import { Vector3 } from 'three'
 import manifest from '../../../../assets/slam-demo/manifest.json'
+import type { Acquisition } from '../sensor/runtime'
 import type { SimulationController } from '../sim/controller'
 import { createSimulation, type Simulation, setStatus, stepSimulation } from '../sim/simulation'
 import { scenePosition } from '../sim/world'
@@ -161,11 +162,13 @@ export function Scene({
 	controller,
 	onReady,
 	onFailure,
+	acquisition,
 }: {
 	state: Simulation
 	controller: SimulationController
 	onReady: () => void
 	onFailure: () => void
+	acquisition: Acquisition
 }) {
 	const quality = usePresentation((s) => s.quality)
 	return (
@@ -208,7 +211,7 @@ export function Scene({
 					decay={2}
 				/>
 				<Suspense fallback={null}>
-					<AuthoredAssets controller={controller} onReady={onReady} />
+					<AuthoredAssets controller={controller} onReady={onReady} acquisition={acquisition} />
 				</Suspense>
 				<Paths state={state} />
 				<RenderMetrics controller={controller} />

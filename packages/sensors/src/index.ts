@@ -62,3 +62,5 @@ export type { ObstacleKind, RayHit } from './raycast'
 export { castRayAgainstWorld, castRaysAgainst } from './raycast'
 export type { LidarSample, LidarScan, Rng } from './scan'
 export { createScan } from './scan'
+
+export * from './stereo'

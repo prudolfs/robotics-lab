@@ -27,7 +27,7 @@ robotics-lab/
     simulator/          differential-drive robotics playground (React Three Fiber)
     drone-mission-planner/
                         3D planning and simulation for autonomous drone missions
-    slam-demo/          visual SLAM explorer (motion and authored lab implemented)
+    slam-demo/          visual SLAM explorer (authored lab and stereo acquisition)
   packages/
     core/               shared types
     drone/              framework-independent drone dynamics and mission logic
@@ -65,7 +65,8 @@ multiple camera modes, route execution and versioned JSON persistence. See the
 A visual SLAM explorer in development. Phase 1 provides a deterministic rover,
 guided inspection loop, manual driving, collision handling and encoder-odometry
 comparison. Phase 2 adds a Blender-authored lab, articulated rover, PBR materials
-and overview/follow/robot-eye inspection views. Camera acquisition and visual SLAM are planned in later phases.
+and overview/follow/robot-eye inspection views. Phase 3 adds calibrated stereo acquisition, noise/dropout controls and pixel replay.
+Feature tracking and visual SLAM are planned in later phases.
 See the [implementation plan](./docs/slam-demo.md).
 
 ---
@@ -162,7 +163,7 @@ aerial robotics. Long-term targets:
   A* navigation, coverage, localization, editor, playback)
 - **Drone Mission Planner** — in progress (3D editing, validation, execution,
   sensors and persistence implemented; external formats and replay next)
-- **Visual SLAM Demo** — Phases 1–2 implemented (motion, odometry and authored lab);
+- **Visual SLAM Demo** — Phases 1–3 implemented (motion, authored lab and stereo acquisition);
   [stereo tracking and mapping planned](./docs/slam-demo.md)
 - **ROS2 Browser Visualization** (and a ROS bridge package)
 

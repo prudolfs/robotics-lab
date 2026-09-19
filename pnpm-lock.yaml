@@ -431,6 +431,9 @@ importers:
       '@robotics-lab/robot':
         specifier: workspace:*
         version: link:../../packages/robot
+      '@robotics-lab/sensors':
+        specifier: workspace:*
+        version: link:../../packages/sensors
       lucide-react:
         specifier: ^1.23.0
         version: 1.23.0(react@19.2.7)

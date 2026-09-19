@@ -25,7 +25,7 @@ test('authored assets, cameras, quality and animated wheels work through public 
 	expect(await page.evaluate(() => window.__slamRenderMetrics?.wheelAngles.left)).toBe(angle)
 	await page.getByRole('button', { name: 'Reset simulation' }).click()
 	await expect.poll(() => page.evaluate(() => window.__slamRenderMetrics?.wheelAngles.left)).toBe(0)
-	await expect(page.getByText('NOT CAPTURING', { exact: true })).toBeVisible()
+	await expect(page.getByText('RENDERED STEREO', { exact: true })).toBeVisible()
 })
 
 test('asset loading blocks driving and a failed asset provides recovery guidance', async ({

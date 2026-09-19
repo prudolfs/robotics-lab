@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first stereo visual SLAM explorer with a Blender-authored robotics lab, live feature tracking, sparse reconstruction and visible loop closure.
 >
-> Status: Phases 0–2 implemented and verified; Phase 2 awaits user review. Phases 3–10 remain planned.
+> Status: Phases 0–3 implemented and verified; Phase 3 awaits user review. Phases 4–10 remain planned.
 
 ## Goal and experience
 
@@ -25,7 +25,7 @@ Graphics are a core deliverable from the beginning. Aim for a polished real-time
 | [HUD plan](hud.md) | Reuse panel/widget lessons and app-local shadcn components without making the new app depend on another app. |
 | [E2E strategy](e2e.md), [world clicks](e2e-world-click.md), [CI notes](playwright-on-github-actions.md) | Vitest for algorithms; a small Playwright suite using public controls and renderer-projected clicks. |
 
-`apps/slam-demo` now contains the Phase 1 motion prototype. Shared vision and visual SLAM packages have not been created. Existing milestone checkboxes are historical planning records; verify relevant code before reuse.
+`apps/slam-demo` now contains motion, authored lab graphics and calibrated stereo acquisition. Pure stereo geometry and sensor models live in `packages/sensors`; shared vision and visual SLAM packages have not been created. Existing milestone checkboxes are historical planning records; verify relevant code before reuse.
 
 ## Scope and technical direction
 
@@ -51,7 +51,7 @@ assets/slam-demo/           Blender sources, export scripts, asset manifest and 
 apps/slam-demo/public/      optimized runtime models, textures and environment assets
 ```
 
-The application path exists after Phase 1; the vision/SLAM packages and production asset paths remain proposed additions. Browser workers adapt the pure packages; simulation and estimator state stay outside Zustand. Do not generalize every app component into a package before it has a clear reusable interface.
+The application, stereo sensor utilities and production asset paths are implemented through Phase 3; the vision/SLAM packages remain proposed additions. Browser workers adapt the pure packages; simulation and estimator state stay outside Zustand. Do not generalize every app component into a package before it has a clear reusable interface.
 
 ## Visual direction and Blender workflow
 
@@ -123,16 +123,18 @@ Review evidence: [Phase 2 screenshots, validation and measured budgets](slam-dem
 
 ### Phase 3 — Calibrated stereo acquisition
 
-- [ ] Add synchronized left/right capture at fixed simulation timestamps, using the same robot pose for both exposures.
-- [ ] Implement projection/unprojection and synthetic observation fixtures with visibility, occlusion, image noise and dropout controls.
-- [ ] Build the browser capture adapter and buffer ownership protocol without coupling pure packages to Three.js or DOM APIs.
-- [ ] Keep camera frames free of debug overlays, landmark markers, presentation bloom, cinematic depth of field and display-only camera motion.
-- [ ] Apply sensor noise to actual input pixels; a decorative overlay on the camera pane does not count as image noise.
-- [ ] Use a worker with bounded queues, timestamped outputs, reset generation IDs and explicit backlog/drop behavior; provide a lockstep fixture mode.
-- [ ] Display the exact processed frame with synchronized overlays and make input mode, capture rate and latency visible.
-- [ ] Test projection, stereo alignment, occlusion, frame ordering and resets while work is pending.
+- [x] Add synchronized left/right capture at fixed simulation timestamps, using the same robot pose for both exposures.
+- [x] Implement projection/unprojection and synthetic observation fixtures with visibility, occlusion, image noise and dropout controls.
+- [x] Build the browser capture adapter and buffer ownership protocol without coupling pure packages to Three.js or DOM APIs.
+- [x] Keep camera frames free of debug overlays, landmark markers, presentation bloom, cinematic depth of field and display-only camera motion.
+- [x] Apply sensor noise to actual input pixels; a decorative overlay on the camera pane does not count as image noise.
+- [x] Use a worker with bounded queues, timestamped outputs, reset generation IDs and explicit backlog/drop behavior; provide a lockstep fixture mode.
+- [x] Display the exact processed frame with synchronized overlays and make input mode, capture rate and latency visible.
+- [x] Test projection, stereo alignment, occlusion, frame ordering and resets while work is pending.
 
-Exit: calibrated stereo pairs reach the processing pipeline reliably, and a recorded input sequence can be replayed without rendering.
+Exit verified: calibrated stereo pairs reach the processing pipeline reliably, and a recorded input sequence can be replayed without rendering.
+
+Review evidence: [Phase 3 screenshots, calibration checks and ownership contract](slam-demo/phase3/README.md), [exact offline replay](slam-demo/phase3/replay.json). Stop for user review before Phase 4.
 
 ### Phase 4 — Feature tracking and stereo visual odometry
 
