@@ -310,7 +310,7 @@ export function VisualInspector({ acquisition }: { acquisition: Acquisition }) {
 		<section className="inspector-section estimator-section" aria-label="Visual odometry">
 			<div className="section-heading">
 				<h2>Visual odometry</h2>
-				<span className="tiny-badge">NO MAP / LOOP CLOSURE</span>
+				<span className="tiny-badge">LOCAL MAP · NO LOOP CLOSURE</span>
 			</div>
 			<div className={`estimator-status vo-${vo?.status ?? 'initializing'}`}>
 				<span className="hollow-dot" />
@@ -362,7 +362,7 @@ export function VisualInspector({ acquisition }: { acquisition: Acquisition }) {
 			</p>
 			<p className="section-description">
 				Image overlay: circles = accepted; crosses = rejected; lines = tracks; yellow = reprojection
-				residual. No persistent landmarks yet.
+				residual. Persistent stereo landmarks appear in the Sparse map inspector.
 			</p>
 		</section>
 	)

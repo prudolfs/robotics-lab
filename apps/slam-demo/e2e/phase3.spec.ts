@@ -51,7 +51,7 @@ test('captures ordered timestamps, clears pending work on reset, and replays a d
 		)
 		.toBeGreaterThan(6)
 	await page.getByRole('button', { name: 'Pause', exact: true }).click()
-	await page.waitForTimeout(200)
+	await expect(page.getByTestId('sensor-queue')).toHaveText('0 / 2')
 	const label = await page.getByTestId('sensor-frame').innerText(),
 		checksum = await page.getByLabel('Processed left image').getAttribute('data-checksum')
 	const [id, time] =

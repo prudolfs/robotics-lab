@@ -1,3 +1,5 @@
+export * from './bundle'
 export * from './geometry'
+export * from './mapping'
 export * from './odometry'
 export * from './types'

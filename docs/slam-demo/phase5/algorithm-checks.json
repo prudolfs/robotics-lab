@@ -1,0 +1,167 @@
+{
+  "retainedLandmarkIds": 351,
+  "lossFreezesPoseAndMap": true,
+  "resetCreatesNewMap": true,
+  "nativeObjectsAfterDispose": 0,
+  "frames": [
+    {
+      "frameId": 0,
+      "status": "initializing",
+      "pose": {
+        "rotation": [
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1
+        ],
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      "revision": 1,
+      "landmarks": 351,
+      "keyframes": 1,
+      "mapMatches": 0,
+      "bundle": null,
+      "nativeObjects": 3,
+      "peakNativeObjects": 12
+    },
+    {
+      "frameId": 1,
+      "status": "tracking",
+      "pose": {
+        "rotation": [
+          0.9999966992449083,
+          0.000037710533404816786,
+          -0.0025690615415078838,
+          -0.00003771930688287976,
+          0.9999999992829599,
+          -0.00000336660012579019,
+          0.002569061412709477,
+          0.000003463492234151516,
+          0.9999966999502858
+        ],
+        "position": [
+          0.014288157051636921,
+          0.00003669011733964913,
+          0.01839986244730688
+        ]
+      },
+      "revision": 2,
+      "landmarks": 351,
+      "keyframes": 1,
+      "mapMatches": 217,
+      "bundle": null,
+      "nativeObjects": 3,
+      "peakNativeObjects": 39
+    },
+    {
+      "frameId": 2,
+      "status": "tracking",
+      "pose": {
+        "rotation": [
+          0.9999925549913308,
+          0.00008753650797241032,
+          -0.0038577583218729833,
+          -0.00008699783746509888,
+          0.9999999864435808,
+          0.00013980062390758807,
+          0.003857770507234024,
+          -0.00013946396645926428,
+          0.9999925490504994
+        ],
+        "position": [
+          0.02358468155437447,
+          -0.00015538979074958224,
+          0.03899696141912131
+        ]
+      },
+      "revision": 3,
+      "landmarks": 351,
+      "keyframes": 1,
+      "mapMatches": 217,
+      "bundle": null,
+      "nativeObjects": 3,
+      "peakNativeObjects": 39
+    },
+    {
+      "frameId": 3,
+      "status": "tracking",
+      "pose": {
+        "position": [
+          0.03419307521605077,
+          0.001666303175049782,
+          0.057746983284908904
+        ],
+        "rotation": [
+          0.999984906635612,
+          0.00039289800547333964,
+          -0.005480158038215755,
+          -0.00039471157863716353,
+          0.9999998676986084,
+          -0.0003298568410771677,
+          0.0054800277130882665,
+          0.00033201494425809716,
+          0.9999849294176093
+        ]
+      },
+      "revision": 4,
+      "landmarks": 488,
+      "keyframes": 2,
+      "mapMatches": 214,
+      "bundle": {
+        "before": 0.07222116514821247,
+        "after": 0.03387332133394801,
+        "iterations": 3,
+        "accepted": true,
+        "reason": "Robust stereo reprojection cost reduced",
+        "milliseconds": 12.994584000000032
+      },
+      "nativeObjects": 3,
+      "peakNativeObjects": 39
+    },
+    {
+      "frameId": 4,
+      "status": "tracking",
+      "pose": {
+        "rotation": [
+          0.999966214786182,
+          0.00021712464332833393,
+          -0.008217185837297102,
+          -0.00021831776784319586,
+          0.9999999657571474,
+          -0.0001443019618688868,
+          0.008217154224405217,
+          0.0001460910442662007,
+          0.9999662279466538
+        ],
+        "position": [
+          0.048625714687544404,
+          0.0005414387622947155,
+          0.0785967219392624
+        ]
+      },
+      "revision": 5,
+      "landmarks": 488,
+      "keyframes": 2,
+      "mapMatches": 250,
+      "bundle": {
+        "before": 0.07222116514821247,
+        "after": 0.03387332133394801,
+        "iterations": 3,
+        "accepted": true,
+        "reason": "Robust stereo reprojection cost reduced",
+        "milliseconds": 12.994584000000032
+      },
+      "nativeObjects": 3,
+      "peakNativeObjects": 39
+    }
+  ]
+}

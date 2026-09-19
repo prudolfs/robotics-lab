@@ -1,8 +1,8 @@
 # SLAM Studio
 
-A browser-first visual SLAM explorer. **Phases 1–4 implement motion, authored graphics, stereo acquisition and visual odometry:** a deterministic differential-drive rover, inspection route, manual control, collision handling and encoder-odometry comparison. Calibrated stereo capture feeds a worker with spatial corner tracking, stereo triangulation and robust PnP motion estimation. Persistent mapping and loop closure remain planned.
+A browser-first visual SLAM explorer. **Phases 1–5 implement motion, authored graphics, stereo acquisition, visual odometry and local sparse mapping:** a deterministic differential-drive rover, inspection route, manual control, collision handling and encoder-odometry comparison. Calibrated stereo capture feeds a worker with spatial corner tracking, stereo triangulation and robust PnP motion estimation. Persistent keyframes and landmarks support local tracking and bundle adjustment. Loop closure and relocalization remain planned.
 
-![Phase 4 visual odometry](../../docs/slam-demo/phase4/tracking.png)
+![Phase 5 local reconstruction](../../docs/slam-demo/phase5/inspector.png)
 
 From the repository root:
 
@@ -47,3 +47,5 @@ Phase 2 sources, export instructions and licenses are in [assets/slam-demo](../.
 Phase 3 adds **Stereo acquisition** settings: rendered pixels or synthetic oracle observations, real-time or lockstep timing, seeded pixel noise and dropout. Use **Left image / Right image** to inspect the exact processed pair. **Save last 6 pairs** exports a bounded pixel fixture; **Replay pixels** processes it without rendering. See the [Phase 3 review](../../docs/slam-demo/phase3/README.md) for tests, ownership/timing contracts, GPU calibration evidence and offline replay instructions.
 
 Phase 4 adds image-derived **Visual odometry**, with initializing/tracking/degraded/lost states and honest frozen estimates on loss. Reset to establish a new origin; synthetic oracle inputs never supply VO. See the [Phase 4 review](../../docs/slam-demo/phase4/README.md) for fixed fixtures, full-route accuracy, screenshots and the unmet 30 ms processing target. The classic worker is built automatically on dev startup and production build; after worker/vision edits during development, run `node scripts/slam-vision/build.mjs` from the root and reload.
+
+Phase 5 adds **Sparse points** and **Keyframes** layers, map-supported PnP tracking, bounded local bundle adjustment in a separate worker, and the **Sparse map** inspector. Click a point/camera or use **Inspect reconstruction** to inspect real linked observations and residuals. Pose and map snapshots publish atomically; reset clears their generation. See the [Phase 5 review](../../docs/slam-demo/phase5/README.md) for measurements, caps, tests and reproduction commands. Mapping remains local: there is no loop closure or recovery after loss yet.

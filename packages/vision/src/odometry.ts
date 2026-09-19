@@ -7,6 +7,7 @@ import {
 	rotate,
 	triangulate,
 } from './geometry'
+import { type BundleScheduler, createLocalMap, descriptor } from './mapping'
 import type {
 	Calibration,
 	Cv,
@@ -107,8 +108,13 @@ export function solveMotion(
 	)
 	return { r, t, inliers: accepted, rmse, predictions }
 }
-/** Frame-to-frame stereo VO. No map, loop closure, ground truth or wheel input. */
-export function createOdometry(cv: Cv, k: Calibration) {
+/** Stereo tracking with optional local mapping; no truth, wheel input or loop closure. */
+export function createOdometry(
+	cv: Cv,
+	k: Calibration,
+	options: { mapping?: boolean; scheduleBundle?: BundleScheduler } = {},
+) {
+	const localMap = options.mapping ? createLocalMap(k, options.scheduleBundle) : null
 	const ledger = { live: 0, peak: 0 },
 		persistent = new NativeScope(ledger)
 	const left = persistent.own(new cv.Mat(k.height, k.width, cv.CV_8UC1)),
@@ -168,6 +174,7 @@ export function createOdometry(cv: Cv, k: Calibration) {
 			lastFrame = frameId
 			const scope = new NativeScope(ledger)
 			const result: OdometryResult = {
+				map: localMap?.snapshot(),
 				status: 'initializing',
 				reason: 'Waiting for a textured stereo pair',
 				frameId,
@@ -352,6 +359,23 @@ export function createOdometry(cv: Cv, k: Calibration) {
 						result.status === 'tracking'
 							? 'Image-derived stereo visual odometry'
 							: 'Motion accepted with limited visual support'
+				}
+				if (localMap && pose) {
+					const map = localMap.update(
+						frameId,
+						timestamp,
+						pose,
+						stereoPixels.map((pixel, i) => ({
+							pixel,
+							point: stereoPoints[i],
+							descriptor: descriptor(left.data, pixel, k),
+						})),
+						(points, pixels) => solveMotion(cv, points, pixels, k, frameId + 91, scope),
+						result.status === 'degraded',
+					)
+					pose = map.pose
+					result.pose = pose
+					result.map = map
 				}
 				if (stereoPoints.length >= 16 && coverage(stereoPixels, k) >= 4) {
 					left.copyTo(reference)

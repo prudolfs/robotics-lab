@@ -49,6 +49,12 @@ export function createVisualEvaluation() {
 				{ x: position[0], y: position[1], z: position[2], frameId: vo.frameId },
 			]
 		},
-		snapshot: () => ({ trail, error, rms: count ? Math.sqrt(sum / count) : null, samples: count }),
+		snapshot: () => ({
+			origin,
+			trail,
+			error,
+			rms: count ? Math.sqrt(sum / count) : null,
+			samples: count,
+		}),
 	}
 }

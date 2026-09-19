@@ -48,3 +48,5 @@ apps/slam-demo/e2e/.results
 
 # Rebuilt by scripts/slam-vision/build.mjs before SLAM dev/build.
 apps/slam-demo/public/vision/worker.js
+
+apps/slam-demo/public/vision/optimizer.js

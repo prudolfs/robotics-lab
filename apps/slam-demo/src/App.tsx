@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { type ReactNode, useCallback, useState, useSyncExternalStore } from 'react'
 import { Scene } from './components/scene'
+import { MapInspector } from './sensor/map-panel'
 import { SensorControls, SensorPanel, VisualInspector } from './sensor/panel'
 import { createAcquisition } from './sensor/runtime'
 import { ROUTE_DURATION, ROUTE_LENGTH } from './sim/route'
@@ -111,6 +112,8 @@ export default function App() {
 		showOdometry,
 		showRoute,
 		showVisual,
+		showMap,
+		showKeyframes,
 		toggle,
 		quality,
 		setQuality,
@@ -161,6 +164,8 @@ export default function App() {
 					<Scene
 						acquisition={acquisition}
 						visualTrail={sensor.visual.trail}
+						map={sensor.latest?.vo?.map}
+						mapOrigin={sensor.visual.origin}
 						state={state}
 						controller={controller}
 						onReady={handleReady}
@@ -216,6 +221,18 @@ export default function App() {
 					</fieldset>
 					<fieldset className="scene-legend" aria-label="Scene layers">
 						<span className="eyebrow">LAYERS</span>
+						<button type="button" aria-pressed={showMap} onClick={() => toggle('showMap')}>
+							<span className="line-swatch visual" />
+							Sparse points
+						</button>
+						<button
+							type="button"
+							aria-pressed={showKeyframes}
+							onClick={() => toggle('showKeyframes')}
+						>
+							<span className="line-swatch keyframes" />
+							Keyframes
+						</button>
 						<button type="button" aria-pressed={showVisual} onClick={() => toggle('showVisual')}>
 							<span className="line-swatch visual" />
 							Visual odometry
@@ -383,6 +400,7 @@ export default function App() {
 						</p>
 					</section>
 					<VisualInspector acquisition={acquisition} />
+					<MapInspector acquisition={acquisition} />
 					<section className="drive-section" aria-label="Manual driving controls">
 						<div className="section-heading">
 							<h2>

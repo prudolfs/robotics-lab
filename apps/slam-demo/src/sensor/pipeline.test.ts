@@ -2,7 +2,7 @@ import { type ProcessedFrame, processFrame, type StereoFrame } from '@robotics-l
 import { expect, it } from 'vitest'
 import { createController } from '../sim/controller'
 import { FramePipeline, type WorkerPort } from './pipeline'
-import { decodeRecording, encodeRecording } from './recording'
+import { cloneFrame, decodeRecording, encodeRecording } from './recording'
 
 function frame(frameId = 0, generation = 0): StereoFrame {
 	return {
@@ -193,4 +193,14 @@ it('reports worker construction failures without throwing into the renderer', ()
 	expect(() => pipeline.reset(0)).not.toThrow()
 	expect(errors[0]).toContain('Worker unavailable')
 	expect(pipeline.depth).toBe(0)
+})
+
+it('pixel recordings exclude large estimator snapshots and preserve only sensor inputs', () => {
+	const input = frame(0, 0)
+	const enriched = { ...input, vo: { map: 'x'.repeat(3 * 1024 * 1024) } }
+	const copy = cloneFrame(enriched)
+	expect('vo' in copy).toBe(false)
+	const bytes = encodeRecording([enriched])
+	expect(new DataView(bytes).getUint32(4, true)).toBeLessThan(2048)
+	expect(decodeRecording(bytes)[0].left).toEqual(input.left)
 })

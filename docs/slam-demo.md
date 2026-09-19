@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first stereo visual SLAM explorer with a Blender-authored robotics lab, live feature tracking, sparse reconstruction and visible loop closure.
 >
-> Status: Phases 0–4 implemented and verified; Phase 4 awaits user review. Phases 5–10 remain planned. Phase 4 processing exceeds the initial 30 ms/pair target; measured limits are documented in its review.
+> Status: Phases 0–5 implemented and verified; Phase 5 awaits user review. Phases 6–10 remain planned. Local mapping meets its measured p95 budget; total vision processing still exceeds the initial 30 ms/pair target. See the Phase 5 review for limits.
 
 ## Goal and experience
 
@@ -152,15 +152,17 @@ Review evidence: [Phase 4 screenshots, fixed fixtures, full-route error and proc
 
 ### Phase 5 — Keyframes and persistent sparse mapping
 
-- [ ] Create keyframes based on motion, feature overlap and tracking quality; store observations and calibrated poses.
-- [ ] Maintain persistent landmark IDs, descriptors, observation links and quality scores without exposing simulator IDs.
-- [ ] Track against the local map and triangulate/fuse new observations; cull duplicates, unstable landmarks and redundant keyframes.
-- [ ] Implement bounded local bundle adjustment with robust loss, a fixed reference frame and safeguards for singular/non-improving solutions.
-- [ ] Publish coherent versioned map snapshots so poses and landmarks are never displayed from different optimization revisions.
-- [ ] Add instanced sparse points, keyframe frusta and selection inspectors showing actual observations and residuals.
-- [ ] Test map consistency, memory caps and reprojection-error improvement on controlled fixtures.
+- [x] Create keyframes based on motion, feature overlap and tracking quality; store observations and calibrated poses.
+- [x] Maintain persistent landmark IDs, descriptors, observation links and quality scores without exposing simulator IDs.
+- [x] Track against the local map and triangulate/fuse new observations; cull duplicates, unstable landmarks and redundant keyframes.
+- [x] Implement bounded local bundle adjustment with robust loss, a fixed reference frame and safeguards for singular/non-improving solutions.
+- [x] Publish coherent versioned map snapshots so poses and landmarks are never displayed from different optimization revisions.
+- [x] Add instanced sparse points, keyframe frusta and selection inspectors showing actual observations and residuals.
+- [x] Test map consistency, memory caps and reprojection-error improvement on controlled fixtures.
 
-Exit: a persistent sparse map supports continued tracking and local refinement within the chosen compute budget.
+Exit verified: a persistent sparse map supports continued tracking and local refinement within the chosen compute budget.
+
+Review evidence: [Phase 5 reconstruction, tests, full-route measurements and compute limits](slam-demo/phase5/README.md). Stop for user review before Phase 6.
 
 ### Phase 6 — Place recognition and loop closure
 

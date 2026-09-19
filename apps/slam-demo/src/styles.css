@@ -1257,3 +1257,39 @@ fieldset {
 .line-swatch.visual {
 	border-top: 2px solid #83dece;
 }
+
+.line-swatch.keyframes {
+	border-color: #a1bafa;
+}
+.map-select {
+	display: grid;
+	gap: 8px;
+	margin-top: 16px;
+	font-size: 11px;
+}
+.map-select select {
+	width: 100%;
+	min-width: 0;
+	padding: 8px;
+	background: #14232c;
+	color: #d9e5e9;
+	border: 1px solid #34454e;
+	border-radius: 4px;
+}
+.map-selection {
+	font-size: 10px;
+	line-height: 1.7;
+	color: #aec1ca;
+	overflow-x: auto;
+}
+.map-selection table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 9px;
+}
+.map-selection th,
+.map-selection td {
+	text-align: left;
+	padding: 5px 3px;
+	border-bottom: 1px solid #34454e;
+}

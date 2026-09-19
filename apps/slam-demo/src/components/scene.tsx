@@ -1,5 +1,6 @@
 import { Line, OrbitControls } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import type { MapSnapshot, Pose3 } from '@robotics-lab/vision'
 import {
 	Component,
 	type ComponentRef,
@@ -19,6 +20,7 @@ import { scenePosition } from '../sim/world'
 import { usePresentation } from '../store'
 import { AuthoredAssets, StudioEnvironment } from './assets'
 import { RenderMetrics } from './render-metrics'
+import { SparseMap } from './sparse-map'
 
 class GraphicsBoundary extends Component<
 	{ children: ReactNode; onFailure: () => void },
@@ -168,6 +170,8 @@ export function Scene({
 	onFailure,
 	acquisition,
 	visualTrail,
+	map,
+	mapOrigin,
 }: {
 	state: Simulation
 	controller: SimulationController
@@ -175,6 +179,8 @@ export function Scene({
 	onFailure: () => void
 	acquisition: Acquisition
 	visualTrail: VisualPoint[]
+	map?: MapSnapshot
+	mapOrigin: Pose3 | null
 }) {
 	const quality = usePresentation((s) => s.quality)
 	return (
@@ -220,6 +226,7 @@ export function Scene({
 					<AuthoredAssets controller={controller} onReady={onReady} acquisition={acquisition} />
 				</Suspense>
 				<Paths state={state} visualTrail={visualTrail} />
+				<SparseMap map={map} origin={mapOrigin} />
 				<RenderMetrics controller={controller} />
 
 				<CameraRig controller={controller} />

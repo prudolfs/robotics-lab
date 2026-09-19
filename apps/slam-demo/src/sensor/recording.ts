@@ -1,19 +1,35 @@
 import { type StereoFrame, validateFrame } from '@robotics-lab/sensors'
 export const RECORDING_LIMIT = 6
 const MAGIC = 0x334d4c53
+// Record sensor inputs only. Estimator/map snapshots must never enter a pixel fixture.
+function metadata(frame: StereoFrame) {
+	return {
+		generation: frame.generation,
+		frameId: frame.frameId,
+		timestamp: frame.timestamp,
+		calibration: { ...frame.calibration },
+		kind: frame.kind,
+		observations: frame.observations?.map((o) => ({
+			id: o.id,
+			left: [...o.left] as [number, number],
+			right: [...o.right] as [number, number],
+		})),
+		checksum:
+			'checksum' in frame && typeof frame.checksum === 'string' ? frame.checksum : undefined,
+	}
+}
 export function cloneFrame(frame: StereoFrame): StereoFrame {
-	return { ...frame, left: frame.left.slice(0), right: frame.right.slice(0) }
+	return { ...metadata(frame), left: frame.left.slice(0), right: frame.right.slice(0) }
 }
 /** Small Phase 3 pixel fixture, not a simulation/session recording or seek format. */
 export function encodeRecording(frames: StereoFrame[]): ArrayBuffer {
 	if (!frames.length || frames.length > RECORDING_LIMIT)
 		throw Error('Record between one and six pairs')
-	const metadata = frames.map((frame) => {
+	const frameMetadata = frames.map((frame) => {
 		validateFrame(frame)
-		const { left, right, ...meta } = frame
-		return meta
+		return metadata(frame)
 	})
-	const header = new TextEncoder().encode(JSON.stringify({ version: 1, frames: metadata }))
+	const header = new TextEncoder().encode(JSON.stringify({ version: 1, frames: frameMetadata }))
 	const size =
 		8 + header.length + frames.reduce((s, f) => s + f.left.byteLength + f.right.byteLength, 0)
 	const output = new Uint8Array(size),

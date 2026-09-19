@@ -19,6 +19,7 @@ export type FeatureOverlay = {
 	reason: string
 }
 export type OdometryResult = {
+	map?: import('./mapping').MapSnapshot
 	status: 'initializing' | 'tracking' | 'degraded' | 'lost'
 	reason: string
 	frameId: number
