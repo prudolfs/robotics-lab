@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1060" viewBox="0 0 1440 1060" role="img" aria-labelledby="title desc">
+<title id="title">Robotics Lab — SLAM visual specification</title><desc id="desc">Viewport layout, compact rover silhouette, lab route, material palette and scientific overlay legend. Design specification rather than a finished render.</desc>
+<defs><pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#2b3a41" stroke-width=".7"/></pattern><linearGradient id="paint" x2="1" y2="1"><stop stop-color="#448e92"/><stop offset="1" stop-color="#163d46"/></linearGradient><linearGradient id="metal"><stop stop-color="#647982"/><stop offset=".45" stop-color="#d4dfe0"/><stop offset="1" stop-color="#637883"/></linearGradient><style>text{font-family:Arial,sans-serif;fill:#dce7e9}.muted{fill:#92abb5}.tiny{font-size:13px}.label{font-size:17px;font-weight:bold}.section{font-size:12px;letter-spacing:2px;fill:#7edbc7}</style></defs>
+<rect width="1440" height="1060" fill="#101a20"/>
+<text x="40" y="40" class="section">ROBOTICS LAB / VISUAL SLAM / PHASE 0</text><text x="40" y="80" font-size="30" font-weight="bold">An inspection lab you can understand through a robot’s eyes.</text><text x="40" y="111" class="muted">Industrial materials · warm task lighting · cool ambient fill · precise, quiet overlays</text>
+<rect x="40" y="145" width="1360" height="480" rx="12" fill="#19262e" stroke="#354852"/>
+<text x="64" y="177" class="section">01 / VIEWPORT COMPOSITION — 1440 × 900 TARGET</text>
+<rect x="64" y="195" width="1000" height="365" fill="url(#grid)"/>
+<path d="M170 240H890V520H170Z" fill="#283940" stroke="#5d7680" stroke-width="4"/>
+<path d="M180 251H410V280H180 M460 251H720V280H460 M840 280H880V450H840" fill="#4c6268" stroke="#789399"/>
+<rect x="435" y="350" width="220" height="80" rx="8" fill="#40565d" stroke="#789399"/>
+<text x="473" y="396" class="tiny">Equipment island</text>
+<path d="M245 474H740Q795 474 795 420V335Q795 310 740 310H270Q220 310 220 360V440Q220 474 245 474" fill="none" stroke="#7edbc7" stroke-width="3" stroke-dasharray="8 5"/>
+<path d="M245 474H480" fill="none" stroke="#7edbc7" stroke-width="4"/>
+<path d="M245 483L490 492" fill="none" stroke="#f4b36d" stroke-width="2" stroke-dasharray="5 5"/>
+<circle cx="480" cy="474" r="10" fill="#7edbc7"/>
+<path d="M490 474L544 450V498Z" fill="#7edbc7" fill-opacity=".13" stroke="#7edbc7"/>
+<text x="198" y="300" class="tiny">A / workbench</text><text x="751" y="266" class="tiny">B / storage</text><text x="205" y="512" class="tiny">C / dock + verified revisit</text>
+<rect x="680" y="430" width="340" height="106" rx="6" fill="#101a20" stroke="#53656e"/>
+<text x="697" y="453" class="tiny">CAMERA / processed frame + tracks</text><path d="M696 480L718 476M758 490L780 481M847 499L869 491M932 477L954 470" stroke="#7edbc7" stroke-width="2"/>
+<rect x="1080" y="195" width="295" height="365" rx="6" fill="#132028"/>
+<text x="1100" y="225" class="label">Tracking</text><text x="1100" y="254" class="muted tiny">Features / inliers / residuals</text><path d="M1100 273H1352" stroke="#3d515a"/>
+<text x="1100" y="307" class="label">Map &amp; keyframes</text><text x="1100" y="336" class="muted tiny">Selected observations and quality</text><path d="M1100 354H1352" stroke="#3d515a"/>
+<text x="1100" y="391" class="label">Verified revisit</text><text x="1100" y="420" class="muted tiny">Candidate → geometry → correction</text><text x="1100" y="460" class="muted tiny">Truth off by default</text><text x="1100" y="488" class="muted tiny">Units always visible</text><text x="1100" y="516" class="muted tiny">No decorative telemetry</text>
+<rect x="64" y="575" width="1311" height="30" rx="4" fill="#0e181e"/><text x="80" y="595" class="tiny">▶ Run     Pause     Reset                       0:00 ━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1:18                 Stereo · 10 Hz</text>
+<text x="40" y="672" class="section">02 / ROVER SILHOUETTE</text>
+<rect x="58" y="748" width="62" height="103" rx="19" fill="#060c10" stroke="#53656e"/><rect x="353" y="748" width="62" height="103" rx="19" fill="#060c10" stroke="#53656e"/>
+<path d="M102 744L141 704H332L373 744V835H102Z" fill="url(#paint)" stroke="#7b9da4" stroke-width="2"/>
+<rect x="184" y="688" width="108" height="38" rx="9" fill="url(#metal)"/><circle cx="201" cy="707" r="11" fill="#091923" stroke="#7edbc7"/><circle cx="275" cy="707" r="11" fill="#091923" stroke="#7edbc7"/>
+<path d="M198 673H277M198 668V678M277 668V678" stroke="#92abb5"/><text x="208" y="658" class="tiny">120 mm</text>
+<rect x="166" y="780" width="135" height="5" fill="#7edbc7"/><text x="72" y="888" class="muted tiny">0.48 × 0.38 m body · 0.45 m optical height</text>
+<text x="486" y="672" class="section">03 / MATERIAL &amp; LIGHTING PALETTE</text>
+<rect x="488" y="700" width="90" height="75" rx="7" fill="url(#paint)"/><rect x="596" y="700" width="90" height="75" rx="7" fill="url(#metal)"/><rect x="704" y="700" width="90" height="75" rx="7" fill="#111a1f" stroke="#425963"/><rect x="812" y="700" width="90" height="75" rx="7" fill="#6e797a"/>
+<text x="488" y="798" class="tiny">Paint</text><text x="596" y="798" class="tiny">Alloy</text><text x="704" y="798" class="tiny">Rubber</text><text x="812" y="798" class="tiny">Floor</text>
+<circle cx="510" cy="840" r="13" fill="#ffd6a0"/><text x="536" y="845" class="tiny">Warm 3500 K workbench lamps</text><circle cx="510" cy="880" r="13" fill="#bddbfa"/><text x="536" y="885" class="tiny">Cool 6500 K ambient fill</text>
+<text x="964" y="672" class="section">04 / SCIENTIFIC OVERLAYS</text>
+<path d="M966 717H1030" stroke="#7edbc7" stroke-width="3"/><text x="1045" y="722" class="tiny">Estimated trajectory</text><path d="M966 757H1030" stroke="#f4b36d" stroke-dasharray="6 4" stroke-width="3"/><text x="1045" y="762" class="tiny">Encoder odometry</text><path d="M966 797H1030" stroke="#aebbc5" stroke-dasharray="2 5" stroke-width="2"/><text x="1045" y="802" class="tiny">Optional ground truth</text><circle cx="982" cy="838" r="4" fill="#7edbc7"/><text x="1045" y="843" class="tiny">Accepted landmark</text><path d="M977 872L987 882M987 872L977 882" stroke="#ef888a" stroke-width="2"/><text x="1045" y="882" class="tiny">Rejected observation</text>
+<path d="M40 929H1400" stroke="#354852"/><text x="40" y="963" class="label">Design gate</text><text x="40" y="995" class="muted">Readable at robot eye level. Texture variation supports tracking. Cosmetic bloom stays out of sensor pixels.</text><text x="40" y="1027" class="muted tiny">This sheet specifies Phase 2 art direction; the Phase 0 browser probe is a separate numerical/material test scene.</text>
+</svg>

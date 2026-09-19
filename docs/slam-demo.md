@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first stereo visual SLAM explorer with a Blender-authored robotics lab, live feature tracking, sparse reconstruction and visible loop closure.
 >
-> Status: planned. All tasks are intentionally unchecked. This document does not indicate implementation progress.
+> Status: Phase 0 implemented and verified; awaiting user review. Phases 1–10 remain planned.
 
 ## Goal and experience
 
@@ -82,16 +82,16 @@ These are planning targets, not measured claims. Reduce expensive presentation e
 
 Goal: resolve the highest-risk numerical and rendering choices before producing the full scene.
 
-- [ ] Write the guided loop storyboard, viewport layout and visual reference sheet with robot, materials, lighting and overlay treatments.
-- [ ] Define meters/radians, timestamps, transform direction, camera optical axes and adapters for the existing 2D world, Three.js scene and Blender exports; test handedness and round trips.
-- [ ] Specify stereo intrinsics, baseline, robot-to-camera extrinsics, capture rate and the initial route length/speed.
-- [ ] Spike a pixel-to-pose pipeline on a short recorded stereo sequence; compare a TypeScript implementation with an OpenCV/WASM adapter for required operations, download size and worker compatibility.
-- [ ] Verify the chosen build actually exposes needed feature, triangulation and pose functions; do not assume native OpenCV APIs all exist in JavaScript bindings.
-- [ ] Compare WebGL2 and WebGPU for stereo render targets, readback, R3F integration and required postprocessing; choose and document one baseline with capability/error behavior.
-- [ ] Establish named reference hardware/browser, benchmark procedure, numerical tolerances and per-stage frame/memory budgets.
-- [ ] Confirm Blender version, export path and whether Blender MCP is available; record the scripted fallback.
+- [x] Write the guided loop storyboard, viewport layout and visual reference sheet with robot, materials, lighting and overlay treatments.
+- [x] Define meters/radians, timestamps, transform direction, camera optical axes and adapters for the existing 2D world, Three.js scene and Blender exports; test handedness and round trips.
+- [x] Specify stereo intrinsics, baseline, robot-to-camera extrinsics, capture rate and the initial route length/speed.
+- [x] Spike a pixel-to-pose pipeline on a short recorded stereo sequence; compare a TypeScript implementation with an OpenCV/WASM adapter for required operations, download size and worker compatibility.
+- [x] Verify the chosen build actually exposes needed feature, triangulation and pose functions; do not assume native OpenCV APIs all exist in JavaScript bindings.
+- [x] Compare WebGL2 and WebGPU for stereo render targets, readback, R3F integration and required postprocessing; choose and document one baseline with capability/error behavior.
+- [x] Establish named reference hardware/browser, benchmark procedure, numerical tolerances and per-stage frame/memory budgets.
+- [x] Confirm Blender version, export path and whether Blender MCP is available; record the scripted fallback.
 
-Exit: a short stereo fixture yields a measured pose estimate, an in-browser material/capture sample works, and the implementation choices are recorded.
+Exit verified: a recorded stereo fixture yields measured pose estimates, the Blender material/capture sample works in-browser, and implementation choices are recorded in the [Phase 0 report](slam-demo/phase0/README.md). Review the [visual specification](slam-demo/phase0/visual-reference.svg) and [browser sample](slam-demo/phase0/browser-probe.png) before beginning Phase 1.
 
 ### Phase 1 — App shell and deterministic simulation
 
