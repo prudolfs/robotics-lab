@@ -23,7 +23,7 @@ import {
 	Square,
 	Target,
 } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { type ReactNode, useCallback, useState } from 'react'
 import { Scene } from './components/scene'
 import { ROUTE_DURATION, ROUTE_LENGTH } from './sim/route'
 import type { Simulation } from './sim/simulation'
@@ -89,8 +89,16 @@ function PoseTable({ state }: { state: Simulation }) {
 }
 export default function App() {
 	const { controller, state } = useSimulation()
+	const [assetsReady, setAssetsReady] = useState(false)
+	const [assetFailed, setAssetFailed] = useState(false)
+	const handleReady = useCallback(() => setAssetsReady(true), [])
+	const handleFailure = useCallback(() => {
+		setAssetsReady(false)
+		setAssetFailed(true)
+	}, [])
 	const press = useManualInput(controller)
-	const { camera, setCamera, showTruth, showOdometry, showRoute, toggle } = usePresentation()
+	const { camera, setCamera, showTruth, showOdometry, showRoute, toggle, quality, setQuality } =
+		usePresentation()
 	const running = state.status === 'running',
 		complete = state.status === 'complete',
 		configLocked = state.tick > 0 || running
@@ -125,7 +133,7 @@ export default function App() {
 					<Box size={15} />
 					<span>Inspection lab</span>
 					<ChevronRight size={13} />
-					<span className="muted">Motion prototype</span>
+					<span className="muted">Inspection environment</span>
 				</div>
 				<span className="environment-badge">
 					<span className="live-dot" />
@@ -134,13 +142,25 @@ export default function App() {
 			</header>
 			<main className="workspace">
 				<section className="viewport" aria-label="Simulation workspace">
-					<Scene state={state} controller={controller} />
+					<Scene
+						state={state}
+						controller={controller}
+						onReady={handleReady}
+						onFailure={handleFailure}
+					/>
+					{!assetsReady && !assetFailed && (
+						<div className="asset-loading" role="status">
+							<span className="loading-orbit" />
+							<strong>Preparing the inspection lab</strong>
+							<span>Loading models and surface materials…</span>
+						</div>
+					)}
 					<div className="scene-heading">
 						<span className="eyebrow">SCENARIO 01 / INDOOR</span>
 						<h1>
 							Inspection lab<span className="title-dot">.</span>
 						</h1>
-						<p>A first look at motion, position, and drift.</p>
+						<p>Explore the lab. Follow the rover. Inspect the details.</p>
 					</div>
 					<fieldset className="view-controls" aria-label="Camera controls">
 						<button
@@ -158,6 +178,22 @@ export default function App() {
 						>
 							<Focus size={15} />
 							Follow robot
+						</button>
+						<button
+							type="button"
+							aria-pressed={camera === 'robot'}
+							onClick={() => setCamera('robot')}
+						>
+							<Camera size={15} />
+							Robot eye
+						</button>
+						<button
+							type="button"
+							aria-pressed={camera === 'bench'}
+							onClick={() => setCamera('bench')}
+						>
+							<Focus size={15} />
+							Workbench
 						</button>
 					</fieldset>
 					<fieldset className="scene-legend" aria-label="Scene layers">
@@ -184,7 +220,15 @@ export default function App() {
 							<span className="axis-glyph">↗</span>
 							<div>
 								<strong>10 × 8 m</strong>
-								<span>Orbit to inspect · Scroll to zoom</span>
+								<span>
+									{camera === 'robot'
+										? 'Left camera mount · presentation view'
+										: camera === 'bench'
+											? 'Instrument workbench · material inspection'
+											: camera === 'follow'
+												? 'Camera follows the rover'
+												: 'Orbit to inspect · Scroll to zoom'}
+								</span>
 							</div>
 						</div>
 						<section className="camera-slot" aria-label="Stereo camera preview">
@@ -215,7 +259,15 @@ export default function App() {
 							<SlidersHorizontal size={17} />
 							Inspector
 						</span>
-						<span className="tiny-badge">ROVER 01</span>
+						<select
+							aria-label="Graphics quality"
+							className="quality-select"
+							value={quality}
+							onChange={(e) => setQuality(e.currentTarget.value as 'standard' | 'low')}
+						>
+							<option value="standard">Standard graphics</option>
+							<option value="low">Low graphics</option>
+						</select>
 					</div>
 					<section className="inspector-section">
 						<div className="section-heading">
@@ -412,7 +464,7 @@ export default function App() {
 					<button
 						type="button"
 						className="run-button"
-						disabled={complete}
+						disabled={complete || !assetsReady}
 						onClick={() => (running ? controller.pause() : controller.play())}
 					>
 						{running ? (

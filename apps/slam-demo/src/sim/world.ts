@@ -1,12 +1,9 @@
 import type { Pose } from '@robotics-lab/core'
+import manifest from '../../../../assets/slam-demo/manifest.json'
 // Canonical coordinates: X forward, Y left, Z up. These are not legacy map coordinates.
-export const WORLD = { width: 10, depth: 8 }
-export const ROBOT_RADIUS = 0.31
-export const OBSTACLES = [
-	{ id: 'island', name: 'Equipment island', x: 0, y: 0, width: 3, depth: 2, height: 0.85 },
-	{ id: 'workbench', name: 'Workbench', x: -2.3, y: 3.35, width: 3, depth: 0.7, height: 0.9 },
-	{ id: 'storage', name: 'Storage', x: 4.35, y: 0.3, width: 0.55, depth: 3, height: 1.45 },
-] as const
+export const WORLD = manifest.world
+export const ROBOT_RADIUS = manifest.robot.radius
+export const OBSTACLES = manifest.obstacles
 export function collides(pose: Pick<Pose, 'x' | 'y'>): boolean {
 	if (
 		Math.abs(pose.x) + ROBOT_RADIUS > WORLD.width / 2 ||

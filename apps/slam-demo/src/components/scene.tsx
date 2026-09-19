@@ -1,11 +1,22 @@
-import { Grid, Line, OrbitControls } from '@react-three/drei'
+import { Line, OrbitControls } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Component, type ComponentRef, type ReactNode, useEffect, useMemo, useRef } from 'react'
-import { type Group, Vector3 } from 'three'
+import {
+	Component,
+	type ComponentRef,
+	type ReactNode,
+	Suspense,
+	useEffect,
+	useMemo,
+	useRef,
+} from 'react'
+import { Vector3 } from 'three'
+import manifest from '../../../../assets/slam-demo/manifest.json'
 import type { SimulationController } from '../sim/controller'
 import { createSimulation, type Simulation, setStatus, stepSimulation } from '../sim/simulation'
-import { OBSTACLES, scenePosition, WORLD } from '../sim/world'
+import { scenePosition } from '../sim/world'
 import { usePresentation } from '../store'
+import { AuthoredAssets, StudioEnvironment } from './assets'
+import { RenderMetrics } from './render-metrics'
 
 class GraphicsBoundary extends Component<
 	{ children: ReactNode; onFailure: () => void },
@@ -21,125 +32,15 @@ class GraphicsBoundary extends Component<
 	render() {
 		return this.state.failed ? (
 			<div className="graphics-error">
-				<strong>The 3D view could not start.</strong>
+				<strong>The lab could not load.</strong>
 				<p>
-					This demo needs WebGL2. Try a browser with hardware acceleration enabled, then reload.
+					Check your connection and WebGL2 support, then reload to retry loading the lab assets.
 				</p>
 			</div>
 		) : (
 			this.props.children
 		)
 	}
-}
-function Lab() {
-	return (
-		<group>
-			<mesh receiveShadow position={[0, -0.13, 0]}>
-				<boxGeometry args={[WORLD.width, 0.24, WORLD.depth]} />
-				<meshStandardMaterial color="#526067" roughness={0.95} />
-			</mesh>
-			<Grid
-				position={[0, 0.005, 0]}
-				args={[10, 8]}
-				cellSize={0.5}
-				cellThickness={0.45}
-				cellColor="#65767b"
-				sectionSize={1}
-				sectionThickness={0.7}
-				sectionColor="#7e8f90"
-				fadeDistance={24}
-				fadeStrength={1}
-			/>
-			{OBSTACLES.map((o) => (
-				<group key={o.id} position={[o.x, 0, -o.y]}>
-					<mesh position={[0, o.height / 2, 0]} castShadow receiveShadow>
-						<boxGeometry args={[o.width, o.height, o.depth]} />
-						<meshStandardMaterial
-							color={o.id === 'island' ? '#36484e' : '#45575d'}
-							roughness={0.72}
-						/>
-					</mesh>
-					<mesh position={[0, o.height + 0.025, 0]} castShadow>
-						<boxGeometry args={[o.width + 0.06, 0.05, o.depth + 0.06]} />
-						<meshStandardMaterial color="#91a09f" roughness={0.5} metalness={0.25} />
-					</mesh>
-				</group>
-			))}
-			{/* Low boundary blocks preserve sightlines while showing the collision perimeter. */}
-			{[-1, 1].map((side) => (
-				<group key={side}>
-					<mesh position={[side * 5, 0.12, 0]} castShadow>
-						<boxGeometry args={[0.08, 0.24, 8]} />
-						<meshStandardMaterial color="#8a9c9d" />
-					</mesh>
-					<mesh position={[0, 0.12, side * 4]} castShadow>
-						<boxGeometry args={[10, 0.24, 0.08]} />
-						<meshStandardMaterial color="#8a9c9d" />
-					</mesh>
-				</group>
-			))}
-			<mesh position={[0, 0.013, 2.5]} rotation={[-Math.PI / 2, 0, 0]}>
-				<planeGeometry args={[0.85, 0.8]} />
-				<meshStandardMaterial color="#213e40" transparent opacity={0.85} />
-			</mesh>
-			<Line
-				points={[
-					[-0.43, 0.025, 2.9],
-					[-0.43, 0.025, 2.1],
-					[0.43, 0.025, 2.1],
-					[0.43, 0.025, 2.9],
-				]}
-				color="#7edbc7"
-				lineWidth={1.5}
-			/>
-		</group>
-	)
-}
-function Rover({ controller }: { controller: SimulationController }) {
-	const root = useRef<Group>(null)
-	useFrame(() => {
-		const pose = controller.read().truth.pose
-		if (root.current) {
-			root.current.position.set(pose.x, 0, -pose.y)
-			root.current.rotation.y = pose.heading
-		}
-	})
-	return (
-		<group ref={root}>
-			<mesh position={[0, 0.2, 0]} castShadow>
-				<boxGeometry args={[0.48, 0.16, 0.38]} />
-				<meshStandardMaterial color="#3f8d87" metalness={0.25} roughness={0.5} />
-			</mesh>
-			<mesh position={[0.08, 0.3, 0]} castShadow>
-				<boxGeometry args={[0.26, 0.07, 0.28]} />
-				<meshStandardMaterial color="#b6c6c5" metalness={0.4} roughness={0.4} />
-			</mesh>
-			<mesh position={[0.16, 0.4, 0]}>
-				<boxGeometry args={[0.04, 0.16, 0.04]} />
-				<meshStandardMaterial color="#9baeb2" />
-			</mesh>
-			<mesh position={[0.16, 0.45, 0]}>
-				<boxGeometry args={[0.06, 0.065, 0.2]} />
-				<meshStandardMaterial color="#16242c" />
-			</mesh>
-			{[-1, 1].map((side) => (
-				<group key={side}>
-					<mesh position={[0, 0.08, side * 0.2]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-						<cylinderGeometry args={[0.08, 0.08, 0.055, 24]} />
-						<meshStandardMaterial color="#111c23" roughness={0.9} />
-					</mesh>
-					<mesh position={[0.194, 0.45, side * 0.06]} rotation={[0, Math.PI / 2, 0]}>
-						<circleGeometry args={[0.017, 16]} />
-						<meshBasicMaterial color="#7edbc7" />
-					</mesh>
-				</group>
-			))}
-			<mesh position={[0.255, 0.2, 0]}>
-				<boxGeometry args={[0.018, 0.025, 0.2]} />
-				<meshBasicMaterial color="#a3f4d9" />
-			</mesh>
-		</group>
-	)
 }
 function CameraRig({ controller }: { controller: SimulationController }) {
 	const mode = usePresentation((s) => s.camera)
@@ -148,6 +49,15 @@ function CameraRig({ controller }: { controller: SimulationController }) {
 	const desired = useMemo(() => new Vector3(), []),
 		target = useMemo(() => new Vector3(), [])
 	useEffect(() => {
+		if ('fov' in camera) {
+			camera.fov = mode === 'robot' ? 53.13010235415598 : 42
+			camera.updateProjectionMatrix()
+		}
+		if (mode === 'bench') {
+			camera.position.set(-0.8, 2.25, -0.25)
+			controls.current?.target.set(-2.3, 1.05, -3.3)
+			controls.current?.update()
+		}
 		if (mode === 'overview') {
 			const scale = Math.max(1, Math.min(1.7, size.height / size.width))
 			camera.position.set(10 * scale, 10 * scale, 12 * scale)
@@ -165,6 +75,15 @@ function CameraRig({ controller }: { controller: SimulationController }) {
 		return () => gl.domElement.removeEventListener('webglcontextlost', lost)
 	}, [controller, gl])
 	useFrame((_, dt) => {
+		if (mode === 'robot') {
+			const p = controller.read().truth.pose,
+				[mx, my, mz] = manifest.mounts.Camera_Left,
+				c = Math.cos(p.heading),
+				sn = Math.sin(p.heading)
+			camera.position.set(p.x + c * mx - sn * my, mz, -(p.y + sn * mx + c * my))
+			target.set(camera.position.x + c, camera.position.y, camera.position.z - sn)
+			camera.lookAt(target)
+		}
 		if (mode === 'follow' && controls.current) {
 			const p = controller.read().truth.pose
 			target.set(p.x, 0.2, -p.y)
@@ -240,38 +159,60 @@ function Paths({ state }: { state: Simulation }) {
 export function Scene({
 	state,
 	controller,
+	onReady,
+	onFailure,
 }: {
 	state: Simulation
 	controller: SimulationController
+	onReady: () => void
+	onFailure: () => void
 }) {
+	const quality = usePresentation((s) => s.quality)
 	return (
-		<GraphicsBoundary onFailure={() => controller.pause()}>
+		<GraphicsBoundary
+			onFailure={() => {
+				controller.pause()
+				onFailure()
+			}}
+		>
 			<Canvas
-				shadows
+				shadows={quality === 'standard'}
 				camera={{ position: [10, 10, 12], fov: 42, near: 0.1, far: 80 }}
-				dpr={[1, 1.5]}
+				dpr={quality === 'low' ? 1 : [1, 1.5]}
 				gl={{ antialias: true }}
 				fallback={<div className="graphics-error">WebGL2 is required to display the lab.</div>}
 				aria-label="Interactive inspection lab"
 			>
 				<color attach="background" args={['#18232b']} />
-				<ambientLight intensity={0.65} />
-				<hemisphereLight args={['#d7ebff', '#4f5350', 1.8]} />
+				<ambientLight intensity={0.3} />
+				<hemisphereLight args={['#d7ebff', '#4f5350', 1.2]} />
 				<directionalLight
 					castShadow
 					position={[1, 8, 4]}
-					intensity={2.8}
+					intensity={2.5}
 					color="#ffecd1"
-					shadow-mapSize={[1024, 1024]}
+					shadow-mapSize={[2048, 2048]}
 					shadow-camera-left={-7}
 					shadow-camera-right={7}
 					shadow-camera-top={7}
 					shadow-camera-bottom={-7}
-					shadow-normalBias={0.04}
+					shadow-normalBias={0.025}
+					shadow-bias={-0.0001}
 				/>
-				<Lab />
+				<StudioEnvironment />
+				<pointLight
+					position={[-2.3, 1.8, -3.15]}
+					color="#ffce91"
+					intensity={5}
+					distance={4}
+					decay={2}
+				/>
+				<Suspense fallback={null}>
+					<AuthoredAssets controller={controller} onReady={onReady} />
+				</Suspense>
 				<Paths state={state} />
-				<Rover controller={controller} />
+				<RenderMetrics controller={controller} />
+
 				<CameraRig controller={controller} />
 			</Canvas>
 		</GraphicsBoundary>

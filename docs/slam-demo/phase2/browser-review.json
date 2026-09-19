@@ -1,0 +1,140 @@
+{
+  "capturedAt": "2026-09-19T01:38:34.961Z",
+  "hardware": "Apple M3 Pro",
+  "os": "darwin 25.5.0",
+  "browser": "152.0.7977.83",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "views": {
+    "overview": {
+      "drawCalls": 58,
+      "triangles": 123692,
+      "geometries": 30,
+      "textures": 9,
+      "camera": "overview",
+      "quality": "standard",
+      "wheelAngles": {
+        "left": 0,
+        "right": 0
+      },
+      "samples": 590,
+      "p50Ms": 16.699999928474426,
+      "p95Ms": 17.5
+    },
+    "workbench": {
+      "drawCalls": 41,
+      "triangles": 116488,
+      "geometries": 30,
+      "textures": 9,
+      "camera": "bench",
+      "quality": "standard",
+      "wheelAngles": {
+        "left": 0,
+        "right": 0
+      },
+      "samples": 560,
+      "p50Ms": 16.699999928474426,
+      "p95Ms": 17.40000009536743
+    },
+    "robot-eye": {
+      "drawCalls": 46,
+      "triangles": 123584,
+      "geometries": 33,
+      "textures": 11,
+      "camera": "robot",
+      "quality": "standard",
+      "wheelAngles": {
+        "left": 0,
+        "right": 0
+      },
+      "samples": 560,
+      "p50Ms": 16.699999928474426,
+      "p95Ms": 17.5
+    },
+    "follow": {
+      "drawCalls": 57,
+      "triangles": 123680,
+      "geometries": 33,
+      "textures": 11,
+      "camera": "follow",
+      "quality": "standard",
+      "wheelAngles": {
+        "left": 0,
+        "right": 0
+      },
+      "samples": 560,
+      "p50Ms": 16.699999928474426,
+      "p95Ms": 17.5
+    },
+    "low": {
+      "drawCalls": 30,
+      "triangles": 64152,
+      "geometries": 33,
+      "textures": 11,
+      "camera": "overview",
+      "quality": "low",
+      "wheelAngles": {
+        "left": 0,
+        "right": 0
+      },
+      "samples": 560,
+      "p50Ms": 16.699999928474426,
+      "p95Ms": 17.5
+    },
+    "running": {
+      "drawCalls": 60,
+      "triangles": 131486,
+      "geometries": 35,
+      "textures": 11,
+      "camera": "overview",
+      "quality": "standard",
+      "wheelAngles": {
+        "left": 229.53614788829194,
+        "right": 257.8356511687549
+      },
+      "samples": 3540,
+      "p50Ms": 16.699999928474426,
+      "p95Ms": 17.5,
+      "framesOver25Ms": 0
+    }
+  },
+  "errors": [],
+  "initialLoadMs": 1326,
+  "resources": [
+    {
+      "name": "/assets/index-WRHBdeA2.js",
+      "bytes": 333638
+    },
+    {
+      "name": "/assets/index-BAD_Ofxq.css",
+      "bytes": 4609
+    },
+    {
+      "name": "/assets/geist-latin-wght-normal-BgDaEnEv.woff2",
+      "bytes": 29400
+    },
+    {
+      "name": "/assets/slam/lab.glb",
+      "bytes": 573652
+    },
+    {
+      "name": "/assets/slam/cutaway.glb",
+      "bytes": 191320
+    },
+    {
+      "name": "/assets/slam/rover.glb",
+      "bytes": 246532
+    },
+    {
+      "name": "/assets/slam/draco/draco_wasm_wrapper.js",
+      "bytes": 11748
+    },
+    {
+      "name": "/assets/slam/draco/draco_decoder.wasm",
+      "bytes": 192420
+    }
+  ],
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M3 Pro, Unspecified Version)"
+}

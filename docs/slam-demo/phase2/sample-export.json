@@ -1,0 +1,27 @@
+{
+  "blender": "5.1.2",
+  "manifestHash": "b37e02e27d0979ee96d559c84c2fc8f2192526f1ebbad976a8ea661f33045626",
+  "source": "assets/slam-demo/workbench.blend",
+  "moduleBounds": {
+    "workbench": {
+      "min": [
+        -3.799999952316284,
+        3.0,
+        0.0
+      ],
+      "max": [
+        -0.7999999523162842,
+        3.6999998092651367,
+        2.0799999237060547
+      ]
+    }
+  },
+  "bundles": {
+    "workbench": {
+      "bytes": 271292,
+      "triangles": 15812,
+      "meshNodes": 10,
+      "sha256": "699e9646f27386a236f32e1523099f09e0ce0383f5e2006bcf91095a7dd42b4f"
+    }
+  }
+}

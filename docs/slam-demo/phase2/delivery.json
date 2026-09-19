@@ -1,0 +1,107 @@
+{
+  "note": "Entire production directory including optional workbench and licenses; gzip estimates depend on server configuration.",
+  "totalBytes": 2862183,
+  "totalGzipBytes": 1604369,
+  "files": [
+    {
+      "file": "assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2",
+      "bytes": 7420,
+      "gzipBytes": 7443
+    },
+    {
+      "file": "assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2",
+      "bytes": 15084,
+      "gzipBytes": 15107
+    },
+    {
+      "file": "assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2",
+      "bytes": 16512,
+      "gzipBytes": 16540
+    },
+    {
+      "file": "assets/geist-latin-wght-normal-BgDaEnEv.woff2",
+      "bytes": 29400,
+      "gzipBytes": 29428
+    },
+    {
+      "file": "assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2",
+      "bytes": 8004,
+      "gzipBytes": 8027
+    },
+    {
+      "file": "assets/index-B5DTQ3QM.css",
+      "bytes": 16663,
+      "gzipBytes": 4577
+    },
+    {
+      "file": "assets/index-DpJq1VzC.js",
+      "bytes": 1214865,
+      "gzipBytes": 333650
+    },
+    {
+      "file": "assets/slam/LICENSE",
+      "bytes": 756,
+      "gzipBytes": 492
+    },
+    {
+      "file": "assets/slam/cutaway.glb",
+      "bytes": 191320,
+      "gzipBytes": 185514
+    },
+    {
+      "file": "assets/slam/draco/LICENSE",
+      "bytes": 13898,
+      "gzipBytes": 4813
+    },
+    {
+      "file": "assets/slam/draco/NOTICE",
+      "bytes": 433,
+      "gzipBytes": 277
+    },
+    {
+      "file": "assets/slam/draco/THREE-LICENSE",
+      "bytes": 1081,
+      "gzipBytes": 667
+    },
+    {
+      "file": "assets/slam/draco/draco_decoder.wasm",
+      "bytes": 192420,
+      "gzipBytes": 63458
+    },
+    {
+      "file": "assets/slam/draco/draco_wasm_wrapper.js",
+      "bytes": 58456,
+      "gzipBytes": 11748
+    },
+    {
+      "file": "assets/slam/draco/provenance.json",
+      "bytes": 269,
+      "gzipBytes": 217
+    },
+    {
+      "file": "assets/slam/lab.glb",
+      "bytes": 573652,
+      "gzipBytes": 482210
+    },
+    {
+      "file": "assets/slam/rover.glb",
+      "bytes": 246532,
+      "gzipBytes": 205307
+    },
+    {
+      "file": "assets/slam/scene-manifest.json",
+      "bytes": 3293,
+      "gzipBytes": 891
+    },
+    {
+      "file": "assets/slam/workbench.glb",
+      "bytes": 271292,
+      "gzipBytes": 233467
+    },
+    {
+      "file": "index.html",
+      "bytes": 833,
+      "gzipBytes": 536
+    }
+  ]
+}

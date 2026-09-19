@@ -9,6 +9,7 @@ import {
 	stepOdometry,
 	type WheelSpeeds,
 } from '@robotics-lab/robot'
+import manifest from '../../../../assets/slam-demo/manifest.json'
 import { CRUISE_SPEED, ROUTE_DURATION, routeSegment, SPAWN } from './route'
 import { collides } from './world'
 export const FIXED_DT = 1 / 60
@@ -29,6 +30,7 @@ export type Simulation = {
 	tick: number
 	elapsed: number
 	distance: number
+	wheelAngles: { left: number; right: number }
 	truth: RobotState
 	odometry: OdometryState
 	estimator: EstimatorSnapshot
@@ -46,17 +48,18 @@ export function createSimulation(config: Partial<Config> = {}): Simulation {
 		tick: 0,
 		elapsed: 0,
 		distance: 0,
+		wheelAngles: { left: 0, right: 0 },
 		truth: createRobot(
 			{ ...SPAWN },
 			{
-				wheelBase: 0.4,
-				wheelRadius: 0.08,
+				wheelBase: manifest.robot.wheelBase,
+				wheelRadius: manifest.robot.wheelRadius,
 				noise: { wheelSlipSigma: settings.noise ? 0.025 : 0, encoderDriftSigma: 0 },
 			},
 		),
 		odometry: createOdometry(
 			{ ...SPAWN },
-			{ wheelBase: 0.4, historyLimit: HISTORY_LIMIT, sampleInterval: 6 },
+			{ wheelBase: manifest.robot.wheelBase, historyLimit: HISTORY_LIMIT, sampleInterval: 6 },
 		),
 		estimator: { status: 'not-connected', pose: null, landmarkCount: 0, keyframeCount: 0 },
 		truthTrail: [{ ...SPAWN }],
@@ -80,6 +83,7 @@ export function stepSimulation(
 ): Simulation {
 	if (state.status !== 'running') return state
 	const rng = seededRng((state.config.seed ^ Math.imul(state.tick + 1, 0x9e3779b9)) >>> 0)
+	const wheelAngles = { ...state.wheelAngles }
 	let truth = state.truth,
 		odometry = state.odometry,
 		elapsed = state.elapsed,
@@ -94,7 +98,10 @@ export function stepSimulation(
 		const dt = part ? Math.min(remaining, part.end - elapsed) : remaining
 		const v = part ? CRUISE_SPEED : Math.max(-1, Math.min(1, input.forward)) * 0.45
 		const omega = part ? part.omega : Math.max(-1, Math.min(1, input.turn)) * 1.2
-		const wheels = { leftWheel: v - omega * 0.2, rightWheel: v + omega * 0.2 }
+		const wheels = {
+			leftWheel: v - (omega * manifest.robot.wheelBase) / 2,
+			rightWheel: v + (omega * manifest.robot.wheelBase) / 2,
+		}
 		let next = stepDifferentialDrive(truth, wheels, dt, rng)
 		const blocked = collides(next.pose)
 		if (blocked) {
@@ -114,6 +121,8 @@ export function stepSimulation(
 			: { leftWheel: wheels.leftWheel * (1 + bias), rightWheel: wheels.rightWheel * (1 - bias) }
 		odometry = stepOdometry(odometry, reported, dt)
 		distance += Math.hypot(next.pose.x - truth.pose.x, next.pose.y - truth.pose.y)
+		wheelAngles.left += (next.wheels.leftWheel * dt) / manifest.robot.wheelRadius
+		wheelAngles.right += (next.wheels.rightWheel * dt) / manifest.robot.wheelRadius
 		truth = next
 		elapsed += dt
 		remaining -= dt
@@ -128,6 +137,7 @@ export function stepSimulation(
 	const next: Simulation = {
 		...state,
 		truth,
+		wheelAngles,
 		odometry,
 		elapsed,
 		tick,

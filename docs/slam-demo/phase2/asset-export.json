@@ -1,0 +1,63 @@
+{
+  "blender": "5.1.2",
+  "manifestHash": "b37e02e27d0979ee96d559c84c2fc8f2192526f1ebbad976a8ea661f33045626",
+  "source": "assets/slam-demo/inspection-lab.blend",
+  "moduleBounds": {
+    "workbench": {
+      "min": [
+        -3.799999952316284,
+        3.0,
+        0.0
+      ],
+      "max": [
+        -0.7999999523162842,
+        3.6999998092651367,
+        2.0799999237060547
+      ]
+    },
+    "island": {
+      "min": [
+        -1.5,
+        -1.0,
+        0.0
+      ],
+      "max": [
+        1.5,
+        1.0,
+        1.2049999237060547
+      ]
+    },
+    "storage": {
+      "min": [
+        4.074999809265137,
+        -1.2000000476837158,
+        0.0
+      ],
+      "max": [
+        4.625,
+        1.7999999523162842,
+        1.4500000476837158
+      ]
+    }
+  },
+  "bundles": {
+    "lab": {
+      "bytes": 573652,
+      "triangles": 52400,
+      "meshNodes": 12,
+      "sha256": "759447f9b7fe8e4c7ff2dead6987d844ffb517292736a772df1b943da1ca541e"
+    },
+    "cutaway": {
+      "bytes": 191320,
+      "triangles": 3608,
+      "meshNodes": 3,
+      "sha256": "46688efaae88f61341f1fc9702cd0a3e88eb7c2598a1eafdf4bc4b68ed0e5f70"
+    },
+    "rover": {
+      "bytes": 246532,
+      "triangles": 7140,
+      "meshNodes": 16,
+      "sha256": "43dbdd15cbf5307ec2f136e796081920b33e6d72674c51f54a55ee807a1f515b"
+    }
+  }
+}

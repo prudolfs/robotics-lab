@@ -25,6 +25,9 @@ describe('deterministic inspection simulation', () => {
 		expect(end.truth.pose.heading).toBeCloseTo(2 * Math.PI, 8)
 		expect(end.collisionCount).toBe(0)
 		expect(end.distance).toBeCloseTo(ROUTE_LENGTH, 6)
+		// Wheel travel follows the inner/outer arc radii, not display frame timing.
+		expect(end.wheelAngles.left * 0.08).toBeCloseTo(ROUTE_LENGTH - Math.PI * 0.4, 6)
+		expect(end.wheelAngles.right * 0.08).toBeCloseTo(ROUTE_LENGTH + Math.PI * 0.4, 6)
 		expect(end.odometry.pose).toEqual(end.truth.pose)
 		expect(end.truth.velocity.vx).toBe(0)
 		expect(end.estimator).toEqual({
@@ -59,6 +62,7 @@ describe('deterministic inspection simulation', () => {
 		expect(end.truth.pose.x).toBeLessThanOrEqual(WORLD.width / 2 - ROBOT_RADIUS)
 		expect(end.odometry.pose).toEqual(end.truth.pose)
 		expect(end.collisionCount).toBe(1)
+		expect(run(end, 60).wheelAngles).toEqual(end.wheelAngles)
 		const reverse = stepSimulation(end, { forward: -1, turn: 0 })
 		expect(reverse.collision).toBe(false)
 		expect(reverse.truth.pose.x).toBeLessThan(end.truth.pose.x)

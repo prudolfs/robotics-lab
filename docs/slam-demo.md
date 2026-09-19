@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first stereo visual SLAM explorer with a Blender-authored robotics lab, live feature tracking, sparse reconstruction and visible loop closure.
 >
-> Status: Phases 0 and 1 implemented and verified; Phase 1 awaits user review. Phases 2–10 remain planned.
+> Status: Phases 0–2 implemented and verified; Phase 2 awaits user review. Phases 3–10 remain planned.
 
 ## Goal and experience
 
@@ -107,17 +107,19 @@ Exit verified: a repeatable robot run works with placeholder geometry and respon
 
 ### Phase 2 — Blender assets and the first polished scene
 
-- [ ] Author the modular lab blockout at real scale, preserving a clear loop route and robot camera sightlines.
-- [ ] Model the robot with separate wheel pivots and named stereo mounts; validate dimensions against calibration.
-- [ ] Build one finished workbench/cabinet area to approve the browser material and lighting treatment before expanding the kit.
-- [ ] Add UVs, baked PBR textures, useful detail normals and a controlled material palette; avoid unnecessary unique materials.
-- [ ] Export visual meshes, simplified collision footprints and named spawn/route anchors from a shared manifest so visuals and simulation remain aligned.
-- [ ] Add stable asset IDs, licensing/attribution records, source `.blend` files and reproducible export scripts.
-- [ ] Add instancing or merged static geometry, suitable detail levels and texture/model compression supported by the selected renderer.
-- [ ] Integrate the complete lab, wheel animation, overview/follow cameras, lighting and loading/error states.
-- [ ] Review robot-eye and overview screenshots in the browser and measure the asset/render budgets.
+- [x] Author the modular lab blockout at real scale, preserving a clear loop route and robot camera sightlines.
+- [x] Model the robot with separate wheel pivots and named stereo mounts; validate dimensions against calibration.
+- [x] Build one finished workbench/cabinet area to approve the browser material and lighting treatment before expanding the kit.
+- [x] Add UVs, baked PBR textures, useful detail normals and a controlled material palette; avoid unnecessary unique materials.
+- [x] Export visual meshes, simplified collision footprints and named spawn/route anchors from a shared manifest so visuals and simulation remain aligned.
+- [x] Add stable asset IDs, licensing/attribution records, source `.blend` files and reproducible export scripts.
+- [x] Add instancing or merged static geometry, suitable detail levels and texture/model compression supported by the selected renderer.
+- [x] Integrate the complete lab, wheel animation, overview/follow cameras, lighting and loading/error states.
+- [x] Review robot-eye and overview screenshots in the browser and measure the asset/render budgets.
 
-Exit: the real app already presents the intended visual quality, with aligned collisions and calibration mounts.
+Exit verified: the real app already presents the intended visual quality, with aligned collisions and calibration mounts.
+
+Review evidence: [Phase 2 screenshots, validation and measured budgets](slam-demo/phase2/README.md), [editable Blender assets and export instructions](../assets/slam-demo/README.md). Stop for user review before Phase 3.
 
 ### Phase 3 — Calibrated stereo acquisition
 
