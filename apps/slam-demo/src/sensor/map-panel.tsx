@@ -154,7 +154,8 @@ export function MapInspector({ acquisition }: { acquisition: Acquisition }) {
 			<p className="section-description">
 				Poses, points and residuals belong to this revision. Blue cameras are retained keyframes;
 				bright mint points have stronger support. The oldest local camera stays fixed during
-				refinement. No loop closure or relocalization yet.
+				refinement. Verified revisits can correct the map; relocalization after loss remains
+				unavailable.
 				{s.replaying
 					? ' Replay stays in its local optical frame; world placement is unavailable.'
 					: ''}

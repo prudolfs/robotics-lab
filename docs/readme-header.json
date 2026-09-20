@@ -1,0 +1,22 @@
+{
+  "width": 1200,
+  "frames": 24,
+  "fps": 1.1111111111111112,
+  "projects": [
+    {
+      "name": "simulator",
+      "firstFrame": 0,
+      "frames": 8
+    },
+    {
+      "name": "drone-mission-planner",
+      "firstFrame": 8,
+      "frames": 8
+    },
+    {
+      "name": "slam-demo",
+      "firstFrame": 16,
+      "frames": 8
+    }
+  ]
+}

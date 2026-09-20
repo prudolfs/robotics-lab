@@ -3,7 +3,15 @@ import { type MapSnapshot, type Pose3, type V3, worldPoint } from '@robotics-lab
 import { useCallback, useLayoutEffect, useRef } from 'react'
 import { Color, type InstancedMesh, Object3D } from 'three'
 import { usePresentation } from '../store'
-export function SparseMap({ map, origin }: { map?: MapSnapshot; origin: Pose3 | null }) {
+import { useAnimatedMap } from './map-animation'
+export function SparseMap({
+	map: committedMap,
+	origin,
+}: {
+	map?: MapSnapshot
+	origin: Pose3 | null
+}) {
+	const map = useAnimatedMap(committedMap)
 	const mesh = useRef<InstancedMesh>(null),
 		{ showMap, showKeyframes, selectedMap, selectMap } = usePresentation()
 	const convert = useCallback(

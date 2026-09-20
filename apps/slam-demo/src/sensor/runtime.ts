@@ -16,6 +16,7 @@ import { FramePipeline, type WorkerPort } from './pipeline'
 import { cloneFrame, decodeRecording, encodeRecording, RECORDING_LIMIT } from './recording'
 import { createVisualEvaluation, type VisionFrame } from './visual'
 export type SensorOptions = {
+	loopClosure: boolean
 	mode: 'rendered' | 'synthetic'
 	timing: 'realtime' | 'lockstep'
 	noise: number
@@ -37,7 +38,13 @@ export function createAcquisition(
 ) {
 	const listeners = new Set<() => void>(),
 		pool: ArrayBuffer[] = []
-	let options: SensorOptions = { mode: 'rendered', timing: 'realtime', noise: 0, dropout: 0 }
+	let options: SensorOptions = {
+		mode: 'rendered',
+		timing: 'realtime',
+		noise: 0,
+		dropout: 0,
+		loopClosure: true,
+	}
 	let latest: VisionFrame | null = null,
 		records: StereoFrame[] = [],
 		adapter: CaptureAdapter | null = null
@@ -100,6 +107,13 @@ export function createAcquisition(
 			controller.pause()
 			publish()
 		},
+		(vo) => {
+			if (latest && vo.map && vo.map.revision > (latest.vo?.map?.revision ?? 0)) {
+				latest = { ...latest, vo }
+				evaluator.revise(vo)
+				publish()
+			}
+		},
 	)
 	function snapshot() {
 		return {
@@ -148,7 +162,8 @@ export function createAcquisition(
 	}
 	function submit(frame: StereoFrame) {
 		starts.set(frame.frameId, performance.now())
-		pipeline.offer(frame)
+		const input = { ...frame, vision: { loopClosure: options.loopClosure } }
+		pipeline.offer(input)
 		// Dropped pending frames release their telemetry entry; only active/pending timestamps remain.
 		publish()
 	}

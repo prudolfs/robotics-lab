@@ -8,6 +8,7 @@ import {
 	triangulate,
 } from './geometry'
 import { type BundleScheduler, createLocalMap, descriptor } from './mapping'
+import { compose, type GraphScheduler, inverse } from './pose-graph'
 import type {
 	Calibration,
 	Cv,
@@ -112,9 +113,15 @@ export function solveMotion(
 export function createOdometry(
 	cv: Cv,
 	k: Calibration,
-	options: { mapping?: boolean; scheduleBundle?: BundleScheduler } = {},
+	options: {
+		mapping?: boolean
+		scheduleBundle?: BundleScheduler
+		loopClosure?: boolean
+		scheduleGraph?: GraphScheduler
+	} = {},
 ) {
-	const localMap = options.mapping ? createLocalMap(k, options.scheduleBundle) : null
+	let lastResult: OdometryResult | null = null
+	const localMap = options.mapping ? createLocalMap(k, options.scheduleBundle, options) : null
 	const ledger = { live: 0, peak: 0 },
 		persistent = new NativeScope(ledger)
 	const left = persistent.own(new cv.Mat(k.height, k.width, cv.CV_8UC1)),
@@ -162,6 +169,15 @@ export function createOdometry(
 		})
 	}
 	return {
+		applyCorrections() {
+			if (!localMap || !pose || !lastResult || lastResult.status === 'lost') return null
+			const map = localMap.flush()
+			if (!map) return null
+			anchorPose = compose(compose(map.pose, inverse(pose)), anchorPose)
+			pose = map.pose
+			lastResult = { ...lastResult, pose, map }
+			return lastResult
+		},
 		process(
 			leftRgba: Uint8Array,
 			rightRgba: Uint8Array,
@@ -369,10 +385,12 @@ export function createOdometry(
 							pixel,
 							point: stereoPoints[i],
 							descriptor: descriptor(left.data, pixel, k),
+							appearance: descriptor(left.data, pixel, k, 3),
 						})),
 						(points, pixels) => solveMotion(cv, points, pixels, k, frameId + 91, scope),
 						result.status === 'degraded',
 					)
+					anchorPose = compose(compose(map.pose, inverse(pose)), anchorPose)
 					pose = map.pose
 					result.pose = pose
 					result.map = map
@@ -388,6 +406,7 @@ export function createOdometry(
 			} finally {
 				scope.dispose()
 				result.nativeObjects = ledger.live
+				lastResult = result
 				result.peakNativeObjects = ledger.peak
 			}
 		},

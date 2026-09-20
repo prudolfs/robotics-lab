@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first stereo visual SLAM explorer with a Blender-authored robotics lab, live feature tracking, sparse reconstruction and visible loop closure.
 >
-> Status: Phases 0–5 implemented and verified; Phase 5 awaits user review. Phases 6–10 remain planned. Local mapping meets its measured p95 budget; total vision processing still exceeds the initial 30 ms/pair target. See the Phase 5 review for limits.
+> Status: Phases 0–6 implemented and verified; Phase 6 awaits user review. Phases 7–10 remain planned. Total vision processing still exceeds the initial 30 ms/pair target. See the [Phase 6 review](slam-demo/phase6/README.md) for measurements and remaining limits.
 
 ## Goal and experience
 
@@ -25,7 +25,7 @@ Graphics are a core deliverable from the beginning. Aim for a polished real-time
 | [HUD plan](hud.md) | Reuse panel/widget lessons and app-local shadcn components without making the new app depend on another app. |
 | [E2E strategy](e2e.md), [world clicks](e2e-world-click.md), [CI notes](playwright-on-github-actions.md) | Vitest for algorithms; a small Playwright suite using public controls and renderer-projected clicks. |
 
-`apps/slam-demo` now contains motion, authored lab graphics and calibrated stereo acquisition. Pure stereo geometry and sensor models live in `packages/sensors`; shared vision and visual SLAM packages have not been created. Existing milestone checkboxes are historical planning records; verify relevant code before reuse.
+`apps/slam-demo` now contains motion, authored lab graphics, calibrated stereo acquisition and the mapping/loop-closure UI. Pure stereo geometry and sensor models live in `packages/sensors`; image tracking, mapping and loop closure live in `packages/vision`. Existing milestone checkboxes are historical planning records; verify relevant code before reuse.
 
 ## Scope and technical direction
 
@@ -51,7 +51,7 @@ assets/slam-demo/           Blender sources, export scripts, asset manifest and 
 apps/slam-demo/public/      optimized runtime models, textures and environment assets
 ```
 
-The application, stereo sensor utilities and production asset paths are implemented through Phase 3; the vision/SLAM packages remain proposed additions. Browser workers adapt the pure packages; simulation and estimator state stay outside Zustand. Do not generalize every app component into a package before it has a clear reusable interface.
+The application, stereo sensor utilities and production asset paths are implemented. Tracking, mapping and loop closure currently share `packages/vision`; a separate `packages/slam` remains a proposed extraction. Browser workers adapt the pure packages; simulation and estimator state stay outside Zustand. Do not generalize every app component into a package before it has a clear reusable interface.
 
 ## Visual direction and Blender workflow
 
@@ -166,16 +166,18 @@ Review evidence: [Phase 5 reconstruction, tests, full-route measurements and com
 
 ### Phase 6 — Place recognition and loop closure
 
-- [ ] Build appearance-based keyframe retrieval with temporal exclusion and a bounded database.
-- [ ] Geometrically verify candidate revisits using descriptor correspondences and robust 3D constraints; reject repeated-looking but different areas.
-- [ ] Add verified constraints to an SE(3) pose graph, anchor its gauge and solve with robust weighting and bounded iterations.
-- [ ] Reconcile landmark positions, duplicate landmarks, the active local map and ongoing tracking after graph correction; follow with local refinement.
-- [ ] Show candidate, verified, rejected and applied events distinctly, with pre/post trajectories and residual summaries.
-- [ ] Animate correction only in the presentation layer while preserving the committed estimator result.
-- [ ] Run the same seeded image sequence with closure enabled and disabled; evaluate trajectory error using a common fixed frame alignment and verify improvement across several fixtures.
-- [ ] Test a true revisit, a visually similar false candidate and a no-loop route; ensure truth proximity never triggers a closure.
+- [x] Build appearance-based keyframe retrieval with temporal exclusion and a bounded database.
+- [x] Geometrically verify candidate revisits using descriptor correspondences and robust 3D constraints; reject repeated-looking but different areas.
+- [x] Add verified constraints to an SE(3) pose graph, anchor its gauge and solve with robust weighting and bounded iterations.
+- [x] Reconcile landmark positions, duplicate landmarks, the active local map and ongoing tracking after graph correction; follow with local refinement.
+- [x] Show candidate, verified, rejected and applied events distinctly, with pre/post trajectories and residual summaries.
+- [x] Animate correction only in the presentation layer while preserving the committed estimator result.
+- [x] Run the same seeded image sequence with closure enabled and disabled; evaluate trajectory error using a common fixed frame alignment and verify improvement across several fixtures.
+- [x] Test a true revisit, a visually similar false candidate and a no-loop route; ensure truth proximity never triggers a closure.
 
-Exit: revisiting the lab genuinely improves the estimated map and trajectory, with evidence visible in the UI.
+Exit verified: revisiting the lab improves the estimated map and trajectory, with verified constraints and before/after evidence visible in the UI. Three paired image fixtures reduce once-aligned trajectory RMS by 65.8–72.4%.
+
+Review evidence: [Phase 6 implementation, comparisons, tests and screenshots](slam-demo/phase6/README.md), [comparison summary](slam-demo/phase6/comparison-summary.json). Stop for user review before Phase 7.
 
 ### Phase 7 — Relocalization and guided experiments
 

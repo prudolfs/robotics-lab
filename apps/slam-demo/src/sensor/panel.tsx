@@ -184,6 +184,18 @@ export function SensorControls({
 				</select>
 			</label>
 			<label>
+				Loop closure
+				<select
+					aria-label="Loop closure"
+					disabled={locked || s.replaying}
+					value={s.options.loopClosure ? 'enabled' : 'disabled'}
+					onChange={(e) => change({ loopClosure: e.target.value === 'enabled' })}
+				>
+					<option value="enabled">Enabled · verify revisits</option>
+					<option value="disabled">Disabled · comparison baseline</option>
+				</select>
+			</label>
+			<label>
 				Pixel noise ±{s.options.noise} levels
 				<input
 					aria-label="Pixel noise amplitude"
@@ -310,7 +322,7 @@ export function VisualInspector({ acquisition }: { acquisition: Acquisition }) {
 		<section className="inspector-section estimator-section" aria-label="Visual odometry">
 			<div className="section-heading">
 				<h2>Visual odometry</h2>
-				<span className="tiny-badge">LOCAL MAP · NO LOOP CLOSURE</span>
+				<span className="tiny-badge">VERIFIED LOOP CLOSURE</span>
 			</div>
 			<div className={`estimator-status vo-${vo?.status ?? 'initializing'}`}>
 				<span className="hollow-dot" />

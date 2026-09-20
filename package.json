@@ -18,6 +18,8 @@
 		"test:watch": "vitest",
 		"test:ui": "vitest --ui",
 		"dev:slam": "pnpm -C apps/slam-demo dev",
+		"screenshots:slam": "node scripts/capture-slam-views.mjs",
+		"readme:gif": "node scripts/generate-readme-gif.mjs",
 		"build:slam": "pnpm -C apps/slam-demo build",
 		"test:e2e:slam": "pnpm -C apps/slam-demo test:e2e"
 	},

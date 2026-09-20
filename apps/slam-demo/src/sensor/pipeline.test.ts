@@ -204,3 +204,27 @@ it('pixel recordings exclude large estimator snapshots and preserve only sensor 
 	expect(new DataView(bytes).getUint32(4, true)).toBeLessThan(2048)
 	expect(decodeRecording(bytes)[0].left).toEqual(input.left)
 })
+it('accepts same-frame map revisions without reprocessing pixels, and rejects stale generations', () => {
+	const worker = new FakeWorker(),
+		revisions: number[] = []
+	const pipeline = new FramePipeline(
+		() => worker,
+		() => {},
+		() => {},
+		() => {},
+		(vo) => revisions.push(vo.frameId),
+	)
+	pipeline.reset(0)
+	pipeline.offer(frame())
+	worker.finish()
+	const update = { frameId: 0 } as import('@robotics-lab/vision').OdometryResult
+	worker.onmessage?.({ data: { mapUpdate: update, generation: 0 } })
+	expect(revisions).toEqual([0])
+	expect(pipeline.depth).toBe(0)
+	worker.onmessage?.({ data: { mapUpdate: { ...update, frameId: 1 }, generation: 0 } })
+	worker.onmessage?.({ data: { mapUpdate: update, generation: 1 } })
+	expect(revisions).toEqual([0])
+	pipeline.reset(1)
+	worker.onmessage?.({ data: { mapUpdate: update, generation: 0 } })
+	expect(revisions).toEqual([0])
+})

@@ -1,0 +1,42 @@
+{
+  "trueRevisit": {
+    "matches": 36,
+    "inliers": 36,
+    "residual": 0.0000031371263849495506,
+    "measurement": {
+      "rotation": [
+        0.9995000409093279,
+        -0.009998333149774812,
+        0.029995025528877218,
+        0.009998332168931985,
+        0.9999500041740821,
+        0.00015002030834366652,
+        -0.029995025855824527,
+        0.0001499549243266071,
+        0.9995500367352447
+      ],
+      "position": [
+        0.11999994244691131,
+        -0.020000078738596924,
+        0.039999981139929495
+      ]
+    },
+    "reason": "Mutual appearance, stereo 3D and bidirectional PnP verified"
+  },
+  "appearanceLookalike": {
+    "matches": 36,
+    "inliers": 0,
+    "residual": null,
+    "measurement": null,
+    "reason": "Forward geometric fit failed"
+  },
+  "planarAmbiguity": {
+    "matches": 36,
+    "inliers": 0,
+    "residual": null,
+    "measurement": null,
+    "reason": "Ambiguous planar geometry"
+  },
+  "nativeObjectsAfterDispose": 0,
+  "peak": 10
+}

@@ -1,0 +1,205 @@
+{
+  "seed": 7,
+  "noise": 4,
+  "before": {
+    "rms": 0.16064214519800568,
+    "corrections": 0,
+    "lastKeyframe": 752,
+    "events": [
+      {
+        "id": 534,
+        "kind": "candidate",
+        "frameId": 745,
+        "candidate": 0,
+        "score": 0.9795214636994003,
+        "matches": 0,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Appearance retrieval; no pose-distance trigger"
+      },
+      {
+        "id": 535,
+        "kind": "verified",
+        "frameId": 745,
+        "candidate": 0,
+        "score": 0.9795214636994003,
+        "matches": 70,
+        "inliers": 46,
+        "residual": 0.6962116772861787,
+        "reason": "Mutual appearance, stereo 3D and bidirectional PnP verified"
+      },
+      {
+        "id": 536,
+        "kind": "candidate",
+        "frameId": 752,
+        "candidate": 3,
+        "score": 0.9745381091280707,
+        "matches": 0,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Appearance retrieval; no pose-distance trigger"
+      },
+      {
+        "id": 537,
+        "kind": "rejected",
+        "frameId": 752,
+        "candidate": 3,
+        "score": 0.9745381091280707,
+        "matches": 42,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Insufficient spatially distributed 3D support"
+      },
+      {
+        "id": 538,
+        "kind": "candidate",
+        "frameId": 752,
+        "candidate": 0,
+        "score": 0.9683140246751993,
+        "matches": 0,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Appearance retrieval; no pose-distance trigger"
+      },
+      {
+        "id": 539,
+        "kind": "rejected",
+        "frameId": 752,
+        "candidate": 0,
+        "score": 0.9683140246751993,
+        "matches": 77,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Insufficient spatially distributed 3D support"
+      },
+      {
+        "id": 540,
+        "kind": "candidate",
+        "frameId": 752,
+        "candidate": 6,
+        "score": 0.9613282022746383,
+        "matches": 0,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Appearance retrieval; no pose-distance trigger"
+      },
+      {
+        "id": 541,
+        "kind": "rejected",
+        "frameId": 752,
+        "candidate": 6,
+        "score": 0.9613282022746383,
+        "matches": 30,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Forward geometric fit failed"
+      }
+    ]
+  },
+  "after": {
+    "rms": 0.03343912371416992,
+    "baselineRms": 0.16387587728997774,
+    "corrections": 1,
+    "events": [
+      {
+        "id": 540,
+        "kind": "candidate",
+        "frameId": 750,
+        "candidate": 7,
+        "score": 0.9636613317474231,
+        "matches": 0,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Appearance retrieval; no pose-distance trigger"
+      },
+      {
+        "id": 541,
+        "kind": "rejected",
+        "frameId": 750,
+        "candidate": 7,
+        "score": 0.9636613317474231,
+        "matches": 28,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Forward geometric fit failed"
+      },
+      {
+        "id": 542,
+        "kind": "candidate",
+        "frameId": 750,
+        "candidate": 23,
+        "score": 0.9625851121286042,
+        "matches": 0,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Appearance retrieval; no pose-distance trigger"
+      },
+      {
+        "id": 543,
+        "kind": "rejected",
+        "frameId": 750,
+        "candidate": 23,
+        "score": 0.9625851121286042,
+        "matches": 24,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Forward geometric fit failed"
+      },
+      {
+        "id": 544,
+        "kind": "candidate",
+        "frameId": 750,
+        "candidate": 21,
+        "score": 0.9587954053399426,
+        "matches": 0,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Appearance retrieval; no pose-distance trigger"
+      },
+      {
+        "id": 545,
+        "kind": "rejected",
+        "frameId": 750,
+        "candidate": 21,
+        "score": 0.9587954053399426,
+        "matches": 22,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Forward geometric fit failed"
+      },
+      {
+        "id": 546,
+        "kind": "candidate",
+        "frameId": 757,
+        "candidate": 0,
+        "score": 0.9691635993243084,
+        "matches": 0,
+        "inliers": 0,
+        "residual": null,
+        "reason": "Appearance retrieval; no pose-distance trigger"
+      },
+      {
+        "id": 547,
+        "kind": "verified",
+        "frameId": 757,
+        "candidate": 0,
+        "score": 0.9691635993243084,
+        "matches": 147,
+        "inliers": 135,
+        "residual": 0.47277833210203524,
+        "reason": "Mutual appearance, stereo 3D and bidirectional PnP verified"
+      },
+      {
+        "id": 548,
+        "kind": "applied",
+        "frameId": 757,
+        "candidate": 0,
+        "score": 0.9691635993243084,
+        "matches": 147,
+        "inliers": 135,
+        "residual": 0.47277833210203524,
+        "reason": "Verified loop optimized and committed"
+      }
+    ]
+  }
+}

@@ -50,3 +50,5 @@ apps/slam-demo/e2e/.results
 apps/slam-demo/public/vision/worker.js
 
 apps/slam-demo/public/vision/optimizer.js
+
+apps/slam-demo/public/vision/graph.js

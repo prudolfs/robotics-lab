@@ -24,7 +24,7 @@ test('image-derived VO tracks, displays synchronized overlays, and resets its or
 	await page.getByRole('button', { name: 'Reset simulation' }).click()
 	await expect(page.getByTestId('vo-status')).toHaveText('initializing')
 	await expect(page.getByTestId('vo-error')).toHaveText('0.000 m')
-	await expect(page.getByText('LOCAL MAP · NO LOOP CLOSURE', { exact: true })).toBeVisible()
+	await expect(page.getByText('VERIFIED LOOP CLOSURE', { exact: true })).toBeVisible()
 	expect(errors).toEqual([])
 })
 test('blank recorded pixels cause honest tracking loss; synthetic IDs never become visual odometry', async ({

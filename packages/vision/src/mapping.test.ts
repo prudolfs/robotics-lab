@@ -192,3 +192,28 @@ it('publishes asynchronous refinement only with the next coherent frame and reje
 	expect(stale.bundle?.accepted).toBe(false)
 	expect(stale.bundle?.reason).toContain('Stale')
 })
+it('flushes a completed refinement while idle without inventing a frame or scheduling endlessly', () => {
+	const jobs: { job: BundleJob; done: (r: BundleResult) => void }[] = []
+	const map = createLocalMap(k, (job, done) => jobs.push({ job, done }))
+	const samples = Array.from({ length: 24 }, (_, i) => {
+		const point: V3 = [((i % 6) - 2.5) * 0.4, (Math.floor(i / 6) - 1.5) * 0.4, 3],
+			p = required(stereoProjection(identity(), point, k))
+		return {
+			point,
+			pixel: [p[0], p[1]] as [number, number],
+			descriptor: Array.from({ length: 49 }, (_, j) => (j === i ? 1 : 0)),
+		}
+	})
+	map.update(0, 0, identity(), samples, () => null)
+	const old = map.update(30, 3, { ...identity(), position: [0.01, 0, 0] }, samples, () => null),
+		saved = structuredClone(old)
+	jobs[0].done(runBundleJob(jobs[0].job))
+	const revised = required(map.flush())
+	expect(revised.frameId).toBe(30)
+	expect(revised.revision).toBeGreaterThan(old.revision)
+	expect(revised.bundle?.accepted).toBe(true)
+	expect(revised.loop.trajectory.map((f) => f.frameId)).toEqual([0, 30])
+	expect(old).toEqual(saved)
+	expect(map.flush()).toBeUndefined()
+	expect(jobs).toHaveLength(1)
+})

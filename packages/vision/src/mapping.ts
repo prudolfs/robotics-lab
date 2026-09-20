@@ -9,6 +9,8 @@ import {
 	worldPoint,
 } from './bundle'
 import { coverage, identity, integrate, multiply, transpose } from './geometry'
+import { createLoopClosure, type LoopCorrection, type LoopSnapshot } from './loop-closure'
+import { compose, type GraphScheduler, inverse } from './pose-graph'
 import type { Calibration, Pixel, Pose3, V3 } from './types'
 export const MAP_LIMITS = {
 	landmarks: 1000,
@@ -24,6 +26,7 @@ export function runBundleJob(job: BundleJob): BundleResult {
 	return { ...job, report: refineBundle(job.frames, job.points, MAP_LIMITS.iterations) }
 }
 export type MapSnapshot = {
+	loop: LoopSnapshot
 	optimizationPending: boolean
 	bundleRevision: number
 	revision: number
@@ -38,14 +41,21 @@ export type MapSnapshot = {
 	bundle: BundleReport | null
 	updateMs: number
 }
-export type StereoSample = { pixel: Pixel; point: V3; descriptor: number[] }
-export function descriptor(image: Uint8Array, p: Pixel, k: Calibration) {
+export type StereoSample = { pixel: Pixel; point: V3; descriptor: number[]; appearance?: number[] }
+export function descriptor(image: Uint8Array, p: Pixel, k: Calibration, spacing = 1) {
 	const x = Math.round(p[0]),
 		y = Math.round(p[1]),
 		values: number[] = []
-	if (x < 4 || y < 4 || x >= k.width - 4 || y >= k.height - 4) return []
+	if (
+		x < 4 * spacing ||
+		y < 4 * spacing ||
+		x >= k.width - 4 * spacing ||
+		y >= k.height - 4 * spacing
+	)
+		return []
 	for (let dy = -3; dy <= 3; dy++)
-		for (let dx = -3; dx <= 3; dx++) values.push(image[(y + dy) * k.width + x + dx])
+		for (let dx = -3; dx <= 3; dx++)
+			values.push(image[(y + dy * spacing) * k.width + x + dx * spacing])
 	const mean = values.reduce((a, b) => a + b, 0) / 49,
 		norm = Math.hypot(...values.map((v) => v - mean))
 	return norm > 5 ? values.map((v) => (v - mean) / norm) : []
@@ -60,7 +70,58 @@ type Solver = (
 export function createLocalMap(
 	k: Calibration,
 	schedule: BundleScheduler = (job, done) => done(runBundleJob(job)),
+	options: { loopClosure?: boolean; scheduleGraph?: GraphScheduler } = {},
 ) {
+	const loops = createLoopClosure(k, options.loopClosure ?? false, options.scheduleGraph)
+	let correctionEpoch = 0,
+		closureApplied = false,
+		refineAfterLoop = false
+	function applyLoop(correction: LoopCorrection | null, current: Pose3): Pose3 {
+		if (!correction) return current
+		const oldById = new Map(correction.before.map((n) => [n.id, n.pose])),
+			newById = new Map(correction.after.map((n) => [n.id, n.pose]))
+		const delta = (id: number) => {
+			const old = oldById.get(id),
+				next = newById.get(id)
+			return old && next ? compose(next, inverse(old)) : identity()
+		}
+		const latest = frames.at(-1)
+		for (const p of points) {
+			const owner = p.observations.find((o) => oldById.has(o.keyframeId))
+			if (owner) p.position = worldPoint(delta(owner.keyframeId), p.position)
+		}
+		for (const f of frames) {
+			const next = newById.get(f.id)
+			if (next) f.pose = structuredClone(next)
+		}
+		// Merge corrected duplicates and rewrite links atomically in the committed map.
+		const removed = new Set<number>()
+		for (let i = 0; i < points.length; i++)
+			if (!removed.has(points[i].id))
+				for (let j = i + 1; j < points.length; j++) {
+					const a = points[i],
+						b = points[j]
+					if (
+						removed.has(b.id) ||
+						Math.hypot(...a.position.map((v, d) => v - b.position[d])) > 0.06 ||
+						descriptorDistance(a.descriptor, b.descriptor) > 0.15
+					)
+						continue
+					for (const o of b.observations)
+						if (!a.observations.some((v) => v.keyframeId === o.keyframeId))
+							a.observations.push({ ...o, landmarkId: a.id })
+					a.seen += b.seen
+					a.quality = Math.max(a.quality, b.quality)
+					a.lastSeen = Math.max(a.lastSeen, b.lastSeen)
+					removed.add(b.id)
+				}
+		points = points.filter((p) => !removed.has(p.id))
+		culledLandmarks += removed.size
+		refineAfterLoop = true
+		correctionEpoch++
+		closureApplied = true
+		return latest ? compose(delta(latest.id), current) : current
+	}
 	let busy = false,
 		completed: BundleResult | null = null,
 		bundleRevision = 0
@@ -71,7 +132,7 @@ export function createLocalMap(
 		busy = false
 		bundleRevision++
 		lastBundle = result.report
-		if (result.graph !== nextFrame) {
+		if (result.graph !== nextFrame + correctionEpoch * 1000000) {
 			lastBundle = {
 				...result.report,
 				accepted: false,
@@ -133,8 +194,58 @@ export function createLocalMap(
 		points = points.slice(0, MAP_LIMITS.landmarks)
 		culledLandmarks += before - points.length
 	}
+	function scheduleLocal() {
+		const local = frames.slice(-MAP_LIMITS.localFrames),
+			ids = new Set(local.map((f) => f.id))
+		const active = points
+			.filter((p) => p.observations.filter((o) => ids.has(o.keyframeId)).length >= 2)
+			.sort((a, b) => b.quality - a.quality)
+			.slice(0, MAP_LIMITS.localPoints)
+		// Clone the whole transaction; guard against harming observations outside the active window.
+		const proposedFrames = structuredClone(local),
+			proposedPoints = structuredClone(active).map((p) => ({
+				...p,
+				observations: p.observations.filter((o) => ids.has(o.keyframeId)),
+			}))
+		if (!busy && local.length >= 2 && active.length >= 8) {
+			refineAfterLoop = false
+			busy = true
+			schedule(
+				{
+					graph: nextFrame + correctionEpoch * 1000000,
+					frames: proposedFrames,
+					points: proposedPoints,
+				},
+				(result) => {
+					completed = result
+				},
+			)
+		}
+	}
 	return {
 		snapshot: () => lastSnapshot,
+		flush() {
+			if (!lastSnapshot || (!completed && !loops.ready())) return undefined
+			let pose = commit(lastSnapshot.pose)
+			loops.sync(frames)
+			pose = applyLoop(loops.poll(), pose)
+			if (refineAfterLoop) scheduleLocal()
+			pose = commit(pose)
+			loops.sync(frames)
+			loops.record(lastSnapshot.frameId, pose)
+			lastSnapshot = {
+				...lastSnapshot,
+				revision: ++revision,
+				pose: structuredClone(pose),
+				landmarks: structuredClone(points),
+				keyframes: structuredClone(frames),
+				loop: loops.snapshot(),
+				bundleRevision,
+				bundle: lastBundle ? { ...lastBundle } : null,
+				optimizationPending: busy,
+			}
+			return lastSnapshot
+		},
 		update(
 			frameId: number,
 			timestamp: number,
@@ -144,9 +255,12 @@ export function createLocalMap(
 			weak = false,
 		) {
 			const start = performance.now()
+			closureApplied = false
 			let pose = commit(guess),
 				mapMatches = 0,
 				trackingSource: MapSnapshot['trackingSource'] = 'stereo odometry'
+			loops.sync(frames)
+			pose = applyLoop(loops.poll(), pose)
 			// Projection + appearance association; no global retrieval or relocalization.
 			const candidates: {
 				point: Landmark
@@ -237,9 +351,14 @@ export function createLocalMap(
 				: Infinity
 			const overlap = valid.length / Math.max(1, samples.length)
 			const insert =
+				closureApplied ||
 				!last ||
 				(timestamp - last.timestamp >= 0.5 &&
-					(translation > 0.2 || angle > 0.12 || overlap < 0.35 || weak)) ||
+					(translation > 0.2 ||
+						angle > 0.12 ||
+						overlap < 0.35 ||
+						weak ||
+						loops.needsConfirmation(timestamp))) ||
 				timestamp - (last?.timestamp ?? 0) > 2
 			if (insert) {
 				const f: MapKeyframe = {
@@ -296,28 +415,10 @@ export function createLocalMap(
 				}
 				while (frames.length > MAP_LIMITS.keyframes) removeFrame(frames[1].id)
 				prune(frameId)
-				const local = frames.slice(-MAP_LIMITS.localFrames),
-					ids = new Set(local.map((f) => f.id))
-				const active = points
-					.filter((p) => p.observations.filter((o) => ids.has(o.keyframeId)).length >= 2)
-					.sort((a, b) => b.quality - a.quality)
-					.slice(0, MAP_LIMITS.localPoints)
-				// Clone the whole transaction; guard against harming observations outside the active window.
-				const proposedFrames = structuredClone(local),
-					proposedPoints = structuredClone(active).map((p) => ({
-						...p,
-						observations: p.observations.filter((o) => ids.has(o.keyframeId)),
-					}))
-				if (!busy && local.length >= 2 && active.length >= 8) {
-					busy = true
-					schedule(
-						{ graph: nextFrame, frames: proposedFrames, points: proposedPoints },
-						(result) => {
-							completed = result
-						},
-					)
-					pose = commit(pose)
-				}
+				loops.sync(frames)
+				pose = applyLoop(loops.add(f, samples, solve), pose)
+				scheduleLocal()
+				pose = commit(pose)
 				// Discard inconsistent observations, then orphan landmarks.
 				for (const p of points) {
 					p.observations = p.observations.filter((o) => {
@@ -329,7 +430,10 @@ export function createLocalMap(
 				}
 				prune(frameId)
 			}
+			loops.sync(frames)
+			loops.record(frameId, pose)
 			lastSnapshot = {
+				loop: loops.snapshot(),
 				revision: ++revision,
 				optimizationPending: busy,
 				bundleRevision,

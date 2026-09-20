@@ -1,9 +1,14 @@
 import type { StereoFrame } from '@robotics-lab/sensors'
+import type { OdometryResult } from '@robotics-lab/vision'
 import type { VisionFrame } from './visual'
 export type WorkerPort = {
 	postMessage: (message: StereoFrame, transfer: ArrayBuffer[]) => void
 	terminate: () => void
-	onmessage: ((event: { data: VisionFrame | { error: string } }) => void) | null
+	onmessage:
+		| ((event: {
+				data: VisionFrame | { error: string } | { mapUpdate: OdometryResult; generation: number }
+		  }) => void)
+		| null
 	onerror: ((event: { message: string }) => void) | null
 }
 /** Ownership: active buffers belong to the worker; pending buffers belong to this queue.
@@ -20,6 +25,7 @@ export class FramePipeline {
 		private result: (frame: VisionFrame) => void,
 		private release: (frame: StereoFrame) => void,
 		private failure: (message: string) => void,
+		private revise?: (vo: OdometryResult) => void,
 	) {}
 	get busy() {
 		return this.active !== null
@@ -42,6 +48,11 @@ export class FramePipeline {
 		this.worker = worker
 		worker.onmessage = ({ data }) => {
 			if (this.worker !== worker) return
+			if ('mapUpdate' in data) {
+				if (data.generation === this.generation && data.mapUpdate.frameId === this.last)
+					this.revise?.(data.mapUpdate)
+				return
+			}
 			if ('error' in data) {
 				this.stop()
 				this.failure(data.error)

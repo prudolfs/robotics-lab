@@ -1,0 +1,90 @@
+{
+  "browser": "153.0.8010.48",
+  "alignment": "One common initial truth frame; no subsequent trajectory fitting",
+  "reports": [
+    {
+      "seed": 42,
+      "noise": 0,
+      "frames": 758,
+      "checksums": 758,
+      "prefixNoLoop": {
+        "frames": 401,
+        "corrections": 0,
+        "identicalPoses": true
+      },
+      "rmsOff": 0.13679041688177634,
+      "rmsOn": 0.04450128267125026,
+      "improvementPercent": 67.46754364400299,
+      "finalOff": 0.1846526200667074,
+      "finalOn": 0.005861498801039827,
+      "corrections": 1,
+      "firstApplied": 756,
+      "graph": {
+        "before": 81.609383134912,
+        "after": 0.11891955736007633,
+        "iterations": 6,
+        "milliseconds": 82.19999999925494
+      },
+      "wallMs": 108550.79999999702,
+      "database": 123,
+      "landmarks": 977,
+      "keyframes": 12
+    },
+    {
+      "seed": 7,
+      "noise": 4,
+      "frames": 758,
+      "checksums": 758,
+      "prefixNoLoop": {
+        "frames": 401,
+        "corrections": 0,
+        "identicalPoses": true
+      },
+      "rmsOff": 0.16064214519800568,
+      "rmsOn": 0.05497219811106513,
+      "improvementPercent": 65.77971612411734,
+      "finalOff": 0.21889988235247512,
+      "finalOn": 0.004729154818793729,
+      "corrections": 1,
+      "firstApplied": 755,
+      "graph": {
+        "before": 97.01304475500608,
+        "after": 0.06513370634926219,
+        "iterations": 6,
+        "milliseconds": 84.09999999776483
+      },
+      "wallMs": 124047.80000000075,
+      "database": 126,
+      "landmarks": 970,
+      "keyframes": 12
+    },
+    {
+      "seed": 99,
+      "noise": 8,
+      "frames": 758,
+      "checksums": 758,
+      "prefixNoLoop": {
+        "frames": 401,
+        "corrections": 0,
+        "identicalPoses": true
+      },
+      "rmsOff": 0.13462905551874577,
+      "rmsOn": 0.037180328588484475,
+      "improvementPercent": 72.38313197309219,
+      "finalOff": 0.1677859077416775,
+      "finalOn": 0.00033817343865253643,
+      "corrections": 1,
+      "firstApplied": 755,
+      "graph": {
+        "before": 73.51170800078988,
+        "after": 0.05410954815327893,
+        "iterations": 6,
+        "milliseconds": 84.5
+      },
+      "wallMs": 121905.89999999851,
+      "database": 125,
+      "landmarks": 978,
+      "keyframes": 12
+    }
+  ]
+}

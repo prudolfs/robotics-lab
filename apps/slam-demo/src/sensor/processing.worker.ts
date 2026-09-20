@@ -4,6 +4,8 @@ import {
 	type BundleScheduler,
 	type Cv,
 	createOdometry,
+	type GraphResult,
+	type GraphScheduler,
 	type OdometryResult,
 } from '@robotics-lab/vision'
 
@@ -24,6 +26,7 @@ const scheduleBundle: BundleScheduler = (job, done) => {
 		const callback = completeBundle
 		completeBundle = null
 		callback?.(data)
+		publishCorrection()
 	}
 	optimizer.onerror = () => {
 		completeBundle = null
@@ -39,22 +42,48 @@ const scheduleBundle: BundleScheduler = (job, done) => {
 			},
 		})
 		optimizer?.terminate()
+		graphWorker?.terminate()
+		graphWorker = null
 		optimizer = null
 	}
 	optimizer.postMessage(job)
 }
+let graphWorker: Worker | null = null
+const scheduleGraph: GraphScheduler = (job, done) => {
+	graphWorker ??= new Worker('/vision/graph.js')
+	graphWorker.onmessage = ({ data }: { data: GraphResult }) => {
+		done(data)
+		publishCorrection()
+	}
+	graphWorker.onerror = () => {
+		done({ ...job, before: 0, after: 0, iterations: 0, accepted: false, milliseconds: 0 })
+		graphWorker?.terminate()
+		graphWorker = null
+	}
+	graphWorker.postMessage(job)
+}
 let tracker: ReturnType<typeof createOdometry> | null = null,
 	calibrationKey = '',
 	generation = -1
-self.onmessage = async ({ data }: { data: StereoFrame }) => {
+function publishCorrection() {
+	const vo = tracker?.applyCorrections()
+	if (vo) self.postMessage({ mapUpdate: vo, generation })
+}
+self.onmessage = async ({
+	data,
+}: {
+	data: StereoFrame & { vision?: { loopClosure?: boolean; synchronous?: boolean } }
+}) => {
 	try {
 		await ready
 		const start = performance.now(),
 			result = processFrame(data)
-		const key = JSON.stringify(data.calibration)
+		const key = JSON.stringify([data.calibration, data.vision])
 		if (generation !== data.generation || calibrationKey !== key) {
 			tracker?.dispose()
 			optimizer?.terminate()
+			graphWorker?.terminate()
+			graphWorker = null
 			optimizer = null
 			completeBundle = null
 			tracker = null
@@ -64,7 +93,12 @@ self.onmessage = async ({ data }: { data: StereoFrame }) => {
 		let vo: OdometryResult | null = null
 		// Oracle observations are never used as image-derived motion estimates, including in recordings.
 		if (data.kind !== 'synthetic' && !data.observations) {
-			tracker ??= createOdometry(cv, data.calibration, { mapping: true, scheduleBundle })
+			tracker ??= createOdometry(cv, data.calibration, {
+				mapping: true,
+				loopClosure: data.vision?.loopClosure ?? true,
+				scheduleBundle: data.vision?.synchronous ? undefined : scheduleBundle,
+				scheduleGraph: data.vision?.synchronous ? undefined : scheduleGraph,
+			})
 			vo = tracker.process(
 				new Uint8Array(result.left),
 				new Uint8Array(result.right),
@@ -77,6 +111,8 @@ self.onmessage = async ({ data }: { data: StereoFrame }) => {
 	} catch (error) {
 		tracker?.dispose()
 		optimizer?.terminate()
+		graphWorker?.terminate()
+		graphWorker = null
 		optimizer = null
 		completeBundle = null
 		tracker = null

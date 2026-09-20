@@ -1293,3 +1293,48 @@ fieldset {
 	padding: 5px 3px;
 	border-bottom: 1px solid #34454e;
 }
+.loop-chart {
+	width: 100%;
+	margin-top: 12px;
+	background: #111e26;
+	border: 1px solid #34454e;
+	border-radius: 6px;
+}
+.loop-events {
+	list-style: none;
+	padding: 0;
+	max-height: 280px;
+	overflow-y: auto;
+	font-size: 10px;
+}
+.loop-events li {
+	padding: 10px 0;
+	border-bottom: 1px solid #34454e;
+}
+.loop-events p {
+	line-height: 1.5;
+	margin: 5px 0;
+	color: #afc0c9;
+}
+.loop-events small {
+	color: #839ca9;
+}
+.loop-kind {
+	display: inline-block;
+	margin-right: 8px;
+	text-transform: uppercase;
+	font-size: 8px;
+	letter-spacing: 0.08em;
+}
+.loop-kind.candidate {
+	color: #adc2fa;
+}
+.loop-kind.verified {
+	color: #e9d48b;
+}
+.loop-kind.rejected {
+	color: #eaa38e;
+}
+.loop-kind.applied {
+	color: #83dece;
+}

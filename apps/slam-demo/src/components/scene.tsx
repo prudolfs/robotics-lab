@@ -111,7 +111,15 @@ function CameraRig({ controller }: { controller: SimulationController }) {
 		/>
 	)
 }
-function Paths({ state, visualTrail }: { state: Simulation; visualTrail: VisualPoint[] }) {
+function Paths({
+	state,
+	visualTrail,
+	beforeClosureTrail,
+}: {
+	state: Simulation
+	visualTrail: VisualPoint[]
+	beforeClosureTrail: VisualPoint[]
+}) {
 	const { showTruth, showOdometry, showRoute, showVisual } = usePresentation()
 	const route = useMemo(() => {
 		let s = setStatus(createSimulation({ noise: false }), 'running')
@@ -128,6 +136,16 @@ function Paths({ state, visualTrail }: { state: Simulation; visualTrail: VisualP
 	)
 	return (
 		<>
+			{showVisual && beforeClosureTrail.length > 1 && (
+				<Line
+					points={beforeClosureTrail.map((p) => [p.x, 0.065, -p.y])}
+					color="#ad96e5"
+					lineWidth={1.5}
+					dashed
+					dashSize={0.09}
+					gapSize={0.07}
+				/>
+			)}
 			{showVisual && visualTrail.length > 1 && (
 				<Line points={visualTrail.map((p) => [p.x, 0.075, -p.y])} color="#83dece" lineWidth={2.5} />
 			)}
@@ -170,6 +188,7 @@ export function Scene({
 	onFailure,
 	acquisition,
 	visualTrail,
+	beforeClosureTrail,
 	map,
 	mapOrigin,
 }: {
@@ -179,6 +198,7 @@ export function Scene({
 	onFailure: () => void
 	acquisition: Acquisition
 	visualTrail: VisualPoint[]
+	beforeClosureTrail: VisualPoint[]
 	map?: MapSnapshot
 	mapOrigin: Pose3 | null
 }) {
@@ -225,7 +245,7 @@ export function Scene({
 				<Suspense fallback={null}>
 					<AuthoredAssets controller={controller} onReady={onReady} acquisition={acquisition} />
 				</Suspense>
-				<Paths state={state} visualTrail={visualTrail} />
+				<Paths state={state} visualTrail={visualTrail} beforeClosureTrail={beforeClosureTrail} />
 				<SparseMap map={map} origin={mapOrigin} />
 				<RenderMetrics controller={controller} />
 

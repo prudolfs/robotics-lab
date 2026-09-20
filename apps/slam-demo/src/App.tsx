@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { type ReactNode, useCallback, useState, useSyncExternalStore } from 'react'
 import { Scene } from './components/scene'
+import { LoopInspector } from './sensor/loop-panel'
 import { MapInspector } from './sensor/map-panel'
 import { SensorControls, SensorPanel, VisualInspector } from './sensor/panel'
 import { createAcquisition } from './sensor/runtime'
@@ -163,7 +164,8 @@ export default function App() {
 				<section className="viewport" aria-label="Simulation workspace">
 					<Scene
 						acquisition={acquisition}
-						visualTrail={sensor.visual.trail}
+						visualTrail={sensor.visual.displayTrail}
+						beforeClosureTrail={sensor.visual.beforeClosureTrail}
 						map={sensor.latest?.vo?.map}
 						mapOrigin={sensor.visual.origin}
 						state={state}
@@ -401,6 +403,7 @@ export default function App() {
 					</section>
 					<VisualInspector acquisition={acquisition} />
 					<MapInspector acquisition={acquisition} />
+					<LoopInspector acquisition={acquisition} />
 					<section className="drive-section" aria-label="Manual driving controls">
 						<div className="section-heading">
 							<h2>
