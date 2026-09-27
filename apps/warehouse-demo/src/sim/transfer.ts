@@ -1,7 +1,17 @@
+import manifest from '../../../../assets/warehouse-demo/manifest.json'
 import { BAYS, TRUCK_SLOTS } from './scenario'
 import type { Command, WarehouseState } from './world'
 
-export type TransferStage = 'approach' | 'pickup' | 'retreat' | 'turn' | 'cross' | 'place' | 'done'
+export type TransferStage =
+	| 'approach'
+	| 'pickup'
+	| 'lift'
+	| 'retreat'
+	| 'turn'
+	| 'cross'
+	| 'lower'
+	| 'place'
+	| 'done'
 export type TransferRoute = {
 	stage: TransferStage
 	palletId: string
@@ -43,8 +53,19 @@ export function transferStep(
 	if (route.stage === 'pickup') {
 		if (forklift.speed > 0.035) return { route, command: {} }
 		if (forklift.carriedId === route.palletId)
-			return { route: { ...route, stage: 'retreat' }, command: {} }
+			return { route: { ...route, stage: 'lift' }, command: {} }
 		return { route, command: { action: { kind: 'pickup', palletId: route.palletId } } }
+	}
+	if (route.stage === 'lift') {
+		if (forklift.forkHeight >= manifest.forklift.travelHeight)
+			return { route: { ...route, stage: 'retreat' }, command: {} }
+		return { route, command: { fork: 1 } }
+	}
+	if (route.stage === 'lower') {
+		if (Math.abs(forklift.speed) > 0.035) return { route, command: {} }
+		if (forklift.forkHeight <= manifest.forklift.pickupHeight + 0.005)
+			return { route: { ...route, stage: 'place' }, command: {} }
+		return { route, command: { fork: -1 } }
 	}
 	if (route.stage === 'retreat') {
 		if (forklift.y >= route.retreatY - 0.13)
@@ -68,7 +89,7 @@ export function transferStep(
 		const dx = targetX - forklift.x
 		const dy = bay.y - forklift.y
 		const range = Math.hypot(dx, dy)
-		if (range < 0.1) return { route: { ...route, stage: 'place' }, command: {} }
+		if (range < 0.1) return { route: { ...route, stage: 'lower' }, command: {} }
 		const desired = Math.atan2(dy, dx)
 		const headingError = angleDelta(desired, forklift.heading)
 		const steering = clamp(headingError * 2.2 - forklift.heading * (range < 1.2 ? 1.1 : 0))

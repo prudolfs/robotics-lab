@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "units": "meters",
+  "coordinates": {
+    "blender": "x,y,Z-up",
+    "runtime": "x,height,-y",
+    "forkliftForward": "+X"
+  },
+  "world": {
+    "width": 12,
+    "depth": 15.5,
+    "wallHeight": 3.4
+  },
+  "truck": {
+    "centerX": -1.95,
+    "width": 3.7,
+    "depth": 6.2
+  },
+  "forklift": {
+    "length": 1.8,
+    "width": 1,
+    "wheelbase": 1.2,
+    "wheelRadius": 0.24,
+    "loadForward": 1.55,
+    "pickupHeight": 0.1,
+    "travelHeight": 0.3
+  },
+  "pallet": {
+    "width": 1.1,
+    "depth": 1.1,
+    "height": 0.18
+  },
+  "truckSlots": [
+    {
+      "id": "left-front",
+      "lane": "left",
+      "depth": 0,
+      "x": -2.8,
+      "y": -2.1
+    },
+    {
+      "id": "right-front",
+      "lane": "right",
+      "depth": 0,
+      "x": -1,
+      "y": -2.1
+    },
+    {
+      "id": "left-rear",
+      "lane": "left",
+      "depth": 1,
+      "x": -2.8,
+      "y": -4.1
+    },
+    {
+      "id": "right-rear",
+      "lane": "right",
+      "depth": 1,
+      "x": -1,
+      "y": -4.1
+    }
+  ],
+  "bays": [
+    {
+      "id": "B1",
+      "x": 4.9,
+      "y": 2.35
+    },
+    {
+      "id": "B2",
+      "x": 4.9,
+      "y": 3.6
+    },
+    {
+      "id": "B3",
+      "x": 4.9,
+      "y": 4.85
+    },
+    {
+      "id": "B4",
+      "x": 4.9,
+      "y": 6.1
+    },
+    {
+      "id": "B5",
+      "x": 4.9,
+      "y": 7.35
+    },
+    {
+      "id": "B6",
+      "x": 4.9,
+      "y": 8.6
+    },
+    {
+      "id": "B7",
+      "x": 4.9,
+      "y": 9.85
+    },
+    {
+      "id": "B8",
+      "x": 4.9,
+      "y": 11.1
+    }
+  ],
+  "collisions": {
+    "warehouse": {
+      "minX": -5.95,
+      "maxX": 5.95,
+      "maxY": 15.45
+    },
+    "truck": {
+      "minX": -3.75,
+      "maxX": -0.15,
+      "minY": -6.15
+    },
+    "rackBack": {
+      "x": 5.77,
+      "y": 6.75,
+      "halfLength": 0.18,
+      "halfWidth": 5.1,
+      "heading": 0
+    },
+    "palletHalfExtent": 0.55
+  },
+  "pivots": {
+    "mast": "Mast_Lift",
+    "fork": "Fork_Carriage",
+    "frontWheels": [
+      "Wheel_FL",
+      "Wheel_FR"
+    ],
+    "rearWheels": [
+      "Wheel_RL",
+      "Wheel_RR"
+    ],
+    "steering": [
+      "Steer_RL",
+      "Steer_RR"
+    ]
+  },
+  "assets": {
+    "environment": "/assets/warehouse/environment.glb",
+    "forklift": "/assets/warehouse/forklift.glb",
+    "palletA": "/assets/warehouse/pallet-a.glb",
+    "palletB": "/assets/warehouse/pallet-b.glb"
+  }
+}

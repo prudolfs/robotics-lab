@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Scene } from './components/scene'
+import { type CameraMode, Scene } from './components/scene'
 import type { PredictableStage } from './sim/predictable'
 import { BAYS, TRUCK_SLOTS } from './sim/scenario'
 import { useWarehouse } from './sim/use-warehouse'
@@ -16,10 +16,12 @@ function stageLabel(stage: PredictableStage): string {
 	const labels: Record<PredictableStage, string> = {
 		approach: 'Approaching cargo',
 		pickup: 'Picking up cargo',
+		lift: 'Lifting cargo',
 		retreat: 'Leaving truck',
 		turn: 'Turning to rack',
 		cross: 'Driving to bay',
 		place: 'Placing cargo',
+		lower: 'Lowering cargo',
 		backtrack: 'Clearing the rack',
 		'turn-to-dock': 'Turning to dock',
 		'recover-pickup': 'Realigning at truck',
@@ -33,7 +35,8 @@ function stageLabel(stage: PredictableStage): string {
 export default function App() {
 	const [speed, setSpeed] = useState(1)
 	const { controller, state } = useWarehouse(speed)
-	const [camera, setCamera] = useState<'overview' | 'follow'>('overview')
+	const [camera, setCamera] = useState<CameraMode>('overview')
+	const [assetsReady, setAssetsReady] = useState(false)
 	const [showRoute, setShowRoute] = useState(true)
 	const [rendererStatus, setRendererStatus] = useState<RendererStatus>('loading')
 	const route = controller.getRoute()
@@ -41,7 +44,7 @@ export default function App() {
 	const complete = state.status === 'complete'
 	const currentCargo = state.pallets.find((item) => item.id === route.palletId)
 	const destination = BAYS.find((item) => item.id === route.bayId)
-	const remaining = state.scenario.cargo.length - state.delivered
+	const remaining = state.pallets.filter((pallet) => pallet.location.kind === 'truck').length
 	const statusLabel = complete
 		? 'Delivery complete'
 		: route.stage === 'stalled'
@@ -90,17 +93,24 @@ export default function App() {
 						cameraMode={camera}
 						route={route}
 						showRoute={showRoute}
+						onAssetsReady={setAssetsReady}
 						onRendererStatus={setRendererStatus}
 					/>
-					{rendererStatus !== 'webgpu' && (
+					{(rendererStatus !== 'webgpu' || !assetsReady) && (
 						<div className="renderer-overlay" role="status">
 							<strong>
-								{rendererStatus === 'loading' ? 'Preparing the warehouse' : 'WebGPU is unavailable'}
+								{rendererStatus === 'error'
+									? 'Could not load the warehouse'
+									: rendererStatus === 'unsupported'
+										? 'WebGPU is unavailable'
+										: 'Preparing the warehouse'}
 							</strong>
 							<span>
-								{rendererStatus === 'loading'
-									? 'Initializing the renderer…'
-									: 'Use a browser and device with WebGPU support to view this demo.'}
+								{rendererStatus === 'loading' || rendererStatus === 'webgpu'
+									? 'Loading warehouse assets and initializing WebGPU…'
+									: rendererStatus === 'error'
+										? 'Reload to retry loading the warehouse assets.'
+										: 'Use a browser and device with WebGPU support to view this demo.'}
 							</span>
 						</div>
 					)}
@@ -128,6 +138,20 @@ export default function App() {
 						</button>
 						<button
 							type="button"
+							aria-pressed={camera === 'dock'}
+							onClick={() => setCamera('dock')}
+						>
+							Dock
+						</button>
+						<button
+							type="button"
+							aria-pressed={camera === 'rack'}
+							onClick={() => setCamera('rack')}
+						>
+							Rack
+						</button>
+						<button
+							type="button"
 							aria-pressed={showRoute}
 							onClick={() => setShowRoute((value) => !value)}
 						>
@@ -143,7 +167,7 @@ export default function App() {
 						</span>
 					</div>
 					<div className="viewport-caption">
-						PHASE 2 <span>·</span> AUTONOMOUS DELIVERY
+						AUTONOMOUS DELIVERY <span>·</span> DOCK 01
 					</div>
 				</section>
 
@@ -159,7 +183,7 @@ export default function App() {
 						</div>
 						<div className="mode-card">
 							<span className="mode-dot" />
-							Predictable <small>Phase 2</small>
+							Predictable <small>Autonomous</small>
 						</div>
 						<p className="section-help">
 							The forklift unloads every incoming pallet in a repeatable order. Full Laya control
@@ -295,7 +319,11 @@ export default function App() {
 						className="primary-button"
 						type="button"
 						disabled={
-							rendererStatus !== 'webgpu' || running || complete || route.stage === 'stalled'
+							rendererStatus !== 'webgpu' ||
+							!assetsReady ||
+							running ||
+							complete ||
+							route.stage === 'stalled'
 						}
 						onClick={() => controller.start()}
 					>

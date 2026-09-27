@@ -1,4 +1,3 @@
-import { mkdir } from 'node:fs/promises'
 import { expect, test } from '@playwright/test'
 
 test('start, pause, restart, randomize and complete the delivery', async ({ page }) => {
@@ -6,8 +5,7 @@ test('start, pause, restart, randomize and complete the delivery', async ({ page
 	page.on('pageerror', (error) => errors.push(error.message))
 	await page.goto('/')
 	await expect(page.getByTestId('renderer-status')).toContainText('WEBGPU ACTIVE')
-	await mkdir('screenshots', { recursive: true })
-	await page.screenshot({ path: 'screenshots/phase2-overview.png' })
+	await expect(page.getByRole('button', { name: 'Start delivery' })).toBeEnabled()
 	await expect(page.getByTestId('seed')).toHaveText('42')
 	await expect(page.getByTestId('run-status')).toHaveText('Ready to unload')
 	await page.getByRole('button', { name: 'Follow forklift' }).click()
@@ -45,7 +43,13 @@ test('start, pause, restart, randomize and complete the delivery', async ({ page
 	})
 	await expect(page.getByText(/0 still in truck/)).toBeVisible()
 	expect(errors).toEqual([])
-	await page.screenshot({ path: 'screenshots/phase2-complete.png' })
+})
+
+test('a failed warehouse asset explains the error and keeps start disabled', async ({ page }) => {
+	await page.route('**/environment.glb', (route) => route.abort())
+	await page.goto('/')
+	await expect(page.getByText('Could not load the warehouse')).toBeVisible()
+	await expect(page.getByRole('button', { name: 'Start delivery' })).toBeDisabled()
 })
 
 test('unavailable WebGPU is explained and start is disabled', async ({ page }) => {

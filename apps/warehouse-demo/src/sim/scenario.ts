@@ -1,3 +1,5 @@
+import manifest from '../../../../assets/warehouse-demo/manifest.json'
+
 export type TruckSlot = { id: string; lane: 'left' | 'right'; depth: 0 | 1; x: number; y: number }
 export type StorageBay = { id: string; x: number; y: number }
 export type Scenario = {
@@ -6,17 +8,8 @@ export type Scenario = {
 	existing: { bayId: string; stockId: string }[]
 }
 
-export const TRUCK_SLOTS: TruckSlot[] = [
-	{ id: 'left-front', lane: 'left', depth: 0, x: -2.8, y: -2.1 },
-	{ id: 'right-front', lane: 'right', depth: 0, x: -1, y: -2.1 },
-	{ id: 'left-rear', lane: 'left', depth: 1, x: -2.8, y: -4.1 },
-	{ id: 'right-rear', lane: 'right', depth: 1, x: -1, y: -4.1 },
-]
-export const BAYS: StorageBay[] = Array.from({ length: 8 }, (_, index) => ({
-	id: `B${index + 1}`,
-	x: 4.9,
-	y: 2.35 + index * 1.25,
-}))
+export const TRUCK_SLOTS = manifest.truckSlots as TruckSlot[]
+export const BAYS: StorageBay[] = manifest.bays
 export const REFERENCE_SEEDS = [3, 7, 42, 99, 2026, 4821]
 
 function random(seed: number): () => number {

@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first autonomous forklift that unloads a delivery truck into a compact warehouse. The visitor can run the same randomized shipment with a predictable controller or Full Laya control.
 >
-> Status: Phases 0–2 complete. Phase 2 awaits user review; Phases 3–6 remain planned. See the [Phase 2 review](warehouse-demo/phase2/README.md) before continuing.
+> Status: Phases 0–3 complete. Phase 3 awaits user review; Phases 4–6 remain planned. See the [Phase 3 review](warehouse-demo/phase3/README.md) before continuing.
 
 ## Goal and experience
 
@@ -93,15 +93,15 @@ Exit verified: the [Phase 2 review](warehouse-demo/phase2/README.md) records com
 
 ### Phase 3 — Blender assets and browser visual pass
 
-- [ ] Check Blender MCP connectivity when the user enables it; use Blender Python scripts for repeatability and as a fallback.
-- [ ] Model the cutaway shell, loading dock, truck cargo bed, short storage rack, pallets and forklift with separate wheel, steering, mast and fork pivots.
-- [ ] Add a restrained industrial material set, purposeful labels and lighting consistent with the SLAM demo.
-- [ ] Export optimized GLBs plus a manifest of cargo slots, bays, pivots and collision shapes; keep editable sources and export scripts.
-- [ ] Integrate animated forklift motion, fork lift, pallet attachment/placement, truck cargo and existing stock with simulation state.
-- [ ] Review overview, follow, truck-pickup and rack-placement screenshots in the browser; fix readability and mesh/collision alignment.
-- [ ] Measure load time and frame rate on a named WebGPU-capable reference browser/device; reduce asset cost if needed.
+- [x] Check Blender MCP connectivity when the user enables it; use Blender Python scripts for repeatability and as a fallback.
+- [x] Model the cutaway shell, loading dock, truck cargo bed, short storage rack, pallets and forklift with separate wheel, steering, mast and fork pivots.
+- [x] Add a restrained industrial material set, purposeful labels and lighting consistent with the SLAM demo.
+- [x] Export optimized GLBs plus a manifest of cargo slots, bays, pivots and collision shapes; keep editable sources and export scripts.
+- [x] Integrate animated forklift motion, fork lift, pallet attachment/placement, truck cargo and existing stock with simulation state.
+- [x] Review overview, follow, truck-pickup and rack-placement screenshots in the browser; fix readability and mesh/collision alignment.
+- [x] Measure load time and frame rate on a named WebGPU-capable reference browser/device; reduce asset cost if needed.
 
-Exit: the predictable run looks and reads like a finished small industrial scene, with visible pickup and placement rather than teleporting cargo.
+Exit verified: the [Phase 3 review](warehouse-demo/phase3/README.md) records the authored Blender kit, visible pickup and placement, browser screenshots, passing checks and measured WebGPU performance. Stop for user review before Phase 4.
 
 ### Phase 4 — Full Laya control
 

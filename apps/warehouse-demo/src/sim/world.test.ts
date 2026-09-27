@@ -2,7 +2,14 @@ import { expect, test } from 'vitest'
 import { createController } from './controller'
 import { buildRouteGraph, createPredictableRoute, predictableStep, selectTask } from './predictable'
 import { createScenario, REFERENCE_SEEDS, validateScenario } from './scenario'
-import { advance, canOccupy, createWorld, FIXED_DT, type WarehouseState } from './world'
+import {
+	advance,
+	canOccupy,
+	createWorld,
+	FIXED_DT,
+	palletPosition,
+	type WarehouseState,
+} from './world'
 
 test('seeded scenarios are repeatable and feasible', () => {
 	for (let seed = 0; seed < 1000; seed++) {
@@ -151,6 +158,36 @@ test('predictable alignment retries stop after two attempts', () => {
 		expect(route.stage).toBe(attempt < 3 ? 'recover-pickup' : 'stalled')
 	}
 	expect(route.failReason).toContain('after two retries')
+})
+
+test('authored pallet lifts with the forks and is lowered before every placement', () => {
+	const controller = createController(42)
+	controller.start()
+	let placements = 0
+	let lifted = false
+	for (let tick = 0; tick < 60 * 500 && controller.getSnapshot().status !== 'complete'; tick++) {
+		controller.step()
+		const state = controller.getSnapshot()
+		const carried = state.pallets.find((pallet) => pallet.location.kind === 'carried')
+		if (carried) {
+			expect(palletPosition(carried, state).height - 0.15).toBeCloseTo(
+				state.forklift.forkHeight - 0.1,
+			)
+			if (controller.getRoute().stage === 'retreat') {
+				expect(state.forklift.forkHeight).toBeGreaterThanOrEqual(0.3)
+				lifted = true
+			}
+		}
+		if (state.delivered > placements) {
+			expect(lifted).toBe(true)
+			expect(state.forklift.forkHeight).toBeCloseTo(0.1, 2)
+			expect(state.forklift.carriedId).toBeNull()
+			placements = state.delivered
+			lifted = false
+		}
+	}
+	expect(placements).toBe(4)
+	expect(controller.getSnapshot().status).toBe('complete')
 })
 
 for (const seed of REFERENCE_SEEDS) {

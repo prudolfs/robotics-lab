@@ -1,17 +1,18 @@
+import manifest from '../../../../assets/warehouse-demo/manifest.json'
 import { BAYS, createScenario, type Scenario, TRUCK_SLOTS } from './scenario'
 
 export const FIXED_DT = 1 / 60
 export const FORKLIFT = {
-	length: 1.8,
-	width: 1,
-	wheelbase: 1.2,
+	length: manifest.forklift.length,
+	width: manifest.forklift.width,
+	wheelbase: manifest.forklift.wheelbase,
 	maxForward: 1,
 	maxReverse: 0.6,
 	maxSteering: 0.55,
 	maxForkHeight: 1.2,
 	minForkHeight: 0.08,
 	forkSpeed: 0.35,
-	loadForward: 1.55,
+	loadForward: manifest.forklift.loadForward,
 } as const
 
 export type Point = { x: number; y: number }
@@ -69,7 +70,7 @@ export function palletPosition(pallet: Pallet, state: WarehouseState): Point & {
 	return {
 		x: forklift.x + Math.cos(forklift.heading) * FORKLIFT.loadForward,
 		y: forklift.y + Math.sin(forklift.heading) * FORKLIFT.loadForward,
-		height: forklift.forkHeight + 0.12,
+		height: Math.max(0, forklift.forkHeight - manifest.forklift.pickupHeight) + 0.15,
 	}
 }
 
@@ -170,8 +171,14 @@ function overlaps(a: Box, b: Box): boolean {
 }
 
 function insideFloor(point: Point): boolean {
-	if (point.y >= 0) return point.x >= -5.95 && point.x <= 5.95 && point.y <= 15.45
-	return point.x >= -3.75 && point.x <= -0.15 && point.y >= -6.15
+	const bounds = point.y >= 0 ? manifest.collisions.warehouse : manifest.collisions.truck
+	return (
+		point.x >= bounds.minX &&
+		point.x <= bounds.maxX &&
+		(point.y >= 0
+			? point.y <= manifest.collisions.warehouse.maxY
+			: point.y >= manifest.collisions.truck.minY)
+	)
 }
 
 export function canOccupy(state: WarehouseState, forklift: ForkliftState): boolean {
@@ -183,15 +190,15 @@ export function canOccupy(state: WarehouseState, forklift: ForkliftState): boole
 		halfWidth: FORKLIFT.width / 2,
 	}
 	if (corners(chassis).some((corner) => !insideFloor(corner))) return false
-	const rackBack: Box = { x: 5.77, y: 6.75, heading: 0, halfLength: 0.18, halfWidth: 5.1 }
+	const rackBack: Box = manifest.collisions.rackBack
 	const bodyBoxes = [chassis]
 	if (forklift.carriedId) {
 		bodyBoxes.push({
 			x: forklift.x + Math.cos(forklift.heading) * FORKLIFT.loadForward,
 			y: forklift.y + Math.sin(forklift.heading) * FORKLIFT.loadForward,
 			heading: forklift.heading,
-			halfLength: 0.55,
-			halfWidth: 0.55,
+			halfLength: manifest.collisions.palletHalfExtent,
+			halfWidth: manifest.collisions.palletHalfExtent,
 		})
 	}
 	if (
@@ -207,8 +214,8 @@ export function canOccupy(state: WarehouseState, forklift: ForkliftState): boole
 			x: position.x,
 			y: position.y,
 			heading: 0,
-			halfLength: 0.55,
-			halfWidth: 0.55,
+			halfLength: manifest.collisions.palletHalfExtent,
+			halfWidth: manifest.collisions.palletHalfExtent,
 		}
 		if (bodyBoxes.some((box) => overlaps(box, obstacle))) return false
 	}

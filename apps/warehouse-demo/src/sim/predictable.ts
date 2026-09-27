@@ -215,13 +215,17 @@ export function predictableStep(
 	const slot = TRUCK_SLOTS.find((item) => item.id === route.slotId)
 	const bay = BAYS.find((item) => item.id === route.bayId)
 	const goal =
-		result.route.stage === 'approach' || result.route.stage === 'pickup'
+		result.route.stage === 'approach' ||
+		result.route.stage === 'pickup' ||
+		result.route.stage === 'lift'
 			? slot
 				? { x: slot.x, y: slot.y + 1.55 }
 				: null
 			: result.route.stage === 'retreat' || result.route.stage === 'turn'
 				? { x: slot?.x ?? forklift.x, y: route.retreatY }
-				: result.route.stage === 'cross' || result.route.stage === 'place'
+				: result.route.stage === 'cross' ||
+						result.route.stage === 'place' ||
+						result.route.stage === 'lower'
 					? bay
 						? { x: bay.x - 1.55, y: bay.y }
 						: null

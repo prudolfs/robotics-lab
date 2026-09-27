@@ -1,0 +1,100 @@
+{
+  "capturedAt": "2026-09-27T21:05:07.583Z",
+  "url": "http://127.0.0.1:4184",
+  "browser": "153.0.8010.54",
+  "hardware": "Apple M3 Pro",
+  "memoryGB": 18,
+  "os": "darwin 25.5.0",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "views": {
+    "overview": {
+      "backend": "webgpu",
+      "calls": 170,
+      "triangles": 94145,
+      "frames": 461,
+      "medianMs": 16.699999999999715,
+      "p95Ms": 16.700000000001047,
+      "fps": 60.00260314981167
+    },
+    "moving-follow": {
+      "backend": "webgpu",
+      "calls": 127,
+      "triangles": 74859,
+      "frames": 460,
+      "medianMs": 16.699999999998383,
+      "p95Ms": 16.799999999999926,
+      "fps": 60.00208702911586
+    }
+  },
+  "errors": [],
+  "interactiveLoadMs": 517,
+  "canvas": {
+    "width": 1122,
+    "height": 840,
+    "dpr": 1
+  },
+  "backend": "WEBGPU ACTIVE",
+  "gpu": {
+    "vendor": "apple",
+    "architecture": "metal-3",
+    "device": "",
+    "description": ""
+  },
+  "complete": "Delivery complete",
+  "simulatedTime": "04:32.2",
+  "resources": [
+    {
+      "name": "/assets/index-CTGcrj9s.js",
+      "bytes": 310703,
+      "durationMs": 38.39999997615814
+    },
+    {
+      "name": "/assets/three.tsl-CmvITRZy.js",
+      "bytes": 289616,
+      "durationMs": 36.69999998807907
+    },
+    {
+      "name": "/assets/index-DIE2aC9S.css",
+      "bytes": 2921,
+      "durationMs": 6.600000023841858
+    },
+    {
+      "name": "/assets/preload-helper-j0rie3t4.js",
+      "bytes": 83419,
+      "durationMs": 16.100000023841858
+    },
+    {
+      "name": "/assets/Settings-BBITXo7H.js",
+      "bytes": 66,
+      "durationMs": 1.300000011920929
+    },
+    {
+      "name": "/assets/Inspector-BB9F93ZK.js",
+      "bytes": 35638,
+      "durationMs": 4
+    },
+    {
+      "name": "/assets/warehouse/environment.glb",
+      "bytes": 1120908,
+      "durationMs": 4.599999964237213
+    },
+    {
+      "name": "/assets/warehouse/forklift.glb",
+      "bytes": 379220,
+      "durationMs": 1.899999976158142
+    },
+    {
+      "name": "/assets/warehouse/pallet-a.glb",
+      "bytes": 277324,
+      "durationMs": 1.600000023841858
+    },
+    {
+      "name": "/assets/warehouse/pallet-b.glb",
+      "bytes": 254124,
+      "durationMs": 2.5
+    }
+  ]
+}

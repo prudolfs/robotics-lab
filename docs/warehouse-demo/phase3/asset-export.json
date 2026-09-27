@@ -1,0 +1,45 @@
+{
+  "blender": "5.1.2",
+  "manifestHash": "96ed0aee327f0854ff4a9ba3242e01e59a8683e20d69658241ed8d5b5ca285b3",
+  "source": "assets/warehouse-demo/warehouse.blend",
+  "bundles": {
+    "environment": {
+      "bytes": 1120908,
+      "meshes": 12,
+      "triangles": 17912,
+      "pivots": []
+    },
+    "forklift": {
+      "bytes": 379220,
+      "meshes": 23,
+      "triangles": 5888,
+      "pivots": [
+        "Forklift_Root",
+        "Wheel_FL",
+        "Wheel_FR",
+        "Steer_RL",
+        "Wheel_RL",
+        "Steer_RR",
+        "Wheel_RR",
+        "Mast_Lift",
+        "Fork_Carriage"
+      ]
+    },
+    "pallet-a": {
+      "bytes": 277324,
+      "meshes": 8,
+      "triangles": 4028,
+      "pivots": [
+        "Pallet_A"
+      ]
+    },
+    "pallet-b": {
+      "bytes": 254124,
+      "meshes": 7,
+      "triangles": 3704,
+      "pivots": [
+        "Pallet_B"
+      ]
+    }
+  }
+}
