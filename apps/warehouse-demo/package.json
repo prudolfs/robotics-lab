@@ -4,10 +4,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:probe": "vite --host 127.0.0.1",
-    "build:probe": "tsc --noEmit && vite build"
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run src/sim",
+    "test:e2e": "playwright test",
+    "lint": "biome check src e2e playwright.config.ts vite.config.ts vite.probe.config.ts",
+    "dev:probe": "vite --config vite.probe.config.ts --host 127.0.0.1",
+    "build:probe": "tsc --noEmit && vite build --config vite.probe.config.ts"
   },
   "dependencies": {
+    "@fontsource-variable/geist": "5.2.9",
     "@react-three/drei": "11.0.0-alpha.7",
     "@react-three/fiber": "10.0.0-alpha.5",
     "react": "19.2.7",
@@ -15,11 +22,13 @@
     "three": "0.185.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.61.1",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "@types/three": "0.185.0",
     "@vitejs/plugin-react-swc": "4.3.1",
     "typescript": "7.0.2",
-    "vite": "8.1.2"
+    "vite": "8.1.2",
+    "vitest": "4.1.9"
   }
 }

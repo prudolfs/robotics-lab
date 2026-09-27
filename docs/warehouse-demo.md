@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first autonomous forklift that unloads a delivery truck into a compact warehouse. The visitor can run the same randomized shipment with a predictable controller or Full Laya control.
 >
-> Status: Phase 0 completed and awaiting user review. Phases 1–6 remain planned. See the [Phase 0 review](warehouse-demo/phase0/README.md) before continuing.
+> Status: Phases 0–1 complete. Phase 1 awaits user review; Phases 2–6 remain planned. See the [Phase 1 review](warehouse-demo/phase1/README.md) before continuing.
 
 ## Goal and experience
 
@@ -69,16 +69,16 @@ Exit verified: the [Phase 0 review](warehouse-demo/phase0/README.md) documents t
 
 ### Phase 1 — App shell and deterministic warehouse world
 
-- [ ] Scaffold `apps/warehouse-demo`, workspace scripts, app-local styling and a scene shell using the verified Three.js WebGPU, R3F v10 alpha and Drei v11 alpha combination.
-- [ ] Initialize the WebGPU canvas asynchronously, confirm the active backend and show a clear capability/error state instead of silently presenting a WebGL 2 run as WebGPU.
-- [ ] Implement fixed-timestep world updates and seeded scenario generation outside React; add start, pause, restart-same-seed and randomize-new-seed.
-- [ ] Build placeholder truck, dock, rack, pallets and forklift meshes at real scale, with overview/follow camera controls.
-- [ ] Implement forklift steering, forward/reverse travel, fork height and collisions with walls, rack, truck and pallets.
-- [ ] Implement pickup/carry/place transitions using explicit fork alignment, height, reach and bay-availability checks.
-- [ ] Show shipment count, current load, bay occupancy and event/status messages from actual simulation state.
-- [ ] Test seed validity, fixed-step reproducibility, collision bounds, pickup/placement preconditions and reset state.
+- [x] Scaffold `apps/warehouse-demo`, workspace scripts, app-local styling and a scene shell using the verified Three.js WebGPU, R3F v10 alpha and Drei v11 alpha combination.
+- [x] Initialize the WebGPU canvas asynchronously, confirm the active backend and show a clear capability/error state instead of silently presenting a WebGL 2 run as WebGPU.
+- [x] Implement fixed-timestep world updates and seeded scenario generation outside React; add start, pause, restart-same-seed and randomize-new-seed.
+- [x] Build placeholder truck, dock, rack, pallets and forklift meshes at real scale, with overview/follow camera controls.
+- [x] Implement forklift steering, forward/reverse travel, fork height and collisions with walls, rack, truck and pallets.
+- [x] Implement pickup/carry/place transitions using explicit fork alignment, height, reach and bay-availability checks.
+- [x] Show shipment count, current load, bay occupancy and event/status messages from actual simulation state.
+- [x] Test seed validity, fixed-step reproducibility, collision bounds, pickup/placement preconditions and reset state.
 
-Exit: a repeatable, interactive warehouse simulation can complete a pallet transfer with placeholder geometry.
+Exit verified: the [Phase 1 review](warehouse-demo/phase1/README.md) documents a repeatable one-pallet transfer, browser screenshots and passing simulation/browser checks. Stop for user review before Phase 2.
 
 ### Phase 2 — Predictable autonomous unloading
 

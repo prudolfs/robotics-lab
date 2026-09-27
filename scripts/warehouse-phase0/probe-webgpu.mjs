@@ -38,7 +38,7 @@ page.on('response', (response) => {
 	if (response.status() >= 400)
 		failedResources.push({ status: response.status(), url: response.url() })
 })
-await page.goto('http://127.0.0.1:8084/', { waitUntil: 'networkidle' })
+await page.goto('http://127.0.0.1:8084/probe.html', { waitUntil: 'networkidle' })
 await page.waitForTimeout(1800)
 const first = await page.getByTestId('backend').textContent()
 const modelLoaded = await page.getByTestId('model').textContent()

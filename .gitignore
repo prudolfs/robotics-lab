@@ -46,6 +46,10 @@ apps/simulator/screenshots/.results
 apps/slam-demo/e2e/.report
 apps/slam-demo/e2e/.results
 
+# Warehouse demo browser test output
+apps/warehouse-demo/test-results
+apps/warehouse-demo/playwright-report
+
 # Rebuilt by scripts/slam-vision/build.mjs before SLAM dev/build.
 apps/slam-demo/public/vision/worker.js
 
