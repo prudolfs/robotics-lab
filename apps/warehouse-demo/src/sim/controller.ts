@@ -1,11 +1,11 @@
-import { createShowcaseRoute, showcaseStep } from './showcase'
+import { createPredictableRoute, predictableStep } from './predictable'
 import { advance, appendEvent, createWorld, FIXED_DT, setRunStatus } from './world'
 
 export type WarehouseController = ReturnType<typeof createController>
 
 export function createController(seed = 42) {
 	let state = createWorld(seed)
-	let route = createShowcaseRoute(state)
+	let route = createPredictableRoute(state)
 	const listeners = new Set<() => void>()
 	const emit = () => {
 		for (const listener of listeners) listener()
@@ -31,7 +31,7 @@ export function createController(seed = 42) {
 		},
 		reset(nextSeed = state.seed) {
 			state = createWorld(nextSeed, state.generation + 1)
-			route = createShowcaseRoute(state)
+			route = createPredictableRoute(state)
 			emit()
 		},
 		randomize() {
@@ -41,14 +41,15 @@ export function createController(seed = 42) {
 		},
 		step() {
 			if (state.status !== 'running') return
-			const result = showcaseStep(state, route)
+			const result = predictableStep(state, route)
 			route = result.route
 			state = advance(state, result.command, FIXED_DT)
-			if (route.stage === 'done' && state.status === 'running') {
+			if (state.status === 'complete') route = { ...route, stage: 'done', goal: null }
+			if (route.stage === 'stalled' && state.status === 'running') {
 				state = appendEvent(
 					setRunStatus(state, 'paused'),
-					'success',
-					'Phase 1 sample transfer complete',
+					'warning',
+					route.failReason ?? 'Predictable route stalled',
 				)
 			}
 			emit()

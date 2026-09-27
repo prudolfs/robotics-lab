@@ -1,13 +1,13 @@
 import { mkdir } from 'node:fs/promises'
 import { expect, test } from '@playwright/test'
 
-test('start, pause, restart, randomize and complete the sample transfer', async ({ page }) => {
+test('start, pause, restart, randomize and complete the delivery', async ({ page }) => {
 	const errors: string[] = []
 	page.on('pageerror', (error) => errors.push(error.message))
 	await page.goto('/')
 	await expect(page.getByTestId('renderer-status')).toContainText('WEBGPU ACTIVE')
 	await mkdir('screenshots', { recursive: true })
-	await page.screenshot({ path: 'screenshots/phase1-overview.png' })
+	await page.screenshot({ path: 'screenshots/phase2-overview.png' })
 	await expect(page.getByTestId('seed')).toHaveText('42')
 	await expect(page.getByTestId('run-status')).toHaveText('Ready to unload')
 	await page.getByRole('button', { name: 'Follow forklift' }).click()
@@ -20,7 +20,10 @@ test('start, pause, restart, randomize and complete the sample transfer', async 
 		'aria-pressed',
 		'true',
 	)
-	await page.getByRole('button', { name: 'Start transfer' }).click()
+	await page.getByRole('button', { name: 'Route' }).click()
+	await expect(page.getByRole('button', { name: 'Route' })).toHaveAttribute('aria-pressed', 'false')
+	await page.getByRole('button', { name: 'Route' }).click()
+	await page.getByRole('button', { name: 'Start delivery' }).click()
 	await expect(page.getByTestId('run-status')).toHaveText('Forklift active')
 	await expect(page.getByTestId('elapsed')).not.toHaveText('00:00.0')
 	await page.getByRole('button', { name: 'Pause' }).click()
@@ -35,14 +38,14 @@ test('start, pause, restart, randomize and complete the sample transfer', async 
 	await expect(page.getByTestId('elapsed')).toHaveText('00:00.0')
 	await page.getByRole('button', { name: 'Restart same seed' }).click()
 	await expect(page.getByTestId('elapsed')).toHaveText('00:00.0')
-	await page.getByLabel('Playback speed').selectOption('4')
-	await page.getByRole('button', { name: 'Start transfer' }).click()
-	await expect(page.getByTestId('run-status')).toHaveText('Sample transfer complete', {
-		timeout: 35_000,
+	await page.getByLabel('Playback speed').selectOption('8')
+	await page.getByRole('button', { name: 'Start delivery' }).click()
+	await expect(page.getByTestId('run-status')).toHaveText('Delivery complete', {
+		timeout: 100_000,
 	})
-	await expect(page.getByText('1 stored ·')).toBeVisible()
+	await expect(page.getByText(/0 still in truck/)).toBeVisible()
 	expect(errors).toEqual([])
-	await page.screenshot({ path: 'screenshots/phase1-complete.png' })
+	await page.screenshot({ path: 'screenshots/phase2-complete.png' })
 })
 
 test('unavailable WebGPU is explained and start is disabled', async ({ page }) => {
@@ -51,5 +54,5 @@ test('unavailable WebGPU is explained and start is disabled', async ({ page }) =
 	})
 	await page.goto('/')
 	await expect(page.getByText('WebGPU is unavailable')).toBeVisible()
-	await expect(page.getByRole('button', { name: 'Start transfer' })).toBeDisabled()
+	await expect(page.getByRole('button', { name: 'Start delivery' })).toBeDisabled()
 })

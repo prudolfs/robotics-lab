@@ -170,7 +170,7 @@ function overlaps(a: Box, b: Box): boolean {
 }
 
 function insideFloor(point: Point): boolean {
-	if (point.y >= 0) return point.x >= -5.95 && point.x <= 5.95 && point.y <= 11.95
+	if (point.y >= 0) return point.x >= -5.95 && point.x <= 5.95 && point.y <= 15.45
 	return point.x >= -3.75 && point.x <= -0.15 && point.y >= -6.15
 }
 

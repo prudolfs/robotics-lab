@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first autonomous forklift that unloads a delivery truck into a compact warehouse. The visitor can run the same randomized shipment with a predictable controller or Full Laya control.
 >
-> Status: Phases 0–1 complete. Phase 1 awaits user review; Phases 2–6 remain planned. See the [Phase 1 review](warehouse-demo/phase1/README.md) before continuing.
+> Status: Phases 0–2 complete. Phase 2 awaits user review; Phases 3–6 remain planned. See the [Phase 2 review](warehouse-demo/phase2/README.md) before continuing.
 
 ## Goal and experience
 
@@ -82,14 +82,14 @@ Exit verified: the [Phase 1 review](warehouse-demo/phase1/README.md) documents a
 
 ### Phase 2 — Predictable autonomous unloading
 
-- [ ] Add a deterministic task selector that chooses an accessible truck pallet and an empty reachable bay using a documented tie-break rule.
-- [ ] Build a short route graph with approach poses for cargo pickup, dock transit and bay placement.
-- [ ] Implement steering, speed, stopping and fork sequencing along that route; include bounded recovery for small alignment errors.
-- [ ] Keep task selection and motion logic independent from rendering and UI state.
-- [ ] Show current phase and goal in the inspector, with simple route/target overlays that can be hidden.
-- [ ] Verify completion across the fixed seed set, including different cargo orders and pre-filled bays; record run time and any failure reasons.
+- [x] Add a deterministic task selector that chooses an accessible truck pallet and an empty reachable bay using a documented tie-break rule.
+- [x] Build a short route graph with approach poses for cargo pickup, dock transit and bay placement.
+- [x] Implement steering, speed, stopping and fork sequencing along that route; include bounded recovery for small alignment errors.
+- [x] Keep task selection and motion logic independent from rendering and UI state.
+- [x] Show current phase and goal in the inspector, with simple route/target overlays that can be hidden.
+- [x] Verify completion across the fixed seed set, including different cargo orders and pre-filled bays; record run time and any failure reasons.
 
-Exit: Predictable mode unloads every valid seed in the reference set without manual input.
+Exit verified: the [Phase 2 review](warehouse-demo/phase2/README.md) records complete reference and 100-seed runs with no contacts or invalid actions, browser captures and the remaining limits. Stop for user review before Phase 3.
 
 ### Phase 3 — Blender assets and browser visual pass
 

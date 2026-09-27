@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
 import { createController } from './controller'
+import { buildRouteGraph, createPredictableRoute, predictableStep, selectTask } from './predictable'
 import { createScenario, REFERENCE_SEEDS, validateScenario } from './scenario'
 import { advance, canOccupy, createWorld, FIXED_DT, type WarehouseState } from './world'
 
@@ -105,29 +106,78 @@ test('pickup rejects a high fork and cargo blocked by a nearer pallet', () => {
 	expect(state.events.at(-1)?.text).toBe('Near pallet blocks this cargo')
 })
 
+test('task selection uses reachable cargo and an empty bay with stable tie breaks', () => {
+	const state = createWorld(42)
+	const task = selectTask(state)
+	if (!task) throw new Error('Expected a task for seed 42')
+	expect(task?.slotId).toBe('left-front')
+	expect(task?.bayId).toBe('B7')
+	expect(selectTask(state)).toEqual(task)
+	const graph = buildRouteGraph(task.slotId, task.bayId)
+	expect(graph.edges).toHaveLength(6)
+	expect(graph.nodes.pickup).toEqual({ x: -2.8, y: -0.55, heading: -Math.PI / 2 })
+	expect(graph.nodes.bayApproach).toEqual({ x: 3.3500000000000005, y: 9.85, heading: 0 })
+})
+
+test('a small pickup offset triggers a bounded reverse and retry', () => {
+	let state: WarehouseState = { ...createWorld(42), status: 'running' }
+	let route = createPredictableRoute(state)
+	const slot = state.scenario.cargo.find((item) => item.id === route.slotId)
+	if (!slot) throw new Error('Selected cargo is missing')
+	state = {
+		...state,
+		forklift: { ...state.forklift, x: slot.x + 0.18, y: slot.y + 1.55 },
+	}
+	route = { ...route, stage: 'pickup' }
+	state = advance(state, { action: { kind: 'pickup', palletId: route.palletId } })
+	expect(state.invalidActions).toBe(1)
+	for (let tick = 0; tick < 60 * 25 && !state.forklift.carriedId; tick++) {
+		const result = predictableStep(state, route)
+		route = result.route
+		state = advance(state, result.command)
+	}
+	expect(state.forklift.carriedId).toBe(route.palletId)
+	expect(route.recoveryCount).toBe(1)
+	expect(state.contactCount).toBe(0)
+})
+
+test('predictable alignment retries stop after two attempts', () => {
+	let state = createWorld(42)
+	let route = createPredictableRoute(state)
+	for (let attempt = 1; attempt <= 3; attempt++) {
+		state = { ...state, invalidActions: attempt }
+		route = { ...route, stage: 'pickup' }
+		route = predictableStep(state, route).route
+		expect(route.stage).toBe(attempt < 3 ? 'recover-pickup' : 'stalled')
+	}
+	expect(route.failReason).toContain('after two retries')
+})
+
 for (const seed of REFERENCE_SEEDS) {
-	test(`Phase 1 showcase transfers one pallet for seed ${seed}`, () => {
+	test(`Predictable unloads all cargo for reference seed ${seed}`, () => {
 		const controller = createController(seed)
 		controller.start()
-		controller.stepTicks(60 * 200)
+		controller.stepTicks(60 * 700)
 		const state = controller.getSnapshot()
 		expect(controller.getRoute().stage).toBe('done')
-		expect(state.delivered).toBe(1)
-		expect(state.status).toBe('paused')
+		expect(state.delivered).toBe(state.scenario.cargo.length)
+		expect(state.status).toBe('complete')
 		expect(
 			state.pallets.filter((item) => item.origin === 'delivery' && item.location.kind === 'bay'),
-		).toHaveLength(1)
+		).toHaveLength(state.scenario.cargo.length)
 	})
 }
 
-test('Phase 1 showcase transfers a pallet across varied valid layouts', () => {
+test('Predictable unloads varied valid layouts', () => {
 	const failures: { seed: number; stage: string; delivered: number; contact: number }[] = []
 	for (let seed = 0; seed < 100; seed++) {
 		const controller = createController(seed)
 		controller.start()
-		controller.stepTicks(60 * 120)
+		controller.stepTicks(60 * 700)
 		const state = controller.getSnapshot()
-		if (state.delivered !== 1) {
+		expect(state.contactCount, `seed ${seed} collision count`).toBe(0)
+		expect(state.invalidActions, `seed ${seed} invalid action count`).toBe(0)
+		if (state.delivered !== state.scenario.cargo.length) {
 			failures.push({
 				seed,
 				stage: controller.getRoute().stage,

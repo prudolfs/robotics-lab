@@ -2,6 +2,7 @@ import { OrbitControls } from '@react-three/drei/webgpu'
 import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
 import { Component, type ReactNode, useEffect } from 'react'
 import { Vector3, WebGPURenderer } from 'three/webgpu'
+import type { PredictableRoute } from '../sim/predictable'
 import { BAYS } from '../sim/scenario'
 import { palletPosition, type WarehouseState } from '../sim/world'
 
@@ -22,8 +23,8 @@ function CameraTracker({ state, mode }: { state: WarehouseState; mode: CameraMod
 	const target = new Vector3()
 	useEffect(() => {
 		if (mode === 'overview') {
-			camera.position.set(13, 17, 14)
-			camera.lookAt(0, 0.6, -3)
+			camera.position.set(14, 19, 17)
+			camera.lookAt(0, 0.6, -4.5)
 		}
 	}, [camera, mode])
 	useFrame((_, delta) => {
@@ -39,8 +40,8 @@ function CameraTracker({ state, mode }: { state: WarehouseState; mode: CameraMod
 function Floor() {
 	return (
 		<>
-			<mesh receiveShadow position={[0, -0.14, -6]}>
-				<boxGeometry args={[12, 0.28, 12]} />
+			<mesh receiveShadow position={[0, -0.14, -7.75]}>
+				<boxGeometry args={[12, 0.28, 15.5]} />
 				<meshStandardMaterial color="#71858d" roughness={0.9} />
 			</mesh>
 			<mesh receiveShadow position={[-1.95, -0.12, 3.1]}>
@@ -63,20 +64,20 @@ function Building() {
 	return (
 		<>
 			<Floor />
-			<mesh receiveShadow position={[0, 1.8, -12]}>
+			<mesh receiveShadow position={[0, 1.8, -15.5]}>
 				<boxGeometry args={[12, 3.6, 0.14]} />
 				<meshStandardMaterial color="#d4dbd9" roughness={0.82} />
 			</mesh>
-			<mesh receiveShadow position={[-6, 1.8, -6]}>
-				<boxGeometry args={[0.14, 3.6, 12]} />
+			<mesh receiveShadow position={[-6, 1.8, -7.75]}>
+				<boxGeometry args={[0.14, 3.6, 15.5]} />
 				<meshStandardMaterial color="#9eb0b3" roughness={0.85} />
 			</mesh>
-			<mesh receiveShadow position={[6, 0.35, -6]}>
-				<boxGeometry args={[0.14, 0.7, 12]} />
+			<mesh receiveShadow position={[6, 0.35, -7.75]}>
+				<boxGeometry args={[0.14, 0.7, 15.5]} />
 				<meshStandardMaterial color="#bfcac8" roughness={0.85} />
 			</mesh>
 			{[-5.7, -2.8, 0, 2.8, 5.7].map((x) => (
-				<mesh key={x} position={[x, 3.55, -11.88]}>
+				<mesh key={x} position={[x, 3.55, -15.38]}>
 					<boxGeometry args={[0.11, 0.16, 0.15]} />
 					<meshStandardMaterial color="#425c65" metalness={0.55} roughness={0.55} />
 				</mesh>
@@ -246,7 +247,44 @@ function Forklift({ state }: { state: WarehouseState }) {
 	)
 }
 
-function WarehouseWorld({ state, cameraMode }: { state: WarehouseState; cameraMode: CameraMode }) {
+function RouteCue({ state, goal }: { state: WarehouseState; goal: { x: number; y: number } }) {
+	const dx = goal.x - state.forklift.x
+	const dy = goal.y - state.forklift.y
+	const distance = Math.hypot(dx, dy)
+	return (
+		<>
+			<mesh
+				position={[(goal.x + state.forklift.x) / 2, 0.075, -(goal.y + state.forklift.y) / 2]}
+				rotation={[0, Math.atan2(dy, dx), 0]}
+			>
+				<boxGeometry args={[distance, 0.012, 0.025]} />
+				<meshStandardMaterial
+					color="#8de2ce"
+					emissive="#3c9b85"
+					emissiveIntensity={0.7}
+					transparent
+					opacity={0.62}
+				/>
+			</mesh>
+			<mesh position={[goal.x, 0.08, -goal.y]} rotation={[-Math.PI / 2, 0, 0]}>
+				<ringGeometry args={[0.24, 0.3, 32]} />
+				<meshBasicMaterial color="#8de2ce" transparent opacity={0.8} side={2} />
+			</mesh>
+		</>
+	)
+}
+
+function WarehouseWorld({
+	state,
+	cameraMode,
+	route,
+	showRoute,
+}: {
+	state: WarehouseState
+	cameraMode: CameraMode
+	route: PredictableRoute
+	showRoute: boolean
+}) {
 	return (
 		<>
 			<color attach="background" args={['#152128']} />
@@ -267,10 +305,11 @@ function WarehouseWorld({ state, cameraMode }: { state: WarehouseState; cameraMo
 			<Rack state={state} />
 			<Pallets state={state} />
 			<Forklift state={state} />
+			{showRoute && route.goal && <RouteCue state={state} goal={route.goal} />}
 			<OrbitControls
 				makeDefault
 				enabled={cameraMode === 'overview'}
-				target={[0, 0.6, -3]}
+				target={[0, 0.6, -4.5]}
 				minDistance={8}
 				maxDistance={38}
 				maxPolarAngle={Math.PI / 2.12}
@@ -299,24 +338,28 @@ class SceneErrorBoundary extends Component<
 export function Scene({
 	state,
 	cameraMode,
+	route,
+	showRoute,
 	onRendererStatus,
 }: {
 	state: WarehouseState
 	cameraMode: CameraMode
+	route: PredictableRoute
+	showRoute: boolean
 	onRendererStatus: (status: RendererStatus) => void
 }) {
 	return (
 		<SceneErrorBoundary onError={() => onRendererStatus('error')}>
 			<Canvas
 				shadows
-				camera={{ position: [13, 17, 14], fov: 44, near: 0.1, far: 100 }}
+				camera={{ position: [14, 19, 17], fov: 44, near: 0.1, far: 100 }}
 				renderer={async (props: { canvas: HTMLCanvasElement }) => {
 					const renderer = new WebGPURenderer({ canvas: props.canvas, antialias: true })
 					await renderer.init()
 					return renderer
 				}}
 			>
-				<WarehouseWorld state={state} cameraMode={cameraMode} />
+				<WarehouseWorld state={state} cameraMode={cameraMode} route={route} showRoute={showRoute} />
 				<BackendReporter onStatus={onRendererStatus} />
 			</Canvas>
 		</SceneErrorBoundary>

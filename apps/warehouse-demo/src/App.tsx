@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Scene } from './components/scene'
+import type { PredictableStage } from './sim/predictable'
 import { BAYS, TRUCK_SLOTS } from './sim/scenario'
 import { useWarehouse } from './sim/use-warehouse'
 import './styles.css'
@@ -11,26 +12,47 @@ function clock(seconds: number): string {
 	return `${String(minutes).padStart(2, '0')}:${(seconds % 60).toFixed(1).padStart(4, '0')}`
 }
 
+function stageLabel(stage: PredictableStage): string {
+	const labels: Record<PredictableStage, string> = {
+		approach: 'Approaching cargo',
+		pickup: 'Picking up cargo',
+		retreat: 'Leaving truck',
+		turn: 'Turning to rack',
+		cross: 'Driving to bay',
+		place: 'Placing cargo',
+		backtrack: 'Clearing the rack',
+		'turn-to-dock': 'Turning to dock',
+		'recover-pickup': 'Realigning at truck',
+		'recover-place': 'Realigning at bay',
+		stalled: 'Paused for review',
+		done: 'Complete',
+	}
+	return labels[stage]
+}
+
 export default function App() {
 	const [speed, setSpeed] = useState(1)
 	const { controller, state } = useWarehouse(speed)
 	const [camera, setCamera] = useState<'overview' | 'follow'>('overview')
+	const [showRoute, setShowRoute] = useState(true)
 	const [rendererStatus, setRendererStatus] = useState<RendererStatus>('loading')
 	const route = controller.getRoute()
 	const running = state.status === 'running'
-	const sampleDone = route.stage === 'done'
+	const complete = state.status === 'complete'
 	const currentCargo = state.pallets.find((item) => item.id === route.palletId)
 	const destination = BAYS.find((item) => item.id === route.bayId)
 	const remaining = state.scenario.cargo.length - state.delivered
-	const statusLabel = sampleDone
-		? 'Sample transfer complete'
-		: state.contact
-			? 'Contact detected'
-			: running
-				? 'Forklift active'
-				: state.status === 'paused'
-					? 'Paused'
-					: 'Ready to unload'
+	const statusLabel = complete
+		? 'Delivery complete'
+		: route.stage === 'stalled'
+			? 'Controller paused'
+			: state.contact
+				? 'Contact detected'
+				: running
+					? 'Forklift active'
+					: state.status === 'paused'
+						? 'Paused'
+						: 'Ready to unload'
 
 	return (
 		<div className="app-shell">
@@ -63,7 +85,13 @@ export default function App() {
 
 			<main className="workspace">
 				<section className="viewport" aria-label="Warehouse simulation">
-					<Scene state={state} cameraMode={camera} onRendererStatus={setRendererStatus} />
+					<Scene
+						state={state}
+						cameraMode={camera}
+						route={route}
+						showRoute={showRoute}
+						onRendererStatus={setRendererStatus}
+					/>
 					{rendererStatus !== 'webgpu' && (
 						<div className="renderer-overlay" role="status">
 							<strong>
@@ -98,17 +126,24 @@ export default function App() {
 						>
 							▣ Follow forklift
 						</button>
+						<button
+							type="button"
+							aria-pressed={showRoute}
+							onClick={() => setShowRoute((value) => !value)}
+						>
+							◇ Route
+						</button>
 					</fieldset>
 					<div className="viewport-note">
 						<span className="note-arrow">↗</span>
 						<span>
-							12 × 12 m warehouse
+							12 × 15.5 m warehouse
 							<br />
 							<small>Two-lane truck</small>
 						</span>
 					</div>
 					<div className="viewport-caption">
-						PHASE 1 PREVIEW <span>·</span> ONE AUTONOMOUS PALLET TRANSFER
+						PHASE 2 <span>·</span> AUTONOMOUS DELIVERY
 					</div>
 				</section>
 
@@ -124,11 +159,11 @@ export default function App() {
 						</div>
 						<div className="mode-card">
 							<span className="mode-dot" />
-							Predictable preview <small>Phase 1</small>
+							Predictable <small>Phase 2</small>
 						</div>
 						<p className="section-help">
-							A fixed one-pallet transfer demonstrates the warehouse and its physical rules. Full
-							unloading and controller modes follow in later phases.
+							The forklift unloads every incoming pallet in a repeatable order. Full Laya control
+							follows in Phase 4.
 						</p>
 						<div className="property-row">
 							<span>Scenario seed</span>
@@ -151,6 +186,7 @@ export default function App() {
 							>
 								<option value={1}>1×</option>
 								<option value={4}>4×</option>
+								<option value={8}>8×</option>
 							</select>
 						</label>
 					</section>
@@ -178,7 +214,13 @@ export default function App() {
 						<div className="property-row">
 							<span>Step</span>
 							<strong className="capitalize" data-testid="stage">
-								{sampleDone ? 'Complete' : route.stage}
+								{stageLabel(route.stage)}
+							</strong>
+						</div>
+						<div className="property-row">
+							<span>Current goal</span>
+							<strong data-testid="current-goal">
+								{route.goal ? `${route.goal.x.toFixed(1)}, ${route.goal.y.toFixed(1)} m` : '—'}
 							</strong>
 						</div>
 						<div className="property-row">
@@ -252,14 +294,16 @@ export default function App() {
 					<button
 						className="primary-button"
 						type="button"
-						disabled={rendererStatus !== 'webgpu' || running || sampleDone}
+						disabled={
+							rendererStatus !== 'webgpu' || running || complete || route.stage === 'stalled'
+						}
 						onClick={() => controller.start()}
 					>
-						{sampleDone
-							? '✓ Sample complete'
+						{complete
+							? '✓ Delivery complete'
 							: state.status === 'paused'
 								? '▶ Resume'
-								: '▶ Start transfer'}
+								: '▶ Start delivery'}
 					</button>
 					<button type="button" disabled={!running} onClick={() => controller.pause()}>
 						Ⅱ Pause
@@ -275,7 +319,11 @@ export default function App() {
 					<strong data-testid="run-status">{statusLabel}</strong>
 					<span>
 						Seed {state.seed} ·{' '}
-						{currentCargo?.location.kind === 'bay' ? 'Cargo stored' : 'Delivery in progress'}
+						{complete
+							? 'All cargo stored'
+							: currentCargo?.location.kind === 'bay'
+								? 'Cargo stored'
+								: 'Delivery in progress'}
 					</span>
 				</div>
 				<div className="transport-timer">
