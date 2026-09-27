@@ -1,0 +1,25 @@
+{
+  "name": "@robotics-lab/warehouse-demo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:probe": "vite --host 127.0.0.1",
+    "build:probe": "tsc --noEmit && vite build"
+  },
+  "dependencies": {
+    "@react-three/drei": "11.0.0-alpha.7",
+    "@react-three/fiber": "10.0.0-alpha.5",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "three": "0.185.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@types/three": "0.185.0",
+    "@vitejs/plugin-react-swc": "4.3.1",
+    "typescript": "7.0.2",
+    "vite": "8.1.2"
+  }
+}

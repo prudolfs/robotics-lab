@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first autonomous forklift that unloads a delivery truck into a compact warehouse. The visitor can run the same randomized shipment with a predictable controller or Full Laya control.
 >
-> Status: planning. Every task below is unstarted.
+> Status: Phase 0 completed and awaiting user review. Phases 1–6 remain planned. See the [Phase 0 review](warehouse-demo/phase0/README.md) before continuing.
 
 ## Goal and experience
 
@@ -55,17 +55,17 @@ Blender is the asset authoring tool. The user plans to open Blender and enable B
 
 Goal: settle the smallest convincing layout and prove that the proposed Full Laya action loop is viable enough to build around.
 
-- [ ] Sketch the top-down dock, truck, forklift aisle and rack layout; specify dimensions, approach clearances and the default camera view.
-- [ ] Define forklift pose, steering, speed, fork height, carried load, pallet positions, bay occupancy and run-state units/conventions.
-- [ ] Define seeded scenario rules for cargo order/placement and pre-existing stock; generate sample seeds and check reachable cargo and sufficient bays.
-- [ ] Specify the discrete Full Laya action vocabulary, qualitative observations, decision rate, timeout behavior and physical rejection rules.
-- [ ] Probe the live `/v1/systemone` API with representative navigation, pickup and placement situations. Compare a few phrasings and record response time, correct-choice rate and common mistakes.
-- [ ] Define measurable completion, stall and invalid-action criteria, plus a fixed seed set for controller comparison.
-- [ ] Record a visual reference and asset list that matches the SLAM demo's palette and level of detail.
-- [ ] Spike a minimal Three.js WebGPU scene through R3F v10 alpha and compatible Drei v11 alpha; verify the active backend, canvas lifecycle, controls, GLB materials and shadows in the reference browser.
-- [ ] Pin compatible prerelease versions and record WebGPU capability behavior and any unsupported material/effect choices before asset production.
+- [x] Sketch the top-down dock, truck, forklift aisle and rack layout; specify dimensions, approach clearances and the default camera view.
+- [x] Define forklift pose, steering, speed, fork height, carried load, pallet positions, bay occupancy and run-state units/conventions.
+- [x] Define seeded scenario rules for cargo order/placement and pre-existing stock; generate sample seeds and check reachable cargo and sufficient bays.
+- [x] Specify the discrete Full Laya action vocabulary, qualitative observations, decision rate, timeout behavior and physical rejection rules.
+- [x] Probe the live `/v1/systemone` API with representative navigation, pickup and placement situations. Compare a few phrasings and record response time, correct-choice rate and common mistakes.
+- [x] Define measurable completion, stall and invalid-action criteria, plus a fixed seed set for controller comparison.
+- [x] Record a visual reference and asset list that matches the SLAM demo's palette and level of detail.
+- [x] Spike a minimal Three.js WebGPU scene through R3F v10 alpha and compatible Drei v11 alpha; verify the active backend, canvas lifecycle, controls, GLB materials and shadows in the reference browser.
+- [x] Pin compatible prerelease versions and record WebGPU capability behavior and any unsupported material/effect choices before asset production.
 
-Exit: a documented scene layout, sample valid seeds and a small decision probe establish the scope and risks before building the full app.
+Exit verified: the [Phase 0 review](warehouse-demo/phase0/README.md) documents the layout, 1,000 valid generated seeds, 36 live Laya decisions, and an active WebGPU browser render. Stop for user review before Phase 1.
 
 ### Phase 1 — App shell and deterministic warehouse world
 

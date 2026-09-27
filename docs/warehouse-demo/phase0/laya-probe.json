@@ -1,0 +1,549 @@
+{
+  "endpoint": "http://127.0.0.1:8000/v1/systemone",
+  "generatedAt": "2026-09-27T16:50:59.024Z",
+  "caseCount": 12,
+  "summary": {
+    "navigation": {
+      "direct": {
+        "correct": 2,
+        "total": 4,
+        "medianLatencyMs": 37,
+        "errors": 0
+      },
+      "relative": {
+        "correct": 3,
+        "total": 4,
+        "medianLatencyMs": 34,
+        "errors": 0
+      },
+      "position": {
+        "correct": 3,
+        "total": 4,
+        "medianLatencyMs": 33,
+        "errors": 0
+      }
+    },
+    "pickup": {
+      "direct": {
+        "correct": 3,
+        "total": 4,
+        "medianLatencyMs": 34,
+        "errors": 0
+      },
+      "readiness": {
+        "correct": 3,
+        "total": 4,
+        "medianLatencyMs": 32,
+        "errors": 0
+      },
+      "conditions": {
+        "correct": 4,
+        "total": 4,
+        "medianLatencyMs": 29,
+        "errors": 0
+      }
+    },
+    "placement": {
+      "direct": {
+        "correct": 3,
+        "total": 4,
+        "medianLatencyMs": 27,
+        "errors": 0
+      },
+      "readiness": {
+        "correct": 2,
+        "total": 4,
+        "medianLatencyMs": 31,
+        "errors": 0
+      },
+      "conditions": {
+        "correct": 3,
+        "total": 4,
+        "medianLatencyMs": 27,
+        "errors": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "caseId": "nav-left",
+      "group": "navigation",
+      "variant": "direct",
+      "expected": "left",
+      "selected": "left",
+      "correct": true,
+      "latencyMs": 1064,
+      "probabilities": {
+        "left": 0.7807,
+        "ahead": 0.165,
+        "right": 0.0544
+      }
+    },
+    {
+      "caseId": "nav-left",
+      "group": "navigation",
+      "variant": "relative",
+      "expected": "left",
+      "selected": "left",
+      "correct": true,
+      "latencyMs": 140,
+      "probabilities": {
+        "left": 0.9451,
+        "ahead": 0.029,
+        "right": 0.0259
+      }
+    },
+    {
+      "caseId": "nav-left",
+      "group": "navigation",
+      "variant": "position",
+      "expected": "left",
+      "selected": "left",
+      "correct": true,
+      "latencyMs": 36,
+      "probabilities": {
+        "left": 0.9315,
+        "ahead": 0.042,
+        "right": 0.0266
+      }
+    },
+    {
+      "caseId": "nav-right",
+      "group": "navigation",
+      "variant": "direct",
+      "expected": "right",
+      "selected": "ahead",
+      "correct": false,
+      "latencyMs": 33,
+      "probabilities": {
+        "left": 0.3415,
+        "ahead": 0.3805,
+        "right": 0.278
+      }
+    },
+    {
+      "caseId": "nav-right",
+      "group": "navigation",
+      "variant": "relative",
+      "expected": "right",
+      "selected": "right",
+      "correct": true,
+      "latencyMs": 32,
+      "probabilities": {
+        "left": 0.0871,
+        "ahead": 0.156,
+        "right": 0.7569
+      }
+    },
+    {
+      "caseId": "nav-right",
+      "group": "navigation",
+      "variant": "position",
+      "expected": "right",
+      "selected": "right",
+      "correct": true,
+      "latencyMs": 32,
+      "probabilities": {
+        "left": 0.0601,
+        "ahead": 0.1394,
+        "right": 0.8005
+      }
+    },
+    {
+      "caseId": "nav-ahead",
+      "group": "navigation",
+      "variant": "direct",
+      "expected": "ahead",
+      "selected": "ahead",
+      "correct": true,
+      "latencyMs": 32,
+      "probabilities": {
+        "left": 0.2291,
+        "ahead": 0.5752,
+        "right": 0.1957
+      }
+    },
+    {
+      "caseId": "nav-ahead",
+      "group": "navigation",
+      "variant": "relative",
+      "expected": "ahead",
+      "selected": "ahead",
+      "correct": true,
+      "latencyMs": 31,
+      "probabilities": {
+        "left": 0.0771,
+        "ahead": 0.8541,
+        "right": 0.0688
+      }
+    },
+    {
+      "caseId": "nav-ahead",
+      "group": "navigation",
+      "variant": "position",
+      "expected": "ahead",
+      "selected": "ahead",
+      "correct": true,
+      "latencyMs": 33,
+      "probabilities": {
+        "left": 0.0839,
+        "ahead": 0.7099,
+        "right": 0.2062
+      }
+    },
+    {
+      "caseId": "nav-near-left",
+      "group": "navigation",
+      "variant": "direct",
+      "expected": "left",
+      "selected": "ahead",
+      "correct": false,
+      "latencyMs": 37,
+      "probabilities": {
+        "left": 0.4219,
+        "ahead": 0.4509,
+        "right": 0.1273
+      }
+    },
+    {
+      "caseId": "nav-near-left",
+      "group": "navigation",
+      "variant": "relative",
+      "expected": "left",
+      "selected": "ahead",
+      "correct": false,
+      "latencyMs": 34,
+      "probabilities": {
+        "left": 0.0751,
+        "ahead": 0.8923,
+        "right": 0.0327
+      }
+    },
+    {
+      "caseId": "nav-near-left",
+      "group": "navigation",
+      "variant": "position",
+      "expected": "left",
+      "selected": "ahead",
+      "correct": false,
+      "latencyMs": 32,
+      "probabilities": {
+        "left": 0.0577,
+        "ahead": 0.9188,
+        "right": 0.0235
+      }
+    },
+    {
+      "caseId": "pickup-ready",
+      "group": "pickup",
+      "variant": "direct",
+      "expected": true,
+      "selected": false,
+      "correct": false,
+      "latencyMs": 117,
+      "probabilities": {
+        "true": 0.3465,
+        "false": 0.6535
+      }
+    },
+    {
+      "caseId": "pickup-ready",
+      "group": "pickup",
+      "variant": "readiness",
+      "expected": true,
+      "selected": true,
+      "correct": true,
+      "latencyMs": 32,
+      "probabilities": {
+        "true": 0.8037,
+        "false": 0.19630000000000003
+      }
+    },
+    {
+      "caseId": "pickup-ready",
+      "group": "pickup",
+      "variant": "conditions",
+      "expected": true,
+      "selected": true,
+      "correct": true,
+      "latencyMs": 29,
+      "probabilities": {
+        "true": 0.8247,
+        "false": 0.1753
+      }
+    },
+    {
+      "caseId": "pickup-offset",
+      "group": "pickup",
+      "variant": "direct",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 28,
+      "probabilities": {
+        "true": 0.1073,
+        "false": 0.8927
+      }
+    },
+    {
+      "caseId": "pickup-offset",
+      "group": "pickup",
+      "variant": "readiness",
+      "expected": false,
+      "selected": true,
+      "correct": false,
+      "latencyMs": 31,
+      "probabilities": {
+        "true": 0.5301,
+        "false": 0.4699
+      }
+    },
+    {
+      "caseId": "pickup-offset",
+      "group": "pickup",
+      "variant": "conditions",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 28,
+      "probabilities": {
+        "true": 0.3601,
+        "false": 0.6399
+      }
+    },
+    {
+      "caseId": "pickup-high",
+      "group": "pickup",
+      "variant": "direct",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 34,
+      "probabilities": {
+        "true": 0.0516,
+        "false": 0.9484
+      }
+    },
+    {
+      "caseId": "pickup-high",
+      "group": "pickup",
+      "variant": "readiness",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 115,
+      "probabilities": {
+        "true": 0.1361,
+        "false": 0.8639
+      }
+    },
+    {
+      "caseId": "pickup-high",
+      "group": "pickup",
+      "variant": "conditions",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 31,
+      "probabilities": {
+        "true": 0.0987,
+        "false": 0.9013
+      }
+    },
+    {
+      "caseId": "pickup-far",
+      "group": "pickup",
+      "variant": "direct",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 27,
+      "probabilities": {
+        "true": 0.2124,
+        "false": 0.7876
+      }
+    },
+    {
+      "caseId": "pickup-far",
+      "group": "pickup",
+      "variant": "readiness",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 27,
+      "probabilities": {
+        "true": 0.2695,
+        "false": 0.7304999999999999
+      }
+    },
+    {
+      "caseId": "pickup-far",
+      "group": "pickup",
+      "variant": "conditions",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 27,
+      "probabilities": {
+        "true": 0.1006,
+        "false": 0.8994
+      }
+    },
+    {
+      "caseId": "place-ready",
+      "group": "placement",
+      "variant": "direct",
+      "expected": true,
+      "selected": false,
+      "correct": false,
+      "latencyMs": 28,
+      "probabilities": {
+        "true": 0.0954,
+        "false": 0.9046
+      }
+    },
+    {
+      "caseId": "place-ready",
+      "group": "placement",
+      "variant": "readiness",
+      "expected": true,
+      "selected": true,
+      "correct": true,
+      "latencyMs": 28,
+      "probabilities": {
+        "true": 0.8927,
+        "false": 0.10729999999999995
+      }
+    },
+    {
+      "caseId": "place-ready",
+      "group": "placement",
+      "variant": "conditions",
+      "expected": true,
+      "selected": true,
+      "correct": true,
+      "latencyMs": 27,
+      "probabilities": {
+        "true": 0.7912,
+        "false": 0.20879999999999999
+      }
+    },
+    {
+      "caseId": "place-occupied",
+      "group": "placement",
+      "variant": "direct",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 27,
+      "probabilities": {
+        "true": 0.1094,
+        "false": 0.8906000000000001
+      }
+    },
+    {
+      "caseId": "place-occupied",
+      "group": "placement",
+      "variant": "readiness",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 31,
+      "probabilities": {
+        "true": 0.275,
+        "false": 0.725
+      }
+    },
+    {
+      "caseId": "place-occupied",
+      "group": "placement",
+      "variant": "conditions",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 27,
+      "probabilities": {
+        "true": 0.1223,
+        "false": 0.8777
+      }
+    },
+    {
+      "caseId": "place-offset",
+      "group": "placement",
+      "variant": "direct",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 27,
+      "probabilities": {
+        "true": 0.0775,
+        "false": 0.9225
+      }
+    },
+    {
+      "caseId": "place-offset",
+      "group": "placement",
+      "variant": "readiness",
+      "expected": false,
+      "selected": true,
+      "correct": false,
+      "latencyMs": 27,
+      "probabilities": {
+        "true": 0.6559,
+        "false": 0.34409999999999996
+      }
+    },
+    {
+      "caseId": "place-offset",
+      "group": "placement",
+      "variant": "conditions",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 27,
+      "probabilities": {
+        "true": 0.195,
+        "false": 0.8049999999999999
+      }
+    },
+    {
+      "caseId": "place-high",
+      "group": "placement",
+      "variant": "direct",
+      "expected": false,
+      "selected": false,
+      "correct": true,
+      "latencyMs": 27,
+      "probabilities": {
+        "true": 0.1739,
+        "false": 0.8261000000000001
+      }
+    },
+    {
+      "caseId": "place-high",
+      "group": "placement",
+      "variant": "readiness",
+      "expected": false,
+      "selected": true,
+      "correct": false,
+      "latencyMs": 33,
+      "probabilities": {
+        "true": 0.5451,
+        "false": 0.45489999999999997
+      }
+    },
+    {
+      "caseId": "place-high",
+      "group": "placement",
+      "variant": "conditions",
+      "expected": false,
+      "selected": true,
+      "correct": false,
+      "latencyMs": 28,
+      "probabilities": {
+        "true": 0.5228,
+        "false": 0.47719999999999996
+      }
+    }
+  ]
+}

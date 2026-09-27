@@ -1,0 +1,26 @@
+{
+  "url": "http://127.0.0.1:8084/",
+  "disabled": true,
+  "browser": "153.0.8010.54",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+  "gpu": {
+    "available": false,
+    "adapter": false,
+    "features": []
+  },
+  "first": "Backend: webgl-fallback",
+  "second": "Backend: webgl-fallback",
+  "modelLoaded": "GLB loaded: true",
+  "controlsChangedView": true,
+  "canvasBefore": 1,
+  "canvasAfterUnmount": 0,
+  "canvasAfterRemount": 1,
+  "pageErrors": [],
+  "pageWarnings": [
+    "THREE.WebGPURenderer: WebGPU is not available, running under WebGL2 backend.",
+    "[Scheduler] Root \"root_0\" not found; invalidation ignored.",
+    "THREE.WebGPURenderer: WebGPU is not available, running under WebGL2 backend.",
+    "[Scheduler] Root \"root_0\" not found; invalidation ignored."
+  ],
+  "failedResources": []
+}

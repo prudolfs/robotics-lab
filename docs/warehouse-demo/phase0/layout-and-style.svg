@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1360" height="860" viewBox="0 0 1360 860" role="img" aria-labelledby="title desc">
+  <title id="title">Warehouse demo Phase 0 layout and visual reference</title>
+  <desc id="desc">A compact warehouse with a two-lane truck, open dock apron, forklift route, and eight single-level storage bays. Materials and interface colors follow the SLAM demo.</desc>
+  <defs>
+    <style>
+      text { font-family: Arial, sans-serif; fill: #e6eded; }
+      .small { font-size: 14px; fill: #a9bac1; letter-spacing: 1px; }
+      .label { font-size: 18px; font-weight: 600; }
+      .micro { font-size: 12px; fill: #b4c9ca; }
+      .line { stroke: #6c858d; stroke-width: 2; }
+    </style>
+    <pattern id="floor" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M34 0H0V34" fill="none" stroke="#4a626c" stroke-width="1" opacity=".35"/></pattern>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="6" refY="4" orient="auto"><path d="M0 0L7 4L0 8" fill="none" stroke="#85dbc5" stroke-width="2"/></marker>
+  </defs>
+  <rect width="1360" height="860" fill="#111a20"/>
+  <text x="52" y="58" class="small" fill="#85dbc5">WAREHOUSE DEMO / PHASE 0</text>
+  <text x="52" y="102" font-size="37" font-weight="650">Compact unloading scene.</text>
+  <text x="52" y="133" font-size="17" fill="#a9bac1">Top-down blockout • dimensions in meters • concept, not production geometry</text>
+
+  <!-- World, x from -6 to 6 and y from -6.2 to 12. -->
+  <g transform="translate(343 606) scale(48 -38)">
+    <rect x="-6" y="0" width="12" height="12" fill="#70848e" stroke="#cad7d7" stroke-width=".06"/>
+    <rect x="-6" y="0" width="12" height="12" fill="url(#floor)"/>
+    <rect x="-3.8" y="-6.2" width="3.7" height="6.2" fill="#354c57" stroke="#b8c8cc" stroke-width=".08"/>
+    <rect x="-3.8" y="-6.2" width="3.7" height=".75" fill="#263942"/>
+    <rect x="-4.2" y="-.22" width="4.5" height=".44" fill="#d9ba6b"/>
+    <path d="M-4.2 0H.3" stroke="#203139" stroke-width=".08" stroke-dasharray=".15 .12"/>
+    <!-- Truck cargo slots. -->
+    <g fill="#c4a473" stroke="#614f3f" stroke-width=".035">
+      <rect x="-3.35" y="-2.75" width="1.1" height="1.1"/>
+      <rect x="-1.55" y="-2.75" width="1.1" height="1.1"/>
+      <rect x="-3.35" y="-4.75" width="1.1" height="1.1"/>
+      <rect x="-1.55" y="-4.75" width="1.1" height="1.1"/>
+    </g>
+    <!-- Rack and bays. -->
+    <rect x="4.25" y="1.65" width="1.5" height="10.2" fill="#263e47" stroke="#bad0d0" stroke-width=".04"/>
+    <g fill="#345c59" stroke="#85dbc5" stroke-width=".025">
+      <rect x="4.4" y="1.75" width="1.2" height="1.12"/>
+      <rect x="4.4" y="3" width="1.2" height="1.12"/>
+      <rect x="4.4" y="4.25" width="1.2" height="1.12"/>
+      <rect x="4.4" y="5.5" width="1.2" height="1.12"/>
+      <rect x="4.4" y="6.75" width="1.2" height="1.12"/>
+      <rect x="4.4" y="8" width="1.2" height="1.12"/>
+      <rect x="4.4" y="9.25" width="1.2" height="1.12"/>
+      <rect x="4.4" y="10.5" width="1.2" height="1.12"/>
+    </g>
+    <rect x="4.55" y="5.67" width=".9" height=".8" fill="#bd9b67"/>
+    <rect x="4.55" y="9.42" width=".9" height=".8" fill="#bd9b67"/>
+    <!-- Travel path and forklift. -->
+    <path d="M-2 3.1V-1.1M-2 3.1H2.6V7.3H3.7" fill="none" stroke="#85dbc5" stroke-width=".055" stroke-dasharray=".24 .13" opacity=".9"/>
+    <rect x="-2.7" y="2.5" width="1.3" height="2" rx=".13" fill="#145a55" stroke="#95e2cc" stroke-width=".05"/>
+    <rect x="-2.47" y="2.15" width=".2" height=".42" fill="#bec9be"/>
+    <rect x="-1.83" y="2.15" width=".2" height=".42" fill="#bec9be"/>
+  </g>
+
+  <text x="365" y="700" class="label">TRUCK / TWO CARGO LANES</text>
+  <text x="365" y="724" class="small">Near pallets gate rear pallets</text>
+  <text x="658" y="589" class="label">DOCK APRON</text>
+  <text x="658" y="613" class="small">Flush bed • clear turn area</text>
+  <text x="658" y="235" class="label">RACK / B1–B8</text>
+  <text x="658" y="259" class="small">Single level • seeded stock</text>
+  <path d="M650 246L628 246" class="line"/>
+
+  <rect x="956" y="172" width="354" height="566" rx="12" fill="#162128" stroke="#2b3941" stroke-width="2"/>
+  <text x="987" y="213" class="small">VISUAL DIRECTION</text>
+  <text x="987" y="250" class="label">SLAM lab family</text>
+  <text x="987" y="288" class="micro">Cutaway industrial architecture</text>
+  <text x="987" y="311" class="micro">Brushed/cool metal + warm wood pallets</text>
+  <text x="987" y="334" class="micro">Warm dock task lights, cool ambient fill</text>
+  <text x="987" y="357" class="micro">Restrained mint route/decision overlays</text>
+  <text x="987" y="380" class="micro">Readable pallet IDs and occupied bays</text>
+  <text x="987" y="421" class="small">PALETTE</text>
+  <g>
+    <rect x="987" y="439" width="52" height="52" rx="5" fill="#111a20" stroke="#6d838a"/>
+    <rect x="1048" y="439" width="52" height="52" rx="5" fill="#70848e"/>
+    <rect x="1109" y="439" width="52" height="52" rx="5" fill="#145a55"/>
+    <rect x="1170" y="439" width="52" height="52" rx="5" fill="#85dbc5"/>
+    <rect x="1231" y="439" width="52" height="52" rx="5" fill="#c4a473"/>
+  </g>
+  <text x="987" y="534" class="small">DEFAULT CAMERA</text>
+  <text x="987" y="560" class="micro">High three-quarter view from open side,</text>
+  <text x="987" y="583" class="micro">showing truck mouth and every bay.</text>
+  <text x="987" y="627" class="small">ASSET KIT</text>
+  <text x="987" y="651" class="micro">Shell • truck • dock • rack • pallets</text>
+  <text x="987" y="674" class="micro">Forklift chassis/wheels/mast/forks</text>
+  <text x="987" y="697" class="micro">Lights • signs • restrained small props</text>
+  <text x="365" y="818" class="small">REFERENCE: SLAM demo palette  •  WAREHOUSE: 12 × 12 m  •  TRUCK: 3.7 × 6.2 m</text>
+</svg>
