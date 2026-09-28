@@ -203,7 +203,8 @@ try {
 	run('ffmpeg', [
 		...input,
 		'-vf',
-		`scale=${width}:-2:flags=lanczos,palettegen=stats_mode=full`,
+		// A fully opaque palette and complete frames keep project transitions consistent in README viewers.
+		`scale=${width}:-2:flags=lanczos,palettegen=stats_mode=full:reserve_transparent=0`,
 		'-frames:v',
 		'1',
 		palette,
@@ -214,6 +215,8 @@ try {
 		palette,
 		'-filter_complex',
 		`[0:v]scale=${width}:-2:flags=lanczos[x];[x][1:v]paletteuse=dither=sierra2_4a`,
+		'-gifflags',
+		'0',
 		'-loop',
 		'0',
 		staged,
