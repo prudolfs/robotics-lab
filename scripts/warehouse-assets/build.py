@@ -106,7 +106,8 @@ def text(name,body,loc,size,mat='white',rotation=(0,0,0),parent=None):
     bpy.ops.object.convert(target='MESH');return obj
 
 # Warehouse cutaway and dock. All floor obstacles use the manifest's simulation footprint.
-box('Concrete_foundation',(0,7.75,-.2),(12,.0+15.5,.4),'slate',.04)
+# Keep the foundation below the 5 cm finish slab: coincident top faces flicker in WebGPU.
+box('Concrete_foundation',(0,7.75,-.225),(12,15.5,.35),'slate',.04)
 box('Concrete_floor',(0,7.75,-.025),(11.9,15.4,.05),'floor',0)
 box('Back_wall',(0,15.52,1.7),(12,.14,3.4),'wall-light')
 box('Left_wall',(-6.02,7.75,1.7),(.14,15.5,3.4),'wall')

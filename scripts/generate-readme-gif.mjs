@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Captures all three apps sequentially, then atomically replaces the README GIF.
+// Captures all four apps sequentially, then atomically replaces the README GIF.
 // Run from any directory: node scripts/generate-readme-gif.mjs [output.gif]
 import { spawn, spawnSync } from 'node:child_process'
 import { mkdir, mkdtemp, readdir, rename, rm, writeFile } from 'node:fs/promises'
@@ -168,7 +168,25 @@ try {
 			await page.screenshot({ path: framePath(count * 2 + i) })
 		}
 	})
-	if ((await readdir(frames)).filter((name) => name.endsWith('.png')).length !== count * 3)
+	await captureApp('warehouse-demo', 4184, async (page) => {
+		await expect(page.getByTestId('renderer-status')).toContainText('WEBGPU ACTIVE')
+		await expect(page.getByRole('button', { name: 'Start delivery' })).toBeEnabled()
+		await page.getByLabel('Playback speed').selectOption('8')
+		await page.getByRole('button', { name: 'Start delivery' }).click()
+		const views = ['Overview', 'Dock', 'Follow forklift', 'Rack']
+		let lastView
+		for (let i = 0; i < count; i++) {
+			const view = views[Math.floor((i * views.length) / count)]
+			if (view !== lastView) {
+				await page.getByRole('button', { name: view }).click()
+				await page.waitForTimeout(350)
+				lastView = view
+			}
+			await page.waitForTimeout(frameMs)
+			await page.screenshot({ path: framePath(count * 3 + i) })
+		}
+	})
+	if ((await readdir(frames)).filter((name) => name.endsWith('.png')).length !== count * 4)
 		throw Error('Incomplete project capture')
 	const palette = resolve(temporary, 'palette.png')
 	const staged = resolve(temporary, 'header.gif')
@@ -206,9 +224,9 @@ try {
 		`${JSON.stringify(
 			{
 				width,
-				frames: count * 3,
+				frames: count * 4,
 				fps,
-				projects: ['simulator', 'drone-mission-planner', 'slam-demo'].map((name, i) => ({
+				projects: ['simulator', 'drone-mission-planner', 'slam-demo', 'warehouse-demo'].map((name, i) => ({
 					name,
 					firstFrame: i * count,
 					frames: count,
@@ -218,7 +236,7 @@ try {
 			2,
 		)}\n`,
 	)
-	process.stdout.write(`Wrote ${output}: ${count * 3} frames across all three projects.\n`)
+	process.stdout.write(`Wrote ${output}: ${count * 4} frames across all four projects.\n`)
 } finally {
 	await rm(temporary, { recursive: true, force: true })
 }

@@ -1,6 +1,6 @@
 # Phase 2 review — Predictable autonomous unloading
 
-The [warehouse app](../../../apps/warehouse-demo/README.md) now unloads **every incoming pallet** without manual driving or task selection. The [overview](../../../apps/warehouse-demo/screenshots/phase2-overview.png) and [completed delivery](../../../apps/warehouse-demo/screenshots/phase2-complete.png) are browser captures of the WebGPU scene with placeholder geometry.
+The [warehouse app](../../../apps/warehouse-demo/README.md) now unloads **every incoming pallet** without manual driving or task selection. The current [overview](../../../apps/warehouse-demo/screenshots/overview.png) and [production completed delivery](../phase6/production-complete.png) show the WebGPU scene with authored graphics. Phase 2 originally used placeholder geometry; those captures were replaced during Phase 6.
 
 ## Controller
 

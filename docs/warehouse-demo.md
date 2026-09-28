@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first autonomous forklift that unloads a delivery truck into a compact warehouse. The visitor can run the same randomized shipment with a predictable controller or Full Laya control.
 >
-> Status: Phases 0–5 complete. Phase 5 awaits user review; Phase 6 remains planned. See the [Phase 5 review](warehouse-demo/phase5/README.md) before continuing.
+> Status: Phases 0–6 complete. Phase 6 awaits user review. See the [Phase 6 review](warehouse-demo/phase6/README.md).
 
 ## Goal and experience
 
@@ -128,25 +128,29 @@ Exit verified: the [Phase 5 review](warehouse-demo/phase5/README.md) records run
 
 ### Phase 6 — Verification and release
 
-- [ ] Run targeted simulation/controller tests, app typecheck/build and relevant shared-package regressions.
-- [ ] Add a small public-UI end-to-end suite for start, seeded restart, randomization, predictable completion, mode switch and unavailable Laya service.
-- [ ] Capture representative browser screenshots and a short full-run recording; verify visual quality and performance on the reference setup.
-- [ ] Verify the deployed build uses the WebGPU backend on supported hardware and explains unsupported browsers/devices clearly.
-- [ ] Document architecture, Blender source/export workflow, local Laya startup/endpoint configuration, measured controller results and known limits.
-- [ ] Add an app README and root README launch instructions once the app exists.
-- [ ] Verify a clean local startup and full unloading run from the documented commands.
+- [x] Run targeted simulation/controller tests, app typecheck/build and relevant shared-package regressions.
+- [x] Add a small public-UI end-to-end suite for start, seeded restart, randomization, predictable completion, mode switch and unavailable Laya service.
+- [x] Capture representative browser screenshots and a short full-run recording; verify visual quality and performance on the reference setup.
+- [x] Verify the deployed build uses the WebGPU backend on supported hardware and explains unsupported browsers/devices clearly.
+- [x] Document architecture, Blender source/export workflow, local Laya startup/endpoint configuration, measured controller results and known limits.
+- [x] Add an app README and root README launch instructions once the app exists.
+- [x] Verify a clean local startup and full unloading run from the documented commands.
+- [x] Replace the old app screenshots with four current views: overview, dock pickup, follow forklift and rack placement.
+- [x] Add a warehouse README GIF and update the monorepo README and animated preview to include all four projects.
+- [x] Add a repeatable capture command for a short X video, and generate the MP4.
+- [x] Fix overlapping foundation/floor surfaces causing z-fighting and recapture screenshots, video and GIFs.
 
-Exit: a shareable browser demo with a dependable autonomous baseline and an honest, measurable Full Laya mode.
+Exit verified: the [Phase 6 review](warehouse-demo/phase6/README.md) records passing warehouse and shared-package checks, a complete production WebGPU run, four current views, a full-run video and GIF previews. Stop for user review.
 
 ## Completion criteria
 
-- [ ] A fresh visitor can start a run and watch the forklift move every incoming pallet from truck to available warehouse storage without manual control.
-- [ ] Randomizing changes both truck cargo order and existing bay occupancy while always producing a feasible scenario.
-- [ ] Restarting the same seed restores the same initial world; Predictable mode reproduces the same outcome.
-- [ ] Full Laya controls task and forklift commands through the local endpoint, exposes its decisions and pauses with an explanation when it cannot progress.
-- [ ] Pallet attachment, fork movement, truck access, collisions and storage occupancy agree between simulation and rendered scene.
-- [ ] The browser scene maintains the SLAM demo's visual language without adding unrelated robotics systems.
-- [ ] The warehouse scene runs on Three.js WebGPU through R3F v10 alpha and compatible Drei helpers on the reference browser.
+- [x] A fresh visitor can start a run and watch the forklift move every incoming pallet from truck to available warehouse storage without manual control.
+- [x] Randomizing changes both truck cargo order and existing bay occupancy while always producing a feasible scenario.
+- [x] Restarting the same seed restores the same initial world; Predictable mode reproduces the same outcome.
+- [x] Full Laya controls task and forklift commands through the local endpoint, exposes its decisions and pauses with an explanation when it cannot progress.
+- [x] Pallet attachment, fork movement, truck access, collisions and storage occupancy agree between simulation and rendered scene.
+- [x] The browser scene maintains the SLAM demo's visual language without adding unrelated robotics systems.
+- [x] The warehouse scene runs on Three.js WebGPU through R3F v10 alpha and compatible Drei helpers on the reference browser.
 
 ## Later possibilities
 

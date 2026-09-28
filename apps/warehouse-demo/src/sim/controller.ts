@@ -2,6 +2,7 @@ import type { LayaTransport } from './laya-client'
 import { createLayaController } from './laya-controller'
 import { createPredictableRoute, predictableStep } from './predictable'
 import type { RunRecording, RunSummary } from './recording'
+import { createScenario } from './scenario'
 import type { Command } from './world'
 import { advance, appendEvent, createWorld, FIXED_DT, setRunStatus } from './world'
 
@@ -177,7 +178,28 @@ export function createController(
 		randomize() {
 			const values = new Uint32Array(1)
 			crypto.getRandomValues(values)
-			reset(values[0] === state.seed ? (values[0] + 1) >>> 0 : values[0])
+			const previousCargo = state.scenario.cargo
+				.map((item) => `${item.id}:${item.cargoId}`)
+				.join('|')
+			const previousStock = state.scenario.existing
+				.map((item) => item.bayId)
+				.sort()
+				.join('|')
+			for (let offset = 0; offset < 1024; offset++) {
+				const seed = (values[0] + offset) >>> 0
+				if (seed === state.seed) continue
+				const next = createScenario(seed)
+				const nextCargo = next.cargo.map((item) => `${item.id}:${item.cargoId}`).join('|')
+				const nextStock = next.existing
+					.map((item) => item.bayId)
+					.sort()
+					.join('|')
+				if (nextCargo !== previousCargo && nextStock !== previousStock) {
+					reset(seed)
+					return
+				}
+			}
+			throw new Error('Unable to generate a different shipment and storage layout')
 		},
 		step() {
 			if (state.status !== 'running') return

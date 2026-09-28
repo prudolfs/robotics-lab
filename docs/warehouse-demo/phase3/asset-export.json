@@ -4,13 +4,13 @@
   "source": "assets/warehouse-demo/warehouse.blend",
   "bundles": {
     "environment": {
-      "bytes": 1120908,
+      "bytes": 1120820,
       "meshes": 12,
       "triangles": 17912,
       "pivots": []
     },
     "forklift": {
-      "bytes": 379220,
+      "bytes": 379100,
       "meshes": 23,
       "triangles": 5888,
       "pivots": [
@@ -26,7 +26,7 @@
       ]
     },
     "pallet-a": {
-      "bytes": 277324,
+      "bytes": 277256,
       "meshes": 8,
       "triangles": 4028,
       "pivots": [
@@ -34,7 +34,7 @@
       ]
     },
     "pallet-b": {
-      "bytes": 254124,
+      "bytes": 254068,
       "meshes": 7,
       "triangles": 3704,
       "pivots": [

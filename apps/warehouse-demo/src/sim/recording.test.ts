@@ -131,6 +131,22 @@ test('restarting and randomizing repeatedly retain bounded review history', () =
 	expect(controller.getRecording()).toBeNull()
 })
 
+test('randomization changes truck arrangement and occupied bays together', () => {
+	const controller = createController(42)
+	for (let index = 0; index < 30; index++) {
+		const previous = controller.getSnapshot().scenario
+		controller.randomize()
+		const next = controller.getSnapshot().scenario
+		expect(next.seed).not.toBe(previous.seed)
+		expect(next.cargo.map((item) => `${item.id}:${item.cargoId}`)).not.toEqual(
+			previous.cargo.map((item) => `${item.id}:${item.cargoId}`),
+		)
+		expect(next.existing.map((item) => item.bayId).sort()).not.toEqual(
+			previous.existing.map((item) => item.bayId).sort(),
+		)
+	}
+})
+
 test('a complete recorded Laya delivery replays the exact trajectory through every pickup and placement', async () => {
 	const { readFileSync } = await import('node:fs')
 	const { gunzipSync } = await import('node:zlib')

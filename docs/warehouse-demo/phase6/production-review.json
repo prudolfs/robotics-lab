@@ -1,0 +1,24 @@
+{
+  "browser": "153.0.8010.54",
+  "url": "http://127.0.0.1:4184",
+  "errors": [],
+  "readyMs": 935,
+  "backend": "WEBGPU ACTIVE",
+  "gpu": {
+    "vendor": "apple",
+    "architecture": "metal-3"
+  },
+  "render": {
+    "backend": "webgpu",
+    "geometries": 59,
+    "textures": 12,
+    "medianMs": 16.699999999999715,
+    "p95Ms": 16.70000000000016
+  },
+  "complete": {
+    "status": "Delivery complete",
+    "elapsed": "04:32.2",
+    "summary": "Run summary\nComplete\nDelivered\n4 / 4\nSimulated time\n4:32.2\nContacts / invalid\n0 / 0\nPauses\n0\nCompare with Full Laya\n\nSame seed 42; starts a fresh run. The previous result stays below."
+  },
+  "unsupportedMessage": "WebGPU is unavailable"
+}

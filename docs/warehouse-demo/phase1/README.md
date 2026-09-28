@@ -1,6 +1,6 @@
 # Phase 1 review — app shell and deterministic world
 
-Phase 1 now has a runnable [warehouse app](../../../apps/warehouse-demo/README.md). Its [overview screenshot](../../../apps/warehouse-demo/screenshots/phase1-overview.png) shows the randomized truck cargo, existing stock, compact rack, forklift and inspector. The [completed sample](../../../apps/warehouse-demo/screenshots/phase1-complete.png) shows one pallet placed in storage.
+Phase 1 now has a runnable [warehouse app](../../../apps/warehouse-demo/README.md). The current [overview screenshot](../../../apps/warehouse-demo/screenshots/overview.png) shows the randomized truck cargo, existing stock, compact rack, forklift and inspector. The earlier placeholder captures were replaced during Phase 6.
 
 ## What is implemented
 

@@ -1,6 +1,6 @@
 # Robotics Lab
 
-![Robotics Lab: robot simulator, drone mission planner and SLAM Studio](docs/readme-header.gif)
+![Robotics Lab: robot simulator, drone mission planner, SLAM Studio and Warehouse Demo](docs/readme-header.gif)
 
 > A browser-first robotics platform built with TypeScript, React and Three.js.
 
@@ -15,7 +15,8 @@ See [`docs/project.md`](./docs/project.md) for the philosophy and long-term
 roadmap. The application plans live in
 [`docs/simulator.md`](./docs/simulator.md),
 [`docs/drone-mission-planner.md`](./docs/drone-mission-planner.md) and
-[`docs/slam-demo.md`](./docs/slam-demo.md).
+[`docs/slam-demo.md`](./docs/slam-demo.md) and
+[`docs/warehouse-demo.md`](./docs/warehouse-demo.md).
 
 ---
 
@@ -28,6 +29,7 @@ robotics-lab/
     drone-mission-planner/
                         3D planning and simulation for autonomous drone missions
     slam-demo/          visual SLAM explorer (authored lab, sparse mapping and loop closure)
+    warehouse-demo/     WebGPU autonomous forklift and warehouse delivery
   packages/
     core/               shared types
     drone/              framework-independent drone dynamics and mission logic
@@ -60,6 +62,15 @@ autonomous drone missions. It includes manual flight, virtual lidar/GPS/IMU,
 multiple camera modes, route execution and versioned JSON persistence. See the
 [full development plan](./docs/drone-mission-planner.md).
 
+### [Warehouse Demo](./apps/warehouse-demo)
+
+A compact WebGPU warehouse where an autonomous forklift unloads a seeded truck.
+Predictable mode completes deliveries without a service; Full Laya makes local
+model decisions for task selection and forklift control. Both modes share the
+same scenarios, run summaries and comparison flow. Recorded Laya runs replay
+offline. See the [implementation plan](./docs/warehouse-demo.md) and
+[app guide](./apps/warehouse-demo/README.md).
+
 ### [SLAM Studio](./apps/slam-demo)
 
 A visual SLAM explorer in development. Phase 1 provides a deterministic rover,
@@ -88,7 +99,7 @@ See the [implementation plan](./docs/slam-demo.md).
 ## Getting started
 
 Prerequisites: Node, pnpm, and a current browser with WebGL (simulator) or
-WebGPU (drone mission planner).
+WebGPU (drone mission planner and warehouse demo).
 
 ```sh
 pnpm install
@@ -106,6 +117,17 @@ Run the drone mission planner (requires WebGPU):
 pnpm -C apps/drone-mission-planner dev
 ```
 
+Run Warehouse Demo (WebGPU):
+
+```sh
+pnpm -C apps/warehouse-demo dev    # http://127.0.0.1:8084
+pnpm -C apps/warehouse-demo test
+pnpm -C apps/warehouse-demo test:e2e
+```
+
+Full Laya also needs a local decision server at
+`http://127.0.0.1:8000/v1/systemone`; Predictable mode runs on its own.
+
 Run SLAM Studio (WebGL2):
 
 ```sh
@@ -119,12 +141,14 @@ Build it:
 pnpm -C apps/simulator build
 pnpm -C apps/drone-mission-planner build
 pnpm build:slam
+pnpm -C apps/warehouse-demo build
 ```
 
 ### Testing
 
 ```sh
-pnpm test                  # unit tests (Vitest)
+pnpm exec vitest run packages   # shared-package unit tests
+pnpm -C apps/warehouse-demo test # warehouse simulation/controller tests
 pnpm -C apps/simulator test:e2e   # Playwright against the preview build
 pnpm test:e2e:soak                # long-running stability / leak suites
 ```
@@ -139,8 +163,8 @@ via a renderer bridge shipped in the production build — see
 
 ## Regenerating the README header
 
-The animated GIF cycles through all three applications: robot navigation,
-drone mission execution, and the four SLAM Studio camera views. Regenerate it
+The animated GIF cycles through all four applications: robot navigation,
+drone mission execution, the SLAM Studio camera views, and warehouse delivery. Regenerate it
 from fresh browser captures with:
 
 ```sh
@@ -150,7 +174,7 @@ scripts/build-readme-header.sh
 
 Requires pnpm, Playwright Chromium, local Google Chrome with WebGPU support,
 and ffmpeg. The script builds the apps, starts preview servers on ports 8080,
-4194 and 4195, captures one project at a time, and closes the browsers and
+4194, 4195 and 4184, captures one project at a time, and closes the browsers and
 servers it starts. The previous GIF is replaced only after all captures and
 encoding succeed.
 
@@ -159,6 +183,11 @@ width. Override `E2E_FRAME_COUNT`, `E2E_FRAME_MS`, `WIDTH`, or `FRAMERATE` as
 needed. An optional output path can be passed to the script. The output is
 `docs/readme-header.gif`; `docs/readme-header.json` records the project frame
 ranges and playback settings. The simulator README shares this showcase.
+
+For the four 1080×1080 warehouse screenshots, app GIF and short X video,
+start `pnpm -C apps/warehouse-demo dev`, then run
+`node scripts/capture-warehouse-demo.mjs`. They are saved under
+`apps/warehouse-demo/screenshots` and `apps/warehouse-demo/media`.
 
 For the four 1080×1080 SLAM screenshots, start `pnpm dev:slam`, then run
 `pnpm screenshots:slam`. Files are saved in `apps/slam-demo/screenshots`.
@@ -175,6 +204,8 @@ aerial robotics. Long-term targets:
   A* navigation, coverage, localization, editor, playback)
 - **Drone Mission Planner** — in progress (3D editing, validation, execution,
   sensors and persistence implemented; external formats and replay next)
+- **Warehouse Demo** — autonomous forklift delivery, same-seed controller comparison and recorded Full Laya playback;
+  [implementation plan](./docs/warehouse-demo.md)
 - **Visual SLAM Demo** — Phases 1–6 implemented (motion, authored lab, stereo acquisition, visual odometry, sparse mapping and verified loop closure);
   [relocalization and guided experiments next](./docs/slam-demo.md)
 - **ROS2 Browser Visualization** (and a ROS bridge package)

@@ -19,6 +19,8 @@
 		"test:ui": "vitest --ui",
 		"dev:slam": "pnpm -C apps/slam-demo dev",
 		"screenshots:slam": "node scripts/capture-slam-views.mjs",
+		"screenshots:warehouse": "node scripts/capture-warehouse-demo.mjs",
+		"video:warehouse:x": "node scripts/capture-warehouse-demo.mjs --video-only",
 		"readme:gif": "node scripts/generate-readme-gif.mjs",
 		"build:slam": "pnpm -C apps/slam-demo build",
 		"test:e2e:slam": "pnpm -C apps/slam-demo test:e2e"

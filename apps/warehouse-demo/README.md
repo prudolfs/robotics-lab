@@ -1,6 +1,8 @@
 # Warehouse Demo
 
-Phase 5 of the autonomous warehouse delivery. It renders authored Blender assets with Three.js WebGPU through React Three Fiber v10 alpha and Drei v11 alpha. The **Predictable** controller unloads every incoming pallet into an empty bay, with visible pickup, lift, carry and lowering. **Full Laya** chooses cargo, bays and discrete motor commands through the local model, with visible decisions and bounded failure pauses.
+Autonomous warehouse delivery through Phase 6. It renders authored Blender assets with Three.js WebGPU through React Three Fiber v10 alpha and Drei v11 alpha. The **Predictable** controller unloads every incoming pallet into an empty bay, with visible pickup, lift, carry and lowering. **Full Laya** chooses cargo, bays and discrete motor commands through the local model, with visible decisions and bounded failure pauses.
+
+![Warehouse delivery preview](media/preview.gif)
 
 Run `pnpm -C apps/warehouse-demo dev` and open the local URL. A WebGPU-capable browser and device are required. The page confirms the active WebGPU backend and explains when it is unavailable.
 
@@ -19,3 +21,9 @@ See [the asset workflow](../../assets/warehouse-demo/README.md) for the editable
 Keep your Laya server running at `http://127.0.0.1:8000/v1/systemone`. The Vite dev/preview proxy forwards `/api/laya/v1/systemone` to it. Set `LAYA_ORIGIN` to change the proxy origin; set `VITE_LAYA_ENDPOINT` to explicitly configure a browser endpoint. Static hosting needs a reachable endpoint or a same-origin proxy. Predictable mode works without the service.
 
 The [Phase 4 review](../../docs/warehouse-demo/phase4/README.md) documents the control boundary, prompt measurements, reference-seed comparison, browser evidence and failure limits. Run `node scripts/warehouse-phase4/compare.mjs` from the repository root for the live comparison. This sends real local-model requests; run it separately from other live measurements.
+
+## Capture and share
+
+With the app running locally, run `pnpm screenshots:warehouse` from the repository root. It captures four current WebGPU views—[overview](screenshots/overview.png), [dock pickup](screenshots/dock-pickup.png), [follow forklift](screenshots/follow-forklift.png), and [rack placement](screenshots/rack-placement.png)—plus this README GIF and a [short square MP4 for X](media/x-preview.mp4). Run `pnpm video:warehouse:x` to update just the video and GIF from a fresh complete Predictable delivery. Requires local Chrome and ffmpeg. `WAREHOUSE_URL` overrides the capture URL.
+
+See the [Phase 6 review](../../docs/warehouse-demo/phase6/README.md) for production-browser verification, test results and release limits.
