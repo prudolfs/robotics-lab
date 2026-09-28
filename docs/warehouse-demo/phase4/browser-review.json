@@ -1,0 +1,11 @@
+{
+  "browser": "153.0.8010.54",
+  "status": "Delivery complete",
+  "stage": "Complete",
+  "elapsed": "06:15.7",
+  "wallSeconds": 376.095,
+  "requests": 1513,
+  "errors": [],
+  "inspector": "Inspector\n01 / DELIVERY\nRun configuration\n01\nAutonomous control\nPredictable\nFull Laya\n\nLaya chooses cargo, bays and driving commands. Changing mode restarts the same shipment.\n\nScenario seed\n42\nIncoming cargo\n4 pallets\nExisting stock\n2 bays\nPlayback speed\n1×\n4×\n8×\nFull Laya\nidle\n\nStop · steer straight · forks hold · place\n\nResponse age\n0.3 s\nRequests / rejected\n1513 / 0\nDecision probabilities · 137 ms\nCurrent transfer\n02\nPICKUP\nC4\nLeft Truck Lane\n→\nSTORAGE\nB3\nBay 3\nStep\nComplete\nCurrent goal\n—\nCarried load\nNone\nFork height\n0.10 m\nVehicle speed\n0.00 m/s\nContact / invalid\n0 / 0\n\n4 stored · 0 still in truck\n\nStorage bays\n03\nB1\nC1\nB2\nC3\nB3\nC4\nB4\nEMPTY\nB5\nEMPTY\nB6\nS1\nB7\nC2\nB8\nS2\nEvents\n04\n06:15.7\nShipment complete\n06:15.7\nC4 stored in B3\n05:25.6\nC4 picked up\n04:40.0\nC3 stored in B2",
+  "backend": "WEBGPU ACTIVE"
+}

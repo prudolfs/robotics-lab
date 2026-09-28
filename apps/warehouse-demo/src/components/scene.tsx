@@ -2,7 +2,7 @@ import { OrbitControls } from '@react-three/drei/webgpu'
 import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
 import { Component, type ReactNode, Suspense, useEffect } from 'react'
 import { Vector3, WebGPURenderer } from 'three/webgpu'
-import type { PredictableRoute } from '../sim/predictable'
+import type { WarehouseController } from '../sim/controller'
 import type { WarehouseState } from '../sim/world'
 import { AuthoredAssets } from './assets'
 
@@ -108,7 +108,7 @@ function WarehouseWorld({
 }: {
 	state: WarehouseState
 	cameraMode: CameraMode
-	route: PredictableRoute
+	route: ReturnType<WarehouseController['getRoute']>
 	showRoute: boolean
 	onAssetsReady: (ready: boolean) => void
 }) {
@@ -175,7 +175,7 @@ export function Scene({
 }: {
 	state: WarehouseState
 	cameraMode: CameraMode
-	route: PredictableRoute
+	route: ReturnType<WarehouseController['getRoute']>
 	showRoute: boolean
 	onRendererStatus: (status: RendererStatus) => void
 	onAssetsReady: (ready: boolean) => void

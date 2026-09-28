@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "laya-integration": {
+      "source": "wdobry/laya-playground",
+      "sourceType": "github",
+      "skillPath": "skills/laya-integration/SKILL.md",
+      "computedHash": "59891228b982c9bd36f776ed83062ea5ff7eb168f4da862c2380b0b1b2e36093"
+    }
+  }
+}

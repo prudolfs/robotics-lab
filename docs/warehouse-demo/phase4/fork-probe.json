@@ -1,0 +1,515 @@
+[
+  {
+    "variant": "relative",
+    "state": "The forks are below the target height. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. No load operation is needed.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.2587,
+        "lower": 0.2156,
+        "hold": 0.5257
+      },
+      "confidence": 0.0728,
+      "answer_confidence": 0.5257,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are below the target height. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Collect the selected truck pallet.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.3266,
+        "lower": 0.2874,
+        "hold": 0.3859
+      },
+      "confidence": 0.0067,
+      "answer_confidence": 0.3859,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are below the target height. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Release the load into the selected empty bay.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.2539,
+        "lower": 0.2353,
+        "hold": 0.5108
+      },
+      "confidence": 0.061,
+      "answer_confidence": 0.5108,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are above the target height. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. No load operation is needed.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.2622,
+        "lower": 0.4136,
+        "hold": 0.3242
+      },
+      "confidence": 0.0157,
+      "answer_confidence": 0.4136,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are above the target height. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Collect the selected truck pallet.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "raise",
+      "probabilities": {
+        "raise": 0.4858,
+        "lower": 0.2927,
+        "hold": 0.2214
+      },
+      "confidence": 0.0495,
+      "answer_confidence": 0.4858,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are above the target height. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Release the load into the selected empty bay.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "raise",
+      "probabilities": {
+        "raise": 0.3835,
+        "lower": 0.3115,
+        "hold": 0.305
+      },
+      "confidence": 0.0051,
+      "answer_confidence": 0.3835,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are at the target height. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. No load operation is needed.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.065,
+        "lower": 0.149,
+        "hold": 0.786
+      },
+      "confidence": 0.4078,
+      "answer_confidence": 0.786,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are at the target height. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Collect the selected truck pallet.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.2208,
+        "lower": 0.2172,
+        "hold": 0.562
+      },
+      "confidence": 0.0998,
+      "answer_confidence": 0.562,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are at the target height. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Release the load into the selected empty bay.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.1356,
+        "lower": 0.1524,
+        "hold": 0.712
+      },
+      "confidence": 0.2722,
+      "answer_confidence": 0.712,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are too low. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. No load operation is needed.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.1409,
+        "lower": 0.5557,
+        "hold": 0.3034
+      },
+      "confidence": 0.1221,
+      "answer_confidence": 0.5557,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are too low. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Collect the selected truck pallet.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.2674,
+        "lower": 0.5134,
+        "hold": 0.2192
+      },
+      "confidence": 0.0646,
+      "answer_confidence": 0.5134,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are too low. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Release the load into the selected empty bay.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.2502,
+        "lower": 0.4347,
+        "hold": 0.3151
+      },
+      "confidence": 0.0236,
+      "answer_confidence": 0.4347,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are too high. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. No load operation is needed.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.1476,
+        "lower": 0.5498,
+        "hold": 0.3026
+      },
+      "confidence": 0.1144,
+      "answer_confidence": 0.5498,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are too high. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Collect the selected truck pallet.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.3433,
+        "lower": 0.3887,
+        "hold": 0.268
+      },
+      "confidence": 0.0103,
+      "answer_confidence": 0.3887,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are too high. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Release the load into the selected empty bay.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.2793,
+        "lower": 0.3894,
+        "hold": 0.3313
+      },
+      "confidence": 0.0083,
+      "answer_confidence": 0.3894,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are at the correct height. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. No load operation is needed.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.1188,
+        "lower": 0.2354,
+        "hold": 0.6458
+      },
+      "confidence": 0.2026,
+      "answer_confidence": 0.6458,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are at the correct height. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Collect the selected truck pallet.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.274,
+        "lower": 0.3155,
+        "hold": 0.4105
+      },
+      "confidence": 0.0131,
+      "answer_confidence": 0.4105,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are at the correct height. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Release the load into the selected empty bay.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.2339,
+        "lower": 0.3195,
+        "hold": 0.4466
+      },
+      "confidence": 0.0312,
+      "answer_confidence": 0.4466,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is below its target. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. No load operation is needed.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.0868,
+        "lower": 0.6485,
+        "hold": 0.2647
+      },
+      "confidence": 0.231,
+      "answer_confidence": 0.6485,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is below its target. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Collect the selected truck pallet.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.242,
+        "lower": 0.5234,
+        "hold": 0.2346
+      },
+      "confidence": 0.0694,
+      "answer_confidence": 0.5234,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is below its target. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Release the load into the selected empty bay.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.1644,
+        "lower": 0.5632,
+        "hold": 0.2724
+      },
+      "confidence": 0.113,
+      "answer_confidence": 0.5632,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is above its target. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. No load operation is needed.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.1616,
+        "lower": 0.4423,
+        "hold": 0.3961
+      },
+      "confidence": 0.0696,
+      "answer_confidence": 0.4423,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is above its target. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Collect the selected truck pallet.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "raise",
+      "probabilities": {
+        "raise": 0.3843,
+        "lower": 0.2501,
+        "hold": 0.3656
+      },
+      "confidence": 0.0151,
+      "answer_confidence": 0.3843,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is above its target. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Release the load into the selected empty bay.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.3621,
+        "lower": 0.273,
+        "hold": 0.3649
+      },
+      "confidence": 0.0077,
+      "answer_confidence": 0.3649,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is level with its target. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. No load operation is needed.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.0341,
+        "lower": 0.0293,
+        "hold": 0.9366
+      },
+      "confidence": 0.7452,
+      "answer_confidence": 0.9366,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is level with its target. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Collect the selected truck pallet.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.122,
+        "lower": 0.0986,
+        "hold": 0.7794
+      },
+      "confidence": 0.3817,
+      "answer_confidence": 0.7794,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is level with its target. The forklift is at its target. The travel direction is forward. The alignment is straight ahead. Release the load into the selected empty bay.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.0743,
+        "lower": 0.057,
+        "hold": 0.8687
+      },
+      "confidence": 0.5643,
+      "answer_confidence": 0.8687,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  }
+]

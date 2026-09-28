@@ -1,0 +1,80 @@
+{
+  "generatedAt": "2026-09-28T01:59:41.502Z",
+  "pacing": "Fixed timestep; await each outstanding request between ticks. Latency is real, simulation does not advance while the runner awaits HTTP.",
+  "results": [
+    {
+      "seed": 42,
+      "mode": "predictable",
+      "status": "complete",
+      "delivered": 4,
+      "incoming": 4,
+      "elapsed": 272.18333333341445,
+      "wallSeconds": 0.040107124999999993,
+      "contactCount": 0,
+      "invalidActions": 0,
+      "reason": null,
+      "requests": 0,
+      "medianLatencyMs": null,
+      "p95LatencyMs": null,
+      "finalRoute": {
+        "palletId": "C2",
+        "slotId": "right-rear",
+        "bayId": "B3",
+        "retreatY": 6.8999999999999995,
+        "stage": "done",
+        "baselineDelivered": 3,
+        "backtrackX": -3.03,
+        "backtrackY": 6.114406365216685,
+        "goal": null,
+        "recoveryCount": 0,
+        "seenInvalidActions": 0,
+        "failReason": null
+      },
+      "finalForklift": {
+        "x": 3.2799440165354525,
+        "y": 4.867357049463547,
+        "heading": -0.044780315573237146,
+        "speed": 0,
+        "steering": 0,
+        "forkHeight": 0.10000000000000003,
+        "carriedId": null
+      },
+      "rejections": []
+    },
+    {
+      "seed": 42,
+      "mode": "laya",
+      "status": "complete",
+      "delivered": 4,
+      "incoming": 4,
+      "elapsed": 367.9166666666607,
+      "wallSeconds": 170.75262062500002,
+      "contactCount": 0,
+      "invalidActions": 0,
+      "reason": null,
+      "requests": 1495,
+      "medianLatencyMs": 109.80020800000057,
+      "p95LatencyMs": 128.1694580000003,
+      "finalRoute": {
+        "stage": "done",
+        "palletId": "C4",
+        "slotId": "left-rear",
+        "bayId": "B3",
+        "goal": null,
+        "baselineDelivered": 3,
+        "backtrackY": 3.60822827564466,
+        "failReason": null
+      },
+      "finalForklift": {
+        "x": 3.28122390680238,
+        "y": 4.8407192499502925,
+        "heading": 0.03479255726320215,
+        "speed": 0,
+        "steering": 0,
+        "forkHeight": 0.10000000000000003,
+        "carriedId": null
+      },
+      "rejections": []
+    }
+  ]
+}

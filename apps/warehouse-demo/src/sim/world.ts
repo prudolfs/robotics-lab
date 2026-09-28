@@ -224,6 +224,8 @@ export function canOccupy(state: WarehouseState, forklift: ForkliftState): boole
 
 function actionResult(state: WarehouseState, action: Action): WarehouseState {
 	const { forklift } = state
+	if (Math.abs(forklift.speed) > 0.035)
+		return invalid(state, 'Stop the forklift before pickup or placement')
 	if (action.kind === 'pickup') {
 		const pallet = state.pallets.find((item) => item.id === action.palletId)
 		if (pallet?.location.kind !== 'truck') return invalid(state, 'Pallet is not in the truck')

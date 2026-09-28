@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { type CameraMode, Scene } from './components/scene'
+import type { LayaStage } from './sim/laya-observation'
 import type { PredictableStage } from './sim/predictable'
 import { BAYS, TRUCK_SLOTS } from './sim/scenario'
 import { useWarehouse } from './sim/use-warehouse'
@@ -12,8 +13,11 @@ function clock(seconds: number): string {
 	return `${String(minutes).padStart(2, '0')}:${(seconds % 60).toFixed(1).padStart(4, '0')}`
 }
 
-function stageLabel(stage: PredictableStage): string {
-	const labels: Record<PredictableStage, string> = {
+function stageLabel(stage: PredictableStage | LayaStage): string {
+	const labels: Record<PredictableStage | LayaStage, string> = {
+		select: 'Selecting cargo and bay',
+		'lane-clear': 'Clearing the dock',
+		'lane-turn': 'Changing truck lane',
 		approach: 'Approaching cargo',
 		pickup: 'Picking up cargo',
 		lift: 'Lifting cargo',
@@ -32,6 +36,16 @@ function stageLabel(stage: PredictableStage): string {
 	return labels[stage]
 }
 
+function decisionLabel(choices: Record<string, string>): string {
+	if (choices.cargo) return `Cargo ${choices.cargo} → bay ${choices.bay}`
+	const travel =
+		choices.travel === 'at'
+			? 'Stop'
+			: `${choices.gear === 'reverse' ? 'Reverse' : 'Forward'} ${choices.travel === 'near' ? 'creep' : 'cruise'}`
+	const forks = choices.fork === 'below' ? 'raise' : choices.fork === 'above' ? 'lower' : 'hold'
+	return `${travel} · steer ${choices.steering?.replaceAll('_', ' ')} · forks ${forks}${choices.action !== 'none' ? ` · ${choices.action}` : ''}`
+}
+
 export default function App() {
 	const [speed, setSpeed] = useState(1)
 	const { controller, state } = useWarehouse(speed)
@@ -39,7 +53,16 @@ export default function App() {
 	const [assetsReady, setAssetsReady] = useState(false)
 	const [showRoute, setShowRoute] = useState(true)
 	const [rendererStatus, setRendererStatus] = useState<RendererStatus>('loading')
+	const [wallTime, setWallTime] = useState(() => performance.now())
+	useEffect(() => {
+		const timer = setInterval(() => setWallTime(performance.now()), 500)
+		return () => clearInterval(timer)
+	}, [])
 	const route = controller.getRoute()
+	const mode = controller.getMode()
+	const laya = controller.getLaya()
+	const responseAge =
+		laya.lastResponseAt === null ? null : Math.max(0, (wallTime - laya.lastResponseAt) / 1000)
 	const running = state.status === 'running'
 	const complete = state.status === 'complete'
 	const currentCargo = state.pallets.find((item) => item.id === route.palletId)
@@ -181,13 +204,23 @@ export default function App() {
 							<span>Run configuration</span>
 							<small>01</small>
 						</div>
-						<div className="mode-card">
-							<span className="mode-dot" />
-							Predictable <small>Autonomous</small>
-						</div>
+						<label className="speed-row" htmlFor="control-mode">
+							<span>Autonomous control</span>
+							<select
+								id="control-mode"
+								value={mode}
+								onChange={(event) =>
+									controller.setMode(event.target.value as 'predictable' | 'laya')
+								}
+							>
+								<option value="predictable">Predictable</option>
+								<option value="laya">Full Laya</option>
+							</select>
+						</label>
 						<p className="section-help">
-							The forklift unloads every incoming pallet in a repeatable order. Full Laya control
-							follows in Phase 4.
+							{mode === 'laya'
+								? 'Laya chooses cargo, bays and driving commands. Changing mode restarts the same shipment.'
+								: 'The forklift unloads every incoming pallet in a repeatable order.'}
 						</p>
 						<div className="property-row">
 							<span>Scenario seed</span>
@@ -205,7 +238,8 @@ export default function App() {
 							<span>Playback speed</span>
 							<select
 								id="speed"
-								value={speed}
+								value={mode === 'laya' ? 1 : speed}
+								disabled={mode === 'laya'}
 								onChange={(event) => setSpeed(Number(event.target.value))}
 							>
 								<option value={1}>1×</option>
@@ -215,6 +249,53 @@ export default function App() {
 						</label>
 					</section>
 
+					{mode === 'laya' && (
+						<section className="inspector-section laya-section" aria-label="Laya decisions">
+							<div className="section-title">
+								<span>Full Laya</span>
+								<small data-testid="laya-connection">{laya.connection}</small>
+							</div>
+							<p className="section-help" data-testid="laya-decision">
+								{laya.last
+									? decisionLabel(laya.last.choices)
+									: 'Waiting to start autonomous decisions.'}
+							</p>
+							<div className="property-row">
+								<span>Response age</span>
+								<strong>{responseAge === null ? '—' : `${responseAge.toFixed(1)} s`}</strong>
+							</div>
+							<div className="property-row">
+								<span>Requests / rejected</span>
+								<strong>
+									{laya.requests} / {laya.rejections.length}
+								</strong>
+							</div>
+							{laya.last && (
+								<details>
+									<summary>Decision probabilities · {Math.round(laya.last.latencyMs)} ms</summary>
+									{Object.entries(laya.last.probabilities).map(([key, values]) => (
+										<p className="section-help" key={key}>
+											<strong>{key}</strong>:{' '}
+											{Object.entries(values)
+												.map(([name, p]) => `${name.replaceAll('_', ' ')} ${Math.round(p * 100)}%`)
+												.join(' · ')}
+										</p>
+									))}
+								</details>
+							)}
+							{laya.error && (
+								<p className="controller-error" role="status">
+									{laya.error}
+								</p>
+							)}
+							{laya.rejections.slice(-3).map((rejection) => (
+								<p className="section-help" key={rejection.time}>
+									{clock(rejection.time)} · {rejection.reason}
+								</p>
+							))}
+						</section>
+					)}
+
 					<section className="inspector-section">
 						<div className="section-title">
 							<span>Current transfer</span>
@@ -223,7 +304,7 @@ export default function App() {
 						<div className="transfer-card">
 							<div>
 								<span className="tiny-label">PICKUP</span>
-								<strong>{route.palletId}</strong>
+								<strong>{route.palletId || '—'}</strong>
 								<small>
 									{TRUCK_SLOTS.find((item) => item.id === route.slotId)?.lane} truck lane
 								</small>
@@ -231,7 +312,7 @@ export default function App() {
 							<span className="transfer-arrow">→</span>
 							<div>
 								<span className="tiny-label">STORAGE</span>
-								<strong>{route.bayId}</strong>
+								<strong>{route.bayId || '—'}</strong>
 								<small>{destination ? `Bay ${destination.id.slice(1)}` : 'Available bay'}</small>
 							</div>
 						</div>

@@ -1,0 +1,88 @@
+{
+  "generatedAt": "2026-09-27T21:28:01.613Z",
+  "pacing": "Fixed timestep; await each outstanding request between ticks. Latency is real, simulation does not advance while the runner awaits HTTP.",
+  "results": [
+    {
+      "seed": 42,
+      "mode": "predictable",
+      "status": "complete",
+      "delivered": 4,
+      "incoming": 4,
+      "elapsed": 272.18333333341445,
+      "wallSeconds": 0.03983054099999998,
+      "contactCount": 0,
+      "invalidActions": 0,
+      "reason": null,
+      "requests": 0,
+      "medianLatencyMs": null,
+      "p95LatencyMs": null,
+      "finalRoute": {
+        "palletId": "C2",
+        "slotId": "right-rear",
+        "bayId": "B3",
+        "retreatY": 6.8999999999999995,
+        "stage": "done",
+        "baselineDelivered": 3,
+        "backtrackX": -3.03,
+        "backtrackY": 6.114406365216685,
+        "goal": null,
+        "recoveryCount": 0,
+        "seenInvalidActions": 0,
+        "failReason": null
+      },
+      "finalForklift": {
+        "x": 3.2799440165354525,
+        "y": 4.867357049463547,
+        "heading": -0.044780315573237146,
+        "speed": 0,
+        "steering": 0,
+        "forkHeight": 0.10000000000000003,
+        "carriedId": null
+      },
+      "rejections": []
+    },
+    {
+      "seed": 42,
+      "mode": "laya",
+      "status": "paused",
+      "delivered": 0,
+      "incoming": 4,
+      "elapsed": 46.033333333332,
+      "wallSeconds": 22.155500833,
+      "contactCount": 1,
+      "invalidActions": 0,
+      "reason": "Laya made no task or approach progress for 15 simulated seconds (lane-turn)",
+      "requests": 185,
+      "medianLatencyMs": 115.90462499999921,
+      "p95LatencyMs": 120.8901249999999,
+      "finalRoute": {
+        "stage": "stalled",
+        "palletId": "C1",
+        "slotId": "right-front",
+        "bayId": "B1",
+        "goal": {
+          "x": -1,
+          "y": 4.4
+        },
+        "baselineDelivered": 0,
+        "backtrackY": 1.7,
+        "failReason": "Laya made no task or approach progress for 15 simulated seconds (lane-turn)"
+      },
+      "finalForklift": {
+        "x": -2.8,
+        "y": 14.545666666666204,
+        "heading": -1.5707963267948966,
+        "speed": 0,
+        "steering": 0.525,
+        "forkHeight": 0.1,
+        "carriedId": null
+      },
+      "rejections": [
+        {
+          "time": 30.99999999999952,
+          "reason": "Forklift stopped at an obstacle"
+        }
+      ]
+    }
+  ]
+}

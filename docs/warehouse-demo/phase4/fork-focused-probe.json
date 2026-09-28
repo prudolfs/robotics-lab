@@ -1,0 +1,515 @@
+[
+  {
+    "variant": "relative",
+    "state": "The forks are below the target height.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.3042,
+        "lower": 0.2479,
+        "hold": 0.4479
+      },
+      "confidence": 0.0283,
+      "answer_confidence": 0.4479,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are below the target height.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.3042,
+        "lower": 0.2479,
+        "hold": 0.4479
+      },
+      "confidence": 0.0283,
+      "answer_confidence": 0.4479,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are below the target height.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.3042,
+        "lower": 0.2479,
+        "hold": 0.4479
+      },
+      "confidence": 0.0283,
+      "answer_confidence": 0.4479,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are above the target height.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.3626,
+        "lower": 0.4115,
+        "hold": 0.2258
+      },
+      "confidence": 0.0267,
+      "answer_confidence": 0.4115,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are above the target height.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.3626,
+        "lower": 0.4115,
+        "hold": 0.2258
+      },
+      "confidence": 0.0267,
+      "answer_confidence": 0.4115,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are above the target height.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.3626,
+        "lower": 0.4115,
+        "hold": 0.2258
+      },
+      "confidence": 0.0267,
+      "answer_confidence": 0.4115,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are at the target height.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.1091,
+        "lower": 0.161,
+        "hold": 0.7299
+      },
+      "confidence": 0.3031,
+      "answer_confidence": 0.7299,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are at the target height.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.1091,
+        "lower": 0.161,
+        "hold": 0.7299
+      },
+      "confidence": 0.3031,
+      "answer_confidence": 0.7299,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "relative",
+    "state": "The forks are at the target height.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.1091,
+        "lower": 0.161,
+        "hold": 0.7299
+      },
+      "confidence": 0.3031,
+      "answer_confidence": 0.7299,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are too low.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.1078,
+        "lower": 0.5629,
+        "hold": 0.3293
+      },
+      "confidence": 0.1541,
+      "answer_confidence": 0.5629,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are too low.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.1078,
+        "lower": 0.5629,
+        "hold": 0.3293
+      },
+      "confidence": 0.1541,
+      "answer_confidence": 0.5629,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are too low.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.1078,
+        "lower": 0.5629,
+        "hold": 0.3293
+      },
+      "confidence": 0.1541,
+      "answer_confidence": 0.5629,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are too high.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.1985,
+        "lower": 0.3906,
+        "hold": 0.4109
+      },
+      "confidence": 0.041,
+      "answer_confidence": 0.4109,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are too high.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.1985,
+        "lower": 0.3906,
+        "hold": 0.4109
+      },
+      "confidence": 0.041,
+      "answer_confidence": 0.4109,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are too high.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.1985,
+        "lower": 0.3906,
+        "hold": 0.4109
+      },
+      "confidence": 0.041,
+      "answer_confidence": 0.4109,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are at the correct height.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.1723,
+        "lower": 0.3465,
+        "hold": 0.4811
+      },
+      "confidence": 0.0695,
+      "answer_confidence": 0.4811,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are at the correct height.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.1723,
+        "lower": 0.3465,
+        "hold": 0.4811
+      },
+      "confidence": 0.0695,
+      "answer_confidence": 0.4811,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "level",
+    "state": "The forks are at the correct height.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.1723,
+        "lower": 0.3465,
+        "hold": 0.4811
+      },
+      "confidence": 0.0695,
+      "answer_confidence": 0.4811,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is below its target.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.0812,
+        "lower": 0.7473,
+        "hold": 0.1715
+      },
+      "confidence": 0.3411,
+      "answer_confidence": 0.7473,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is below its target.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.0812,
+        "lower": 0.7473,
+        "hold": 0.1715
+      },
+      "confidence": 0.3411,
+      "answer_confidence": 0.7473,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is below its target.",
+    "expected": "raise",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.0812,
+        "lower": 0.7473,
+        "hold": 0.1715
+      },
+      "confidence": 0.3411,
+      "answer_confidence": 0.7473,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is above its target.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.324,
+        "lower": 0.4512,
+        "hold": 0.2248
+      },
+      "confidence": 0.0354,
+      "answer_confidence": 0.4512,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is above its target.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.324,
+        "lower": 0.4512,
+        "hold": 0.2248
+      },
+      "confidence": 0.0354,
+      "answer_confidence": 0.4512,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is above its target.",
+    "expected": "lower",
+    "answer": {
+      "type": "choice",
+      "choice": "lower",
+      "probabilities": {
+        "raise": 0.324,
+        "lower": 0.4512,
+        "hold": 0.2248
+      },
+      "confidence": 0.0354,
+      "answer_confidence": 0.4512,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is level with its target.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.0225,
+        "lower": 0.0185,
+        "hold": 0.959
+      },
+      "confidence": 0.8185,
+      "answer_confidence": 0.959,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is level with its target.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.0225,
+        "lower": 0.0185,
+        "hold": 0.959
+      },
+      "confidence": 0.8185,
+      "answer_confidence": 0.959,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  },
+  {
+    "variant": "platform",
+    "state": "The lifting platform is level with its target.",
+    "expected": "hold",
+    "answer": {
+      "type": "choice",
+      "choice": "hold",
+      "probabilities": {
+        "raise": 0.0225,
+        "lower": 0.0185,
+        "hold": 0.959
+      },
+      "confidence": 0.8185,
+      "answer_confidence": 0.959,
+      "action": {
+        "act_probability": 1
+      }
+    }
+  }
+]

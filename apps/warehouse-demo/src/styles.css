@@ -616,3 +616,17 @@ select:focus-visible {
 		margin-left: 0;
 	}
 }
+
+.laya-section details {
+	font-size: 11px;
+	color: var(--text-muted, #93a9ad);
+}
+.laya-section summary {
+	cursor: pointer;
+	line-height: 1.6;
+}
+.controller-error {
+	color: #f4c89e;
+	font-size: 12px;
+	line-height: 1.6;
+}

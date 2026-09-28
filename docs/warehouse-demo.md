@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first autonomous forklift that unloads a delivery truck into a compact warehouse. The visitor can run the same randomized shipment with a predictable controller or Full Laya control.
 >
-> Status: Phases 0–3 complete. Phase 3 awaits user review; Phases 4–6 remain planned. See the [Phase 3 review](warehouse-demo/phase3/README.md) before continuing.
+> Status: Phases 0–4 complete. Phase 4 awaits user review; Phases 5–6 remain planned. See the [Phase 4 review](warehouse-demo/phase4/README.md) before continuing.
 
 ## Goal and experience
 
@@ -105,15 +105,15 @@ Exit verified: the [Phase 3 review](warehouse-demo/phase3/README.md) records the
 
 ### Phase 4 — Full Laya control
 
-- [ ] Add a typed client for the local Laya endpoint, request validation, cancellation/generation IDs on restart and bounded in-flight requests.
-- [ ] Convert simulator state into concise qualitative descriptions, calculating geometry and legal candidates in code before asking Laya.
-- [ ] Let Laya choose the next accessible cargo and available bay, then issue discrete travel, steering and fork commands at the measured decision rate.
-- [ ] Enforce only simulation invariants and physical constraints on those commands. Log rejection reasons; do not invoke the predictable route controller in this mode.
-- [ ] Brake or hold safely on delayed/failed responses, and pause with a specific explanation after bounded no-progress, repeated invalid actions or unrecoverable decisions.
-- [ ] Show Laya connection state, current decisions, probabilities, response age and rejected actions in a compact inspector.
-- [ ] Compare both modes on the same seed set; report Full Laya completion rate, intervention-free transfers, decision latency and failure types. Revise prompts/action vocabulary based on those results.
+- [x] Add a typed client for the local Laya endpoint, request validation, cancellation/generation IDs on restart and bounded in-flight requests.
+- [x] Convert simulator state into concise qualitative descriptions, calculating geometry and legal candidates in code before asking Laya.
+- [x] Let Laya choose the next accessible cargo and available bay, then issue discrete travel, steering and fork commands at the measured decision rate.
+- [x] Enforce only simulation invariants and physical constraints on those commands. Log rejection reasons; do not invoke the predictable route controller in this mode.
+- [x] Brake or hold safely on delayed/failed responses, and pause with a specific explanation after bounded no-progress, repeated invalid actions or unrecoverable decisions.
+- [x] Show Laya connection state, current decisions, probabilities, response age and rejected actions in a compact inspector.
+- [x] Compare both modes on the same seed set; report Full Laya completion rate, intervention-free transfers, decision latency and failure types. Revise prompts/action vocabulary based on those results.
 
-Exit: Full Laya visibly controls at least representative complete unload runs, and its failures are observable rather than hidden. If it cannot do so reliably, document the measured limit before changing the scope.
+Exit verified: the [Phase 4 review](warehouse-demo/phase4/README.md) records 6/6 Full Laya reference runs, 20/20 intervention-free transfers, a complete production-browser run, model latencies, prompt revisions and explicit failure handling. Stop for user review before Phase 5.
 
 ### Phase 5 — Scenario controls, comparison and polish
 

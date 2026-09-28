@@ -1,0 +1,2624 @@
+{
+  "generatedAt": "2026-09-28T01:54:21.399Z",
+  "summary": {
+    "travel": {
+      "correct": 46,
+      "total": 48,
+      "minimumWinningProbability": 0.4852
+    },
+    "gear": {
+      "correct": 48,
+      "total": 48,
+      "minimumWinningProbability": 0.6778
+    },
+    "steering": {
+      "correct": 48,
+      "total": 48,
+      "minimumWinningProbability": 0.3571
+    },
+    "fork": {
+      "correct": 37,
+      "total": 48,
+      "minimumWinningProbability": 0.3785
+    },
+    "action": {
+      "correct": 48,
+      "total": 48,
+      "minimumWinningProbability": 0.4278
+    }
+  },
+  "results": [
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is left. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "left",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.8939,
+            "creep": 0.0856,
+            "cruise": 0.0204
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9155,
+            "reverse": 0.0845
+          }
+        },
+        "steering": {
+          "choice": "left",
+          "probabilities": {
+            "left": 0.6665,
+            "slight_left": 0.1134,
+            "straight": 0.145,
+            "slight_right": 0.0383,
+            "right": 0.0367
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.03,
+            "lower": 0.0416,
+            "hold": 0.9284
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.2497,
+            "place": 0.1621,
+            "none": 0.5882
+          }
+        }
+      },
+      "latencyMs": 632.840916
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is slightly left. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "slight_left",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.8887,
+            "creep": 0.0913,
+            "cruise": 0.02
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9293,
+            "reverse": 0.0707
+          }
+        },
+        "steering": {
+          "choice": "slight_left",
+          "probabilities": {
+            "left": 0.1752,
+            "slight_left": 0.7108,
+            "straight": 0.05,
+            "slight_right": 0.0288,
+            "right": 0.0352
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0307,
+            "lower": 0.0361,
+            "hold": 0.9332
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.1882,
+            "place": 0.1296,
+            "none": 0.6822
+          }
+        }
+      },
+      "latencyMs": 111.86804100000006
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "straight",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.8866,
+            "creep": 0.0876,
+            "cruise": 0.0258
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.8762,
+            "reverse": 0.1238
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0396,
+            "slight_left": 0.0668,
+            "straight": 0.6822,
+            "slight_right": 0.0465,
+            "right": 0.1648
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0329,
+            "lower": 0.0389,
+            "hold": 0.9282
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.2236,
+            "place": 0.1468,
+            "none": 0.6296
+          }
+        }
+      },
+      "latencyMs": 112.62016600000004
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is slightly right. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "slight_right",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.9157,
+            "creep": 0.0644,
+            "cruise": 0.0199
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9049,
+            "reverse": 0.0951
+          }
+        },
+        "steering": {
+          "choice": "slight_right",
+          "probabilities": {
+            "left": 0.0364,
+            "slight_left": 0.1202,
+            "straight": 0.1605,
+            "slight_right": 0.3571,
+            "right": 0.3257
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0292,
+            "lower": 0.0353,
+            "hold": 0.9356
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.1596,
+            "place": 0.1105,
+            "none": 0.7299
+          }
+        }
+      },
+      "latencyMs": 117.78529200000003
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is right. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "right",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.9219,
+            "creep": 0.0581,
+            "cruise": 0.0201
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9352,
+            "reverse": 0.0648
+          }
+        },
+        "steering": {
+          "choice": "right",
+          "probabilities": {
+            "left": 0.0647,
+            "slight_left": 0.1309,
+            "straight": 0.3317,
+            "slight_right": 0.0779,
+            "right": 0.3949
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0322,
+            "lower": 0.0386,
+            "hold": 0.9291
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.217,
+            "place": 0.1353,
+            "none": 0.6477
+          }
+        }
+      },
+      "latencyMs": 119.68200000000002
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is left. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "left",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.8778,
+            "creep": 0.0925,
+            "cruise": 0.0297
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.0216,
+            "reverse": 0.9784
+          }
+        },
+        "steering": {
+          "choice": "left",
+          "probabilities": {
+            "left": 0.7453,
+            "slight_left": 0.0908,
+            "straight": 0.1051,
+            "slight_right": 0.0341,
+            "right": 0.0248
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0397,
+            "lower": 0.0477,
+            "hold": 0.9126
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.2541,
+            "place": 0.165,
+            "none": 0.5809
+          }
+        }
+      },
+      "latencyMs": 122.31254100000001
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is slightly left. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "slight_left",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.8785,
+            "creep": 0.0946,
+            "cruise": 0.0269
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.0161,
+            "reverse": 0.9839
+          }
+        },
+        "steering": {
+          "choice": "slight_left",
+          "probabilities": {
+            "left": 0.1692,
+            "slight_left": 0.7256,
+            "straight": 0.0427,
+            "slight_right": 0.0336,
+            "right": 0.0288
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0425,
+            "lower": 0.0431,
+            "hold": 0.9144
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.2019,
+            "place": 0.139,
+            "none": 0.6591
+          }
+        }
+      },
+      "latencyMs": 120.20045800000003
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "straight",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.8599,
+            "creep": 0.0977,
+            "cruise": 0.0423
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.0807,
+            "reverse": 0.9193
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0393,
+            "slight_left": 0.0659,
+            "straight": 0.6687,
+            "slight_right": 0.0477,
+            "right": 0.1784
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.043,
+            "lower": 0.0446,
+            "hold": 0.9124
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.2263,
+            "place": 0.1493,
+            "none": 0.6244
+          }
+        }
+      },
+      "latencyMs": 128.61120899999992
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is slightly right. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "slight_right",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.903,
+            "creep": 0.0705,
+            "cruise": 0.0265
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.033,
+            "reverse": 0.967
+          }
+        },
+        "steering": {
+          "choice": "slight_right",
+          "probabilities": {
+            "left": 0.0318,
+            "slight_left": 0.1089,
+            "straight": 0.1502,
+            "slight_right": 0.3995,
+            "right": 0.3095
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0406,
+            "lower": 0.0416,
+            "hold": 0.9178
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.1733,
+            "place": 0.121,
+            "none": 0.7057
+          }
+        }
+      },
+      "latencyMs": 125.16925000000015
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is right. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "right",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.9091,
+            "creep": 0.0624,
+            "cruise": 0.0285
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.0266,
+            "reverse": 0.9734
+          }
+        },
+        "steering": {
+          "choice": "right",
+          "probabilities": {
+            "left": 0.0606,
+            "slight_left": 0.1287,
+            "straight": 0.3274,
+            "slight_right": 0.0844,
+            "right": 0.3989
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.04,
+            "lower": 0.042,
+            "hold": 0.918
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.2275,
+            "place": 0.1404,
+            "none": 0.6322
+          }
+        }
+      },
+      "latencyMs": 122.84924999999998
+    },
+    {
+      "state": "The forklift is close to its target. The travel direction is forward. The alignment is left. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "creep",
+        "gear": "forward",
+        "steering": "left",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "creep",
+          "probabilities": {
+            "stop": 0.3424,
+            "creep": 0.6023,
+            "cruise": 0.0553
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9291,
+            "reverse": 0.0709
+          }
+        },
+        "steering": {
+          "choice": "left",
+          "probabilities": {
+            "left": 0.652,
+            "slight_left": 0.1158,
+            "straight": 0.1394,
+            "slight_right": 0.0426,
+            "right": 0.0501
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0313,
+            "lower": 0.0463,
+            "hold": 0.9224
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.2098,
+            "place": 0.1573,
+            "none": 0.6329
+          }
+        }
+      },
+      "latencyMs": 121.12116700000001
+    },
+    {
+      "state": "The forklift is close to its target. The travel direction is forward. The alignment is slightly left. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "creep",
+        "gear": "forward",
+        "steering": "slight_left",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "creep",
+          "probabilities": {
+            "stop": 0.3363,
+            "creep": 0.6046,
+            "cruise": 0.0591
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9414,
+            "reverse": 0.0586
+          }
+        },
+        "steering": {
+          "choice": "slight_left",
+          "probabilities": {
+            "left": 0.1685,
+            "slight_left": 0.7003,
+            "straight": 0.0552,
+            "slight_right": 0.0347,
+            "right": 0.0414
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0245,
+            "lower": 0.0344,
+            "hold": 0.941
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.1863,
+            "place": 0.144,
+            "none": 0.6696
+          }
+        }
+      },
+      "latencyMs": 128.94937500000015
+    },
+    {
+      "state": "The forklift is close to its target. The travel direction is forward. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "creep",
+        "gear": "forward",
+        "steering": "straight",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "creep",
+          "probabilities": {
+            "stop": 0.3301,
+            "creep": 0.6014,
+            "cruise": 0.0685
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9141,
+            "reverse": 0.0859
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0418,
+            "slight_left": 0.0742,
+            "straight": 0.6582,
+            "slight_right": 0.0511,
+            "right": 0.1748
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0269,
+            "lower": 0.037,
+            "hold": 0.9361
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.1965,
+            "place": 0.1449,
+            "none": 0.6586
+          }
+        }
+      },
+      "latencyMs": 133.1018750000003
+    },
+    {
+      "state": "The forklift is close to its target. The travel direction is forward. The alignment is slightly right. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "creep",
+        "gear": "forward",
+        "steering": "slight_right",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "creep",
+          "probabilities": {
+            "stop": 0.3924,
+            "creep": 0.5498,
+            "cruise": 0.0578
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9219,
+            "reverse": 0.0781
+          }
+        },
+        "steering": {
+          "choice": "slight_right",
+          "probabilities": {
+            "left": 0.037,
+            "slight_left": 0.1181,
+            "straight": 0.1462,
+            "slight_right": 0.3885,
+            "right": 0.3101
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0259,
+            "lower": 0.0365,
+            "hold": 0.9376
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.1691,
+            "place": 0.1262,
+            "none": 0.7047
+          }
+        }
+      },
+      "latencyMs": 127.79929099999981
+    },
+    {
+      "state": "The forklift is close to its target. The travel direction is forward. The alignment is right. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "creep",
+        "gear": "forward",
+        "steering": "right",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "creep",
+          "probabilities": {
+            "stop": 0.3882,
+            "creep": 0.5519,
+            "cruise": 0.0599
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9465,
+            "reverse": 0.0535
+          }
+        },
+        "steering": {
+          "choice": "right",
+          "probabilities": {
+            "left": 0.0628,
+            "slight_left": 0.1343,
+            "straight": 0.333,
+            "slight_right": 0.0847,
+            "right": 0.3853
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0345,
+            "lower": 0.0489,
+            "hold": 0.9167
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.1839,
+            "place": 0.1278,
+            "none": 0.6883
+          }
+        }
+      },
+      "latencyMs": 125.357125
+    },
+    {
+      "state": "The forklift is close to its target. The travel direction is reverse. The alignment is left. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "creep",
+        "gear": "reverse",
+        "steering": "left",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "creep",
+          "probabilities": {
+            "stop": 0.4189,
+            "creep": 0.5236,
+            "cruise": 0.0575
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.0166,
+            "reverse": 0.9834
+          }
+        },
+        "steering": {
+          "choice": "left",
+          "probabilities": {
+            "left": 0.7469,
+            "slight_left": 0.0907,
+            "straight": 0.0976,
+            "slight_right": 0.0336,
+            "right": 0.0312
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0393,
+            "lower": 0.0514,
+            "hold": 0.9093
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.2156,
+            "place": 0.1604,
+            "none": 0.624
+          }
+        }
+      },
+      "latencyMs": 121.73475000000008
+    },
+    {
+      "state": "The forklift is close to its target. The travel direction is reverse. The alignment is slightly left. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "creep",
+        "gear": "reverse",
+        "steering": "slight_left",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "creep",
+          "probabilities": {
+            "stop": 0.4335,
+            "creep": 0.5103,
+            "cruise": 0.0563
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.0216,
+            "reverse": 0.9784
+          }
+        },
+        "steering": {
+          "choice": "slight_left",
+          "probabilities": {
+            "left": 0.1585,
+            "slight_left": 0.7308,
+            "straight": 0.0427,
+            "slight_right": 0.0333,
+            "right": 0.0348
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0277,
+            "lower": 0.0376,
+            "hold": 0.9346
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.1979,
+            "place": 0.1526,
+            "none": 0.6495
+          }
+        }
+      },
+      "latencyMs": 127.52158400000008
+    },
+    {
+      "state": "The forklift is close to its target. The travel direction is reverse. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "creep",
+        "gear": "reverse",
+        "steering": "straight",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "creep",
+          "probabilities": {
+            "stop": 0.4061,
+            "creep": 0.5144,
+            "cruise": 0.0795
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.072,
+            "reverse": 0.928
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0393,
+            "slight_left": 0.0714,
+            "straight": 0.6579,
+            "slight_right": 0.0496,
+            "right": 0.1818
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0318,
+            "lower": 0.0388,
+            "hold": 0.9293
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.1971,
+            "place": 0.1458,
+            "none": 0.6571
+          }
+        }
+      },
+      "latencyMs": 123.65016700000024
+    },
+    {
+      "state": "The forklift is close to its target. The travel direction is reverse. The alignment is slightly right. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "creep",
+        "gear": "reverse",
+        "steering": "slight_right",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.4852,
+            "creep": 0.4611,
+            "cruise": 0.0537
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.0517,
+            "reverse": 0.9483
+          }
+        },
+        "steering": {
+          "choice": "slight_right",
+          "probabilities": {
+            "left": 0.0306,
+            "slight_left": 0.1065,
+            "straight": 0.1279,
+            "slight_right": 0.4309,
+            "right": 0.3041
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0323,
+            "lower": 0.0441,
+            "hold": 0.9236
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.1803,
+            "place": 0.1364,
+            "none": 0.6834
+          }
+        }
+      },
+      "latencyMs": 122.79599999999982
+    },
+    {
+      "state": "The forklift is close to its target. The travel direction is reverse. The alignment is right. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "creep",
+        "gear": "reverse",
+        "steering": "right",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.491,
+            "creep": 0.4473,
+            "cruise": 0.0618
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.0365,
+            "reverse": 0.9635
+          }
+        },
+        "steering": {
+          "choice": "right",
+          "probabilities": {
+            "left": 0.0581,
+            "slight_left": 0.1323,
+            "straight": 0.3273,
+            "slight_right": 0.0882,
+            "right": 0.3941
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0428,
+            "lower": 0.0542,
+            "hold": 0.9029
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.1937,
+            "place": 0.1338,
+            "none": 0.6726
+          }
+        }
+      },
+      "latencyMs": 122.30812500000002
+    },
+    {
+      "state": "The forklift is far from its target. The travel direction is forward. The alignment is left. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "cruise",
+        "gear": "forward",
+        "steering": "left",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "cruise",
+          "probabilities": {
+            "stop": 0.252,
+            "creep": 0.109,
+            "cruise": 0.639
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.8828,
+            "reverse": 0.1172
+          }
+        },
+        "steering": {
+          "choice": "left",
+          "probabilities": {
+            "left": 0.7517,
+            "slight_left": 0.0807,
+            "straight": 0.1015,
+            "slight_right": 0.0343,
+            "right": 0.0317
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0409,
+            "lower": 0.0545,
+            "hold": 0.9046
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.1062,
+            "place": 0.0836,
+            "none": 0.8102
+          }
+        }
+      },
+      "latencyMs": 125.81279099999983
+    },
+    {
+      "state": "The forklift is far from its target. The travel direction is forward. The alignment is slightly left. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "cruise",
+        "gear": "forward",
+        "steering": "slight_left",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "cruise",
+          "probabilities": {
+            "stop": 0.2477,
+            "creep": 0.09,
+            "cruise": 0.6624
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9154,
+            "reverse": 0.0846
+          }
+        },
+        "steering": {
+          "choice": "slight_left",
+          "probabilities": {
+            "left": 0.1428,
+            "slight_left": 0.7475,
+            "straight": 0.0406,
+            "slight_right": 0.0335,
+            "right": 0.0355
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0325,
+            "lower": 0.0434,
+            "hold": 0.9241
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.0865,
+            "place": 0.0726,
+            "none": 0.8409
+          }
+        }
+      },
+      "latencyMs": 123.83762499999966
+    },
+    {
+      "state": "The forklift is far from its target. The travel direction is forward. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "cruise",
+        "gear": "forward",
+        "steering": "straight",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "cruise",
+          "probabilities": {
+            "stop": 0.2216,
+            "creep": 0.0778,
+            "cruise": 0.7007
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.8872,
+            "reverse": 0.1128
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0289,
+            "slight_left": 0.0484,
+            "straight": 0.7343,
+            "slight_right": 0.041,
+            "right": 0.1474
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.038,
+            "lower": 0.0401,
+            "hold": 0.9219
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.0976,
+            "place": 0.083,
+            "none": 0.8193
+          }
+        }
+      },
+      "latencyMs": 128.12575000000015
+    },
+    {
+      "state": "The forklift is far from its target. The travel direction is forward. The alignment is slightly right. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "cruise",
+        "gear": "forward",
+        "steering": "slight_right",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "cruise",
+          "probabilities": {
+            "stop": 0.2121,
+            "creep": 0.0629,
+            "cruise": 0.725
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.8964,
+            "reverse": 0.1036
+          }
+        },
+        "steering": {
+          "choice": "slight_right",
+          "probabilities": {
+            "left": 0.0248,
+            "slight_left": 0.0834,
+            "straight": 0.1136,
+            "slight_right": 0.4544,
+            "right": 0.3239
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0322,
+            "lower": 0.041,
+            "hold": 0.9269
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.0656,
+            "place": 0.0568,
+            "none": 0.8776
+          }
+        }
+      },
+      "latencyMs": 131.96345800000017
+    },
+    {
+      "state": "The forklift is far from its target. The travel direction is forward. The alignment is right. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "cruise",
+        "gear": "forward",
+        "steering": "right",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "cruise",
+          "probabilities": {
+            "stop": 0.1732,
+            "creep": 0.0694,
+            "cruise": 0.7574
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9264,
+            "reverse": 0.0736
+          }
+        },
+        "steering": {
+          "choice": "right",
+          "probabilities": {
+            "left": 0.0433,
+            "slight_left": 0.1005,
+            "straight": 0.2811,
+            "slight_right": 0.0745,
+            "right": 0.5006
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0446,
+            "lower": 0.0514,
+            "hold": 0.904
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.0877,
+            "place": 0.0688,
+            "none": 0.8435
+          }
+        }
+      },
+      "latencyMs": 127.47754099999975
+    },
+    {
+      "state": "The forklift is far from its target. The travel direction is reverse. The alignment is left. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "cruise",
+        "gear": "reverse",
+        "steering": "left",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "cruise",
+          "probabilities": {
+            "stop": 0.3166,
+            "creep": 0.099,
+            "cruise": 0.5844
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.0254,
+            "reverse": 0.9746
+          }
+        },
+        "steering": {
+          "choice": "left",
+          "probabilities": {
+            "left": 0.8101,
+            "slight_left": 0.0677,
+            "straight": 0.0695,
+            "slight_right": 0.0295,
+            "right": 0.0231
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0573,
+            "lower": 0.0602,
+            "hold": 0.8824
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.0985,
+            "place": 0.078,
+            "none": 0.8235
+          }
+        }
+      },
+      "latencyMs": 127.14045799999985
+    },
+    {
+      "state": "The forklift is far from its target. The travel direction is reverse. The alignment is slightly left. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "cruise",
+        "gear": "reverse",
+        "steering": "slight_left",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "cruise",
+          "probabilities": {
+            "stop": 0.3385,
+            "creep": 0.0909,
+            "cruise": 0.5706
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.0307,
+            "reverse": 0.9693
+          }
+        },
+        "steering": {
+          "choice": "slight_left",
+          "probabilities": {
+            "left": 0.12,
+            "slight_left": 0.8029,
+            "straight": 0.0246,
+            "slight_right": 0.0265,
+            "right": 0.026
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0397,
+            "lower": 0.0461,
+            "hold": 0.9142
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.0778,
+            "place": 0.0674,
+            "none": 0.8547
+          }
+        }
+      },
+      "latencyMs": 132.88412500000004
+    },
+    {
+      "state": "The forklift is far from its target. The travel direction is reverse. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "cruise",
+        "gear": "reverse",
+        "steering": "straight",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "cruise",
+          "probabilities": {
+            "stop": 0.2332,
+            "creep": 0.0692,
+            "cruise": 0.6976
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.0531,
+            "reverse": 0.9469
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0285,
+            "slight_left": 0.0508,
+            "straight": 0.7325,
+            "slight_right": 0.0412,
+            "right": 0.147
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0473,
+            "lower": 0.0398,
+            "hold": 0.9129
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.0803,
+            "place": 0.0683,
+            "none": 0.8514
+          }
+        }
+      },
+      "latencyMs": 125.11799999999994
+    },
+    {
+      "state": "The forklift is far from its target. The travel direction is reverse. The alignment is slightly right. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "cruise",
+        "gear": "reverse",
+        "steering": "slight_right",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "cruise",
+          "probabilities": {
+            "stop": 0.2599,
+            "creep": 0.0563,
+            "cruise": 0.6838
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.0456,
+            "reverse": 0.9544
+          }
+        },
+        "steering": {
+          "choice": "slight_right",
+          "probabilities": {
+            "left": 0.0227,
+            "slight_left": 0.0787,
+            "straight": 0.0908,
+            "slight_right": 0.4942,
+            "right": 0.3136
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0421,
+            "lower": 0.043,
+            "hold": 0.9149
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.0612,
+            "place": 0.0548,
+            "none": 0.884
+          }
+        }
+      },
+      "latencyMs": 132.26174999999967
+    },
+    {
+      "state": "The forklift is far from its target. The travel direction is reverse. The alignment is right. The forks are at the required height. No load operation is needed.",
+      "expected": {
+        "travel": "cruise",
+        "gear": "reverse",
+        "steering": "right",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "cruise",
+          "probabilities": {
+            "stop": 0.2141,
+            "creep": 0.0615,
+            "cruise": 0.7244
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.0244,
+            "reverse": 0.9756
+          }
+        },
+        "steering": {
+          "choice": "right",
+          "probabilities": {
+            "left": 0.043,
+            "slight_left": 0.1005,
+            "straight": 0.2411,
+            "slight_right": 0.0809,
+            "right": 0.5345
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0582,
+            "lower": 0.0539,
+            "hold": 0.8879
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.0783,
+            "place": 0.059,
+            "none": 0.8627
+          }
+        }
+      },
+      "latencyMs": 131.40279199999986
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is straight ahead. The forks are below travel height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "straight",
+        "fork": "raise",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.8824,
+            "creep": 0.0757,
+            "cruise": 0.0419
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.8176,
+            "reverse": 0.1824
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.049,
+            "slight_left": 0.0821,
+            "straight": 0.663,
+            "slight_right": 0.0617,
+            "right": 0.1442
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0517,
+            "lower": 0.1192,
+            "hold": 0.8292
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.3173,
+            "place": 0.1937,
+            "none": 0.4891
+          }
+        }
+      },
+      "latencyMs": 123.17316700000083
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is straight ahead. The forks are below travel height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "straight",
+        "fork": "raise",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.8446,
+            "creep": 0.0904,
+            "cruise": 0.065
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.1434,
+            "reverse": 0.8566
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0571,
+            "slight_left": 0.0941,
+            "straight": 0.63,
+            "slight_right": 0.0706,
+            "right": 0.1482
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0793,
+            "lower": 0.1139,
+            "hold": 0.8068
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.2953,
+            "place": 0.1803,
+            "none": 0.5243
+          }
+        }
+      },
+      "latencyMs": 116.9591249999994
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is straight ahead. The forks are below travel height. Collect the selected truck pallet.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "straight",
+        "fork": "raise",
+        "action": "pickup"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.7971,
+            "creep": 0.1314,
+            "cruise": 0.0715
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.8797,
+            "reverse": 0.1203
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0662,
+            "slight_left": 0.1378,
+            "straight": 0.4902,
+            "slight_right": 0.0987,
+            "right": 0.2071
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.1846,
+            "lower": 0.3746,
+            "hold": 0.4408
+          }
+        },
+        "action": {
+          "choice": "pickup",
+          "probabilities": {
+            "pickup": 0.7286,
+            "place": 0.1641,
+            "none": 0.1074
+          }
+        }
+      },
+      "latencyMs": 119.14049999999952
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is straight ahead. The forks are below travel height. Collect the selected truck pallet.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "straight",
+        "fork": "raise",
+        "action": "pickup"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.7807,
+            "creep": 0.1329,
+            "cruise": 0.0864
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.2684,
+            "reverse": 0.7316
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0796,
+            "slight_left": 0.1589,
+            "straight": 0.4476,
+            "slight_right": 0.1135,
+            "right": 0.2005
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.1894,
+            "lower": 0.3489,
+            "hold": 0.4617
+          }
+        },
+        "action": {
+          "choice": "pickup",
+          "probabilities": {
+            "pickup": 0.6985,
+            "place": 0.1775,
+            "none": 0.124
+          }
+        }
+      },
+      "latencyMs": 122.39220800000021
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is straight ahead. The forks are below travel height. Release the load into the selected empty bay.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "straight",
+        "fork": "raise",
+        "action": "place"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.8149,
+            "creep": 0.1211,
+            "cruise": 0.064
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9005,
+            "reverse": 0.0995
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0522,
+            "slight_left": 0.0996,
+            "straight": 0.6119,
+            "slight_right": 0.0742,
+            "right": 0.1621
+          }
+        },
+        "fork": {
+          "choice": "lower",
+          "probabilities": {
+            "raise": 0.2036,
+            "lower": 0.5251,
+            "hold": 0.2713
+          }
+        },
+        "action": {
+          "choice": "place",
+          "probabilities": {
+            "pickup": 0.3101,
+            "place": 0.4446,
+            "none": 0.2453
+          }
+        }
+      },
+      "latencyMs": 147.95391700000073
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is straight ahead. The forks are below travel height. Release the load into the selected empty bay.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "straight",
+        "fork": "raise",
+        "action": "place"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.7924,
+            "creep": 0.1274,
+            "cruise": 0.0802
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.1569,
+            "reverse": 0.8431
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0579,
+            "slight_left": 0.1084,
+            "straight": 0.5848,
+            "slight_right": 0.0821,
+            "right": 0.1668
+          }
+        },
+        "fork": {
+          "choice": "lower",
+          "probabilities": {
+            "raise": 0.2154,
+            "lower": 0.4655,
+            "hold": 0.3191
+          }
+        },
+        "action": {
+          "choice": "place",
+          "probabilities": {
+            "pickup": 0.3172,
+            "place": 0.4278,
+            "none": 0.2551
+          }
+        }
+      },
+      "latencyMs": 127.40441699999974
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is straight ahead. The forks are above placement height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "straight",
+        "fork": "lower",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.89,
+            "creep": 0.0717,
+            "cruise": 0.0383
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.7764,
+            "reverse": 0.2236
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0537,
+            "slight_left": 0.0784,
+            "straight": 0.6508,
+            "slight_right": 0.0553,
+            "right": 0.1618
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.1181,
+            "lower": 0.2771,
+            "hold": 0.6048
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.2593,
+            "place": 0.1725,
+            "none": 0.5682
+          }
+        }
+      },
+      "latencyMs": 121.33808299999964
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is straight ahead. The forks are above placement height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "straight",
+        "fork": "lower",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.8453,
+            "creep": 0.0886,
+            "cruise": 0.0662
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.1386,
+            "reverse": 0.8614
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0576,
+            "slight_left": 0.0816,
+            "straight": 0.6484,
+            "slight_right": 0.0581,
+            "right": 0.1543
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.1158,
+            "lower": 0.3153,
+            "hold": 0.569
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.2521,
+            "place": 0.1717,
+            "none": 0.5762
+          }
+        }
+      },
+      "latencyMs": 132.46554099999958
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is straight ahead. The forks are above placement height. Collect the selected truck pallet.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "straight",
+        "fork": "lower",
+        "action": "pickup"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.7821,
+            "creep": 0.151,
+            "cruise": 0.0669
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.8915,
+            "reverse": 0.1085
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0705,
+            "slight_left": 0.1266,
+            "straight": 0.4944,
+            "slight_right": 0.0957,
+            "right": 0.2127
+          }
+        },
+        "fork": {
+          "choice": "raise",
+          "probabilities": {
+            "raise": 0.4218,
+            "lower": 0.215,
+            "hold": 0.3633
+          }
+        },
+        "action": {
+          "choice": "pickup",
+          "probabilities": {
+            "pickup": 0.7385,
+            "place": 0.1526,
+            "none": 0.1089
+          }
+        }
+      },
+      "latencyMs": 124.02408300000025
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is straight ahead. The forks are above placement height. Collect the selected truck pallet.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "straight",
+        "fork": "lower",
+        "action": "pickup"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.7604,
+            "creep": 0.1518,
+            "cruise": 0.0878
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.2396,
+            "reverse": 0.7604
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0722,
+            "slight_left": 0.1292,
+            "straight": 0.4885,
+            "slight_right": 0.1004,
+            "right": 0.2098
+          }
+        },
+        "fork": {
+          "choice": "raise",
+          "probabilities": {
+            "raise": 0.4036,
+            "lower": 0.2312,
+            "hold": 0.3652
+          }
+        },
+        "action": {
+          "choice": "pickup",
+          "probabilities": {
+            "pickup": 0.7183,
+            "place": 0.1669,
+            "none": 0.1147
+          }
+        }
+      },
+      "latencyMs": 120.78608299999996
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is straight ahead. The forks are above placement height. Release the load into the selected empty bay.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "straight",
+        "fork": "lower",
+        "action": "place"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.7959,
+            "creep": 0.1385,
+            "cruise": 0.0656
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9125,
+            "reverse": 0.0875
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0506,
+            "slight_left": 0.0909,
+            "straight": 0.6173,
+            "slight_right": 0.0683,
+            "right": 0.1729
+          }
+        },
+        "fork": {
+          "choice": "lower",
+          "probabilities": {
+            "raise": 0.3772,
+            "lower": 0.3806,
+            "hold": 0.2423
+          }
+        },
+        "action": {
+          "choice": "place",
+          "probabilities": {
+            "pickup": 0.3059,
+            "place": 0.4774,
+            "none": 0.2167
+          }
+        }
+      },
+      "latencyMs": 130.74374999999964
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is straight ahead. The forks are above placement height. Release the load into the selected empty bay.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "straight",
+        "fork": "lower",
+        "action": "place"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.7788,
+            "creep": 0.1383,
+            "cruise": 0.0829
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.157,
+            "reverse": 0.843
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0534,
+            "slight_left": 0.0932,
+            "straight": 0.6156,
+            "slight_right": 0.0682,
+            "right": 0.1696
+          }
+        },
+        "fork": {
+          "choice": "raise",
+          "probabilities": {
+            "raise": 0.3785,
+            "lower": 0.3724,
+            "hold": 0.2491
+          }
+        },
+        "action": {
+          "choice": "place",
+          "probabilities": {
+            "pickup": 0.3165,
+            "place": 0.4655,
+            "none": 0.218
+          }
+        }
+      },
+      "latencyMs": 130.12854199999947
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is straight ahead. The forks are at placement height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "straight",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.9039,
+            "creep": 0.0698,
+            "cruise": 0.0263
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.8519,
+            "reverse": 0.1481
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0383,
+            "slight_left": 0.0592,
+            "straight": 0.7092,
+            "slight_right": 0.0435,
+            "right": 0.1498
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0646,
+            "lower": 0.094,
+            "hold": 0.8414
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.2488,
+            "place": 0.1961,
+            "none": 0.5552
+          }
+        }
+      },
+      "latencyMs": 126.95987499999956
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is straight ahead. The forks are at placement height. No load operation is needed.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "straight",
+        "fork": "hold",
+        "action": "none"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.8585,
+            "creep": 0.0946,
+            "cruise": 0.0469
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.1417,
+            "reverse": 0.8583
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0423,
+            "slight_left": 0.0644,
+            "straight": 0.6895,
+            "slight_right": 0.0488,
+            "right": 0.155
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.0805,
+            "lower": 0.102,
+            "hold": 0.8175
+          }
+        },
+        "action": {
+          "choice": "none",
+          "probabilities": {
+            "pickup": 0.244,
+            "place": 0.1921,
+            "none": 0.564
+          }
+        }
+      },
+      "latencyMs": 124.81987500000014
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is straight ahead. The forks are at placement height. Collect the selected truck pallet.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "straight",
+        "fork": "hold",
+        "action": "pickup"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.7931,
+            "creep": 0.1508,
+            "cruise": 0.056
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.9275,
+            "reverse": 0.0725
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0562,
+            "slight_left": 0.1102,
+            "straight": 0.5521,
+            "slight_right": 0.0728,
+            "right": 0.2087
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.2436,
+            "lower": 0.2565,
+            "hold": 0.4999
+          }
+        },
+        "action": {
+          "choice": "pickup",
+          "probabilities": {
+            "pickup": 0.7524,
+            "place": 0.151,
+            "none": 0.0966
+          }
+        }
+      },
+      "latencyMs": 121.28637499999968
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is straight ahead. The forks are at placement height. Collect the selected truck pallet.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "straight",
+        "fork": "hold",
+        "action": "pickup"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.771,
+            "creep": 0.1553,
+            "cruise": 0.0737
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.3222,
+            "reverse": 0.6778
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.062,
+            "slight_left": 0.1176,
+            "straight": 0.5201,
+            "slight_right": 0.0801,
+            "right": 0.2202
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.2531,
+            "lower": 0.231,
+            "hold": 0.5158
+          }
+        },
+        "action": {
+          "choice": "pickup",
+          "probabilities": {
+            "pickup": 0.7321,
+            "place": 0.1657,
+            "none": 0.1022
+          }
+        }
+      },
+      "latencyMs": 123.07829099999981
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is forward. The alignment is straight ahead. The forks are at placement height. Release the load into the selected empty bay.",
+      "expected": {
+        "travel": "stop",
+        "gear": "forward",
+        "steering": "straight",
+        "fork": "hold",
+        "action": "place"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.7675,
+            "creep": 0.163,
+            "cruise": 0.0695
+          }
+        },
+        "gear": {
+          "choice": "forward",
+          "probabilities": {
+            "forward": 0.931,
+            "reverse": 0.069
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0412,
+            "slight_left": 0.0749,
+            "straight": 0.646,
+            "slight_right": 0.0554,
+            "right": 0.1825
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.2239,
+            "lower": 0.3767,
+            "hold": 0.3993
+          }
+        },
+        "action": {
+          "choice": "place",
+          "probabilities": {
+            "pickup": 0.2393,
+            "place": 0.5922,
+            "none": 0.1685
+          }
+        }
+      },
+      "latencyMs": 134.1220000000003
+    },
+    {
+      "state": "The forklift is at its target. The travel direction is reverse. The alignment is straight ahead. The forks are at placement height. Release the load into the selected empty bay.",
+      "expected": {
+        "travel": "stop",
+        "gear": "reverse",
+        "steering": "straight",
+        "fork": "hold",
+        "action": "place"
+      },
+      "answers": {
+        "travel": {
+          "choice": "stop",
+          "probabilities": {
+            "stop": 0.7391,
+            "creep": 0.1723,
+            "cruise": 0.0886
+          }
+        },
+        "gear": {
+          "choice": "reverse",
+          "probabilities": {
+            "forward": 0.2165,
+            "reverse": 0.7835
+          }
+        },
+        "steering": {
+          "choice": "straight",
+          "probabilities": {
+            "left": 0.0446,
+            "slight_left": 0.0797,
+            "straight": 0.6325,
+            "slight_right": 0.0584,
+            "right": 0.1848
+          }
+        },
+        "fork": {
+          "choice": "hold",
+          "probabilities": {
+            "raise": 0.2254,
+            "lower": 0.3533,
+            "hold": 0.4213
+          }
+        },
+        "action": {
+          "choice": "place",
+          "probabilities": {
+            "pickup": 0.2629,
+            "place": 0.5633,
+            "none": 0.1738
+          }
+        }
+      },
+      "latencyMs": 134.14687500000036
+    }
+  ]
+}

@@ -1,0 +1,650 @@
+[
+  {
+    "variant": "distance",
+    "state": "The destination has been reached. The travel direction is forward. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "stop",
+    "expectedGear": "forward",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "stop",
+        "probabilities": {
+          "stop": 0.5591,
+          "creep": 0.2434,
+          "cruise": 0.1974
+        },
+        "confidence": 0.0995,
+        "answer_confidence": 0.5591,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "forward",
+        "probabilities": {
+          "forward": 0.8923,
+          "reverse": 0.1077
+        },
+        "confidence": 0.5071,
+        "answer_confidence": 0.8923,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 598.893875
+  },
+  {
+    "variant": "distance",
+    "state": "The destination has been reached. The travel direction is reverse. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "stop",
+    "expectedGear": "reverse",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "stop",
+        "probabilities": {
+          "stop": 0.6178,
+          "creep": 0.2126,
+          "cruise": 0.1695
+        },
+        "confidence": 0.1557,
+        "answer_confidence": 0.6178,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "reverse",
+        "probabilities": {
+          "forward": 0.02,
+          "reverse": 0.98
+        },
+        "confidence": 0.8585,
+        "answer_confidence": 0.98,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 52.329000000000065
+  },
+  {
+    "variant": "distance",
+    "state": "The destination is nearby. The travel direction is forward. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "creep",
+    "expectedGear": "forward",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "stop",
+        "probabilities": {
+          "stop": 0.4457,
+          "creep": 0.2963,
+          "cruise": 0.258
+        },
+        "confidence": 0.0259,
+        "answer_confidence": 0.4457,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "forward",
+        "probabilities": {
+          "forward": 0.8745,
+          "reverse": 0.1255
+        },
+        "confidence": 0.455,
+        "answer_confidence": 0.8745,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 58.006125
+  },
+  {
+    "variant": "distance",
+    "state": "The destination is nearby. The travel direction is reverse. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "creep",
+    "expectedGear": "reverse",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "stop",
+        "probabilities": {
+          "stop": 0.5257,
+          "creep": 0.2652,
+          "cruise": 0.209
+        },
+        "confidence": 0.0741,
+        "answer_confidence": 0.5257,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "reverse",
+        "probabilities": {
+          "forward": 0.0461,
+          "reverse": 0.9539
+        },
+        "confidence": 0.7302,
+        "answer_confidence": 0.9539,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 47.226999999999975
+  },
+  {
+    "variant": "distance",
+    "state": "The destination is far away. The travel direction is forward. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "cruise",
+    "expectedGear": "forward",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "stop",
+        "probabilities": {
+          "stop": 0.5787,
+          "creep": 0.1624,
+          "cruise": 0.2588
+        },
+        "confidence": 0.1247,
+        "answer_confidence": 0.5787,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "forward",
+        "probabilities": {
+          "forward": 0.7976,
+          "reverse": 0.2024
+        },
+        "confidence": 0.2734,
+        "answer_confidence": 0.7976,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 45.722667
+  },
+  {
+    "variant": "distance",
+    "state": "The destination is far away. The travel direction is reverse. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "cruise",
+    "expectedGear": "reverse",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "stop",
+        "probabilities": {
+          "stop": 0.5898,
+          "creep": 0.1579,
+          "cruise": 0.2523
+        },
+        "confidence": 0.135,
+        "answer_confidence": 0.5898,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "reverse",
+        "probabilities": {
+          "forward": 0.048,
+          "reverse": 0.952
+        },
+        "confidence": 0.7221,
+        "answer_confidence": 0.952,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 47.97858400000007
+  },
+  {
+    "variant": "remaining",
+    "state": "There is no distance remaining. The travel direction is forward. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "stop",
+    "expectedGear": "forward",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "stop",
+        "probabilities": {
+          "stop": 0.5837,
+          "creep": 0.1941,
+          "cruise": 0.2221
+        },
+        "confidence": 0.1201,
+        "answer_confidence": 0.5837,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "forward",
+        "probabilities": {
+          "forward": 0.9192,
+          "reverse": 0.0808
+        },
+        "confidence": 0.595,
+        "answer_confidence": 0.9192,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 60.41245900000001
+  },
+  {
+    "variant": "remaining",
+    "state": "There is no distance remaining. The travel direction is reverse. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "stop",
+    "expectedGear": "reverse",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "stop",
+        "probabilities": {
+          "stop": 0.6649,
+          "creep": 0.1522,
+          "cruise": 0.1829
+        },
+        "confidence": 0.2094,
+        "answer_confidence": 0.6649,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "reverse",
+        "probabilities": {
+          "forward": 0.0208,
+          "reverse": 0.9792
+        },
+        "confidence": 0.8541,
+        "answer_confidence": 0.9792,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 46.61075000000005
+  },
+  {
+    "variant": "remaining",
+    "state": "There is a short distance remaining. The travel direction is forward. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "creep",
+    "expectedGear": "forward",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "stop",
+        "probabilities": {
+          "stop": 0.4245,
+          "creep": 0.37,
+          "cruise": 0.2056
+        },
+        "confidence": 0.0381,
+        "answer_confidence": 0.4245,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "forward",
+        "probabilities": {
+          "forward": 0.8906,
+          "reverse": 0.1094
+        },
+        "confidence": 0.5018,
+        "answer_confidence": 0.8906,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 60.24987500000009
+  },
+  {
+    "variant": "remaining",
+    "state": "There is a short distance remaining. The travel direction is reverse. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "creep",
+    "expectedGear": "reverse",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "stop",
+        "probabilities": {
+          "stop": 0.471,
+          "creep": 0.3402,
+          "cruise": 0.1887
+        },
+        "confidence": 0.0569,
+        "answer_confidence": 0.471,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "reverse",
+        "probabilities": {
+          "forward": 0.0259,
+          "reverse": 0.9741
+        },
+        "confidence": 0.8267,
+        "answer_confidence": 0.9741,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 47.888541999999916
+  },
+  {
+    "variant": "remaining",
+    "state": "There is a long distance remaining. The travel direction is forward. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "cruise",
+    "expectedGear": "forward",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "cruise",
+        "probabilities": {
+          "stop": 0.3276,
+          "creep": 0.1877,
+          "cruise": 0.4847
+        },
+        "confidence": 0.0619,
+        "answer_confidence": 0.4847,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "forward",
+        "probabilities": {
+          "forward": 0.8397,
+          "reverse": 0.1603
+        },
+        "confidence": 0.3649,
+        "answer_confidence": 0.8397,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 46.741415999999845
+  },
+  {
+    "variant": "remaining",
+    "state": "There is a long distance remaining. The travel direction is reverse. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "cruise",
+    "expectedGear": "reverse",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "stop",
+        "probabilities": {
+          "stop": 0.483,
+          "creep": 0.1587,
+          "cruise": 0.3583
+        },
+        "confidence": 0.0794,
+        "answer_confidence": 0.483,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "reverse",
+        "probabilities": {
+          "forward": 0.024,
+          "reverse": 0.976
+        },
+        "confidence": 0.8365,
+        "answer_confidence": 0.976,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 50.44329199999993
+  },
+  {
+    "variant": "motion",
+    "state": "The forklift is at its target. The travel direction is forward. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "stop",
+    "expectedGear": "forward",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "stop",
+        "probabilities": {
+          "stop": 0.8859,
+          "creep": 0.0881,
+          "cruise": 0.026
+        },
+        "confidence": 0.6211,
+        "answer_confidence": 0.8859,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "forward",
+        "probabilities": {
+          "forward": 0.8765,
+          "reverse": 0.1235
+        },
+        "confidence": 0.4607,
+        "answer_confidence": 0.8765,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 57.42124999999987
+  },
+  {
+    "variant": "motion",
+    "state": "The forklift is at its target. The travel direction is reverse. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "stop",
+    "expectedGear": "reverse",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "stop",
+        "probabilities": {
+          "stop": 0.8598,
+          "creep": 0.0978,
+          "cruise": 0.0424
+        },
+        "confidence": 0.5529,
+        "answer_confidence": 0.8598,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "reverse",
+        "probabilities": {
+          "forward": 0.081,
+          "reverse": 0.919
+        },
+        "confidence": 0.5943,
+        "answer_confidence": 0.919,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 48.51237500000002
+  },
+  {
+    "variant": "motion",
+    "state": "The forklift is close to its target. The travel direction is forward. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "creep",
+    "expectedGear": "forward",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "creep",
+        "probabilities": {
+          "stop": 0.3291,
+          "creep": 0.6023,
+          "cruise": 0.0687
+        },
+        "confidence": 0.2216,
+        "answer_confidence": 0.6023,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "forward",
+        "probabilities": {
+          "forward": 0.9146,
+          "reverse": 0.0854
+        },
+        "confidence": 0.579,
+        "answer_confidence": 0.9146,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 59.03008299999988
+  },
+  {
+    "variant": "motion",
+    "state": "The forklift is close to its target. The travel direction is reverse. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "creep",
+    "expectedGear": "reverse",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "creep",
+        "probabilities": {
+          "stop": 0.4049,
+          "creep": 0.5157,
+          "cruise": 0.0793
+        },
+        "confidence": 0.1729,
+        "answer_confidence": 0.5157,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "reverse",
+        "probabilities": {
+          "forward": 0.0721,
+          "reverse": 0.9279
+        },
+        "confidence": 0.6263,
+        "answer_confidence": 0.9279,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 49.489708000000064
+  },
+  {
+    "variant": "motion",
+    "state": "The forklift is far from its target. The travel direction is forward. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "cruise",
+    "expectedGear": "forward",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "cruise",
+        "probabilities": {
+          "stop": 0.2217,
+          "creep": 0.0778,
+          "cruise": 0.7005
+        },
+        "confidence": 0.2883,
+        "answer_confidence": 0.7005,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "forward",
+        "probabilities": {
+          "forward": 0.887,
+          "reverse": 0.113
+        },
+        "confidence": 0.491,
+        "answer_confidence": 0.887,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 50.03233399999999
+  },
+  {
+    "variant": "motion",
+    "state": "The forklift is far from its target. The travel direction is reverse. The alignment is straight ahead. The forks are at the required height. No load operation is needed.",
+    "expected": "cruise",
+    "expectedGear": "reverse",
+    "answers": {
+      "travel": {
+        "type": "choice",
+        "choice": "cruise",
+        "probabilities": {
+          "stop": 0.2334,
+          "creep": 0.0694,
+          "cruise": 0.6972
+        },
+        "confidence": 0.2934,
+        "answer_confidence": 0.6972,
+        "action": {
+          "act_probability": 1
+        }
+      },
+      "gear": {
+        "type": "choice",
+        "choice": "reverse",
+        "probabilities": {
+          "forward": 0.0529,
+          "reverse": 0.9471
+        },
+        "confidence": 0.7013,
+        "answer_confidence": 0.9471,
+        "action": {
+          "act_probability": 1
+        }
+      }
+    },
+    "latencyMs": 49.17399999999998
+  }
+]
