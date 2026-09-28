@@ -1,6 +1,7 @@
 import { OrbitControls } from '@react-three/drei/webgpu'
 import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { Component, type ReactNode, Suspense, useEffect } from 'react'
+import { Component, type ReactNode, Suspense, useEffect, useRef } from 'react'
+import type { OrbitControls as OrbitControlsImpl } from 'three/addons/controls/OrbitControls.js'
 import { Vector3, WebGPURenderer } from 'three/webgpu'
 import type { WarehouseController } from '../sim/controller'
 import type { WarehouseState } from '../sim/world'
@@ -15,6 +16,8 @@ declare global {
 			frameMs: number[]
 			calls: number
 			triangles: number
+			geometries: number
+			textures: number
 			backend: string
 		}
 	}
@@ -30,6 +33,8 @@ function BackendReporter({ onStatus }: { onStatus: (status: RendererStatus) => v
 			frameMs: [],
 			calls: 0,
 			triangles: 0,
+			geometries: 0,
+			textures: 0,
 			backend: active ? 'webgpu' : 'unsupported',
 		}
 		const previous = scene.onAfterRender
@@ -37,6 +42,8 @@ function BackendReporter({ onStatus }: { onStatus: (status: RendererStatus) => v
 			previous.apply(scene, args)
 			const metrics = window.__warehouseRenderMetrics
 			if (!metrics) return
+			metrics.geometries = renderer.info.memory.geometries
+			metrics.textures = renderer.info.memory.textures
 			metrics.calls = renderer.info.render.drawCalls
 			metrics.triangles = renderer.info.render.triangles
 		}
@@ -62,19 +69,40 @@ const CAMERA = {
 
 function CameraTracker({ state, mode }: { state: WarehouseState; mode: CameraMode }) {
 	const camera = useThree((scene) => scene.camera)
-	const target = new Vector3()
+	const controls = useThree((scene) => scene.controls) as OrbitControlsImpl | null
+	const size = useThree((scene) => scene.size)
+	const target = useRef(new Vector3())
+	const pose = useRef(state.forklift)
+	pose.current = state.forklift
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reset the camera when a new scenario generation starts
 	useEffect(() => {
-		if (mode !== 'follow') {
+		if (mode === 'follow') {
+			target.current.set(pose.current.x, 0.7, -pose.current.y)
+			camera.position.set(target.current.x + 4.2, 4.8, target.current.z + 5.1)
+			camera.lookAt(target.current)
+		} else {
+			target.current.fromArray(CAMERA[mode].target)
 			camera.position.fromArray(CAMERA[mode].position)
-			camera.lookAt(new Vector3().fromArray(CAMERA[mode].target))
+			if (mode === 'overview')
+				camera.position
+					.sub(target.current)
+					.multiplyScalar(Math.max(1, Math.sqrt(1.2 / (size.width / size.height))))
+					.add(target.current)
+			controls?.target.copy(target.current)
+			controls?.update()
+			camera.lookAt(target.current)
 		}
-	}, [camera, mode])
+		// A new generation resets the camera pose; moving vehicles are tracked below.
+	}, [camera, controls, mode, state.generation, size.width, size.height])
 	useFrame((_, delta) => {
 		if (mode !== 'follow') return
-		target.set(state.forklift.x, 0.7, -state.forklift.y)
-		const desired = new Vector3(target.x + 4.2, 4.8, target.z + 5.1)
+		target.current.lerp(
+			new Vector3(state.forklift.x, 0.7, -state.forklift.y),
+			1 - Math.exp(-4 * delta),
+		)
+		const desired = new Vector3(target.current.x + 4.2, 4.8, target.current.z + 5.1)
 		camera.position.lerp(desired, 1 - Math.exp(-4 * delta))
-		camera.lookAt(target)
+		camera.lookAt(target.current)
 	})
 	return null
 }
@@ -105,12 +133,14 @@ function WarehouseWorld({
 	route,
 	showRoute,
 	onAssetsReady,
+	reducedMotion,
 }: {
 	state: WarehouseState
 	cameraMode: CameraMode
 	route: ReturnType<WarehouseController['getRoute']>
 	showRoute: boolean
 	onAssetsReady: (ready: boolean) => void
+	reducedMotion: boolean
 }) {
 	return (
 		<>
@@ -131,19 +161,17 @@ function WarehouseWorld({
 			/>
 			<directionalLight position={[8, 8, -10]} intensity={1.2} color="#a9d9ec" />
 			<Suspense fallback={null}>
-				<AuthoredAssets state={state} onReady={onAssetsReady} />
+				<AuthoredAssets state={state} onReady={onAssetsReady} reducedMotion={reducedMotion} />
 			</Suspense>
 			{showRoute && route.goal && <RouteCue state={state} goal={route.goal} />}
-			{cameraMode !== 'follow' && (
-				<OrbitControls
-					key={cameraMode}
-					makeDefault
-					target={[...CAMERA[cameraMode].target]}
-					minDistance={3}
-					maxDistance={38}
-					maxPolarAngle={Math.PI / 2.08}
-				/>
-			)}
+			<OrbitControls
+				makeDefault
+				enabled={cameraMode !== 'follow'}
+				enableDamping={!reducedMotion}
+				minDistance={3}
+				maxDistance={48}
+				maxPolarAngle={Math.PI / 2.08}
+			/>
 			<CameraTracker state={state} mode={cameraMode} />
 		</>
 	)
@@ -172,6 +200,7 @@ export function Scene({
 	showRoute,
 	onRendererStatus,
 	onAssetsReady,
+	reducedMotion,
 }: {
 	state: WarehouseState
 	cameraMode: CameraMode
@@ -179,6 +208,7 @@ export function Scene({
 	showRoute: boolean
 	onRendererStatus: (status: RendererStatus) => void
 	onAssetsReady: (ready: boolean) => void
+	reducedMotion: boolean
 }) {
 	return (
 		<SceneErrorBoundary onError={() => onRendererStatus('error')}>
@@ -198,6 +228,7 @@ export function Scene({
 					route={route}
 					showRoute={showRoute}
 					onAssetsReady={onAssetsReady}
+					reducedMotion={reducedMotion}
 				/>
 				<BackendReporter onStatus={onRendererStatus} />
 			</Canvas>

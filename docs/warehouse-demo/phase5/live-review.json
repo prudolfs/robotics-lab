@@ -1,0 +1,11 @@
+{
+  "browser": "153.0.8010.54",
+  "backend": "WEBGPU ACTIVE",
+  "manualPauseTime": "00:03.9",
+  "originalTime": "00:04.6",
+  "replayTime": "00:04.6",
+  "originalRequests": 17,
+  "requestsAfterPlayback": 17,
+  "summary": "Run summary\nStalled\nDelivered\n0 / 4\nSimulated time\n0:04.6\nContacts / invalid\n0 / 0\nPauses\n2\n\nLaya paused after 3 failed requests: Failed to fetch\n\nCompare with Predictable\n\nSame seed 42; starts a fresh run. The previous result stays below.\n\nReplay recorded Laya run\n\nSeed 42 · 0:04.6 · 13 decisions. Recording stays in this tab until replaced or reloaded.",
+  "errors": []
+}

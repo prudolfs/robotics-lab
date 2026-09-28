@@ -2,7 +2,7 @@
 
 > Implementation plan for a browser-first autonomous forklift that unloads a delivery truck into a compact warehouse. The visitor can run the same randomized shipment with a predictable controller or Full Laya control.
 >
-> Status: Phases 0–4 complete. Phase 4 awaits user review; Phases 5–6 remain planned. See the [Phase 4 review](warehouse-demo/phase4/README.md) before continuing.
+> Status: Phases 0–5 complete. Phase 5 awaits user review; Phase 6 remains planned. See the [Phase 5 review](warehouse-demo/phase5/README.md) before continuing.
 
 ## Goal and experience
 
@@ -117,14 +117,14 @@ Exit verified: the [Phase 4 review](warehouse-demo/phase4/README.md) records 6/6
 
 ### Phase 5 — Scenario controls, comparison and polish
 
-- [ ] Finalize seed display, randomize, restart-same-seed and mode selection. Changing mode restarts the run so both controllers begin from identical conditions.
-- [ ] Add a compact run summary: delivered pallets, elapsed simulated time, collisions/invalid actions, pauses and outcome.
-- [ ] Support comparison by rerunning the same seed in the other mode; keep side-by-side visualization optional rather than doubling the scene workload.
-- [ ] Record decisions and timestamps for an exact Full Laya playback path, clearly distinguishing playback from a fresh model run.
-- [ ] Refine camera handoff, focus states, responsive layout, reduced motion and readable non-color status cues.
-- [ ] Check repeated starts, resets, randomizations, mode switches and local-service disconnects for stale responses or leaked render resources.
+- [x] Finalize seed display, randomize, restart-same-seed and mode selection. Changing mode restarts the run so both controllers begin from identical conditions.
+- [x] Add a compact run summary: delivered pallets, elapsed simulated time, collisions/invalid actions, pauses and outcome.
+- [x] Support comparison by rerunning the same seed in the other mode; keep side-by-side visualization optional rather than doubling the scene workload.
+- [x] Record decisions and timestamps for an exact Full Laya playback path, clearly distinguishing playback from a fresh model run.
+- [x] Refine camera handoff, focus states, responsive layout, reduced motion and readable non-color status cues.
+- [x] Check repeated starts, resets, randomizations, mode switches and local-service disconnects for stale responses or leaked render resources.
 
-Exit: visitors can understand what happened, replay a shipment and compare the two autonomous modes fairly.
+Exit verified: the [Phase 5 review](warehouse-demo/phase5/README.md) records run summaries, same-seed comparison, exact recorded simulation playback, live disconnect evidence, responsive and reduced-motion checks, and bounded render resources. Stop for user review before Phase 6.
 
 ### Phase 6 — Verification and release
 

@@ -22,7 +22,8 @@ export function useWarehouse(playbackSpeed = 1) {
 			const delta = Math.min(0.25, Math.max(0, (now - last) / 1000))
 			last = now
 			if (controller.getSnapshot().status === 'running') {
-				accumulator += delta * (controller.getMode() === 'laya' ? 1 : playbackSpeed)
+				accumulator +=
+					delta * (controller.getMode() === 'laya' && !controller.getPlayback() ? 1 : playbackSpeed)
 				while (accumulator >= FIXED_DT) {
 					controller.step()
 					accumulator -= FIXED_DT

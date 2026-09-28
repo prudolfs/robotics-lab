@@ -33,6 +33,8 @@ export type DecisionRecord = {
 	id: number
 	generation: number
 	time: number
+	responseTime: number
+	responseTick: number
 	stage: string
 	observation: string
 	choices: Record<string, string>
@@ -137,6 +139,8 @@ export function createLayaController(
 					id,
 					generation,
 					time: state.elapsed,
+					responseTime: latest.elapsed,
+					responseTick: latest.tick,
 					stage: requestStage,
 					observation: payload.state,
 					choices,

@@ -630,3 +630,174 @@ select:focus-visible {
 	font-size: 12px;
 	line-height: 1.6;
 }
+
+summary:focus-visible,
+a:focus-visible {
+	outline: 2px solid #85dbc5;
+	outline-offset: 3px;
+}
+.run-review button {
+	width: 100%;
+	padding: 10px;
+	margin-top: 9px;
+	border: 1px solid #42655e;
+	border-radius: 5px;
+	background: #203b35;
+	color: #d6f1e8;
+	font-size: 11px;
+}
+.run-review button:hover:not(:disabled) {
+	background: #305148;
+}
+.summary-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 14px 10px;
+	margin: 0 0 12px;
+}
+.summary-grid dt {
+	color: #9db0b7;
+	font-size: 10px;
+}
+.summary-grid dd {
+	margin: 4px 0 0;
+	font-size: 14px;
+	font-variant-numeric: tabular-nums;
+}
+.run-review .section-title strong {
+	font-size: 10px;
+	text-transform: capitalize;
+}
+.comparison-result {
+	padding: 10px;
+	margin-top: 10px;
+	border: 1px solid #3d525b;
+	border-radius: 5px;
+	font-size: 11px;
+}
+.comparison-result p {
+	color: #a9bfc4;
+	line-height: 1.7;
+	margin-bottom: 0;
+}
+.playback-notice {
+	border-left: 3px solid #e3bc78;
+	padding-left: 10px;
+	color: #eed4a6;
+	font-size: 12px;
+	line-height: 1.6;
+}
+.bay-tile strong {
+	text-align: center;
+	overflow-wrap: anywhere;
+}
+@media (min-width: 801px) and (max-width: 1200px) {
+	.scene-heading {
+		top: 14px;
+		left: 14px;
+	}
+	.scene-heading p {
+		display: none;
+	}
+	.view-controls {
+		top: auto;
+		bottom: 65px;
+		right: 14px;
+	}
+}
+@media (max-width: 800px) {
+	.app-shell {
+		display: flex;
+		flex-direction: column;
+		min-height: 100dvh;
+	}
+	.app-header {
+		min-height: 62px;
+		gap: 10px;
+	}
+	.workspace {
+		display: contents;
+	}
+	.viewport {
+		order: 1;
+		flex: none;
+		height: 52dvh;
+		min-height: 370px;
+	}
+	.transport {
+		order: 2;
+		position: sticky;
+		top: 0;
+		z-index: 6;
+		min-height: 0;
+		gap: 10px;
+	}
+	.transport-status {
+		display: flex;
+		min-width: 0;
+	}
+	.transport-status span {
+		display: none;
+	}
+	.transport-timer {
+		margin-left: auto;
+	}
+	.inspector {
+		order: 3;
+		overflow: visible;
+	}
+	.scene-heading {
+		top: 12px;
+		left: 12px;
+	}
+	.scene-heading p {
+		display: none;
+	}
+	.view-controls {
+		top: auto;
+		bottom: 15px;
+		left: 10px;
+		right: 10px;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+	.view-controls button {
+		min-height: 40px;
+		padding: 8px;
+	}
+	.viewport-note,
+	.viewport-caption {
+		display: none;
+	}
+	.transport-buttons {
+		flex-wrap: wrap;
+		width: 100%;
+	}
+	.transport-buttons button {
+		flex: 1;
+		min-height: 44px;
+		padding: 10px 8px;
+	}
+	.transport-timer span {
+		display: none;
+	}
+}
+@media (max-width: 380px) {
+	.brand-mark {
+		display: none;
+	}
+	.environment-badge {
+		font-size: 7px;
+		padding: 8px 6px;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.progress-track div,
+	*,
+	*::before,
+	*::after {
+		scroll-behavior: auto;
+		transition: none;
+		animation: none;
+	}
+}

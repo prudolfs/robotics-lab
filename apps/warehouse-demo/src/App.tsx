@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { RunReview } from './components/run-review'
 import { type CameraMode, Scene } from './components/scene'
+import { useReducedMotion } from './components/use-reduced-motion'
 import type { LayaStage } from './sim/laya-observation'
 import type { PredictableStage } from './sim/predictable'
 import { BAYS, TRUCK_SLOTS } from './sim/scenario'
@@ -49,7 +51,9 @@ function decisionLabel(choices: Record<string, string>): string {
 export default function App() {
 	const [speed, setSpeed] = useState(1)
 	const { controller, state } = useWarehouse(speed)
+	const reducedMotion = useReducedMotion()
 	const [camera, setCamera] = useState<CameraMode>('overview')
+	const effectiveCamera = reducedMotion && camera === 'follow' ? 'overview' : camera
 	const [assetsReady, setAssetsReady] = useState(false)
 	const [showRoute, setShowRoute] = useState(true)
 	const [rendererStatus, setRendererStatus] = useState<RendererStatus>('loading')
@@ -60,6 +64,8 @@ export default function App() {
 	}, [])
 	const route = controller.getRoute()
 	const mode = controller.getMode()
+	const playback = controller.getPlayback()
+	const liveLaya = mode === 'laya' && !playback
 	const laya = controller.getLaya()
 	const responseAge =
 		laya.lastResponseAt === null ? null : Math.max(0, (wallTime - laya.lastResponseAt) / 1000)
@@ -68,17 +74,25 @@ export default function App() {
 	const currentCargo = state.pallets.find((item) => item.id === route.palletId)
 	const destination = BAYS.find((item) => item.id === route.bayId)
 	const remaining = state.pallets.filter((pallet) => pallet.location.kind === 'truck').length
-	const statusLabel = complete
-		? 'Delivery complete'
-		: route.stage === 'stalled'
-			? 'Controller paused'
-			: state.contact
-				? 'Contact detected'
-				: running
-					? 'Forklift active'
-					: state.status === 'paused'
-						? 'Paused'
-						: 'Ready to unload'
+	const statusLabel = playback
+		? playback.finished
+			? 'Playback finished'
+			: running
+				? 'Playing recording'
+				: state.status === 'paused'
+					? 'Playback paused'
+					: 'Recording ready'
+		: complete
+			? 'Delivery complete'
+			: route.stage === 'stalled'
+				? 'Controller paused'
+				: state.contact
+					? 'Contact detected'
+					: running
+						? 'Forklift active'
+						: state.status === 'paused'
+							? 'Paused'
+							: 'Ready to unload'
 
 	return (
 		<div className="app-shell">
@@ -113,7 +127,8 @@ export default function App() {
 				<section className="viewport" aria-label="Warehouse simulation">
 					<Scene
 						state={state}
-						cameraMode={camera}
+						cameraMode={effectiveCamera}
+						reducedMotion={reducedMotion}
 						route={route}
 						showRoute={showRoute}
 						onAssetsReady={setAssetsReady}
@@ -147,28 +162,34 @@ export default function App() {
 					<fieldset className="view-controls" aria-label="Camera controls">
 						<button
 							type="button"
-							aria-pressed={camera === 'overview'}
+							aria-pressed={effectiveCamera === 'overview'}
 							onClick={() => setCamera('overview')}
 						>
 							◎ Overview
 						</button>
 						<button
 							type="button"
-							aria-pressed={camera === 'follow'}
+							aria-pressed={effectiveCamera === 'follow'}
+							disabled={reducedMotion}
+							title={
+								reducedMotion
+									? 'Follow camera is disabled by your reduced-motion preference'
+									: 'Follow forklift'
+							}
 							onClick={() => setCamera('follow')}
 						>
 							▣ Follow forklift
 						</button>
 						<button
 							type="button"
-							aria-pressed={camera === 'dock'}
+							aria-pressed={effectiveCamera === 'dock'}
 							onClick={() => setCamera('dock')}
 						>
 							Dock
 						</button>
 						<button
 							type="button"
-							aria-pressed={camera === 'rack'}
+							aria-pressed={effectiveCamera === 'rack'}
 							onClick={() => setCamera('rack')}
 						>
 							Rack
@@ -190,7 +211,7 @@ export default function App() {
 						</span>
 					</div>
 					<div className="viewport-caption">
-						AUTONOMOUS DELIVERY <span>·</span> DOCK 01
+						{playback ? 'RECORDED PLAYBACK · NO MODEL REQUESTS' : 'AUTONOMOUS DELIVERY · DOCK 01'}
 					</div>
 				</section>
 
@@ -238,8 +259,8 @@ export default function App() {
 							<span>Playback speed</span>
 							<select
 								id="speed"
-								value={mode === 'laya' ? 1 : speed}
-								disabled={mode === 'laya'}
+								value={liveLaya ? 1 : speed}
+								disabled={liveLaya}
 								onChange={(event) => setSpeed(Number(event.target.value))}
 							>
 								<option value={1}>1×</option>
@@ -249,11 +270,15 @@ export default function App() {
 						</label>
 					</section>
 
+					<RunReview controller={controller} />
+
 					{mode === 'laya' && (
 						<section className="inspector-section laya-section" aria-label="Laya decisions">
 							<div className="section-title">
-								<span>Full Laya</span>
-								<small data-testid="laya-connection">{laya.connection}</small>
+								<span>{playback ? 'Recorded Laya decisions' : 'Full Laya'}</span>
+								<small data-testid="laya-connection">
+									{playback ? 'playback' : laya.connection}
+								</small>
 							</div>
 							<p className="section-help" data-testid="laya-decision">
 								{laya.last
@@ -261,13 +286,19 @@ export default function App() {
 									: 'Waiting to start autonomous decisions.'}
 							</p>
 							<div className="property-row">
-								<span>Response age</span>
-								<strong>{responseAge === null ? '—' : `${responseAge.toFixed(1)} s`}</strong>
+								<span>{playback ? 'Recorded response time' : 'Response age'}</span>
+								<strong>
+									{playback
+										? `${(laya.last?.responseTime ?? 0).toFixed(1)} s`
+										: responseAge === null
+											? '—'
+											: `${responseAge.toFixed(1)} s`}
+								</strong>
 							</div>
 							<div className="property-row">
 								<span>Requests / rejected</span>
 								<strong>
-									{laya.requests} / {laya.rejections.length}
+									{laya.requests} / {state.contactCount + state.invalidActions}
 								</strong>
 							</div>
 							{laya.last && (
@@ -367,7 +398,7 @@ export default function App() {
 								return (
 									<div key={bay.id} className={`bay-tile ${occupant ? 'occupied' : 'empty'}`}>
 										<span>{bay.id}</span>
-										<strong>{occupant?.id ?? 'EMPTY'}</strong>
+										<strong>{occupant ? `Occupied: ${occupant.id}` : 'EMPTY'}</strong>
 									</div>
 								)
 							})}
@@ -404,35 +435,50 @@ export default function App() {
 							!assetsReady ||
 							running ||
 							complete ||
-							route.stage === 'stalled'
+							(!playback && route.stage === 'stalled') ||
+							playback?.finished === true
 						}
 						onClick={() => controller.start()}
 					>
-						{complete
-							? '✓ Delivery complete'
-							: state.status === 'paused'
-								? '▶ Resume'
-								: '▶ Start delivery'}
+						{playback?.finished
+							? '✓ Playback finished'
+							: complete
+								? '✓ Delivery complete'
+								: playback
+									? state.status === 'paused'
+										? '▶ Resume playback'
+										: '▶ Start playback'
+									: state.status === 'paused'
+										? '▶ Resume'
+										: '▶ Start delivery'}
 					</button>
 					<button type="button" disabled={!running} onClick={() => controller.pause()}>
 						Ⅱ Pause
 					</button>
-					<button type="button" onClick={() => controller.reset()} aria-label="Restart same seed">
-						↺ Restart
+					<button
+						type="button"
+						onClick={() => controller.reset()}
+						aria-label={playback ? 'Start a fresh Laya run with this seed' : 'Restart same seed'}
+					>
+						{playback ? '↺ Fresh run' : '↺ Restart'}
 					</button>
 					<button type="button" onClick={() => controller.randomize()}>
 						⚄ Randomize
 					</button>
 				</div>
 				<div className="transport-status">
-					<strong data-testid="run-status">{statusLabel}</strong>
+					<strong data-testid="run-status" role="status" aria-live="polite">
+						{statusLabel}
+					</strong>
 					<span>
 						Seed {state.seed} ·{' '}
-						{complete
-							? 'All cargo stored'
-							: currentCargo?.location.kind === 'bay'
-								? 'Cargo stored'
-								: 'Delivery in progress'}
+						{playback
+							? 'Recorded playback · no model requests'
+							: complete
+								? 'All cargo stored'
+								: currentCargo?.location.kind === 'bay'
+									? 'Cargo stored'
+									: 'Delivery in progress'}
 					</span>
 				</div>
 				<div className="transport-timer">

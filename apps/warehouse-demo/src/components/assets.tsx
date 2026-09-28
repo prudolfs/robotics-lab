@@ -17,7 +17,17 @@ function prepare(model: Group): Group {
 	return copy
 }
 
-function Cargo({ model, pallet, state }: { model: Group; pallet: Pallet; state: WarehouseState }) {
+function Cargo({
+	model,
+	pallet,
+	state,
+	reducedMotion,
+}: {
+	model: Group
+	pallet: Pallet
+	state: WarehouseState
+	reducedMotion: boolean
+}) {
 	const clone = useMemo(() => prepare(model), [model])
 	const root = useRef<Group>(null)
 	const transition = useRef({ location: '', generation: -1, offset: new Vector3() })
@@ -52,7 +62,7 @@ function Cargo({ model, pallet, state }: { model: Group; pallet: Pallet; state: 
 			previous.offset.copy(root.current.position).sub(target)
 		}
 		previous.location = location
-		previous.offset.multiplyScalar(Math.exp(-22 * delta))
+		previous.offset.multiplyScalar(reducedMotion ? 0 : Math.exp(-22 * delta))
 		root.current.position.copy(target).add(previous.offset)
 		root.current.rotation.y =
 			pallet.location.kind === 'carried'
@@ -62,7 +72,7 @@ function Cargo({ model, pallet, state }: { model: Group; pallet: Pallet; state: 
 					: 0
 	})
 	return (
-		<group ref={root} dispose={null}>
+		<group ref={root}>
 			<primitive object={clone} />
 			<mesh position={[0.12, 0.66, 0.515]}>
 				<planeGeometry args={[0.25, 0.125]} />
@@ -75,11 +85,13 @@ function Cargo({ model, pallet, state }: { model: Group; pallet: Pallet; state: 
 export function AuthoredAssets({
 	state,
 	onReady,
+	reducedMotion,
 }: {
 	state: WarehouseState
 	onReady: (ready: boolean) => void
+	reducedMotion: boolean
 }) {
-	const models = useGLTF(Object.values(manifest.assets), false)
+	const models = useGLTF(Object.values(manifest.assets), { draco: false })
 	const environment = useMemo(() => prepare(models[0].scene), [models])
 	const forklift = useMemo(() => prepare(models[1].scene), [models])
 	const root = useRef<Group>(null)
@@ -128,6 +140,7 @@ export function AuthoredAssets({
 					model={models[Number(pallet.id.slice(1)) % 2 ? 2 : 3].scene}
 					pallet={pallet}
 					state={state}
+					reducedMotion={reducedMotion}
 				/>
 			))}
 		</>
