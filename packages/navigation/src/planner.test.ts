@@ -113,3 +113,15 @@ test('planPath exposes the open / closed cell sets in world coordinates', () => 
 	}
 	expect(res.iterations).toBeGreaterThan(0)
 })
+test('same-cell goals still validate blocked endpoints', () => {
+	const grid = makeGrid(5, 5)
+	const point = cellCenterWorld(grid, 2, 2)
+	occupyWorld(grid, point.x, point.y)
+	expect(planPath(grid, point, point).status).toBe('invalid_start')
+})
+
+test('out-of-bounds endpoints are rejected instead of clamped into a route', () => {
+	const grid = makeGrid(5, 5)
+	expect(planPath(grid, { x: -10, y: 0 }, { x: 1, y: 1 }).status).toBe('invalid_start')
+	expect(planPath(grid, { x: 1, y: 1 }, { x: 20, y: 20 }).status).toBe('invalid_goal')
+})

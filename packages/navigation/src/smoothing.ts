@@ -33,7 +33,6 @@ import {
 	cellCenterWorld,
 	classify,
 	type OccupancyGrid,
-	traceSegment,
 } from '@robotics-lab/occupancy-grid'
 
 /**
@@ -74,7 +73,6 @@ export function shortcutPath(
 	if (path.length <= 2) return path.slice()
 	const inflationRadius = options.inflationRadius ?? 1
 	const allowUnknown = options.allowUnknown ?? true
-	if (path.length <= 2) return path.slice()
 	// Pre-build the blocked mask once so the line-of-sight tests share it with
 	// the inflation semantics the planner used (keeps smoothing / planning in
 	// agreement about what is impassable).
@@ -151,10 +149,36 @@ function segmentIsClear(grid: OccupancyGrid, blocked: Uint8Array, a: Cell2, b: C
 	const ay = grid.origin.y + (a.row + 0.5) * grid.resolution
 	const bx = grid.origin.x + (b.col + 0.5) * grid.resolution
 	const by = grid.origin.y + (b.row + 0.5) * grid.resolution
-	const visits = traceSegment(grid, ax, ay, bx, by)
-	for (const v of visits) {
-		if (v.index < 0) return false // leaving the grid is not "clear"
-		if (blocked[v.index]) return false
+	let col = a.col
+	let row = a.row
+	const dx = bx - ax
+	const dy = by - ay
+	const sx = Math.sign(dx)
+	const sy = Math.sign(dy)
+	const deltaX = dx === 0 ? Infinity : grid.resolution / Math.abs(dx)
+	const deltaY = dy === 0 ? Infinity : grid.resolution / Math.abs(dy)
+	let tx = deltaX / 2
+	let ty = deltaY / 2
+	const clear = (c: number, r: number) =>
+		c >= 0 && r >= 0 && c < grid.width && r < grid.height && !blocked[r * grid.width + c]
+	if (!clear(col, row)) return false
+	while (col !== b.col || row !== b.row) {
+		if (Math.abs(tx - ty) < 1e-10) {
+			// A corner touch crosses both neighbouring cells, just like an A*
+			// diagonal move. Bresenham used to skip these and cut blocked corners.
+			if (!clear(col + sx, row) || !clear(col, row + sy)) return false
+			col += sx
+			row += sy
+			tx += deltaX
+			ty += deltaY
+		} else if (tx < ty) {
+			col += sx
+			tx += deltaX
+		} else {
+			row += sy
+			ty += deltaY
+		}
+		if (!clear(col, row)) return false
 	}
 	return true
 }

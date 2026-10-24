@@ -59,7 +59,7 @@ export default function App() {
 			<TopBar />
 			<main className="grid min-h-0 grid-cols-[minmax(0,1fr)_318px] max-[620px]:grid-cols-1 max-[860px]:grid-cols-[minmax(0,1fr)_270px] max-[620px]:grid-rows-[minmax(260px,55%)_minmax(0,45%)]">
 				<div
-					className="relative min-h-0 min-w-0 overflow-hidden bg-[linear-gradient(180deg,#b9d0d2_0%,#e0e2d8_45%,#9da793_100%)] dark:bg-[linear-gradient(180deg,#9eb1aa_0%,#c8d0c5_44%,#727e70_100%)] [&_canvas]:block [&_canvas]:touch-none"
+					className="relative min-h-0 min-w-0 overflow-hidden bg-[#18232b] [&_canvas]:block [&_canvas]:touch-none"
 					data-testid="mission-viewport"
 				>
 					{webgpuSupported ? (
@@ -136,7 +136,7 @@ export default function App() {
 function WebGPUFallback() {
 	return (
 		<div
-			className="absolute inset-0 z-[3] grid place-content-center justify-items-center bg-[linear-gradient(180deg,#53665f,#24342d)] p-[30px] text-center text-[#eef5f0]"
+			className="absolute inset-0 z-[3] grid place-content-center justify-items-center bg-[linear-gradient(180deg,#334d5b,#14232c)] p-[30px] text-center text-[#eef5f0]"
 			role="alert"
 		>
 			<span className="mb-4 grid size-12 place-items-center rounded-xl border border-white/20 bg-white/10 text-primary">

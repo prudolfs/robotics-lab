@@ -19,7 +19,7 @@ export function MissionExecutionHud({
 
 	return (
 		<section
-			className="absolute bottom-[18px] left-1/2 z-[5] w-[min(480px,calc(100%-370px))] -translate-x-1/2 rounded-xl border border-white/15 bg-[#08100d]/80 p-3 text-white shadow-xl backdrop-blur-md max-[620px]:bottom-3 max-[860px]:bottom-[62px] max-[860px]:w-[min(440px,calc(100%-36px))]"
+			className="absolute bottom-[18px] left-1/2 z-[5] w-[min(480px,calc(100%-370px))] -translate-x-1/2 rounded-lg border border-[#35444c] bg-[#142029]/95 p-3 text-white shadow-lg backdrop-blur-md max-[620px]:bottom-3 max-[860px]:bottom-[62px] max-[860px]:w-[min(440px,calc(100%-36px))]"
 			aria-label="Mission execution"
 		>
 			<div className="flex items-start justify-between gap-3">
@@ -28,7 +28,7 @@ export function MissionExecutionHud({
 						Mission execution
 					</small>
 					<strong
-						className="mt-1 block truncate text-emerald-300 text-xs capitalize"
+						className="mt-1 block truncate text-primary text-xs capitalize"
 						aria-live="polite"
 					>
 						{execution.paused ? `${execution.phase} · paused` : execution.phase.replace('-', ' ')}
@@ -63,7 +63,7 @@ export function MissionExecutionHud({
 								invalid
 									? 'bg-red-400'
 									: state === 'complete'
-										? 'bg-emerald-300'
+										? 'bg-primary'
 										: state === 'current'
 											? 'bg-amber-300 shadow-[0_0_6px_currentColor]'
 											: 'bg-white/15'
@@ -121,7 +121,7 @@ export function MissionExecutionHud({
 				<Button
 					size="sm"
 					variant="outline"
-					className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+					className="border-[#35444c] bg-white/5 text-white hover:bg-white/10 hover:text-white"
 					disabled={!execution.running}
 					onClick={controls.rtlMission}
 				>
@@ -130,7 +130,7 @@ export function MissionExecutionHud({
 				<Button
 					size="sm"
 					variant="outline"
-					className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+					className="border-[#35444c] bg-white/5 text-white hover:bg-white/10 hover:text-white"
 					disabled={!execution.running}
 					onClick={controls.landMission}
 				>

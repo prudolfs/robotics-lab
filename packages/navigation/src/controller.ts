@@ -11,22 +11,8 @@
 // that gets a differential-drive robot to a 2D target while staying within the
 // robot's speed envelope.
 //
-// The controller stacks two proportional laws onto the same drive envelope:
-//
-//   1. a *heading* controller that turns the robot to face the goal;
-//   2. a *distance* controller that throttles the forward speed down to zero
-//      when the robot is misaligned, and ramps it back up as it lines up; and
-//   3. a *braking* term that scales the linear speed by the fraction of the
-//      goal distance remaining, so the robot coasts to a stop rather than
-//      overshooting and oscillating.
-//
-// `v` is the forward speed and `bias` the turn bias; the per-wheel speeds are
-// `left = v - bias`, `right = v + bias` (the same algebra as the teleop
-// mapping in `@/sim/teleop`), but the bias here is the closed-loop heading
-// error instead of a key press. Each wheel is clamped to the speed envelope
-// independently so neither wheel can exceed `maxSpeed` — turn priority over
-// forward motion emerges from the `cos(headingError)` alignment factor that
-// throttles `v` towards zero when the robot is pointing the wrong way.
+// Misaligned robots rotate in place. Once aligned, forward speed tapers near
+// the target and both wheels are scaled together to respect the speed limit.
 
 import type { Pose } from '@robotics-lab/core'
 import { angularDelta } from '@robotics-lab/core'
@@ -44,8 +30,7 @@ export type NavConfig = {
 	/** Proportional gain on the distance to goal (metres -> m/s of forward speed). */
 	distanceGain: number
 	/** Heading error (radians) within which the robot is considered "aligned"
-	 *  and allowed to drive forward full-tilt. Misalign bigger than this and the
-	 *  forward speed is throttled down by `cos(error)`. */
+	 *  and allowed to drive forward. Larger errors rotate in place. */
 	alignTolerance: number
 	/** Distance (metres) within which the robot is considered to have arrived. */
 	arrivalRadius: number
@@ -68,7 +53,7 @@ export const DEFAULT_NAV_CONFIG: NavConfig = {
 }
 
 /** Finite state the controller reports each step. */
-export type NavStatus = 'idle' | 'rotating' | 'driving' | 'arrived'
+export type NavStatus = 'idle' | 'rotating' | 'driving' | 'arrived' | 'blocked'
 
 /** Result of a single control step. */
 export type NavOutput = {
@@ -117,6 +102,7 @@ export function hasArrived(pose: Pose, goal: Goal, config: NavConfig): boolean {
  */
 export function controlToGoal(pose: Pose, goal: Goal | null, config: NavConfig): NavOutput {
 	if (goal === null) return idleOutput(pose, pose)
+	if (!Number.isFinite(config.maxSpeed) || config.maxSpeed <= 0) return idleOutput(pose, goal)
 	const distance = distanceToGoal(pose, goal)
 	if (distance <= config.arrivalRadius) return arrivedOutput(pose, goal)
 
@@ -126,7 +112,6 @@ export function controlToGoal(pose: Pose, goal: Goal | null, config: NavConfig):
 	// Forward speed is proportional to distance, coupled to alignment: far
 	// off-target and we turn in place before committing to forward motion.
 	const aligned = Math.abs(headingError) <= config.alignTolerance
-	const alignmentFactor = aligned ? 1 : Math.cos(headingError)
 
 	// Brake linearly as we approach: full speed outside `brakeRadius`, tapering
 	// to `minDriveSpeed` just outside the arrival radius so we don't skid past.
@@ -134,28 +119,30 @@ export function controlToGoal(pose: Pose, goal: Goal | null, config: NavConfig):
 	const brakeFactor =
 		brakeWindow <= 0 ? 1 : clamp01((distance - config.arrivalRadius) / brakeWindow)
 
-	const v =
-		config.distanceGain *
-		distance *
-		alignmentFactor *
-		(config.minDriveSpeed + (1 - config.minDriveSpeed) * brakeFactor)
+	// Turning is genuinely in place. cos(error) used to become negative for
+	// goals behind the robot, causing it to reverse into nearby obstacles.
+	const v = aligned
+		? Math.min(
+				config.maxSpeed,
+				Math.max(config.minDriveSpeed, config.distanceGain * distance * brakeFactor),
+			)
+		: 0
 	// Turn bias from the heading error.
 	const bias = config.headingGain * headingError
 
-	// Per-wheel speeds; each clamped to the envelope independently so neither
-	// wheel can exceed `maxSpeed`. When misaligned, `v` is already ~0 from the
-	// alignment factor, so the bias dominates and the robot spins in place.
-	const leftWheel = clamp(v - bias, -config.maxSpeed, config.maxSpeed)
-	const rightWheel = clamp(v + bias, -config.maxSpeed, config.maxSpeed)
+	// Scale both wheels together to preserve the requested curvature.
+	const scale = Math.max(
+		1,
+		Math.abs(v - bias) / config.maxSpeed,
+		Math.abs(v + bias) / config.maxSpeed,
+	)
+	const leftWheel = (v - bias) / scale
+	const rightWheel = (v + bias) / scale
 
 	const status: NavStatus = aligned ? 'driving' : 'rotating'
 	return { input: { leftWheel, rightWheel }, status, headingError, distance }
 }
 
-function clamp(value: number, lo: number, hi: number): number {
-	return value < lo ? lo : value > hi ? hi : value
-}
-
 function clamp01(value: number): number {
-	return clamp(value, 0, 1)
+	return Math.max(0, Math.min(1, value))
 }

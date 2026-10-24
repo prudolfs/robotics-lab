@@ -36,17 +36,19 @@ export type GoalViewProps = {
 	pose: Pose
 	/** Queued goals in travel order (head first). Empty draws nothing. */
 	goals: Goal[]
+	/** Destination markers can be shown without a misleading direct route. */
+	showConnections?: boolean
 }
 
 /**
  * Render the queued navigation goals and the planned trajectory from the robot
  * through the queue. Returns null when there is nothing to draw.
  */
-export function GoalView({ pose, goals }: GoalViewProps) {
+export function GoalView({ pose, goals, showConnections = true }: GoalViewProps) {
 	if (goals.length === 0) return null
 	return (
 		<group>
-			<Trajectory pose={pose} goals={goals} />
+			{showConnections && <Trajectory pose={pose} goals={goals} />}
 			<Markers goals={goals} />
 		</group>
 	)

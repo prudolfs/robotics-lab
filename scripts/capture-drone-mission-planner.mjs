@@ -45,6 +45,15 @@ const server = spawn(
 
 let browser
 try {
+	const deadline = Date.now() + 30000
+	while (true) {
+		try {
+			if ((await fetch(url, { signal: AbortSignal.timeout(1000) })).ok) break
+		} catch {}
+		if (server.exitCode !== null) throw new Error('Drone preview exited before it was ready.')
+		if (Date.now() > deadline) throw new Error('Drone preview did not start within 30 seconds.')
+		await new Promise((resolve) => setTimeout(resolve, 200))
+	}
 	browser = await chromium.launch({
 		channel: process.env.BROWSER_CHANNEL ?? 'chrome',
 		headless: true,

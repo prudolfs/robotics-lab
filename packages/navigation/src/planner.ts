@@ -43,8 +43,7 @@ export type PlanResult = {
 	/** Smoothed world-space waypoints from start (exclusive) to goal
 	 *  (inclusive). The robot is already at the start cell so the first cell
 	 *  is dropped to avoid commanding a zero-distance jump; when the search
-	 *  fails / is trivial this is empty and the caller falls back to whatever
-	 *  it was going to do (drive straight at the goal via the controller). */
+	 *  fails this is empty. Callers should stop and surface the failure. */
 	waypoints: Vec2[]
 	/** Raw cell path the search returned (start..goal, inclusive). */
 	cellPath: Cell2[]
@@ -74,23 +73,8 @@ export function planPath(
 	options: PlannerOptions = {},
 ): PlanResult {
 	const algorithm = options.algorithm ?? 'astar'
-	const startCell = clampToGrid(grid, worldToCell(grid, start))
-	const goalCell = clampToGrid(grid, worldToCell(grid, goal))
-
-	// Trivial path: the start and goal cells are the same, so there is nothing
-	// to plan — just drive at the goal point.
-	if (startCell.col === goalCell.col && startCell.row === goalCell.row) {
-		const goalWorld = cellCenterWorld(grid, goalCell.col, goalCell.row)
-		return {
-			status: 'ok',
-			waypoints: [goalWorld],
-			cellPath: [startCell, goalCell],
-			closed: [],
-			open: [],
-			cost: 0,
-			iterations: 0,
-		}
-	}
+	const startCell = worldToCell(grid, start)
+	const goalCell = worldToCell(grid, goal)
 
 	const result: SearchResult =
 		algorithm === 'dijkstra'
@@ -130,12 +114,4 @@ export function planPath(
 
 function cellsToWorld(grid: OccupancyGrid, cells: Cell2[]): Vec2[] {
 	return cells.map((c) => cellCenterWorld(grid, c.col, c.row))
-}
-
-/** Clamp a cell that may fall fractionally outside the grid back in bounds. */
-function clampToGrid(grid: OccupancyGrid, cell: Cell2): Cell2 {
-	return {
-		col: Math.min(grid.width - 1, Math.max(0, cell.col)),
-		row: Math.min(grid.height - 1, Math.max(0, cell.row)),
-	}
 }

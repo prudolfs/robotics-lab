@@ -1,6 +1,8 @@
 import type { Pose } from '@robotics-lab/core'
 import type { RobotParams } from '@robotics-lab/robot'
+import { Suspense } from 'react'
 import { worldToScene } from './coords'
+import { LabModel } from './lab-model'
 
 const BODY_LENGTH = 0.4
 const BODY_WIDTH = 0.28
@@ -21,7 +23,7 @@ export type RobotViewProps = {
 
 /**
  * Renders a differential-drive robot at a pose:
- * a chassis cuboid, two side wheels, and a forward heading indicator arrow.
+ * a Blender-authored sensor chassis, two wheels, and a forward heading indicator.
  *
  * The robot model is purely visual here — rendering only observes the
  * simulation's robot pose and never owns it.
@@ -37,7 +39,9 @@ export function RobotView({ pose, params }: RobotViewProps) {
 
 	return (
 		<group position={[x, y, z]} rotation={[0, yaw, 0]}>
-			<Body />
+			<Suspense fallback={<Body />}>
+				<LabModel name="rover-chassis" />
+			</Suspense>
 			<HeadingArrow />
 			{/* left wheel (scene -z side) */}
 			<Wheel position={[0, WHEEL_ELEVATION, -halfBase]} />
@@ -72,9 +76,17 @@ function HeadingArrow() {
 
 function Wheel({ position }: { position: [number, number, number] }) {
 	return (
-		<mesh position={position} rotation={[0, 0, Math.PI / 2]} castShadow>
-			<cylinderGeometry args={[WHEEL_RADIUS, WHEEL_RADIUS, WHEEL_WIDTH, 24]} />
-			<meshStandardMaterial color="#111827" roughness={0.7} />
-		</mesh>
+		<group position={position}>
+			<Suspense
+				fallback={
+					<mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+						<cylinderGeometry args={[WHEEL_RADIUS, WHEEL_RADIUS, WHEEL_WIDTH, 24]} />
+						<meshStandardMaterial color="#111827" roughness={0.7} />
+					</mesh>
+				}
+			>
+				<LabModel name="rover-wheel" />
+			</Suspense>
+		</group>
 	)
 }

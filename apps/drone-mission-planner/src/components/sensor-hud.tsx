@@ -40,7 +40,7 @@ export function SensorHud({
 
 	return (
 		<section
-			className="absolute top-[164px] left-[18px] z-[4] w-[310px] rounded-xl border border-white/15 bg-[#08100d]/75 p-3 text-white shadow-xl backdrop-blur-md max-[620px]:hidden max-[860px]:w-[260px]"
+			className="absolute top-[164px] left-[18px] z-[4] w-[310px] rounded-lg border border-[#35444c] bg-[#142029]/95 p-3 text-white shadow-lg backdrop-blur-md max-[620px]:hidden max-[860px]:w-[260px]"
 			aria-label="Sensor HUD"
 		>
 			<div className="flex items-center justify-between">

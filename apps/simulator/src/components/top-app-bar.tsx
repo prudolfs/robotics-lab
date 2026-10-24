@@ -18,7 +18,7 @@
 // assertions keep matching. The theme toggle sits to the right of those, as
 // the last header item.
 
-import { Moon, Pause, Play, RotateCcw, Sun } from 'lucide-react'
+import { Bot, Moon, Pause, Play, RotateCcw, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { SimulationControls } from '@/sim/use-simulation-loop'
@@ -40,11 +40,17 @@ export function TopAppBar({ controls }: TopAppBarProps) {
 	return (
 		<header
 			data-testid="simulator-hud"
-			className="pointer-events-auto fixed inset-x-0 top-0 z-40 flex h-12 items-center justify-between gap-3 border-border border-b bg-card/80 px-3 backdrop-blur-md"
+			className="pointer-events-auto fixed inset-x-0 top-0 z-40 flex h-12 items-center justify-between gap-3 border-border border-b bg-card px-5"
 		>
 			{/* Left: title + hidden robot sentinel. */}
-			<div className="flex items-center gap-2">
-				<h1 className="font-semibold text-foreground text-sm tracking-tight">
+			<div className="flex items-center gap-3">
+				<span
+					className="grid size-8 shrink-0 place-items-center rounded-lg border border-primary/30 bg-primary/10 text-primary"
+					aria-hidden="true"
+				>
+					<Bot className="size-4" />
+				</span>
+				<h1 className="font-medium text-[17px] text-foreground tracking-tight max-[700px]:text-xs">
 					Robotics Lab — Simulator
 				</h1>
 				{robot && (

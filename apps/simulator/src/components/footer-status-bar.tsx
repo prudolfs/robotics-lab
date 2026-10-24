@@ -15,25 +15,43 @@ export function FooterStatusBar() {
 	const running = useSimulatorStore((s) => s.running)
 	const autonomous = useSimulatorStore((s) => s.autonomous)
 
-	const status = !running ? 'PAUSED' : autonomous ? 'AUTO' : 'MANUAL'
+	const navStatus = useSimulatorStore((s) => s.navStatus)
+	const collision = useSimulatorStore((s) => s.collision)
+	const algorithm = useSimulatorStore((s) => s.planner.algorithm)
+	const status = !running
+		? 'PAUSED'
+		: collision
+			? 'CONTACT: STOPPED'
+			: autonomous
+				? navStatus === 'blocked'
+					? 'BLOCKED'
+					: `${algorithm === 'dijkstra' ? 'DIJKSTRA' : 'A*'}: ${navStatus.toUpperCase()}`
+				: 'MANUAL'
 
 	return (
 		<footer
 			data-testid="footer-status-bar"
-			className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex h-8 items-center justify-between border-border border-t bg-card/80 px-3 font-mono text-[11px] text-muted-foreground backdrop-blur-md"
+			className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex h-8 items-center justify-between border-border border-t bg-card px-5 text-[11px] text-muted-foreground backdrop-blur-md"
 		>
 			<div className="flex items-center gap-4">
 				<span data-testid="sim-time">
-					<span className="text-emerald-500">SIM_TIME:</span> {fmtTime(simTime)}
+					<span className="text-primary">SIM_TIME:</span> {fmtTime(simTime)}
 				</span>
 				<span data-testid="fps-counter">FPS: {fps}</span>
 				<span>
-					<span className="text-emerald-500">STATUS:</span> {status}
+					<span className="text-primary">STATUS:</span> {status}
 				</span>
 			</div>
 			<div className="flex items-center gap-4">
-				<span className="text-[10px] uppercase tracking-wider">v2.4.0-dev</span>
-				<span className="font-semibold text-foreground uppercase tracking-wider">{status}</span>
+				<span className="text-[10px] text-primary max-[700px]:hidden">
+					Violet line: planned route
+				</span>
+				<span
+					data-testid="navigation-summary"
+					className="font-semibold text-foreground uppercase tracking-wider"
+				>
+					{status}
+				</span>
 			</div>
 		</footer>
 	)

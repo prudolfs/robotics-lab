@@ -101,3 +101,19 @@ test('computeCoverageProgress marks near cells as visited', () => {
 	expect(count).toBeGreaterThan(0)
 	expect(visited.size).toBeGreaterThan(0)
 })
+test('coverage honors lane spacing and emits endpoints rather than every cell', () => {
+	const grid = makeGrid(8, 8, 0.2)
+	const result = coveragePath(
+		grid,
+		{ x: 0.1, y: 0.1 },
+		{
+			...DEFAULT_COVERAGE_CONFIG,
+			stripWidth: 0.6,
+			returnToStart: false,
+		},
+	)
+	expect(result.strips.map((strip) => strip[0].row)).toEqual([0, 3, 6, 7])
+	expect(result.waypoints).toHaveLength(7)
+	expect(result.strips[1][0].col).toBe(7)
+	expect(result.strips[1][7].col).toBe(0)
+})

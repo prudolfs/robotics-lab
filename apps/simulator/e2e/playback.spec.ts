@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test'
 import { readFileSync } from 'node:fs'
+import { expect, test } from '@playwright/test'
 import { setupConsoleGuard, teardownConsoleGuard } from './console-guard'
 import { activateTab, launchSimulator } from './fixtures'
 
@@ -43,8 +43,7 @@ async function recordAFewFrames(
 	await page.waitForTimeout(holdMs)
 	await page.keyboard.up(key)
 	// Cadence-committed: stop driving as soon as the timeline reflects
-	// ≥1 captured frame, rather than waiting a fixed settle after release. This
-	// is the observable-state signal for "the recorder captured something".
+	// ≥2 captured frames: the scrub test needs a second frame to seek to.
 	await expect
 		.poll(
 			async () => {
@@ -54,7 +53,7 @@ async function recordAFewFrames(
 			},
 			{ timeout: timeoutMs },
 		)
-		.toBeGreaterThan(0)
+		.toBeGreaterThanOrEqual(2)
 }
 
 test.describe('Milestone 13 — Playback', () => {
@@ -141,7 +140,9 @@ test.describe('Milestone 13 — Playback', () => {
 		await expect(scrubber).toHaveValue(lastMax ?? '0')
 	})
 
-	test('scrubbing the timeline seeks and pauses, Exit returns to live control', async ({ page }) => {
+	test('scrubbing the timeline seeks and pauses, Exit returns to live control', async ({
+		page,
+	}) => {
 		await openPlayback(page)
 
 		// Record a short run.

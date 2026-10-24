@@ -1,5 +1,7 @@
 import type { Cylinder } from '@robotics-lab/maps'
+import { Suspense } from 'react'
 import { worldToScene } from './coords'
+import { LabModel } from './lab-model'
 
 const DEFAULT_CYL_ELEVATION = 0.6
 
@@ -13,10 +15,18 @@ export function Cylinders({ cylinders }: { cylinders: Cylinder[] }) {
 				const h = c.elevation ?? DEFAULT_CYL_ELEVATION
 				const [x, y, z] = worldToScene(c.center, h / 2)
 				return (
-					<mesh key={cylKey(c, i)} position={[x, y, z]} castShadow receiveShadow>
-						<cylinderGeometry args={[c.diameter / 2, c.diameter / 2, h, 24]} />
-						<meshStandardMaterial color="#0e7490" roughness={0.5} />
-					</mesh>
+					<group key={cylKey(c, i)} position={[x, y, z]} scale={[c.diameter, h, c.diameter]}>
+						<Suspense
+							fallback={
+								<mesh castShadow receiveShadow>
+									<cylinderGeometry args={[0.5, 0.5, 1, 24]} />
+									<meshStandardMaterial color="#38645f" />
+								</mesh>
+							}
+						>
+							<LabModel name="lab-drum" />
+						</Suspense>
+					</group>
 				)
 			})}
 		</group>

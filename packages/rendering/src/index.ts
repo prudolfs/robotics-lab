@@ -32,3 +32,4 @@ export { Walls } from './walls'
 export { WorldView } from './world-view'
 
 export const RENDERING_PACKAGE_NAME = '@robotics-lab/rendering'
+export { LabModel } from './lab-model'

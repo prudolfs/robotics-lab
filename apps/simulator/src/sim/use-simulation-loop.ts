@@ -289,6 +289,9 @@ export function useSimulationLoop(): SimulationControls {
 					const scan: LidarScan | null = world ? createScan(live.lidar, frame.pose, world) : null
 					observe({
 						...live,
+						path: [],
+						planStatus: 'idle',
+						collision: false,
 						robot,
 						scan,
 						time: frame.time,

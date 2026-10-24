@@ -14,8 +14,8 @@ function WebGPUGrid({ size }: { size: number }) {
 
 	return (
 		<group position={[0, -0.015, 0]}>
-			<gridHelper args={[size, minorDivisions, '#68786f', '#87938b']} />
-			<gridHelper args={[size, majorDivisions, '#46564e', '#68786f']} position={[0, 0.004, 0]} />
+			<gridHelper args={[size, minorDivisions, '#354a55', '#425963']} />
+			<gridHelper args={[size, majorDivisions, '#536e7b', '#354a55']} position={[0, 0.004, 0]} />
 		</group>
 	)
 }
@@ -43,6 +43,7 @@ export function MissionScene({
 
 	return (
 		<>
+			<color attach="background" args={['#18232b']} />
 			<FlightCamera drone={droneState} mode={cameraMode} fov={cameraFov} worldScale={worldScale} />
 			<Lights />
 			<group scale={worldScale}>
@@ -58,7 +59,7 @@ export function MissionScene({
 				/>
 				<DroneView state={droneState} params={PREVIEW_DRONE_PARAMS} />
 			</group>
-			<fog attach="fog" args={['#b9c1b6', 20, 68]} />
+			<fog attach="fog" args={['#18232b', 20, 68]} />
 		</>
 	)
 }

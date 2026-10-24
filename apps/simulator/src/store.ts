@@ -167,6 +167,8 @@ export type SimulatorStore = {
 	/** Observed: whether the controller is currently driving the robot. */
 	autonomous: boolean
 	/** Observed: status reported by the controller on the last fixed step. */
+	planStatus: SimState['planStatus']
+	collision: boolean
 	navStatus: NavStatus
 	/** Observed: the smoothed planner waypoints the controller is following
 	 *  toward `goals[0]`. Distinct from `goals` so the HUD shows the true
@@ -398,6 +400,8 @@ export function sampleState(next: SimState) {
 		goals: next.goals,
 		autonomous: next.autonomous,
 		navStatus: next.navStatus,
+		planStatus: next.planStatus,
+		collision: next.collision,
 		path: next.path,
 		planClosed: next.planClosed,
 		planOpen: next.planOpen,
@@ -597,9 +601,11 @@ export const useSimulatorStore = create<SimulatorStore>((set, get) => {
 			// watches and resets the grid on increment.
 			set((s) => ({ mapNonce: s.mapNonce + 1 }))
 		},
-		setGoal: (goal) => set({ goals: [goal], autonomous: true }),
+		setGoal: (goal) =>
+			set({ goals: [goal], autonomous: true, coverageMode: false, coverageComplete: false }),
 		addGoal: (goal) => set((s) => ({ goals: [...s.goals, goal] })),
-		clearGoals: () => set({ goals: [], autonomous: false }),
+		clearGoals: () =>
+			set({ goals: [], autonomous: false, coverageMode: false, coverageComplete: false }),
 		setAutonomous: (on) => set({ autonomous: on }),
 		toggleAutonomous: () => set((s) => ({ autonomous: !s.autonomous })),
 		setNav: (nav) => set({ nav }),

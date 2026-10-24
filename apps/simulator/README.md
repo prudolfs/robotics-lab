@@ -41,6 +41,18 @@ repository-wide philosophy.
 Everything is driven through the browser — keyboard, mouse, and the HUD
 controls. There is no backend.
 
+Navigation plans with A* (or Dijkstra) on the loaded map, inflated for the rover's
+entire turning footprint. The lidar occupancy grid remains a separate observed
+map; sensor noise and unseen walls cannot remove physical obstacles. A swept
+collision guard also protects manual driving, wheel slip and fast steps.
+
+The violet polyline is the active planned route, the mint ring marks its next
+waypoint, and destination rings mark queued goals. The Nav tab and footer show
+whether the robot is turning, driving, paused or blocked. An unreachable or unsafe
+goal remains queued with the robot stopped; choose another goal or edit the map.
+Clean Room generates reachable coverage lanes and uses the same planner between
+lane endpoints, including transitions around obstacles.
+
 ---
 
 ## Tech stack

@@ -217,6 +217,18 @@ function search(
 	let heapNegG = new Float64Array(n)
 	let heapSize = 0
 	function heapPush(idx: number, f: number, g: number): void {
+		if (heapSize === heapIdx.length) {
+			const capacity = Math.max(8, heapIdx.length * 2)
+			const nextIdx = new Int32Array(capacity)
+			const nextKey = new Float64Array(capacity)
+			const nextNegG = new Float64Array(capacity)
+			nextIdx.set(heapIdx)
+			nextKey.set(heapKey)
+			nextNegG.set(heapNegG)
+			heapIdx = nextIdx
+			heapKey = nextKey
+			heapNegG = nextNegG
+		}
 		heapIdx[heapSize] = idx
 		heapKey[heapSize] = f
 		heapNegG[heapSize] = -g
@@ -291,7 +303,7 @@ function search(
 			const nr = cr + move.dr
 			if (nc < 0 || nc >= w || nr < 0 || nr >= h) continue
 			const ni = nr * w + nc
-			if (blocked[ni]) continue
+			if (blocked[ni] || closed[ni]) continue
 			// Prevent diagonal clipping: a diagonal move requires *both* its
 			// orthogonal neighbours to be clear (no cutting corners).
 			if (move.dc !== 0 && move.dr !== 0) {
@@ -308,20 +320,6 @@ function search(
 				const f = tentative + heuristic(cc2, goal)
 				heapPush(ni, f, tentative)
 			}
-		}
-		// Grow the heap storage if we have nearly filled it. This keeps the
-		// search robust on grids bigger than the default without recompiling.
-		if (heapSize + moves.length > heapIdx.length) {
-			const grow = Math.min(n, heapIdx.length * 2)
-			const newIdx = new Int32Array(grow)
-			const newKey = new Float64Array(grow)
-			const newNegG = new Float64Array(grow)
-			newIdx.set(heapIdx)
-			newKey.set(heapKey)
-			newNegG.set(heapNegG)
-			heapIdx = newIdx
-			heapKey = newKey
-			heapNegG = newNegG
 		}
 	}
 

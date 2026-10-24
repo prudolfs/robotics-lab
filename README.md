@@ -54,6 +54,8 @@ in tests.
 
 A differential-drive robotics playground with lidar, occupancy-grid mapping,
 A* navigation, coverage planning, localization, editing and playback.
+Its slate and mint HUD and Blender-authored rover and lab props share the visual
+style of SLAM Studio and Warehouse Demo.
 
 ### [Drone Mission Planner](./apps/drone-mission-planner)
 
@@ -61,6 +63,8 @@ A WebGPU-powered 3D planner for composing, validating, simulating and saving
 autonomous drone missions. It includes manual flight, virtual lidar/GPS/IMU,
 multiple camera modes, route execution and versioned JSON persistence. See the
 [full development plan](./docs/drone-mission-planner.md).
+The planner uses the same slate and mint interface, with a Blender-authored drone
+and shared [lab models](./assets/lab-kit).
 
 ### [Warehouse Demo](./apps/warehouse-demo)
 

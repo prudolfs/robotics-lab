@@ -236,3 +236,10 @@ test('PLAYBACK_TICK_SCALE advances one recorded frame per real-time tick at 1x',
 	// at 1x moves exactly one frame forward (the remainder model floors).
 	expect(PLAYBACK_TICK_SCALE).toBe(1 / 6)
 })
+test('blocked navigation frames survive recording serialization', () => {
+	const rec: Recording = {
+		...createRecording('empty'),
+		frames: [{ ...frame(0, 0), navStatus: 'blocked', autonomous: true, goals: [{ x: 4, y: 0 }] }],
+	}
+	expect(deserializeRecording(serializeRecording(rec)).frames[0].navStatus).toBe('blocked')
+})

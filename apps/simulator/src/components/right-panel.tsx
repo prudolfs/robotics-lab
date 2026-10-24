@@ -169,7 +169,7 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 				data-testid="right-panel"
 				data-open={open}
 				className={cn(
-					'pointer-events-auto absolute top-0 right-4 bottom-0 z-20 flex w-[20rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden border-border border-l bg-card/80 shadow-2xl backdrop-blur-md transition-transform duration-300 motion-reduce:transition-none',
+					'pointer-events-auto absolute top-0 right-4 bottom-0 z-20 flex w-[20rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden border-border border-l bg-card shadow-xl transition-transform duration-300 motion-reduce:transition-none',
 					open ? 'translate-x-0' : 'translate-x-full motion-reduce:translate-x-0',
 				)}
 			>
@@ -201,9 +201,7 @@ export function RightPanel({ controls, onReset }: RightPanelProps) {
 									)}
 								>
 									<Icon className="size-4" />
-									<span className="font-mono font-semibold text-[9px] uppercase tracking-wider">
-										{label}
-									</span>
+									<span className="font-medium text-[10px]">{label}</span>
 								</button>
 							)
 						})}

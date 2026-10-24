@@ -29,6 +29,7 @@ export function SimulatorScene({
 }: SimulatorSceneProps) {
 	return (
 		<>
+			<color attach="background" args={['#18232b']} />
 			<SimulatorCamera />
 			<Lights />
 			{showGrid && <InfiniteGrid />}

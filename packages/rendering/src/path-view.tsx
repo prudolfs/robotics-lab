@@ -10,15 +10,16 @@
 // As with the other overlays, the component only *observes* the immutable
 // planner artifacts from the store — it owns no simulation state. The store /
 // `App` feed a fresh snapshot each render so the open / closed fields "fill
-// in" live as the planner replans on the enriching occupancy grid, and the
+// in" as the planner replans against the loaded map, and the
 // path line retreats as the controller consumes waypoints.
 //
 // The dots are drawn with two `InstancedMesh`es (one per bucket) sized the
 // same way as the occupancy-grid view: allocated once at a generous capacity
 // and rewritten each render, so changing cell sets never tears down the
-// geometry. The path line is a `lineSegments` (same trick `GoalView` uses to
-// dodge the JSX `<line>` / SVG `line` collision in TypeScript).
+// geometry. The route uses a screen-width line so it stays visible above
+// the occupancy grid and dense lidar rays.
 
+import { Line } from '@react-three/drei'
 import type { Goal } from '@robotics-lab/navigation'
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
@@ -68,7 +69,15 @@ export function PathView({ closed, open, path, pose }: PathViewProps) {
 			{open && open.length > 0 && (
 				<NodeDots points={open} color={OPEN_COLOR} opacity={OPEN_OPACITY} />
 			)}
-			{path && path.length > 0 && <PathLine path={path} pose={pose ?? null} />}
+			{path && path.length > 0 && (
+				<>
+					<PathLine path={path} pose={pose ?? null} />
+					<mesh position={worldToScene(path[0], 0.03)} rotation={[-Math.PI / 2, 0, 0]}>
+						<ringGeometry args={[0.07, 0.1, 24]} />
+						<meshBasicMaterial color="#85dbc5" side={THREE.DoubleSide} depthTest={false} />
+					</mesh>
+				</>
+			)}
 		</group>
 	)
 }
@@ -123,8 +132,7 @@ function NodeDots({
 
 /**
  * Polyline from the robot (if provided) through the planned waypoints, drawn
- * as `lineSegments` of consecutive vertex pairs — the same approach `GoalView`
- * uses to avoid the R3F `<line>` / SVG `<line>` JSX collision.
+ * with a constant screen width so it remains legible when zoomed out.
  */
 function PathLine({
 	path,
@@ -133,42 +141,22 @@ function PathLine({
 	path: { x: number; y: number }[]
 	pose: { x: number; y: number; heading: number } | null
 }) {
-	const positions = useMemo(() => buildSegmentPositions(path, pose), [path, pose])
-	const geometry = useMemo(
-		() =>
-			new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(positions, 3)),
-		[positions],
-	)
-	if (positions.length === 0) return null
+	const points = useMemo(() => {
+		const result: ScenePos[] = []
+		if (pose) result.push(worldToScene(pose, LAYER_ELEVATION))
+		for (const waypoint of path) result.push(worldToScene(waypoint, LAYER_ELEVATION))
+		return result
+	}, [path, pose])
+	if (points.length < 2) return null
 	return (
-		<lineSegments geometry={geometry}>
-			<lineBasicMaterial color={PATH_COLOR} transparent opacity={PATH_OPACITY} />
-		</lineSegments>
+		<Line
+			points={points}
+			color={PATH_COLOR}
+			lineWidth={2.5}
+			transparent
+			opacity={PATH_OPACITY}
+			depthTest={false}
+			renderOrder={10}
+		/>
 	)
-}
-
-/** Segment-pair vertex buffer for the path: [p0,p1, p1,p2, ...]. Pairs rather
- *  than a connected strip because `lineSegments` reads 2 vertices per line. */
-function buildSegmentPositions(
-	path: { x: number; y: number }[],
-	pose: { x: number; y: number; heading: number } | null,
-): Float32Array {
-	const pts: ScenePos[] = []
-	if (pose) pts.push(worldToScene(pose, LAYER_ELEVATION))
-	for (const p of path) pts.push(worldToScene(p, LAYER_ELEVATION))
-	if (pts.length < 2) return new Float32Array(0)
-	const segCount = pts.length - 1
-	const out = new Float32Array(segCount * 2 * 3)
-	let write = 0
-	for (let i = 0; i < segCount; i++) {
-		const a = pts[i]
-		const b = pts[i + 1]
-		out[write++] = a[0]
-		out[write++] = a[1]
-		out[write++] = a[2]
-		out[write++] = b[0]
-		out[write++] = b[1]
-		out[write++] = b[2]
-	}
-	return out
 }

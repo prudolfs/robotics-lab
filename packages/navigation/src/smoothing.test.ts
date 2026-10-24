@@ -158,3 +158,19 @@ test('smoothToWorld pares the path down to corners only on an L', () => {
 	expect(pts[0]).toEqual(cellCenterWorld(grid, 0, 0))
 	expect(pts[pts.length - 1]).toEqual(cellCenterWorld(grid, 2, 2))
 })
+test('shortcuts cannot cut diagonally across the corner of a blocked cell', () => {
+	const grid = makeGrid(4, 4)
+	occupy(grid, 1, 0)
+	const path = [
+		{ col: 0, row: 0 },
+		{ col: 0, row: 1 },
+		{ col: 1, row: 1 },
+		{ col: 2, row: 2 },
+	]
+	const result = shortcutPath(grid, path, { inflationRadius: 0 })
+	expect(result).toEqual([
+		{ col: 0, row: 0 },
+		{ col: 0, row: 1 },
+		{ col: 2, row: 2 },
+	])
+})

@@ -155,7 +155,7 @@ export default function App() {
 					<RobotView pose={robot.pose} params={robot.params} />
 					{showOccupancy && <OccupancyGridView data-testid="occupancy-grid-overlay" grid={grid} />}
 					{showLidar && <LidarView scan={scan} />}
-					<GoalView pose={robot.pose} goals={goals} />
+					<GoalView pose={robot.pose} goals={goals} showConnections={false} />
 					{showPath && (
 						<PathView closed={planClosed} open={planOpen} path={path} pose={robot.pose} />
 					)}

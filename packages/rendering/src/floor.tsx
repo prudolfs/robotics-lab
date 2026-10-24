@@ -18,7 +18,7 @@ export function Floor({ width, depth }: { width: number; depth: number }) {
 			receiveShadow
 		>
 			<meshStandardMaterial
-				color="#1f2937"
+				color="#34454e"
 				roughness={0.9}
 				metalness={0}
 				polygonOffset

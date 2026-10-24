@@ -5,9 +5,10 @@
 export function Lights() {
 	return (
 		<>
-			<hemisphereLight args={[0xffffff, 0x444444, 0.6]} />
-			<directionalLight position={[10, 12, 8]} intensity={0.8} />
-			<ambientLight intensity={0.2} />
+			<hemisphereLight args={['#d0e4e2', '#344751', 1.2]} />
+			<directionalLight position={[10, 12, 8]} intensity={2} color="#ffe5c5" />
+			<directionalLight position={[-8, 6, -10]} intensity={0.7} color="#a9d9ec" />
+			<ambientLight intensity={0.3} />
 		</>
 	)
 }

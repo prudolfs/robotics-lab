@@ -12,7 +12,7 @@ export function SimulationControls({
 	controls: SimulationActions
 }) {
 	return (
-		<div className="absolute top-4 left-1/2 z-[4] flex -translate-x-1/2 items-center gap-2 rounded-[10px] border border-white/15 bg-[#08100d]/70 p-1.5 text-white shadow-lg backdrop-blur-md">
+		<div className="absolute top-4 left-1/2 z-[4] flex -translate-x-1/2 items-center gap-2 rounded-[10px] border border-[#35444c] bg-[#142029]/95 p-1.5 text-white shadow-lg backdrop-blur-md">
 			<div className="grid min-w-[66px] px-1.5 leading-none">
 				<small className="mb-1 text-[8px] text-white/50 uppercase tracking-[0.1em]">Sim time</small>
 				<strong className="font-mono text-[11px] tabular-nums">

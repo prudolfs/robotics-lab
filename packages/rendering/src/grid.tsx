@@ -10,10 +10,10 @@ export function InfiniteGrid() {
 			args={[200, 200]}
 			cellSize={0.5}
 			cellThickness={0.6}
-			cellColor="#9ca3af"
+			cellColor="#6e8791"
 			sectionSize={2}
 			sectionThickness={1}
-			sectionColor="#6b7280"
+			sectionColor="#48636e"
 			fadeDistance={60}
 			fadeStrength={1}
 			infiniteGrid

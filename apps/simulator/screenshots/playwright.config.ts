@@ -21,6 +21,7 @@ export default defineConfig({
 	use: {
 		baseURL: 'http://localhost:8080',
 		headless: true,
+		colorScheme: 'dark',
 		viewport: { width: 1280, height: 720 },
 		trace: 'retain-on-failure',
 		screenshot: 'only-on-failure',

@@ -114,13 +114,11 @@ export function WidgetCard({
 	// underlined by a hairline `border-b`, then the body sits below it. The
 	// panel is the only glass container (mirrors `.temp/right-panel/` mocks).
 	return (
-		<section data-testid={testId} className={cn('flex w-full flex-col gap-2 pb-1', className)}>
+		<section data-testid={testId} className={cn('flex w-full flex-col gap-2 pb-4', className)}>
 			<div className="flex items-center justify-between gap-2 border-border border-b pb-2">
 				<div className="flex min-w-0 items-center gap-1.5">
 					<DragHandle widget={widget} title={title} />
-					<h3 className="truncate font-semibold text-foreground text-xs uppercase tracking-wider">
-						{title}
-					</h3>
+					<h3 className="truncate font-medium text-foreground text-xs">{title}</h3>
 				</div>
 				<div className="flex items-center gap-1">
 					{status != null && <div className="flex-none">{status}</div>}

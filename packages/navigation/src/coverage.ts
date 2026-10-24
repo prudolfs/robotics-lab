@@ -93,10 +93,9 @@ export type CoverageResult = {
  *  5. Optionally prepend the robot's current position as the start and append
  *     the start cell if return-to-start is enabled.
  *
- * The returned waypoints are smooth cell centers that the go-to-goal controller
- * can chase. They need no further planning interpolation because they already lie
- * on free cells, but `planPath` can be used between non-adjacent waypoints if
- * desired (the simulator loop already does this through the existing planner).
+ * These are lane destinations, not a collision-free connecting polyline.
+ * Callers must plan between them: consecutive lanes can be separated by walls
+ * or disconnected runs of free cells. The simulator uses A* for each transition.
  */
 export function coveragePath(
 	grid: OccupancyGrid,
@@ -202,7 +201,7 @@ function buildStrips(
 	grid: OccupancyGrid,
 	region: CoverageRegion,
 	reachable: Set<number>,
-	_config: CoverageConfig,
+	config: CoverageConfig,
 	start: Cell2,
 ): { waypoints: Goal[]; strips: Cell2[][] } {
 	const waypoints: Goal[] = []
@@ -211,7 +210,11 @@ function buildStrips(
 
 	// Row-wise strips: each strip = a row (or partial row) of reachable cells.
 	// Walk top-to-bottom (ascending row), alternating direction per row.
-	for (let row = region.minRow; row <= region.maxRow; row++) {
+	const rowStep = Math.max(1, Math.round(config.stripWidth / grid.resolution))
+	const rows: number[] = []
+	for (let row = region.minRow; row <= region.maxRow; row += rowStep) rows.push(row)
+	if (rows[rows.length - 1] !== region.maxRow) rows.push(region.maxRow)
+	for (const [stripIndex, row] of rows.entries()) {
 		// Collect all reachable cells in this row within the region.
 		const stripCells: Cell2[] = []
 		for (let col = region.minCol; col <= region.maxCol; col++) {
@@ -222,15 +225,17 @@ function buildStrips(
 		if (stripCells.length === 0) continue
 
 		// Group strip cells into contiguous runs.
+		const isEvenStrip = stripIndex % 2 === 0
 		const runs = splitIntoRuns(stripCells)
+		if (!isEvenStrip) runs.reverse()
 		for (const run of runs) {
 			if (run.length === 0) continue
 			// Determine direction based on strip parity (alternating rows).
-			const isEvenStrip = (row - region.minRow) % 2 === 0
 			const ordered = isEvenStrip ? run : [...run].reverse()
 
 			// Cell centers waypoints for this run in world space.
-			const pts = ordered.map((c) => cellCenterWorld(grid, c.col, c.row))
+			const ends = ordered.length > 1 ? [ordered[0], ordered[ordered.length - 1]] : ordered
+			const pts = ends.map((c) => cellCenterWorld(grid, c.col, c.row))
 
 			strips.push(ordered)
 

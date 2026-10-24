@@ -19,9 +19,9 @@ import type { MissionValidationResult } from '@/mission-validation'
 import { usePlannerStore } from '@/store'
 import { summarizeWorld, WORLD_SCALE_OPTIONS, type WorldScale } from '@/world'
 
-const sectionClass = 'border-border border-b p-[18px]'
+const sectionClass = 'border-border border-b p-[21px]'
 const headingClass =
-	'mb-4 flex items-center gap-2 text-[10px] text-muted-foreground uppercase tracking-[0.1em] [&_svg]:size-3.5 [&_svg]:text-primary'
+	'mb-4 flex items-center gap-2 font-medium text-[11px] text-foreground [&_svg]:size-3.5 [&_svg]:text-primary'
 
 export function SettingsPanel({ validation }: { validation: MissionValidationResult }) {
 	const altitude = usePlannerStore((state) => state.cruiseAltitude)
@@ -45,7 +45,7 @@ export function SettingsPanel({ validation }: { validation: MissionValidationRes
 
 	return (
 		<aside
-			className="min-w-0 overflow-y-auto border-border border-l bg-background/95 backdrop-blur-lg max-[620px]:border-t max-[620px]:border-l-0"
+			className="min-w-0 overflow-y-auto border-border border-l bg-card max-[620px]:border-t max-[620px]:border-l-0"
 			aria-label="Mission settings"
 		>
 			<div className="flex items-center justify-between border-border border-b px-[18px] py-[19px]">
@@ -256,11 +256,9 @@ function SettingField({
 
 function RouteStat({ value, label }: { value: string; label: string }) {
 	return (
-		<div className="grid gap-1 rounded-lg border border-border bg-muted/60 p-3">
+		<div className="grid gap-1 border-border border-b py-3">
 			<span className="font-semibold text-lg tracking-[-0.04em]">{value}</span>
-			<small className="text-[10px] text-muted-foreground uppercase tracking-[0.06em]">
-				{label}
-			</small>
+			<small className="text-[10px] text-muted-foreground">{label}</small>
 		</div>
 	)
 }

@@ -6,6 +6,7 @@
 // (was the top-right badge in the old HUD). The absolute positioning is gone —
 // it is now a normal-flow card in the Nav tab.
 
+import type { NavStatus } from '@robotics-lab/navigation'
 import { Button } from '@/components/ui/button'
 import { WidgetCard } from '@/components/widgets/widget-card'
 import type { SimulationControls } from '@/sim/use-simulation-loop'
@@ -18,6 +19,8 @@ export function NavigationWidget({ controls }: { controls: SimulationControls })
 	const autonomous = useSimulatorStore((s) => s.autonomous)
 	const navStatus = useSimulatorStore((s) => s.navStatus)
 	const robot = useSimulatorStore((s) => s.robot)
+	const planStatus = useSimulatorStore((s) => s.planStatus)
+	const running = useSimulatorStore((s) => s.running)
 	const setAutonomous = useSimulatorStore((s) => s.setAutonomous)
 	const clearGoals = useSimulatorStore((s) => s.clearGoals)
 	const planner = useSimulatorStore((s) => s.planner)
@@ -79,6 +82,37 @@ export function NavigationWidget({ controls }: { controls: SimulationControls })
 				</span>
 			</div>
 
+			<div
+				data-testid="navigation-plan"
+				className="rounded-md border border-border bg-muted/40 p-2.5 text-[10px] leading-5"
+				aria-live="polite"
+			>
+				<strong className="block font-medium text-primary">
+					{!autonomous
+						? 'Manual control'
+						: !running
+							? 'Navigation paused'
+							: navStatus === 'blocked'
+								? 'Stopped: no safe route'
+								: `${planner.algorithm === 'dijkstra' ? 'Dijkstra' : 'A*'} ${coverageMode ? 'coverage route' : 'route following'}`}
+				</strong>
+				<span className="text-muted-foreground">
+					{navStatus === 'blocked'
+						? planStatus === 'invalid_goal'
+							? 'Choose a goal farther from obstacles and walls.'
+							: 'Destination kept. Replanning; choose another goal or edit the map.'
+						: 'Plans on the loaded map with clearance for the entire robot. Lidar builds a separate observed map.'}
+				</span>
+				{autonomous && path[0] && (
+					<span data-testid="navigation-target" className="block text-foreground">
+						Next turn: ({fmt(path[0].x)}, {fmt(path[0].y)})
+					</span>
+				)}
+				<span className="block text-muted-foreground">
+					Violet: active route · mint ring: next waypoint · red ring: destination
+				</span>
+			</div>
+
 			<span className="text-[10px] text-muted-foreground">
 				click the floor to set a goal · shift-click to queue waypoints
 			</span>
@@ -88,7 +122,13 @@ export function NavigationWidget({ controls }: { controls: SimulationControls })
 				<span className="font-semibold text-foreground text-xs">Coverage</span>
 				<div className="flex items-center gap-1">
 					{coverageMode && !coverageComplete && (
-						<span className="animate-pulse text-amber-500 text-xs">Running...</span>
+						<span className="text-amber-500 text-xs">
+							{navStatus === 'blocked'
+								? 'Blocked'
+								: autonomous && running
+									? 'Running...'
+									: 'Paused'}
+						</span>
 					)}
 					{coverageComplete && <span className="text-emerald-500 text-xs">Complete</span>}
 				</div>
@@ -99,7 +139,7 @@ export function NavigationWidget({ controls }: { controls: SimulationControls })
 					variant={coverageMode ? 'default' : 'outline'}
 					size="xs"
 					onClick={controls.startCoverage}
-					disabled={coverageMode}
+					disabled={coverageMode && !coverageComplete}
 				>
 					Clean Room
 				</Button>
@@ -153,21 +193,17 @@ export function NavigationWidget({ controls }: { controls: SimulationControls })
 	)
 }
 
-function StatusBadge({
-	status,
-	autonomous,
-}: {
-	status: 'idle' | 'rotating' | 'driving' | 'arrived'
-	autonomous: boolean
-}) {
+function StatusBadge({ status, autonomous }: { status: NavStatus; autonomous: boolean }) {
 	const tone =
 		!autonomous || status === 'idle'
 			? 'text-muted-foreground'
-			: status === 'driving'
-				? 'text-emerald-500'
-				: status === 'rotating'
-					? 'text-amber-500'
-					: 'text-cyan-500'
+			: status === 'blocked'
+				? 'text-destructive'
+				: status === 'driving'
+					? 'text-emerald-500'
+					: status === 'rotating'
+						? 'text-amber-500'
+						: 'text-cyan-500'
 	const label = !autonomous ? 'manual' : status
 	return (
 		<span data-testid="nav-status" className={`flex items-center gap-1 font-mono text-xs ${tone}`}>

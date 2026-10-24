@@ -23,7 +23,7 @@ export function CameraControls({
 }) {
 	return (
 		<section
-			className="absolute top-[72px] left-[18px] z-[4] rounded-xl border border-white/15 bg-[#08100d]/75 p-2 text-white shadow-xl backdrop-blur-md max-[620px]:top-[66px] max-[620px]:left-3"
+			className="absolute top-[72px] left-[18px] z-[4] rounded-lg border border-[#35444c] bg-[#142029]/95 p-2 text-white shadow-lg backdrop-blur-md max-[620px]:top-[66px] max-[620px]:left-3"
 			aria-label="Camera controls"
 		>
 			<div className="flex gap-1">

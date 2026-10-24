@@ -244,7 +244,8 @@ function parseFrame(raw: unknown, i: number): PlaybackFrame {
 		navStatus !== 'idle' &&
 		navStatus !== 'rotating' &&
 		navStatus !== 'driving' &&
-		navStatus !== 'arrived'
+		navStatus !== 'arrived' &&
+		navStatus !== 'blocked'
 	) {
 		throw new Error(`frame ${i}: bad navStatus`)
 	}

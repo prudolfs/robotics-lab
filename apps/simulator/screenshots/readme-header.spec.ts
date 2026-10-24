@@ -21,9 +21,9 @@
 //   E2E_FRAME_COUNT  Number of frames to capture (default: 6).
 //   E2E_FRAME_MS    Wall-clock ms between frames (default: 1200).
 
-import { expect, test } from '@playwright/test'
 import { mkdir, readdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { expect, test } from '@playwright/test'
 import { launchSimulatorForWorld } from '../e2e/simulator'
 
 test('capture README header frames', async ({ page }) => {
@@ -35,6 +35,11 @@ test('capture README header frames', async ({ page }) => {
 	const frameMs = Number(process.env.E2E_FRAME_MS ?? 1200)
 
 	const sim = await launchSimulatorForWorld(page)
+	await page.getByRole('button', { name: 'obstacles', exact: true }).click()
+	await page.getByTestId('panel-tab-nav').click()
+	await page.evaluate(() => document.fonts.ready)
+	// Allow the authored GLB props to finish loading before the first frame.
+	await page.waitForTimeout(1500)
 
 	const capture = async (i: number) => {
 		const buf = await page.screenshot({ type: 'png' })
@@ -48,13 +53,13 @@ test('capture README header frames', async ({ page }) => {
 	// Queue two navigation goals so the robot keeps moving across the whole
 	// capture window — the running A* / lidar / occupancy grid is the most
 	// representative "product" moment of the app.
-	await sim.placeGoal({ x: 2.5, y: -1.5 })
+	await sim.placeGoal({ x: -3.8, y: 2.8 })
 
 	for (let i = 1; i < frameCount; i++) {
 		await page.waitForTimeout(frameMs)
 		// Halfway through, queue a second goal so the tail keeps moving.
 		if (i === Math.floor(frameCount / 2)) {
-			await sim.queueGoal({ x: -2.5, y: 1.5 }).catch(() => {
+			await sim.queueGoal({ x: 0, y: -2.6 }).catch(() => {
 				/* HUD nudge fallback may reject; ignore for capture */
 			})
 		}

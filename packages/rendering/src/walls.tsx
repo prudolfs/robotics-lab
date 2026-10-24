@@ -31,7 +31,7 @@ export function Walls({ walls }: { walls: Wall[] }) {
 						receiveShadow
 					>
 						<boxGeometry args={[length, height, thickness]} />
-						<meshStandardMaterial color="#475569" roughness={0.7} />
+						<meshStandardMaterial color="#6b828c" roughness={0.7} />
 					</mesh>
 				)
 			})}

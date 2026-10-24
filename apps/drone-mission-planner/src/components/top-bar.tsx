@@ -89,14 +89,14 @@ export function TopBar() {
 
 	return (
 		<>
-			<header className="relative z-10 grid h-[68px] grid-cols-[300px_1fr_auto] items-center gap-5 border-border border-b bg-background px-[18px] max-[620px]:h-[58px] max-[860px]:grid-cols-[auto_1fr_auto] max-[620px]:px-3">
+			<header className="relative z-10 grid h-[68px] grid-cols-[300px_1fr_auto] items-center gap-5 border-border border-b bg-card px-[27px] max-[620px]:h-[58px] max-[860px]:grid-cols-[auto_1fr_auto] max-[620px]:px-3">
 				<div className="flex items-center gap-[11px]">
 					<span className="grid size-9 place-items-center rounded-[10px] border border-primary/40 bg-primary/10 text-primary">
 						<Cloud className="size-5" aria-hidden="true" />
 					</span>
 					<span className="grid leading-[1.05] max-[860px]:hidden">
-						<strong className="text-[15px] tracking-[-0.02em]">Flightdeck</strong>
-						<small className="mt-1 text-[10px] text-muted-foreground uppercase tracking-[0.1em]">
+						<strong className="font-medium text-[21px] tracking-[-0.04em]">Flightdeck</strong>
+						<small className="mt-1 text-[8px] text-muted-foreground uppercase tracking-[0.1em]">
 							Mission planner
 						</small>
 					</span>
@@ -106,7 +106,7 @@ export function TopBar() {
 						Mission
 					</span>
 					<input
-						className="min-w-0 rounded-md border border-transparent bg-transparent px-2 py-1.5 font-semibold text-sm outline-none hover:border-border hover:bg-muted focus:border-border focus:bg-muted"
+						className="min-w-0 rounded-md border border-transparent bg-transparent px-2 py-1.5 font-medium text-sm outline-none hover:border-border hover:bg-muted focus:border-border focus:bg-muted"
 						aria-label="Mission name"
 						value={missionName}
 						onChange={(event) => setMissionName(event.target.value)}
@@ -158,7 +158,7 @@ export function TopBar() {
 			{dialogOpen ? (
 				<div className="fixed inset-0 z-50 grid place-items-center bg-black/55 p-4 backdrop-blur-sm">
 					<section
-						className="max-h-[min(720px,calc(100vh-32px))] w-full max-w-[620px] overflow-y-auto rounded-xl border border-border bg-background p-5 shadow-2xl"
+						className="max-h-[min(720px,calc(100vh-32px))] w-full max-w-[620px] overflow-y-auto rounded-lg border border-border bg-background p-5 shadow-2xl"
 						aria-label="Load mission"
 						aria-modal="true"
 						role="dialog"

@@ -207,3 +207,10 @@ test('closed-loop controller reaches a goal behind the spawn orientation', () =>
 	const pose = closedLoop(goal, 30)
 	expect(distanceToGoal(pose, goal)).toBeLessThan(DEFAULT_NAV_CONFIG.arrivalRadius + 1e-6)
 })
+test('a misaligned goal never causes reverse translation', () => {
+	for (const heading of [0.2, 1.2, 2.2, Math.PI, -2.2]) {
+		const out = controlToGoal({ x: 0, y: 0, heading }, { x: 0.1, y: 0 }, DEFAULT_NAV_CONFIG)
+		expect(out.status).toBe('rotating')
+		expect(out.input.leftWheel + out.input.rightWheel).toBeCloseTo(0, 12)
+	}
+})
