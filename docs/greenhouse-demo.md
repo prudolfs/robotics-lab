@@ -2,7 +2,7 @@
 
 > Proposed implementation plan for the next Robotics Lab project: an expressive robot that learns useful tasks in a simulated greenhouse.
 >
-> Status: planning only. All implementation tasks are unchecked. Stop for user review of this document before starting Phase 0.
+> Status: Phase 0 complete; awaiting user review. See the [Phase 0 review](greenhouse-demo/phase0/README.md). Later phases remain unchecked. Stop before starting Phase 1.
 
 ## Goal and experience
 
@@ -52,7 +52,8 @@ Proposed root commands are `pnpm setup:greenhouse`, `pnpm dev:greenhouse`, `pnpm
 
 | Area | Proposed direction |
 | --- | --- |
-| Frontend | Reuse React, TypeScript, Vite, Three.js and existing HUD/camera conventions. Verify the renderer/dependency combination in Phase 0; keep renderer-specific dependencies app-local. |
+| Frontend / 3D | React, TypeScript and Vite, with React Three Fiber and Drei using Three.js WebGPU as the actual rendering backend. Verify and pin a compatible combination in Phase 0; keep renderer-specific dependencies app-local. Detect unsupported WebGPU explicitly instead of silently presenting a WebGL fallback as WebGPU. |
+| GUI | Tailwind CSS and shadcn/ui with Base UI primitives (Base Nova) for controls, panels and status displays. Keep simulation state outside React and use existing monorepo HUD/camera conventions where suitable. |
 | Simulation | Python-only, fixed-timestep environment with seeded reset, step, observation, reward, termination and snapshot interfaces. No dependency on FastAPI, LangGraph or rendering. |
 | Physics | Evaluate MuJoCo as the initial candidate in Phase 0. Commit to a backend only after headless stepping, platform installation and browser mesh alignment work. Clearly document simplified grasp constraints if used. |
 | API | FastAPI owns interactive session commands, snapshot streaming, dataset metadata, job control and artifacts. Stream render snapshots at a bounded rate separately from physics stepping. |
@@ -85,6 +86,8 @@ A compact cutaway greenhouse with warm daylight, translucent glazing, green plan
 
 The robot has an original silhouette, two driven wheels with a stable support, a movable binocular head and one simple gripper/lift. Its body and gripper must match the collision and reach model. Glances, head tilts, indicator lights and optional chirps express task events; authored expressions are separate from learned motor behavior.
 
+Ask the user to open Blender and enable Blender MCP when a phase needs interactive asset authoring or inspection. Placeholder geometry in Phase 0 does not require Blender. Check connectivity before asset work and preserve editable sources and repeatable exports.
+
 Provide a Watch / Teach / Train / Compare flow with a spacious viewport. Show the active controller/checkpoint, current task and a short event timeline. Put detailed observations, reward components and failures in an optional inspector. Include overview, follow and robot-eye cameras; the robot-eye view is an inspection view until an image-based policy actually consumes it.
 
 ## Implementation phases
@@ -93,18 +96,18 @@ Provide a Watch / Teach / Train / Compare flow with a spacious viewport. Show th
 
 Goal: prove the smallest useful learning environment before building the full application.
 
-- [ ] Specify the one-capsule task, greenhouse dimensions, robot geometry, gripper reach, tray acceptance region and reset conditions.
-- [ ] Define observation/action schemas, control and physics frequencies, success conditions, timeouts and invalid-action behavior.
-- [ ] Evaluate the Python simulator candidate on the user's reference machine, including headless stepping, contacts, reset repeatability and installation requirements.
-- [ ] Choose and document grasp semantics: physical grasping or an explicit constrained attachment with alignment/reach checks. Record what the choice can and cannot teach.
-- [ ] Build a throwaway headless task probe and a minimal expert trajectory; measure episode stepping throughput without rendering.
-- [ ] Train a tiny behavior-cloning probe and evaluate complete episodes on a separate validation set to test whether the proposed observations/actions support learning.
-- [ ] Define the curriculum, dataset splits, comparison metrics and initial acceptance thresholds before full training.
-- [ ] Probe a Python snapshot in a minimal browser scene, validating coordinates, units, object identity, interpolation and reset handling.
-- [ ] Verify a compatible renderer stack and record the backend/capability behavior and reference hardware.
-- [ ] Record the visual brief, initial asset inventory, feasibility findings and unresolved tradeoffs in a Phase 0 review.
+- [x] Specify the one-capsule task, greenhouse dimensions, robot geometry, gripper reach, tray acceptance region and reset conditions.
+- [x] Define observation/action schemas, control and physics frequencies, success conditions, timeouts and invalid-action behavior.
+- [x] Evaluate the Python simulator candidate on the user's reference machine, including headless stepping, contacts, reset repeatability and installation requirements.
+- [x] Choose and document grasp semantics: physical grasping or an explicit constrained attachment with alignment/reach checks. Record what the choice can and cannot teach.
+- [x] Build a throwaway headless task probe and a minimal expert trajectory; measure episode stepping throughput without rendering.
+- [x] Train a tiny behavior-cloning probe and evaluate complete episodes on a separate validation set to test whether the proposed observations/actions support learning.
+- [x] Define the curriculum, dataset splits, comparison metrics and initial acceptance thresholds before full training.
+- [x] Probe a Python snapshot in a minimal browser scene, validating coordinates, units, object identity, interpolation and reset handling.
+- [x] Verify React Three Fiber, Drei and actual WebGPU rendering, plus Tailwind/shadcn GUI compatibility; record pinned versions, capability behavior and reference hardware.
+- [x] Record the visual brief, initial asset inventory, feasibility findings and unresolved tradeoffs in a Phase 0 review.
 
-Exit: a documented simulator choice, measured headless loop, workable observation/action contract and evidence that a small policy can learn part of the task. Stop for user review before Phase 1.
+Exit verified: the [Phase 0 review](greenhouse-demo/phase0/README.md) records the MuJoCo/PyTorch probe, 30/30 learned validation completions with explicit sensing/grasp assumptions, and a production WebGPU browser check. Stop for user review before Phase 1.
 
 ### Phase 1 — Monorepo service and application foundation
 
@@ -134,6 +137,7 @@ Exit: a coherent browser-visible collection task and a reproducible headless ref
 
 ### Phase 3 — Authored greenhouse and caretaker character
 
+- [ ] Ask the user to open Blender and enable Blender MCP, then verify connectivity before interactive asset work.
 - [ ] Model the greenhouse shell, plants/pots, benches, tray, capsules, charging nook and original caretaker in Blender.
 - [ ] Preserve editable Blender sources and a repeatable export script; export runtime GLBs and a manifest for dimensions, pivots and collision alignment.
 - [ ] Integrate driven wheels, head motion, gripper/lift and carried objects using authoritative simulation state.

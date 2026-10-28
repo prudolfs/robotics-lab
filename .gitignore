@@ -50,6 +50,13 @@ apps/slam-demo/e2e/.results
 apps/warehouse-demo/test-results
 apps/warehouse-demo/playwright-report
 
+# Greenhouse Python feasibility environment and generated model weights.
+scripts/greenhouse-phase0/.venv/
+scripts/greenhouse-phase0/__pycache__/
+scripts/greenhouse-phase0/artifacts/
+scripts/greenhouse-phase0/web/node_modules/
+scripts/greenhouse-phase0/web/dist/
+
 # Rebuilt by scripts/slam-vision/build.mjs before SLAM dev/build.
 apps/slam-demo/public/vision/worker.js
 

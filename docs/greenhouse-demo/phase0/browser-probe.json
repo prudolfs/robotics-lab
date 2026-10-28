@@ -1,0 +1,74 @@
+{
+  "browser": "156.0.8078.49",
+  "gpu": {
+    "available": true,
+    "info": {
+      "vendor": "apple",
+      "architecture": "metal-3",
+      "device": "",
+      "description": ""
+    }
+  },
+  "url": "http://127.0.0.1:4185",
+  "source": "Static playback of Python MuJoCo/PyTorch snapshots, not a live API session",
+  "no_webgpu_override_flags": true,
+  "backend": "webgpu",
+  "checks": {
+    "python_coordinate_transform": true,
+    "playback_advances": true,
+    "reset_discards_old_timeline": true,
+    "final_capsule_matches_python": true,
+    "orbit_controls": true,
+    "tailwind_shadcn_button": {
+      "slot": "button",
+      "background": "rgb(190, 219, 157)",
+      "padding": "10px",
+      "radius": "8px"
+    },
+    "base_ui_keyboard_activation": true,
+    "canvas_unmount_remount": true,
+    "unsupported_webgpu_blocks_canvas": true,
+    "mobile_no_horizontal_overflow": true
+  },
+  "frame_intervals_ms": {
+    "median": 16.699999999999818,
+    "p95": 16.700000000000273
+  },
+  "initial": {
+    "backend": "webgpu",
+    "frame": 0,
+    "robot": [
+      -1.18664767813563,
+      0,
+      0.10682118647699694,
+      0.14855135446279344
+    ],
+    "capsule": [
+      0.06194101354250425,
+      0.05,
+      0.4621297729628947
+    ],
+    "generation": 0
+  },
+  "delivered": {
+    "backend": "webgpu",
+    "frame": 66,
+    "robot": [
+      1.2525270880154857,
+      0,
+      -0.4374219379436224,
+      0.48861621846475956
+    ],
+    "capsule": [
+      1.5527413954119238,
+      0.05,
+      -0.597019461841949
+    ],
+    "generation": 2
+  },
+  "errors": [],
+  "warnings": [
+    "[Scheduler] Root \"root_0\" not found; invalidation ignored.",
+    "[Scheduler] Root \"root_0\" not found; invalidation ignored."
+  ]
+}

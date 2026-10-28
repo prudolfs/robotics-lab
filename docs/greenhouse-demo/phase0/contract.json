@@ -1,0 +1,81 @@
+{
+	"version": "phase0-v1",
+	"scope": "Exploratory feasibility contract; freeze production task settings before Phase 4 dataset collection.",
+	"world": {
+		"units": "metres, radians, seconds",
+		"python_axes": "X/Y ground plane, Z up; positive heading turns +X toward +Y",
+		"three_axes": "[python.x, python.z, -python.y]; heading rotates around +Y",
+		"floor_bounds": { "x": [-3, 3], "y": [-2, 2] },
+		"robot_chassis_radius": 0.23,
+		"robot_chassis_center_height": 0.18,
+		"robot_mass_kg": 2,
+		"capsule_radius": 0.05,
+		"capsule_mass_kg": 0.04,
+		"gripper_reach": 0.34,
+		"tray_center": [1.65, 0.65],
+		"tray_acceptance_radius": 0.2,
+		"dock_center": [-1.75, -0.75],
+		"dock_behavior_implemented": false
+	},
+	"time": { "physics_hz": 200, "control_hz": 20, "snapshot_hz": 10, "episode_timeout_seconds": 30 },
+	"actions": {
+		"shape": [3],
+		"bounds": [-1, 1],
+		"order": ["forward_velocity", "yaw_velocity", "gripper_command"],
+		"scales": { "forward_m_per_second": 0.6, "yaw_radians_per_second": 1.6 },
+		"gripper": "above +0.5 requests pickup; below -0.5 requests release; otherwise hold",
+		"movement": "Ideal differential-drive velocity targets implemented through planar MuJoCo servo joints; no wheel rolling/slip model."
+	},
+	"observations": {
+		"shape": [9],
+		"order": [
+			"target_forward_m / 4",
+			"target_left_m / 4",
+			"sin_bearing",
+			"cos_bearing",
+			"target_range_m / 4",
+			"forward_velocity / 0.6",
+			"left_velocity / 0.6",
+			"yaw_velocity / 1.6",
+			"holding"
+		],
+		"target": "capsule while empty; tray while carrying",
+		"phase": "holding flag supplies phase; one shared goal-conditioned policy",
+		"sensing": "Oracle relative target positions and exact body velocities; no camera inference, range sensor or noise in Phase 0."
+	},
+	"grasp": {
+		"semantics": "Explicit constrained attachment; no learned finger contacts or force feedback.",
+		"pickup": "Gripper tip within 0.10 m of capsule XY and abs(normalized commanded forward velocity) < 0.25.",
+		"carry": "Capsule position follows gripper tip at Z=0.28 m, free-joint velocity cleared each substep.",
+		"release": "Capsule lowered to Z=0.05 m at tip; success requires tip within tray radius and low commanded forward speed.",
+		"limits": "Pickup/release use commanded speed, not measured speed; actual-speed and height gates are required in Phase 2. Capsule/chassis contact is disabled; force transfer, drops and tray walls are not modeled."
+	},
+	"termination": {
+		"success": "Valid release within tray acceptance radius",
+		"failure": "First chassis-wall contact",
+		"truncation": "600 control steps",
+		"invalid_grasp": "Rejected and counted; episode continues"
+	},
+	"dataset": {
+		"training_seeds": [0, 99],
+		"validation_seeds": [10000, 10029],
+		"reserved_final_test_seeds": [20000, 20099],
+		"split_endpoints": "inclusive",
+		"training_sources": "100 scripted expert rollouts plus 12000 synthetic teacher-labeled local observation states, with 30 additional copies of grasp/release examples.",
+		"synthetic_limits": "Synthetic observation coverage can include unreachable poses; it augments imitation labels, not successful physical rollouts. No human demonstrations in Phase 0.",
+		"checkpoint_selection": "Validation successes first, then shorter mean episode duration; final test seeds never used in Phase 0."
+	},
+	"next_phase_gates": {
+		"note": "Proposed gates for subsequent implementation, recorded after exploratory Phase 0; not preregistered Phase 0 results.",
+		"reference": "100% completion on the declared validation suite with no collisions",
+		"imitation": "At least 80% complete episodes on validation, reported beside collisions and invalid actions",
+		"final_release": "Freeze thresholds and test protocol before final test evaluation; no guarantee from the 30-scenario Phase 0 result"
+	},
+	"curriculum": [
+		"one capsule, ideal target positions, clear travel area",
+		"larger starting position and heading variation",
+		"small reachable obstacle layouts with range observations",
+		"multiple capsules composed as single-object skills",
+		"sensor noise and image-derived perception as later extensions"
+	]
+}

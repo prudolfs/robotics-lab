@@ -1,0 +1,498 @@
+{
+  "platform": "macOS-26.5.1-arm64-arm-64bit",
+  "machine": "arm64",
+  "python": "3.11.15",
+  "mujoco": "3.17.0",
+  "torch": "2.15.0",
+  "numpy": "2.4.6",
+  "device": "cpu",
+  "training_seed": 7,
+  "training_examples": 33110,
+  "dataset_sha256": "987617e96cf0da2620273c26b58e4ef33e027c3b59001c656435454ad66259d1",
+  "training_seconds_including_validation": 5.064326499996241,
+  "checks": {
+    "same_seed_exact_snapshots": true,
+    "wall_contact_blocks_motion": true,
+    "wall_robot_x": 2.7700389099483114,
+    "invalid_grasp_rejected": true,
+    "reset_clears_state": true,
+    "carry_and_outside_tray_release": true,
+    "capsule_floor_contact": true,
+    "resting_capsule_height": 0.04978355953907305
+  },
+  "expert_training": {
+    "episodes": 100,
+    "successes": 100,
+    "pickups": 100,
+    "collisions": 0,
+    "invalid_grasps": 0,
+    "mean_simulated_seconds": 7.330000000000001,
+    "control_steps_per_second": 13782.626693566754
+  },
+  "expert_validation": {
+    "episodes": 30,
+    "successes": 30,
+    "pickups": 30,
+    "collisions": 0,
+    "invalid_grasps": 0,
+    "mean_simulated_seconds": 7.448333333333334,
+    "control_steps_per_second": 13470.618493501668
+  },
+  "initial_policy_validation": {
+    "episodes": 30,
+    "successes": 0,
+    "pickups": 0,
+    "collisions": 10,
+    "invalid_grasps": 0,
+    "mean_simulated_seconds": 29.208333333333336,
+    "control_steps_per_second": 14677.813623495427
+  },
+  "learned_validation": {
+    "episodes": 30,
+    "successes": 30,
+    "pickups": 30,
+    "collisions": 0,
+    "invalid_grasps": 0,
+    "mean_simulated_seconds": 6.553333333333333,
+    "control_steps_per_second": 11734.55489663314
+  },
+  "validation_episodes": [
+    {
+      "seed": 10000,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.65,
+      "steps": 133,
+      "wall_seconds": 0.011661834025289863,
+      "failure": null
+    },
+    {
+      "seed": 10001,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.1000000000000005,
+      "steps": 122,
+      "wall_seconds": 0.010622917034197599,
+      "failure": null
+    },
+    {
+      "seed": 10002,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.0,
+      "steps": 120,
+      "wall_seconds": 0.010615749983116984,
+      "failure": null
+    },
+    {
+      "seed": 10003,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.3500000000000005,
+      "steps": 127,
+      "wall_seconds": 0.0109626249759458,
+      "failure": null
+    },
+    {
+      "seed": 10004,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 5.7,
+      "steps": 114,
+      "wall_seconds": 0.01021083298837766,
+      "failure": null
+    },
+    {
+      "seed": 10005,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.800000000000001,
+      "steps": 136,
+      "wall_seconds": 0.01124325004639104,
+      "failure": null
+    },
+    {
+      "seed": 10006,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.7,
+      "steps": 134,
+      "wall_seconds": 0.011230208037886769,
+      "failure": null
+    },
+    {
+      "seed": 10007,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.0,
+      "steps": 120,
+      "wall_seconds": 0.01014374999795109,
+      "failure": null
+    },
+    {
+      "seed": 10008,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 5.800000000000001,
+      "steps": 116,
+      "wall_seconds": 0.009530042007099837,
+      "failure": null
+    },
+    {
+      "seed": 10009,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 5.75,
+      "steps": 115,
+      "wall_seconds": 0.009929124964401126,
+      "failure": null
+    },
+    {
+      "seed": 10010,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.9,
+      "steps": 138,
+      "wall_seconds": 0.010972457996103913,
+      "failure": null
+    },
+    {
+      "seed": 10011,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.050000000000001,
+      "steps": 121,
+      "wall_seconds": 0.010603875038214028,
+      "failure": null
+    },
+    {
+      "seed": 10012,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 7.15,
+      "steps": 143,
+      "wall_seconds": 0.012448750028852373,
+      "failure": null
+    },
+    {
+      "seed": 10013,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.5,
+      "steps": 130,
+      "wall_seconds": 0.011099834053311497,
+      "failure": null
+    },
+    {
+      "seed": 10014,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 7.300000000000001,
+      "steps": 146,
+      "wall_seconds": 0.012077874969691038,
+      "failure": null
+    },
+    {
+      "seed": 10015,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.800000000000001,
+      "steps": 136,
+      "wall_seconds": 0.011914708011317998,
+      "failure": null
+    },
+    {
+      "seed": 10016,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.95,
+      "steps": 139,
+      "wall_seconds": 0.0119452920043841,
+      "failure": null
+    },
+    {
+      "seed": 10017,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.050000000000001,
+      "steps": 121,
+      "wall_seconds": 0.010587750002741814,
+      "failure": null
+    },
+    {
+      "seed": 10018,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.6000000000000005,
+      "steps": 132,
+      "wall_seconds": 0.01091816701227799,
+      "failure": null
+    },
+    {
+      "seed": 10019,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 5.95,
+      "steps": 119,
+      "wall_seconds": 0.010330000019166619,
+      "failure": null
+    },
+    {
+      "seed": 10020,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 8.1,
+      "steps": 162,
+      "wall_seconds": 0.013872040959540755,
+      "failure": null
+    },
+    {
+      "seed": 10021,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.5,
+      "steps": 130,
+      "wall_seconds": 0.010884749994147569,
+      "failure": null
+    },
+    {
+      "seed": 10022,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 7.75,
+      "steps": 155,
+      "wall_seconds": 0.013362833007704467,
+      "failure": null
+    },
+    {
+      "seed": 10023,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 5.75,
+      "steps": 115,
+      "wall_seconds": 0.009596250019967556,
+      "failure": null
+    },
+    {
+      "seed": 10024,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.5,
+      "steps": 130,
+      "wall_seconds": 0.01122620899695903,
+      "failure": null
+    },
+    {
+      "seed": 10025,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 7.4,
+      "steps": 148,
+      "wall_seconds": 0.012336915999185294,
+      "failure": null
+    },
+    {
+      "seed": 10026,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 5.7,
+      "steps": 114,
+      "wall_seconds": 0.00975812500109896,
+      "failure": null
+    },
+    {
+      "seed": 10027,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.550000000000001,
+      "steps": 131,
+      "wall_seconds": 0.010978207981679589,
+      "failure": null
+    },
+    {
+      "seed": 10028,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 7.75,
+      "steps": 155,
+      "wall_seconds": 0.013264041976071894,
+      "failure": null
+    },
+    {
+      "seed": 10029,
+      "success": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_grasps": 0,
+      "simulated_seconds": 6.5,
+      "steps": 130,
+      "wall_seconds": 0.010750334011390805,
+      "failure": null
+    }
+  ],
+  "history": [
+    {
+      "epoch": 10,
+      "loss": 0.03139827268627974,
+      "validation": {
+        "episodes": 30,
+        "successes": 30,
+        "pickups": 30,
+        "collisions": 0,
+        "invalid_grasps": 0,
+        "mean_simulated_seconds": 6.553333333333333,
+        "control_steps_per_second": 12106.759435573806
+      }
+    },
+    {
+      "epoch": 20,
+      "loss": 0.018716477015270638,
+      "validation": {
+        "episodes": 30,
+        "successes": 30,
+        "pickups": 30,
+        "collisions": 0,
+        "invalid_grasps": 0,
+        "mean_simulated_seconds": 6.763333333333333,
+        "control_steps_per_second": 11504.963304781615
+      }
+    },
+    {
+      "epoch": 30,
+      "loss": 0.012711396928016956,
+      "validation": {
+        "episodes": 30,
+        "successes": 30,
+        "pickups": 30,
+        "collisions": 0,
+        "invalid_grasps": 0,
+        "mean_simulated_seconds": 6.988333333333332,
+        "control_steps_per_second": 11353.303149380443
+      }
+    },
+    {
+      "epoch": 40,
+      "loss": 0.009507535462482617,
+      "validation": {
+        "episodes": 30,
+        "successes": 30,
+        "pickups": 30,
+        "collisions": 0,
+        "invalid_grasps": 0,
+        "mean_simulated_seconds": 7.201666666666667,
+        "control_steps_per_second": 11312.684415669879
+      }
+    },
+    {
+      "epoch": 50,
+      "loss": 0.007652364484965801,
+      "validation": {
+        "episodes": 30,
+        "successes": 30,
+        "pickups": 30,
+        "collisions": 0,
+        "invalid_grasps": 0,
+        "mean_simulated_seconds": 7.401666666666667,
+        "control_steps_per_second": 12005.124105304149
+      }
+    },
+    {
+      "epoch": 60,
+      "loss": 0.006251155051331107,
+      "validation": {
+        "episodes": 30,
+        "successes": 30,
+        "pickups": 30,
+        "collisions": 0,
+        "invalid_grasps": 0,
+        "mean_simulated_seconds": 7.410000000000001,
+        "control_steps_per_second": 11468.860829649557
+      }
+    },
+    {
+      "epoch": 70,
+      "loss": 0.005392105891727484,
+      "validation": {
+        "episodes": 30,
+        "successes": 30,
+        "pickups": 30,
+        "collisions": 0,
+        "invalid_grasps": 0,
+        "mean_simulated_seconds": 7.446666666666667,
+        "control_steps_per_second": 10849.742662626259
+      }
+    },
+    {
+      "epoch": 80,
+      "loss": 0.004731841261785191,
+      "validation": {
+        "episodes": 30,
+        "successes": 30,
+        "pickups": 30,
+        "collisions": 0,
+        "invalid_grasps": 0,
+        "mean_simulated_seconds": 7.366666666666666,
+        "control_steps_per_second": 11878.169526400376
+      }
+    }
+  ],
+  "final_test_evaluated": false
+}
