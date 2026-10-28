@@ -1,0 +1,392 @@
+{
+  "$defs": {
+    "Ack": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted": {
+          "title": "Accepted",
+          "type": "boolean"
+        },
+        "api_version": {
+          "const": "1",
+          "title": "Api Version",
+          "type": "string"
+        },
+        "command": {
+          "enum": [
+            "ping",
+            "reset_preview"
+          ],
+          "title": "Command",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "ack",
+          "title": "Kind",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "enum": [
+                "stale_generation",
+                "session_mismatch",
+                "rate_limited"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "request_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        },
+        "tick": {
+          "minimum": 0,
+          "title": "Tick",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "api_version",
+        "session_id",
+        "generation",
+        "tick",
+        "kind",
+        "request_id",
+        "command",
+        "accepted",
+        "reason"
+      ],
+      "title": "Ack",
+      "type": "object"
+    },
+    "Heartbeat": {
+      "additionalProperties": false,
+      "properties": {
+        "api_version": {
+          "const": "1",
+          "title": "Api Version",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "heartbeat",
+          "title": "Kind",
+          "type": "string"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        },
+        "tick": {
+          "minimum": 0,
+          "title": "Tick",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "api_version",
+        "session_id",
+        "generation",
+        "tick",
+        "kind"
+      ],
+      "title": "Heartbeat",
+      "type": "object"
+    },
+    "Hello": {
+      "additionalProperties": false,
+      "properties": {
+        "api_version": {
+          "const": "1",
+          "title": "Api Version",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "hello",
+          "title": "Kind",
+          "type": "string"
+        },
+        "mode": {
+          "const": "foundation_preview",
+          "default": "foundation_preview",
+          "title": "Mode",
+          "type": "string"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        },
+        "tick": {
+          "minimum": 0,
+          "title": "Tick",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "api_version",
+        "session_id",
+        "generation",
+        "tick",
+        "kind"
+      ],
+      "title": "Hello",
+      "type": "object"
+    },
+    "Robot": {
+      "additionalProperties": false,
+      "properties": {
+        "heading": {
+          "title": "Heading",
+          "type": "number"
+        },
+        "holding": {
+          "title": "Holding",
+          "type": "boolean"
+        },
+        "id": {
+          "const": "caretaker",
+          "title": "Id",
+          "type": "string"
+        },
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "x",
+        "y",
+        "heading",
+        "holding"
+      ],
+      "title": "Robot",
+      "type": "object"
+    },
+    "Scene": {
+      "additionalProperties": false,
+      "properties": {
+        "capsule": {
+          "$ref": "#/$defs/SceneObject"
+        },
+        "mode": {
+          "const": "foundation_preview",
+          "title": "Mode",
+          "type": "string"
+        },
+        "robot": {
+          "$ref": "#/$defs/Robot"
+        },
+        "tray": {
+          "$ref": "#/$defs/SceneObject"
+        }
+      },
+      "required": [
+        "mode",
+        "robot",
+        "capsule",
+        "tray"
+      ],
+      "title": "Scene",
+      "type": "object"
+    },
+    "SceneObject": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "position": {
+          "$ref": "#/$defs/Vector3"
+        }
+      },
+      "required": [
+        "id",
+        "position"
+      ],
+      "title": "SceneObject",
+      "type": "object"
+    },
+    "Snapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "api_version": {
+          "const": "1",
+          "title": "Api Version",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "snapshot",
+          "title": "Kind",
+          "type": "string"
+        },
+        "scene": {
+          "$ref": "#/$defs/Scene"
+        },
+        "seed": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        },
+        "tick": {
+          "minimum": 0,
+          "title": "Tick",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "api_version",
+        "session_id",
+        "generation",
+        "tick",
+        "kind",
+        "seed",
+        "scene"
+      ],
+      "title": "Snapshot",
+      "type": "object"
+    },
+    "StreamError": {
+      "additionalProperties": false,
+      "properties": {
+        "api_version": {
+          "const": "1",
+          "title": "Api Version",
+          "type": "string"
+        },
+        "code": {
+          "const": "invalid_message",
+          "default": "invalid_message",
+          "title": "Code",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "error",
+          "title": "Kind",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        },
+        "tick": {
+          "minimum": 0,
+          "title": "Tick",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "api_version",
+        "session_id",
+        "generation",
+        "tick",
+        "kind",
+        "message"
+      ],
+      "title": "StreamError",
+      "type": "object"
+    },
+    "Vector3": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        },
+        "z": {
+          "title": "Z",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
+      "title": "Vector3",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "ack": "#/$defs/Ack",
+      "error": "#/$defs/StreamError",
+      "heartbeat": "#/$defs/Heartbeat",
+      "hello": "#/$defs/Hello",
+      "snapshot": "#/$defs/Snapshot"
+    },
+    "propertyName": "kind"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/Hello"
+    },
+    {
+      "$ref": "#/$defs/Snapshot"
+    },
+    {
+      "$ref": "#/$defs/Heartbeat"
+    },
+    {
+      "$ref": "#/$defs/Ack"
+    },
+    {
+      "$ref": "#/$defs/StreamError"
+    }
+  ]
+}

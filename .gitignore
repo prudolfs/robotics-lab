@@ -57,6 +57,17 @@ scripts/greenhouse-phase0/artifacts/
 scripts/greenhouse-phase0/web/node_modules/
 scripts/greenhouse-phase0/web/dist/
 
+# Project-owned Greenhouse service and browser verification output.
+apps/greenhouse-server/.venv/
+apps/greenhouse-server/.mypy_cache/
+apps/greenhouse-server/.pytest_cache/
+apps/greenhouse-server/.ruff_cache/
+apps/greenhouse-server/**/__pycache__/
+apps/greenhouse-server/runtime/
+apps/greenhouse-server/*.egg-info/
+apps/greenhouse-demo/test-results/
+apps/greenhouse-demo/playwright-report/
+
 # Rebuilt by scripts/slam-vision/build.mjs before SLAM dev/build.
 apps/slam-demo/public/vision/worker.js
 

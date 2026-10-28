@@ -2,7 +2,7 @@
 
 > Proposed implementation plan for the next Robotics Lab project: an expressive robot that learns useful tasks in a simulated greenhouse.
 >
-> Status: Phase 0 complete; awaiting user review. See the [Phase 0 review](greenhouse-demo/phase0/README.md). Later phases remain unchecked. Stop before starting Phase 1.
+> Status: Phases 0–1 complete; awaiting user review of the [Phase 1 foundation](greenhouse-demo/phase1/README.md). Later phases remain unchecked. Stop before starting Phase 2.
 
 ## Goal and experience
 
@@ -60,7 +60,7 @@ Proposed root commands are `pnpm setup:greenhouse`, `pnpm dev:greenhouse`, `pnpm
 | Training | PyTorch behavior cloning first; Gymnasium and Stable-Baselines3 PPO for the later practice experiment. Training interacts directly with the environment. |
 | Jobs | A separate worker process performs training/evaluation. Persist job state, metrics and checkpoint references so CPU-heavy work does not block API requests. |
 | Missions | LangGraph coordinates skill execution and bounded recovery. Use LangChain model/tool integrations where useful; model calls remain above the motor-control loop. |
-| Contracts | Version HTTP schemas through FastAPI/Pydantic and generate the TypeScript HTTP client/types. Define and validate WebSocket envelopes separately; OpenAPI does not describe their message protocol. |
+| Contracts | Generate shared TypeScript HTTP model types directly from Pydantic JSON Schema and use a small typed fetch client with runtime validation. Keep TypeScript 7. FastAPI's OpenAPI remains automatic HTTP documentation; the frontend does not depend on an OpenAPI generator. Export and validate WebSocket envelopes separately. |
 | Persistence | Local files for recordings, datasets and model artifacts; SQLite for job/session metadata and mission checkpoints where suitable. Define artifact locations and retention explicitly. |
 | Browser policies | Server-side execution for the first release. ONNX/browser execution is a later option requiring a compatible browser simulation or continued backend state exchange. |
 
@@ -111,16 +111,16 @@ Exit verified: the [Phase 0 review](greenhouse-demo/phase0/README.md) records th
 
 ### Phase 1 — Monorepo service and application foundation
 
-- [ ] Scaffold `apps/greenhouse-demo` and `apps/greenhouse-server`, with app-local dependencies and a packaged Python import layout.
-- [ ] Add uv dependency locking, a Python version pin and ignored virtual environment/cache/runtime output directories.
-- [ ] Add root setup/development/test/build commands and pnpm wrappers for Python test, lint and type checks.
-- [ ] Start Vite and FastAPI together with clear logs, documented ports and clean process shutdown; avoid relying on globally installed Python libraries or Laya.
-- [ ] Implement health/capability endpoints and versioned HTTP contracts; generate the TypeScript HTTP client.
-- [ ] Define validated streaming messages with session IDs, generation IDs, tick numbers and command acknowledgments.
-- [ ] Build the frontend shell with connection, loading, unavailable-server and unsupported-renderer states.
-- [ ] Add a fresh-checkout startup guide covering Python/uv prerequisites and model-provider configuration only where required.
+- [x] Scaffold `apps/greenhouse-demo` and `apps/greenhouse-server`, with app-local dependencies and a packaged Python import layout.
+- [x] Add uv dependency locking, a Python version pin and ignored virtual environment/cache/runtime output directories.
+- [x] Add root setup/development/test/build commands and pnpm wrappers for Python test, lint and type checks.
+- [x] Start Vite and FastAPI together with clear logs, documented ports and clean process shutdown; avoid relying on globally installed Python libraries or Laya.
+- [x] Implement health/capability endpoints and versioned HTTP contracts; generate shared model types from Pydantic JSON Schema and add a typed fetch client without downgrading TypeScript 7.
+- [x] Define validated streaming messages with session IDs, generation IDs, tick numbers and command acknowledgments.
+- [x] Build the frontend shell with connection, loading, unavailable-server and unsupported-renderer states.
+- [x] Add a fresh-checkout startup guide covering Python/uv prerequisites and model-provider configuration only where required.
 
-Exit: a reproducible project-owned server and browser app launched from the monorepo. Stop for user review before Phase 2.
+Exit verified: the [Phase 1 review](greenhouse-demo/phase1/README.md) records the live service/session connection, TypeScript 7 with Pydantic-generated types, passing service/browser checks, production captures and clean paired startup/shutdown. Stop for user review before Phase 2.
 
 ### Phase 2 — Authoritative greenhouse world and reference behavior
 

@@ -1,0 +1,15 @@
+{
+	"name": "@robotics-lab/greenhouse-server",
+	"private": true,
+	"scripts": {
+		"setup": "uv sync --locked",
+		"dev": "uv run --locked uvicorn greenhouse.api.main:app --host 127.0.0.1 --port 8001 --reload --reload-dir src",
+		"start": "uv run --locked uvicorn greenhouse.api.main:app --host 127.0.0.1 --port 8001",
+		"test": "uv run --locked pytest",
+		"lint": "uv run --locked ruff check . && uv run --locked ruff format --check .",
+		"typecheck": "uv run --locked mypy",
+    "build": "uv build",
+		"contracts": "uv run --locked python -m greenhouse.export_contracts",
+		"contracts:check": "uv run --locked python -m greenhouse.export_contracts --check"
+	}
+}

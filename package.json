@@ -8,6 +8,13 @@
 	"type": "module",
 	"main": "index.js",
 	"scripts": {
+		"setup:greenhouse": "pnpm -C apps/greenhouse-server setup && pnpm contracts:greenhouse",
+		"dev:greenhouse": "node scripts/greenhouse/dev.mjs",
+		"contracts:greenhouse": "pnpm -C apps/greenhouse-server contracts && pnpm -C apps/greenhouse-demo contracts",
+		"check:contracts:greenhouse": "pnpm -C apps/greenhouse-server contracts:check && pnpm -C apps/greenhouse-demo contracts:check",
+		"test:greenhouse": "pnpm check:contracts:greenhouse && pnpm -C apps/greenhouse-server test && pnpm -C apps/greenhouse-server lint && pnpm -C apps/greenhouse-server typecheck && pnpm -C apps/greenhouse-demo test && pnpm -C apps/greenhouse-demo typecheck && pnpm -C apps/greenhouse-demo lint",
+		"test:e2e:greenhouse": "pnpm -C apps/greenhouse-demo test:e2e",
+		"build:greenhouse": "pnpm check:contracts:greenhouse && pnpm -C apps/greenhouse-server typecheck && pnpm -C apps/greenhouse-server build && pnpm -C apps/greenhouse-demo build",
 		"lint": "biome lint",
 		"format": "biome format --write",
 		"check": "biome check --write --unsafe",

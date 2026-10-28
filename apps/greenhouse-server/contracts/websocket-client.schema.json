@@ -1,0 +1,106 @@
+{
+  "$defs": {
+    "Ping": {
+      "additionalProperties": false,
+      "properties": {
+        "api_version": {
+          "const": "1",
+          "title": "Api Version",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "ping",
+          "title": "Kind",
+          "type": "string"
+        },
+        "request_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "api_version",
+        "session_id",
+        "generation",
+        "kind",
+        "request_id"
+      ],
+      "title": "Ping",
+      "type": "object"
+    },
+    "ResetPreview": {
+      "additionalProperties": false,
+      "properties": {
+        "api_version": {
+          "const": "1",
+          "title": "Api Version",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "reset_preview",
+          "title": "Kind",
+          "type": "string"
+        },
+        "request_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "seed": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "api_version",
+        "session_id",
+        "generation",
+        "kind",
+        "request_id",
+        "seed"
+      ],
+      "title": "ResetPreview",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "ping": "#/$defs/Ping",
+      "reset_preview": "#/$defs/ResetPreview"
+    },
+    "propertyName": "kind"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/Ping"
+    },
+    {
+      "$ref": "#/$defs/ResetPreview"
+    }
+  ]
+}

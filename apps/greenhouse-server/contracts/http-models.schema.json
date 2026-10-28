@@ -1,0 +1,274 @@
+{
+  "$defs": {
+    "Capabilities": {
+      "additionalProperties": false,
+      "properties": {
+        "api_version": {
+          "const": "1",
+          "default": "1",
+          "title": "Api Version",
+          "type": "string"
+        },
+        "commands": {
+          "default": [
+            "ping",
+            "reset_preview"
+          ],
+          "items": {
+            "enum": [
+              "ping",
+              "reset_preview"
+            ],
+            "type": "string"
+          },
+          "title": "Commands",
+          "type": "array"
+        },
+        "heartbeat_hz": {
+          "default": 1,
+          "title": "Heartbeat Hz",
+          "type": "integer"
+        },
+        "language_missions": {
+          "default": false,
+          "title": "Language Missions",
+          "type": "boolean"
+        },
+        "max_sessions": {
+          "default": 16,
+          "title": "Max Sessions",
+          "type": "integer"
+        },
+        "mode": {
+          "const": "foundation_preview",
+          "default": "foundation_preview",
+          "title": "Mode",
+          "type": "string"
+        },
+        "simulation": {
+          "default": false,
+          "title": "Simulation",
+          "type": "boolean"
+        },
+        "training": {
+          "default": false,
+          "title": "Training",
+          "type": "boolean"
+        }
+      },
+      "title": "Capabilities",
+      "type": "object"
+    },
+    "CreateSession": {
+      "additionalProperties": false,
+      "properties": {
+        "seed": {
+          "default": 42,
+          "maximum": 2147483647,
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "title": "CreateSession",
+      "type": "object"
+    },
+    "Health": {
+      "additionalProperties": false,
+      "properties": {
+        "api_version": {
+          "const": "1",
+          "default": "1",
+          "title": "Api Version",
+          "type": "string"
+        },
+        "server_version": {
+          "title": "Server Version",
+          "type": "string"
+        },
+        "status": {
+          "const": "ok",
+          "default": "ok",
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "server_version"
+      ],
+      "title": "Health",
+      "type": "object"
+    },
+    "Robot": {
+      "additionalProperties": false,
+      "properties": {
+        "heading": {
+          "title": "Heading",
+          "type": "number"
+        },
+        "holding": {
+          "title": "Holding",
+          "type": "boolean"
+        },
+        "id": {
+          "const": "caretaker",
+          "title": "Id",
+          "type": "string"
+        },
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "x",
+        "y",
+        "heading",
+        "holding"
+      ],
+      "title": "Robot",
+      "type": "object"
+    },
+    "Scene": {
+      "additionalProperties": false,
+      "properties": {
+        "capsule": {
+          "$ref": "#/$defs/SceneObject"
+        },
+        "mode": {
+          "const": "foundation_preview",
+          "title": "Mode",
+          "type": "string"
+        },
+        "robot": {
+          "$ref": "#/$defs/Robot"
+        },
+        "tray": {
+          "$ref": "#/$defs/SceneObject"
+        }
+      },
+      "required": [
+        "mode",
+        "robot",
+        "capsule",
+        "tray"
+      ],
+      "title": "Scene",
+      "type": "object"
+    },
+    "SceneObject": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "position": {
+          "$ref": "#/$defs/Vector3"
+        }
+      },
+      "required": [
+        "id",
+        "position"
+      ],
+      "title": "SceneObject",
+      "type": "object"
+    },
+    "SessionView": {
+      "additionalProperties": false,
+      "properties": {
+        "api_version": {
+          "const": "1",
+          "default": "1",
+          "title": "Api Version",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "scene": {
+          "$ref": "#/$defs/Scene"
+        },
+        "seed": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        },
+        "tick": {
+          "minimum": 0,
+          "title": "Tick",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "session_id",
+        "generation",
+        "tick",
+        "seed",
+        "scene"
+      ],
+      "title": "SessionView",
+      "type": "object"
+    },
+    "Vector3": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        },
+        "z": {
+          "title": "Z",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
+      "title": "Vector3",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Schema bundle for TypeScript generation; not a synthetic HTTP endpoint.",
+  "properties": {
+    "capabilities": {
+      "$ref": "#/$defs/Capabilities"
+    },
+    "create_session": {
+      "$ref": "#/$defs/CreateSession"
+    },
+    "health": {
+      "$ref": "#/$defs/Health"
+    },
+    "session": {
+      "$ref": "#/$defs/SessionView"
+    }
+  },
+  "required": [
+    "health",
+    "capabilities",
+    "create_session",
+    "session"
+  ],
+  "title": "HttpModels",
+  "type": "object"
+}

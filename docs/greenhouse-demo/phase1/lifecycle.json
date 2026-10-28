@@ -1,0 +1,15 @@
+{
+  "port_conflict_rejected_without_starting_frontend": true,
+  "cycles": [
+    {
+      "startup": true,
+      "sigint_exit_code": 0,
+      "both_ports_released": true
+    },
+    {
+      "startup": true,
+      "sigint_exit_code": 0,
+      "both_ports_released": true
+    }
+  ]
+}

@@ -1,0 +1,455 @@
+{
+  "components": {
+    "schemas": {
+      "Capabilities": {
+        "additionalProperties": false,
+        "properties": {
+          "api_version": {
+            "const": "1",
+            "default": "1",
+            "title": "Api Version",
+            "type": "string"
+          },
+          "commands": {
+            "default": [
+              "ping",
+              "reset_preview"
+            ],
+            "items": {
+              "enum": [
+                "ping",
+                "reset_preview"
+              ],
+              "type": "string"
+            },
+            "title": "Commands",
+            "type": "array"
+          },
+          "heartbeat_hz": {
+            "default": 1,
+            "title": "Heartbeat Hz",
+            "type": "integer"
+          },
+          "language_missions": {
+            "default": false,
+            "title": "Language Missions",
+            "type": "boolean"
+          },
+          "max_sessions": {
+            "default": 16,
+            "title": "Max Sessions",
+            "type": "integer"
+          },
+          "mode": {
+            "const": "foundation_preview",
+            "default": "foundation_preview",
+            "title": "Mode",
+            "type": "string"
+          },
+          "simulation": {
+            "default": false,
+            "title": "Simulation",
+            "type": "boolean"
+          },
+          "training": {
+            "default": false,
+            "title": "Training",
+            "type": "boolean"
+          }
+        },
+        "title": "Capabilities",
+        "type": "object"
+      },
+      "CreateSession": {
+        "additionalProperties": false,
+        "properties": {
+          "seed": {
+            "default": 42,
+            "maximum": 2147483647.0,
+            "minimum": 0.0,
+            "title": "Seed",
+            "type": "integer"
+          }
+        },
+        "title": "CreateSession",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Health": {
+        "additionalProperties": false,
+        "properties": {
+          "api_version": {
+            "const": "1",
+            "default": "1",
+            "title": "Api Version",
+            "type": "string"
+          },
+          "server_version": {
+            "title": "Server Version",
+            "type": "string"
+          },
+          "status": {
+            "const": "ok",
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "server_version"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "Robot": {
+        "additionalProperties": false,
+        "properties": {
+          "heading": {
+            "title": "Heading",
+            "type": "number"
+          },
+          "holding": {
+            "title": "Holding",
+            "type": "boolean"
+          },
+          "id": {
+            "const": "caretaker",
+            "title": "Id",
+            "type": "string"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "x",
+          "y",
+          "heading",
+          "holding"
+        ],
+        "title": "Robot",
+        "type": "object"
+      },
+      "Scene": {
+        "additionalProperties": false,
+        "properties": {
+          "capsule": {
+            "$ref": "#/components/schemas/SceneObject"
+          },
+          "mode": {
+            "const": "foundation_preview",
+            "title": "Mode",
+            "type": "string"
+          },
+          "robot": {
+            "$ref": "#/components/schemas/Robot"
+          },
+          "tray": {
+            "$ref": "#/components/schemas/SceneObject"
+          }
+        },
+        "required": [
+          "mode",
+          "robot",
+          "capsule",
+          "tray"
+        ],
+        "title": "Scene",
+        "type": "object"
+      },
+      "SceneObject": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "position": {
+            "$ref": "#/components/schemas/Vector3"
+          }
+        },
+        "required": [
+          "id",
+          "position"
+        ],
+        "title": "SceneObject",
+        "type": "object"
+      },
+      "SessionView": {
+        "additionalProperties": false,
+        "properties": {
+          "api_version": {
+            "const": "1",
+            "default": "1",
+            "title": "Api Version",
+            "type": "string"
+          },
+          "generation": {
+            "minimum": 0.0,
+            "title": "Generation",
+            "type": "integer"
+          },
+          "scene": {
+            "$ref": "#/components/schemas/Scene"
+          },
+          "seed": {
+            "maximum": 2147483647.0,
+            "minimum": 0.0,
+            "title": "Seed",
+            "type": "integer"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "tick": {
+            "minimum": 0.0,
+            "title": "Tick",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "session_id",
+          "generation",
+          "tick",
+          "seed",
+          "scene"
+        ],
+        "title": "SessionView",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "Vector3": {
+        "additionalProperties": false,
+        "properties": {
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          },
+          "z": {
+            "title": "Z",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "z"
+        ],
+        "title": "Vector3",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Greenhouse Caretaker API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/greenhouse/capabilities": {
+      "get": {
+        "operationId": "get_capabilities",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capabilities"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Capabilities"
+      }
+    },
+    "/api/v1/greenhouse/health": {
+      "get": {
+        "operationId": "get_health",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/api/v1/greenhouse/sessions": {
+      "post": {
+        "operationId": "create_session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSession"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Session"
+      }
+    },
+    "/api/v1/greenhouse/sessions/{session_id}": {
+      "delete": {
+        "operationId": "delete_session",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Session"
+      },
+      "get": {
+        "operationId": "get_session",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Session"
+      }
+    }
+  }
+}
