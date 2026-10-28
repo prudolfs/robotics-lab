@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { api, type SessionView } from './client'
+import type { ClientMessage } from './generated/websocket-client'
 import { encodeCommand, isCurrentMessage, parseServerMessage } from './protocol'
+
+export type SimulationCommand = Exclude<ClientMessage['kind'], 'ping'>
 
 type Connection = {
 	status: 'connecting' | 'connected' | 'unavailable' | 'error'
@@ -47,8 +50,8 @@ export function useSession() {
 				if (health.api_version !== '1')
 					throw new Error('The greenhouse server is unavailable or uses an incompatible API.')
 				const capabilities = await api.capabilities(abort.signal)
-				if (capabilities.mode !== 'foundation_preview')
-					throw new Error('The greenhouse server does not support this preview.')
+				if (capabilities.mode !== 'reference_simulation')
+					throw new Error('The greenhouse server does not support this simulation.')
 				const created = await api.createSession({ seed: 42 }, abort.signal)
 				sessionId = created.session_id
 				if (disposed) {
@@ -74,10 +77,17 @@ export function useSession() {
 					try {
 						const message = parseServerMessage(event.data)
 						const view = current.current
-						if (!view || !isCurrentMessage(message, view.session_id, view.generation, view.tick))
+						if (
+							!view ||
+							message.session_id !== view.session_id ||
+							message.generation < view.generation
+						)
 							return
 						lastMessage = Date.now()
-						if (message.kind === 'snapshot') {
+						if (
+							message.kind === 'snapshot' &&
+							isCurrentMessage(message, view.session_id, view.generation, view.tick)
+						) {
 							const session: SessionView = {
 								api_version: '1',
 								session_id: message.session_id,
@@ -103,12 +113,27 @@ export function useSession() {
 						) {
 							clearTimeout(pending.current.timer)
 							pending.current = null
+							if (message.accepted)
+								current.current = {
+									...view,
+									generation: message.generation,
+									tick:
+										message.generation > view.generation
+											? message.tick
+											: Math.max(view.tick, message.tick),
+								}
 							setState((previous) => ({
 								...previous,
 								pending: false,
 								message: message.accepted
-									? 'Preview reset acknowledged.'
-									: `Preview reset rejected: ${message.reason}.`,
+									? {
+											start: 'Collection started.',
+											pause: 'Collection paused.',
+											reset: 'Scenario reset.',
+											new_seed: 'New scenario ready.',
+											ping: 'Connection confirmed.',
+										}[message.command]
+									: `Command rejected: ${message.reason}.`,
 							}))
 						} else if (message.kind === 'error') {
 							fail(message.message, 'error')
@@ -164,7 +189,7 @@ export function useSession() {
 		}
 	}, [attempt])
 
-	function resetPreview() {
+	function command(kind: SimulationCommand) {
 		const view = current.current
 		const socket = socketRef.current
 		if (!view || socket?.readyState !== WebSocket.OPEN || pending.current) return
@@ -175,7 +200,7 @@ export function useSession() {
 				...previous,
 				status: 'unavailable',
 				pending: false,
-				message: 'The reset was not acknowledged. Reconnect and try again.',
+				message: 'The command was not acknowledged. Reconnect and try again.',
 			}))
 			socket.close()
 		}, 4000)
@@ -184,14 +209,13 @@ export function useSession() {
 		socket.send(
 			encodeCommand({
 				api_version: '1',
-				kind: 'reset_preview',
+				kind,
 				request_id: id,
 				session_id: view.session_id,
 				generation: view.generation,
-				seed: view.seed,
 			}),
 		)
 	}
 
-	return { ...state, resetPreview, reconnect: () => setAttempt((value) => value + 1) }
+	return { ...state, command, reconnect: () => setAttempt((value) => value + 1) }
 }

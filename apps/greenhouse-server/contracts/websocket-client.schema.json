@@ -1,5 +1,49 @@
 {
   "$defs": {
+    "Control": {
+      "additionalProperties": false,
+      "properties": {
+        "api_version": {
+          "const": "1",
+          "title": "Api Version",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "kind": {
+          "enum": [
+            "start",
+            "pause",
+            "new_seed"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "request_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "api_version",
+        "session_id",
+        "generation",
+        "kind",
+        "request_id"
+      ],
+      "title": "Control",
+      "type": "object"
+    },
     "Ping": {
       "additionalProperties": false,
       "properties": {
@@ -40,7 +84,7 @@
       "title": "Ping",
       "type": "object"
     },
-    "ResetPreview": {
+    "Reset": {
       "additionalProperties": false,
       "properties": {
         "api_version": {
@@ -54,7 +98,7 @@
           "type": "integer"
         },
         "kind": {
-          "const": "reset_preview",
+          "const": "reset",
           "title": "Kind",
           "type": "string"
         },
@@ -64,12 +108,6 @@
           "pattern": "^[a-zA-Z0-9_-]+$",
           "title": "Request Id",
           "type": "string"
-        },
-        "seed": {
-          "maximum": 2147483647,
-          "minimum": 0,
-          "title": "Seed",
-          "type": "integer"
         },
         "session_id": {
           "title": "Session Id",
@@ -81,17 +119,19 @@
         "session_id",
         "generation",
         "kind",
-        "request_id",
-        "seed"
+        "request_id"
       ],
-      "title": "ResetPreview",
+      "title": "Reset",
       "type": "object"
     }
   },
   "discriminator": {
     "mapping": {
+      "new_seed": "#/$defs/Control",
+      "pause": "#/$defs/Control",
       "ping": "#/$defs/Ping",
-      "reset_preview": "#/$defs/ResetPreview"
+      "reset": "#/$defs/Reset",
+      "start": "#/$defs/Control"
     },
     "propertyName": "kind"
   },
@@ -100,7 +140,10 @@
       "$ref": "#/$defs/Ping"
     },
     {
-      "$ref": "#/$defs/ResetPreview"
+      "$ref": "#/$defs/Reset"
+    },
+    {
+      "$ref": "#/$defs/Control"
     }
   ]
 }

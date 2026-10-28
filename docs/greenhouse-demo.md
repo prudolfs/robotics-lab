@@ -2,7 +2,7 @@
 
 > Proposed implementation plan for the next Robotics Lab project: an expressive robot that learns useful tasks in a simulated greenhouse.
 >
-> Status: Phases 0–1 complete; awaiting user review of the [Phase 1 foundation](greenhouse-demo/phase1/README.md). Later phases remain unchecked. Stop before starting Phase 2.
+> Status: Phases 0–2 complete; awaiting user review of the [Phase 2 simulation](greenhouse-demo/phase2/README.md). Later phases remain unchecked. Stop before starting Phase 3.
 
 ## Goal and experience
 
@@ -55,7 +55,7 @@ Proposed root commands are `pnpm setup:greenhouse`, `pnpm dev:greenhouse`, `pnpm
 | Frontend / 3D | React, TypeScript and Vite, with React Three Fiber and Drei using Three.js WebGPU as the actual rendering backend. Verify and pin a compatible combination in Phase 0; keep renderer-specific dependencies app-local. Detect unsupported WebGPU explicitly instead of silently presenting a WebGL fallback as WebGPU. |
 | GUI | Tailwind CSS and shadcn/ui with Base UI primitives (Base Nova) for controls, panels and status displays. Keep simulation state outside React and use existing monorepo HUD/camera conventions where suitable. |
 | Simulation | Python-only, fixed-timestep environment with seeded reset, step, observation, reward, termination and snapshot interfaces. No dependency on FastAPI, LangGraph or rendering. |
-| Physics | Evaluate MuJoCo as the initial candidate in Phase 0. Commit to a backend only after headless stepping, platform installation and browser mesh alignment work. Clearly document simplified grasp constraints if used. |
+| Physics | MuJoCo 3.17.0, verified in Phases 0–2. Python owns fixed-step planar motion and contacts; constrained pickup, idealized sensing and wheel/traction limits are documented explicitly. |
 | API | FastAPI owns interactive session commands, snapshot streaming, dataset metadata, job control and artifacts. Stream render snapshots at a bounded rate separately from physics stepping. |
 | Training | PyTorch behavior cloning first; Gymnasium and Stable-Baselines3 PPO for the later practice experiment. Training interacts directly with the environment. |
 | Jobs | A separate worker process performs training/evaluation. Persist job state, metrics and checkpoint references so CPU-heavy work does not block API requests. |
@@ -124,16 +124,16 @@ Exit verified: the [Phase 1 review](greenhouse-demo/phase1/README.md) records th
 
 ### Phase 2 — Authoritative greenhouse world and reference behavior
 
-- [ ] Implement the fixed-step Python environment independently of HTTP, UI and training libraries.
-- [ ] Implement seeded capsule placement, robot reset, tray state and feasible scenario generation.
-- [ ] Implement wheel motion, collision handling, gripper/lift state and validated pickup/carry/release transitions.
-- [ ] Separate policy observations from simulator truth and document idealized sensing used in this phase.
-- [ ] Implement a scripted reference controller that completes the collection task and produces useful demonstration trajectories.
-- [ ] Add start, pause, same-seed reset and new-seed commands through the API, with bounded snapshot streaming.
-- [ ] Render placeholder greenhouse geometry and robot articulation from server state; add overview and follow views.
-- [ ] Verify seeded resets, task preconditions, timeouts, collisions, complete reference episodes and stale-command rejection after reset.
+- [x] Implement the fixed-step Python environment independently of HTTP, UI and training libraries.
+- [x] Implement seeded capsule placement, robot reset, tray state and feasible scenario generation.
+- [x] Implement wheel motion, collision handling, gripper/lift state and validated pickup/carry/release transitions.
+- [x] Separate policy observations from simulator truth and document idealized sensing used in this phase.
+- [x] Implement a scripted reference controller that completes the collection task and produces useful demonstration trajectories.
+- [x] Add start, pause, same-seed reset and new-seed commands through the API, with bounded snapshot streaming.
+- [x] Render placeholder greenhouse geometry and robot articulation from server state; add overview and follow views.
+- [x] Verify seeded resets, task preconditions, timeouts, collisions, complete reference episodes and stale-command rejection after reset.
 
-Exit: a coherent browser-visible collection task and a reproducible headless reference benchmark. Stop for user review before Phase 3.
+Exit verified: the [Phase 2 review](greenhouse-demo/phase2/README.md) records 130/130 headless reference completions, 43 Python checks, 8 production browser checks, live collection captures and explicit physics/sensing limits. Stop for user review before Phase 3.
 
 ### Phase 3 — Authored greenhouse and caretaker character
 

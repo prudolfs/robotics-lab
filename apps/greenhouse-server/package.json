@@ -8,8 +8,9 @@
 		"test": "uv run --locked pytest",
 		"lint": "uv run --locked ruff check . && uv run --locked ruff format --check .",
 		"typecheck": "uv run --locked mypy",
-    "build": "uv build",
+		"build": "uv build",
 		"contracts": "uv run --locked python -m greenhouse.export_contracts",
-		"contracts:check": "uv run --locked python -m greenhouse.export_contracts --check"
+		"contracts:check": "uv run --locked python -m greenhouse.export_contracts --check",
+		"benchmark": "uv run --locked python -m greenhouse.simulation.benchmark --output ../../docs/greenhouse-demo/phase2"
 	}
 }

@@ -22,13 +22,20 @@ class Health(Contract):
 
 class Capabilities(Contract):
     api_version: Literal["1"] = "1"
-    mode: Literal["foundation_preview"] = "foundation_preview"
-    simulation: bool = False
+    mode: Literal["reference_simulation"] = "reference_simulation"
+    simulation: bool = True
     training: bool = False
     language_missions: bool = False
     heartbeat_hz: int = 1
     max_sessions: int = 16
-    commands: list[Literal["ping", "reset_preview"]] = ["ping", "reset_preview"]
+    snapshot_hz: int = 10
+    commands: list[Literal["ping", "start", "pause", "reset", "new_seed"]] = [
+        "ping",
+        "start",
+        "pause",
+        "reset",
+        "new_seed",
+    ]
 
 
 class Robot(Contract):
@@ -37,6 +44,9 @@ class Robot(Contract):
     y: FiniteFloat
     heading: FiniteFloat
     holding: bool
+    lift_height: FiniteFloat
+    left_wheel_angle: FiniteFloat
+    right_wheel_angle: FiniteFloat
 
 
 class Vector3(Contract):
@@ -50,8 +60,33 @@ class SceneObject(Contract):
     position: Vector3
 
 
+class Obstacle(Contract):
+    id: str
+    position: Vector3
+    half_size: Vector3
+
+
+class TaskEvent(Contract):
+    tick: Count
+    kind: Literal["info", "success", "warning"]
+    text: str
+
+
 class Scene(Contract):
-    mode: Literal["foundation_preview"]
+    mode: Literal["reference_simulation"]
+    simulator_version: str
+    controller: Literal["scripted_reference"]
+    status: Literal["ready", "running", "paused", "complete", "failed"]
+    stage: Literal["approach", "grasp", "lift", "deliver", "lower", "release", "done"]
+    elapsed_seconds: FiniteFloat
+    delivered: bool
+    pickups: Count
+    collisions: Count
+    invalid_actions: Count
+    reason: str | None
+    events: list[TaskEvent]
+    walls: list[Obstacle]
+    pots: list[SceneObject]
     robot: Robot
     capsule: SceneObject
     tray: SceneObject
@@ -90,13 +125,17 @@ class Ping(Envelope):
     request_id: RequestId
 
 
-class ResetPreview(Envelope):
-    kind: Literal["reset_preview"]
+class Reset(Envelope):
+    kind: Literal["reset"]
     request_id: RequestId
-    seed: Seed
 
 
-ClientMessage = Annotated[Ping | ResetPreview, Field(discriminator="kind")]
+class Control(Envelope):
+    kind: Literal["start", "pause", "new_seed"]
+    request_id: RequestId
+
+
+ClientMessage = Annotated[Ping | Reset | Control, Field(discriminator="kind")]
 client_adapter = TypeAdapter[ClientMessage](ClientMessage)
 
 
@@ -106,7 +145,7 @@ class ServerEnvelope(Envelope):
 
 class Hello(ServerEnvelope):
     kind: Literal["hello"]
-    mode: Literal["foundation_preview"] = "foundation_preview"
+    mode: Literal["reference_simulation"] = "reference_simulation"
 
 
 class Snapshot(ServerEnvelope):
@@ -119,13 +158,13 @@ class Heartbeat(ServerEnvelope):
     kind: Literal["heartbeat"]
 
 
-Rejection = Literal["stale_generation", "session_mismatch", "rate_limited"]
+Rejection = Literal["stale_generation", "session_mismatch", "rate_limited", "invalid_state"]
 
 
 class Ack(ServerEnvelope):
     kind: Literal["ack"]
     request_id: RequestId
-    command: Literal["ping", "reset_preview"]
+    command: Literal["ping", "start", "pause", "reset", "new_seed"]
     accepted: bool
     reason: Rejection | None
 

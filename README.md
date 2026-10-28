@@ -17,8 +17,8 @@ roadmap. The application plans live in
 [`docs/drone-mission-planner.md`](./docs/drone-mission-planner.md) and
 [`docs/slam-demo.md`](./docs/slam-demo.md) and
 [`docs/warehouse-demo.md`](./docs/warehouse-demo.md).
-The next project, [Greenhouse Caretaker](./docs/greenhouse-demo.md), now has its
-Phase 1 browser and project-owned Python service foundation.
+The next project, [Greenhouse Caretaker](./docs/greenhouse-demo.md), now has a
+live Python simulation and a scripted collection task through Phase 2.
 
 ---
 
@@ -32,8 +32,8 @@ robotics-lab/
                         3D planning and simulation for autonomous drone missions
     slam-demo/          visual SLAM explorer (authored lab, sparse mapping and loop closure)
     warehouse-demo/     WebGPU autonomous forklift and warehouse delivery
-    greenhouse-demo/    WebGPU caretaker preview and Python session connection
-    greenhouse-server/  uv-managed FastAPI service and shared contracts
+    greenhouse-demo/    WebGPU caretaker collection task and live Python connection
+    greenhouse-server/  uv-managed FastAPI service, MuJoCo world and shared contracts
   packages/
     core/               shared types
     drone/              framework-independent drone dynamics and mission logic
@@ -52,17 +52,23 @@ simulation itself is deterministic and framework independent (no React, no
 Zustand, no browser APIs), so it runs identically in the browser, in Node and
 in tests.
 
+Greenhouse Caretaker adds an independent Python simulation environment for future
+robot learning. Its browser renders authoritative server snapshots; physics runs
+headlessly in Python and is independent of FastAPI and React.
+
 ## Applications
 
 ### [Greenhouse Caretaker](./apps/greenhouse-demo)
 
-A robot-learning project in development. Phase 1 provides a React Three Fiber /
-Drei WebGPU preview, Tailwind and shadcn with Base UI, and a project-owned FastAPI
-service. The current scene is static; simulation and collection are Phase 2.
+A robot-learning project in development. Phase 2 provides a React Three Fiber /
+Drei WebGPU scene, Tailwind and shadcn with Base UI, and a project-owned FastAPI
+service running MuJoCo. A scripted reference controller collects a capsule and
+delivers it to a floor-level tray, with pause/resume, seeded resets and follow view.
+The UI labels the ideal sensing and simplified grasp; learned policies come later.
 With uv installed, run `pnpm setup:greenhouse` and `pnpm dev:greenhouse` after the
 normal `pnpm install`. Open `http://127.0.0.1:8086/`. See the
 [server guide](./apps/greenhouse-server/README.md) and
-[Phase 1 review](./docs/greenhouse-demo/phase1/README.md).
+[Phase 2 review](./docs/greenhouse-demo/phase2/README.md).
 
 ### [Robot Simulator](./apps/simulator)
 

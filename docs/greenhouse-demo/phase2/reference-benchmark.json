@@ -1,0 +1,1186 @@
+{
+  "simulator": "greenhouse-world-v1",
+  "mujoco": "3.17.0",
+  "python": "3.11.15",
+  "platform": "macOS-26.5.1-arm64-arm-64bit",
+  "controller": "scripted_reference",
+  "episodes": 130,
+  "successes": 130,
+  "collisions": 0,
+  "invalid_actions": 0,
+  "wall_seconds": 4.619635334005579,
+  "control_steps_per_second": 5959.561309383376,
+  "final_test_seeds_evaluated": false,
+  "results": [
+    {
+      "seed": 0,
+      "success": true,
+      "ticks": 191,
+      "seconds": 9.55,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 1,
+      "success": true,
+      "ticks": 222,
+      "seconds": 11.100000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 2,
+      "success": true,
+      "ticks": 185,
+      "seconds": 9.25,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 3,
+      "success": true,
+      "ticks": 206,
+      "seconds": 10.3,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 4,
+      "success": true,
+      "ticks": 221,
+      "seconds": 11.05,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 5,
+      "success": true,
+      "ticks": 195,
+      "seconds": 9.75,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 6,
+      "success": true,
+      "ticks": 232,
+      "seconds": 11.600000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 7,
+      "success": true,
+      "ticks": 208,
+      "seconds": 10.4,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 8,
+      "success": true,
+      "ticks": 240,
+      "seconds": 12.0,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 9,
+      "success": true,
+      "ticks": 227,
+      "seconds": 11.350000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10,
+      "success": true,
+      "ticks": 196,
+      "seconds": 9.8,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 11,
+      "success": true,
+      "ticks": 209,
+      "seconds": 10.450000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 12,
+      "success": true,
+      "ticks": 236,
+      "seconds": 11.8,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 13,
+      "success": true,
+      "ticks": 232,
+      "seconds": 11.600000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 14,
+      "success": true,
+      "ticks": 230,
+      "seconds": 11.5,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 15,
+      "success": true,
+      "ticks": 214,
+      "seconds": 10.700000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 16,
+      "success": true,
+      "ticks": 207,
+      "seconds": 10.350000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 17,
+      "success": true,
+      "ticks": 203,
+      "seconds": 10.15,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 18,
+      "success": true,
+      "ticks": 211,
+      "seconds": 10.55,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 19,
+      "success": true,
+      "ticks": 204,
+      "seconds": 10.200000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 20,
+      "success": true,
+      "ticks": 211,
+      "seconds": 10.55,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 21,
+      "success": true,
+      "ticks": 231,
+      "seconds": 11.55,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 22,
+      "success": true,
+      "ticks": 208,
+      "seconds": 10.4,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 23,
+      "success": true,
+      "ticks": 204,
+      "seconds": 10.200000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 24,
+      "success": true,
+      "ticks": 215,
+      "seconds": 10.75,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 25,
+      "success": true,
+      "ticks": 204,
+      "seconds": 10.200000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 26,
+      "success": true,
+      "ticks": 211,
+      "seconds": 10.55,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 27,
+      "success": true,
+      "ticks": 237,
+      "seconds": 11.850000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 28,
+      "success": true,
+      "ticks": 222,
+      "seconds": 11.100000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 29,
+      "success": true,
+      "ticks": 201,
+      "seconds": 10.05,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 30,
+      "success": true,
+      "ticks": 217,
+      "seconds": 10.850000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 31,
+      "success": true,
+      "ticks": 229,
+      "seconds": 11.450000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 32,
+      "success": true,
+      "ticks": 220,
+      "seconds": 11.0,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 33,
+      "success": true,
+      "ticks": 198,
+      "seconds": 9.9,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 34,
+      "success": true,
+      "ticks": 197,
+      "seconds": 9.850000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 35,
+      "success": true,
+      "ticks": 220,
+      "seconds": 11.0,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 36,
+      "success": true,
+      "ticks": 211,
+      "seconds": 10.55,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 37,
+      "success": true,
+      "ticks": 200,
+      "seconds": 10.0,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 38,
+      "success": true,
+      "ticks": 194,
+      "seconds": 9.700000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 39,
+      "success": true,
+      "ticks": 214,
+      "seconds": 10.700000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 40,
+      "success": true,
+      "ticks": 206,
+      "seconds": 10.3,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 41,
+      "success": true,
+      "ticks": 214,
+      "seconds": 10.700000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 42,
+      "success": true,
+      "ticks": 218,
+      "seconds": 10.9,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 43,
+      "success": true,
+      "ticks": 216,
+      "seconds": 10.8,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 44,
+      "success": true,
+      "ticks": 224,
+      "seconds": 11.200000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 45,
+      "success": true,
+      "ticks": 228,
+      "seconds": 11.4,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 46,
+      "success": true,
+      "ticks": 199,
+      "seconds": 9.950000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 47,
+      "success": true,
+      "ticks": 203,
+      "seconds": 10.15,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 48,
+      "success": true,
+      "ticks": 210,
+      "seconds": 10.5,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 49,
+      "success": true,
+      "ticks": 221,
+      "seconds": 11.05,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 50,
+      "success": true,
+      "ticks": 200,
+      "seconds": 10.0,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 51,
+      "success": true,
+      "ticks": 223,
+      "seconds": 11.15,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 52,
+      "success": true,
+      "ticks": 203,
+      "seconds": 10.15,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 53,
+      "success": true,
+      "ticks": 190,
+      "seconds": 9.5,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 54,
+      "success": true,
+      "ticks": 206,
+      "seconds": 10.3,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 55,
+      "success": true,
+      "ticks": 212,
+      "seconds": 10.600000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 56,
+      "success": true,
+      "ticks": 181,
+      "seconds": 9.05,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 57,
+      "success": true,
+      "ticks": 224,
+      "seconds": 11.200000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 58,
+      "success": true,
+      "ticks": 220,
+      "seconds": 11.0,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 59,
+      "success": true,
+      "ticks": 213,
+      "seconds": 10.65,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 60,
+      "success": true,
+      "ticks": 210,
+      "seconds": 10.5,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 61,
+      "success": true,
+      "ticks": 215,
+      "seconds": 10.75,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 62,
+      "success": true,
+      "ticks": 193,
+      "seconds": 9.65,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 63,
+      "success": true,
+      "ticks": 227,
+      "seconds": 11.350000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 64,
+      "success": true,
+      "ticks": 229,
+      "seconds": 11.450000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 65,
+      "success": true,
+      "ticks": 205,
+      "seconds": 10.25,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 66,
+      "success": true,
+      "ticks": 223,
+      "seconds": 11.15,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 67,
+      "success": true,
+      "ticks": 216,
+      "seconds": 10.8,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 68,
+      "success": true,
+      "ticks": 235,
+      "seconds": 11.75,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 69,
+      "success": true,
+      "ticks": 208,
+      "seconds": 10.4,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 70,
+      "success": true,
+      "ticks": 207,
+      "seconds": 10.350000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 71,
+      "success": true,
+      "ticks": 212,
+      "seconds": 10.600000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 72,
+      "success": true,
+      "ticks": 222,
+      "seconds": 11.100000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 73,
+      "success": true,
+      "ticks": 205,
+      "seconds": 10.25,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 74,
+      "success": true,
+      "ticks": 197,
+      "seconds": 9.850000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 75,
+      "success": true,
+      "ticks": 211,
+      "seconds": 10.55,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 76,
+      "success": true,
+      "ticks": 213,
+      "seconds": 10.65,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 77,
+      "success": true,
+      "ticks": 207,
+      "seconds": 10.350000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 78,
+      "success": true,
+      "ticks": 204,
+      "seconds": 10.200000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 79,
+      "success": true,
+      "ticks": 219,
+      "seconds": 10.950000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 80,
+      "success": true,
+      "ticks": 218,
+      "seconds": 10.9,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 81,
+      "success": true,
+      "ticks": 198,
+      "seconds": 9.9,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 82,
+      "success": true,
+      "ticks": 208,
+      "seconds": 10.4,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 83,
+      "success": true,
+      "ticks": 230,
+      "seconds": 11.5,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 84,
+      "success": true,
+      "ticks": 197,
+      "seconds": 9.850000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 85,
+      "success": true,
+      "ticks": 229,
+      "seconds": 11.450000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 86,
+      "success": true,
+      "ticks": 211,
+      "seconds": 10.55,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 87,
+      "success": true,
+      "ticks": 222,
+      "seconds": 11.100000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 88,
+      "success": true,
+      "ticks": 209,
+      "seconds": 10.450000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 89,
+      "success": true,
+      "ticks": 215,
+      "seconds": 10.75,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 90,
+      "success": true,
+      "ticks": 213,
+      "seconds": 10.65,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 91,
+      "success": true,
+      "ticks": 222,
+      "seconds": 11.100000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 92,
+      "success": true,
+      "ticks": 198,
+      "seconds": 9.9,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 93,
+      "success": true,
+      "ticks": 208,
+      "seconds": 10.4,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 94,
+      "success": true,
+      "ticks": 215,
+      "seconds": 10.75,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 95,
+      "success": true,
+      "ticks": 194,
+      "seconds": 9.700000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 96,
+      "success": true,
+      "ticks": 198,
+      "seconds": 9.9,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 97,
+      "success": true,
+      "ticks": 205,
+      "seconds": 10.25,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 98,
+      "success": true,
+      "ticks": 209,
+      "seconds": 10.450000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 99,
+      "success": true,
+      "ticks": 218,
+      "seconds": 10.9,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10000,
+      "success": true,
+      "ticks": 202,
+      "seconds": 10.100000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10001,
+      "success": true,
+      "ticks": 206,
+      "seconds": 10.3,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10002,
+      "success": true,
+      "ticks": 233,
+      "seconds": 11.65,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10003,
+      "success": true,
+      "ticks": 207,
+      "seconds": 10.350000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10004,
+      "success": true,
+      "ticks": 200,
+      "seconds": 10.0,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10005,
+      "success": true,
+      "ticks": 194,
+      "seconds": 9.700000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10006,
+      "success": true,
+      "ticks": 211,
+      "seconds": 10.55,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10007,
+      "success": true,
+      "ticks": 212,
+      "seconds": 10.600000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10008,
+      "success": true,
+      "ticks": 212,
+      "seconds": 10.600000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10009,
+      "success": true,
+      "ticks": 217,
+      "seconds": 10.850000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10010,
+      "success": true,
+      "ticks": 203,
+      "seconds": 10.15,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10011,
+      "success": true,
+      "ticks": 223,
+      "seconds": 11.15,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10012,
+      "success": true,
+      "ticks": 238,
+      "seconds": 11.9,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10013,
+      "success": true,
+      "ticks": 214,
+      "seconds": 10.700000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10014,
+      "success": true,
+      "ticks": 208,
+      "seconds": 10.4,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10015,
+      "success": true,
+      "ticks": 216,
+      "seconds": 10.8,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10016,
+      "success": true,
+      "ticks": 206,
+      "seconds": 10.3,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10017,
+      "success": true,
+      "ticks": 205,
+      "seconds": 10.25,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10018,
+      "success": true,
+      "ticks": 206,
+      "seconds": 10.3,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10019,
+      "success": true,
+      "ticks": 205,
+      "seconds": 10.25,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10020,
+      "success": true,
+      "ticks": 211,
+      "seconds": 10.55,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10021,
+      "success": true,
+      "ticks": 208,
+      "seconds": 10.4,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10022,
+      "success": true,
+      "ticks": 193,
+      "seconds": 9.65,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10023,
+      "success": true,
+      "ticks": 200,
+      "seconds": 10.0,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10024,
+      "success": true,
+      "ticks": 221,
+      "seconds": 11.05,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10025,
+      "success": true,
+      "ticks": 207,
+      "seconds": 10.350000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10026,
+      "success": true,
+      "ticks": 208,
+      "seconds": 10.4,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10027,
+      "success": true,
+      "ticks": 237,
+      "seconds": 11.850000000000001,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10028,
+      "success": true,
+      "ticks": 218,
+      "seconds": 10.9,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    },
+    {
+      "seed": 10029,
+      "success": true,
+      "ticks": 211,
+      "seconds": 10.55,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null
+    }
+  ]
+}

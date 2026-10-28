@@ -3,7 +3,13 @@ name = "robotics-lab-greenhouse"
 version = "0.1.0"
 description = "Project-owned Greenhouse Caretaker API and future simulation environment"
 requires-python = ">=3.11,<3.12"
-dependencies = ["fastapi>=0.115,<1", "pydantic>=2.10,<3", "uvicorn[standard]>=0.34,<1"]
+dependencies = [
+    "fastapi>=0.115,<1",
+    "mujoco==3.17.0",
+    "numpy==2.4.6",
+    "pydantic>=2.10,<3",
+    "uvicorn[standard]>=0.34,<1",
+]
 
 [dependency-groups]
 dev = ["httpx>=0.28,<1", "pytest>=8,<10", "ruff>=0.11,<1", "mypy>=1.15,<2"]
@@ -30,3 +36,7 @@ python_version = "3.11"
 strict = true
 incremental = false
 files = ["src"]
+
+[[tool.mypy.overrides]]
+module = ["mujoco", "mujoco.*"]
+ignore_missing_imports = true

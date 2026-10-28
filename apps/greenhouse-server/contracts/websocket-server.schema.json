@@ -15,7 +15,10 @@
         "command": {
           "enum": [
             "ping",
-            "reset_preview"
+            "start",
+            "pause",
+            "reset",
+            "new_seed"
           ],
           "title": "Command",
           "type": "string"
@@ -36,7 +39,8 @@
               "enum": [
                 "stale_generation",
                 "session_mismatch",
-                "rate_limited"
+                "rate_limited",
+                "invalid_state"
               ],
               "type": "string"
             },
@@ -134,8 +138,8 @@
           "type": "string"
         },
         "mode": {
-          "const": "foundation_preview",
-          "default": "foundation_preview",
+          "const": "reference_simulation",
+          "default": "reference_simulation",
           "title": "Mode",
           "type": "string"
         },
@@ -159,6 +163,28 @@
       "title": "Hello",
       "type": "object"
     },
+    "Obstacle": {
+      "additionalProperties": false,
+      "properties": {
+        "half_size": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "position": {
+          "$ref": "#/$defs/Vector3"
+        }
+      },
+      "required": [
+        "id",
+        "position",
+        "half_size"
+      ],
+      "title": "Obstacle",
+      "type": "object"
+    },
     "Robot": {
       "additionalProperties": false,
       "properties": {
@@ -175,6 +201,18 @@
           "title": "Id",
           "type": "string"
         },
+        "left_wheel_angle": {
+          "title": "Left Wheel Angle",
+          "type": "number"
+        },
+        "lift_height": {
+          "title": "Lift Height",
+          "type": "number"
+        },
+        "right_wheel_angle": {
+          "title": "Right Wheel Angle",
+          "type": "number"
+        },
         "x": {
           "title": "X",
           "type": "number"
@@ -189,7 +227,10 @@
         "x",
         "y",
         "heading",
-        "holding"
+        "holding",
+        "lift_height",
+        "left_wheel_angle",
+        "right_wheel_angle"
       ],
       "title": "Robot",
       "type": "object"
@@ -200,20 +241,121 @@
         "capsule": {
           "$ref": "#/$defs/SceneObject"
         },
+        "collisions": {
+          "minimum": 0,
+          "title": "Collisions",
+          "type": "integer"
+        },
+        "controller": {
+          "const": "scripted_reference",
+          "title": "Controller",
+          "type": "string"
+        },
+        "delivered": {
+          "title": "Delivered",
+          "type": "boolean"
+        },
+        "elapsed_seconds": {
+          "title": "Elapsed Seconds",
+          "type": "number"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/$defs/TaskEvent"
+          },
+          "title": "Events",
+          "type": "array"
+        },
+        "invalid_actions": {
+          "minimum": 0,
+          "title": "Invalid Actions",
+          "type": "integer"
+        },
         "mode": {
-          "const": "foundation_preview",
+          "const": "reference_simulation",
           "title": "Mode",
           "type": "string"
+        },
+        "pickups": {
+          "minimum": 0,
+          "title": "Pickups",
+          "type": "integer"
+        },
+        "pots": {
+          "items": {
+            "$ref": "#/$defs/SceneObject"
+          },
+          "title": "Pots",
+          "type": "array"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
         },
         "robot": {
           "$ref": "#/$defs/Robot"
         },
+        "simulator_version": {
+          "title": "Simulator Version",
+          "type": "string"
+        },
+        "stage": {
+          "enum": [
+            "approach",
+            "grasp",
+            "lift",
+            "deliver",
+            "lower",
+            "release",
+            "done"
+          ],
+          "title": "Stage",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "running",
+            "paused",
+            "complete",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
         "tray": {
           "$ref": "#/$defs/SceneObject"
+        },
+        "walls": {
+          "items": {
+            "$ref": "#/$defs/Obstacle"
+          },
+          "title": "Walls",
+          "type": "array"
         }
       },
       "required": [
         "mode",
+        "simulator_version",
+        "controller",
+        "status",
+        "stage",
+        "elapsed_seconds",
+        "delivered",
+        "pickups",
+        "collisions",
+        "invalid_actions",
+        "reason",
+        "events",
+        "walls",
+        "pots",
         "robot",
         "capsule",
         "tray"
@@ -335,6 +477,36 @@
         "message"
       ],
       "title": "StreamError",
+      "type": "object"
+    },
+    "TaskEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "info",
+            "success",
+            "warning"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "tick": {
+          "minimum": 0,
+          "title": "Tick",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tick",
+        "kind",
+        "text"
+      ],
+      "title": "TaskEvent",
       "type": "object"
     },
     "Vector3": {

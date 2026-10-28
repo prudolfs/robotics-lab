@@ -2,7 +2,7 @@ import { mkdir } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { expect, test } from '@playwright/test'
 
-const capture = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase1/', import.meta.url))
+const capture = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase2/', import.meta.url))
 
 test('connects to Python, renders WebGPU and acknowledges a keyboard reset', async ({ page }) => {
 	const errors: string[] = []
@@ -12,12 +12,12 @@ test('connects to Python, renders WebGPU and acknowledges a keyboard reset', asy
 	await expect(page.getByTestId('renderer-status')).toHaveText('WebGPU active')
 	await expect(page.locator('canvas')).toHaveCount(1)
 	await expect(page.getByTestId('session-generation')).toHaveText('0')
-	await page.getByRole('button', { name: 'Reset preview' }).focus()
+	await page.getByRole('button', { name: 'Restart seed' }).focus()
 	await page.keyboard.press('Space')
 	await expect(page.getByTestId('session-generation')).toHaveText('1')
-	await expect(page.getByRole('status')).toHaveText('Preview reset acknowledged.')
-	await expect(page.getByRole('button', { name: 'Reset preview' })).toBeEnabled()
-	await expect(page.getByText('Static session preview.', { exact: false })).toBeVisible()
+	await expect(page.getByRole('status')).toHaveText('Scenario reset.')
+	await expect(page.getByRole('button', { name: 'Restart seed' })).toBeEnabled()
+	await expect(page.getByText('Scripted reference controller.', { exact: false })).toBeVisible()
 	expect(errors).toEqual([])
 	if (process.env.GREENHOUSE_CAPTURE) {
 		await mkdir(capture, { recursive: true })
@@ -42,7 +42,7 @@ test('shows loading while the server is responding', async ({ page }) => {
 	})
 	await page.goto('/')
 	await expect(page.getByTestId('connection-status')).toHaveText('Connecting…')
-	await expect(page.getByRole('button', { name: 'Reset preview' })).toBeDisabled()
+	await expect(page.getByRole('button', { name: 'Restart seed' })).toBeDisabled()
 	await expect(page.getByTestId('connection-status')).toHaveText('Connected')
 })
 
@@ -57,7 +57,7 @@ test('rejects an incompatible HTTP response using the Pydantic schema', async ({
 	await page.goto('/')
 	await expect(page.getByTestId('connection-status')).toHaveText('Server unavailable')
 	await expect(page.getByRole('status')).toContainText('incompatible HTTP response')
-	await expect(page.getByRole('button', { name: 'Reset preview' })).toBeDisabled()
+	await expect(page.getByRole('button', { name: 'Restart seed' })).toBeDisabled()
 })
 
 test('explains an unavailable server and retries without a reload', async ({ page }) => {
@@ -66,7 +66,7 @@ test('explains an unavailable server and retries without a reload', async ({ pag
 	)
 	await page.goto('/')
 	await expect(page.getByTestId('connection-status')).toHaveText('Server unavailable')
-	await expect(page.getByRole('button', { name: 'Reset preview' })).toBeDisabled()
+	await expect(page.getByRole('button', { name: 'Restart seed' })).toBeDisabled()
 	await expect(page.getByText('pnpm dev:greenhouse', { exact: false })).toBeVisible()
 	if (process.env.GREENHOUSE_CAPTURE)
 		await page.screenshot({ path: `${capture}/server-unavailable.png` })
@@ -85,7 +85,7 @@ test('detects a closed real session and reconnects to a fresh generation', async
 	})
 	await page.goto('/')
 	await expect(page.getByTestId('connection-status')).toHaveText('Connected')
-	await page.getByRole('button', { name: 'Reset preview' }).click()
+	await page.getByRole('button', { name: 'Restart seed' }).click()
 	await expect(page.getByTestId('session-generation')).toHaveText('1')
 	const oldSessionId = sessionId
 	expect(oldSessionId).not.toBe('')
@@ -106,7 +106,7 @@ test('keeps connection controls usable when WebGPU is unavailable', async ({ pag
 	await expect(page.getByTestId('connection-status')).toHaveText('Connected')
 	await expect(page.getByTestId('renderer-status')).toHaveText('WebGPU is unavailable')
 	await expect(page.locator('canvas')).toHaveCount(0)
-	await page.getByRole('button', { name: 'Reset preview' }).click()
+	await page.getByRole('button', { name: 'Restart seed' }).click()
 	await expect(page.getByTestId('session-generation')).toHaveText('1')
 	if (process.env.GREENHOUSE_CAPTURE)
 		await page.screenshot({ path: `${capture}/webgpu-unavailable.png` })

@@ -1,24 +1,21 @@
 import asyncio
 import contextlib
-import os
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, Request, Response, WebSocket, WebSocketDisconnect
-from pydantic import ValidationError
+from fastapi import FastAPI, HTTPException, Request, Response, WebSocket
 
 from greenhouse import __version__
 from greenhouse.api.contracts import (
     Capabilities,
     CreateSession,
     Health,
-    Heartbeat,
-    Hello,
     SessionView,
-    StreamError,
-    client_adapter,
 )
 from greenhouse.api.sessions import Sessions
+from greenhouse.api.stream import stream_session
+from greenhouse.simulation.model import CONTROL_DT
 
 PREFIX = "/api/v1/greenhouse"
 
@@ -33,13 +30,34 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             await asyncio.sleep(30)
             registry.prune()
 
-    task = asyncio.create_task(sweep())
+    async def simulate() -> None:
+        loop = asyncio.get_running_loop()
+        deadline = loop.time()
+        while True:
+            for session in tuple(registry.items.values()):
+                try:
+                    session.advance()
+                except Exception:
+                    logging.getLogger(__name__).exception("Greenhouse simulation failed")
+                    session.world.status = "failed"
+                    session.world.reason = "The simulation could not advance. Check the server log."
+                    session.world.event("warning", session.world.reason)
+                    session.revision += 1
+            deadline += CONTROL_DT
+            if deadline < loop.time() - CONTROL_DT:
+                # Under load, run slower than wall time instead of skipping physics steps.
+                deadline = loop.time()
+            await asyncio.sleep(max(0, deadline - loop.time()))
+
+    tasks = [asyncio.create_task(sweep()), asyncio.create_task(simulate())]
     try:
         yield
     finally:
-        task.cancel()
-        with contextlib.suppress(asyncio.CancelledError):
-            await task
+        for task in tasks:
+            task.cancel()
+        for task in tasks:
+            with contextlib.suppress(asyncio.CancelledError):
+                await task
         registry.items.clear()
 
 
@@ -88,70 +106,4 @@ async def delete_session(session_id: str, request: Request) -> Response:
 
 @app.websocket(f"{PREFIX}/sessions/{{session_id}}/stream")
 async def stream(websocket: WebSocket, session_id: str) -> None:
-    origins = os.getenv(
-        "GREENHOUSE_ALLOWED_ORIGINS",
-        "http://127.0.0.1:8086,http://localhost:8086,http://127.0.0.1:4186,http://localhost:4186",
-    ).split(",")
-    origin = websocket.headers.get("origin")
-    if origin and origin not in origins:
-        await websocket.close(code=4403)
-        return
-    registry: Sessions = websocket.app.state.sessions
-    session = registry.items.get(session_id)
-    if session is None or session.connected:
-        await websocket.close(code=4404 if session is None else 4409)
-        return
-    session.connected = True
-    await websocket.accept()
-    try:
-        await websocket.send_text(
-            Hello(
-                kind="hello",
-                api_version="1",
-                session_id=session_id,
-                generation=session.generation,
-                tick=session.tick,
-            ).model_dump_json()
-        )
-        await websocket.send_text(session.snapshot().model_dump_json())
-        while registry.items.get(session_id) is session:
-            try:
-                text = await asyncio.wait_for(websocket.receive_text(), timeout=1)
-            except TimeoutError:
-                session.last_seen = asyncio.get_running_loop().time()
-                await websocket.send_text(
-                    Heartbeat(
-                        kind="heartbeat",
-                        api_version="1",
-                        session_id=session_id,
-                        generation=session.generation,
-                        tick=session.tick,
-                    ).model_dump_json()
-                )
-                continue
-            try:
-                if len(text) > 4096:
-                    raise ValueError("message too large")
-                command = client_adapter.validate_json(text)
-            except (ValidationError, ValueError):
-                await websocket.send_text(
-                    StreamError(
-                        kind="error",
-                        api_version="1",
-                        session_id=session_id,
-                        generation=session.generation,
-                        tick=session.tick,
-                        message="Expected a valid v1 ping or reset_preview command.",
-                    ).model_dump_json()
-                )
-                continue
-            ack = session.execute(command)
-            await websocket.send_text(ack.model_dump_json())
-            if ack.accepted and command.kind == "reset_preview":
-                await websocket.send_text(session.snapshot().model_dump_json())
-        await websocket.close(code=1000)
-    except WebSocketDisconnect:
-        pass
-    finally:
-        session.connected = False
-        session.last_seen = asyncio.get_running_loop().time()
+    await stream_session(websocket, session_id)

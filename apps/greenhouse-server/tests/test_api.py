@@ -27,11 +27,21 @@ def receive(socket):
     return payload
 
 
+def matching(socket, kind, request_id=None):
+    for _ in range(50):
+        payload = receive(socket)
+        if payload["kind"] == kind and (
+            request_id is None or payload.get("request_id") == request_id
+        ):
+            return payload
+    raise AssertionError(f"Did not receive {kind}")
+
+
 def test_health_capabilities_and_http_schema(client):
     assert client.get(f"{PREFIX}/health").json()["api_version"] == "1"
     capabilities = client.get(f"{PREFIX}/capabilities").json()
-    assert capabilities["mode"] == "foundation_preview"
-    assert not capabilities["simulation"] and not capabilities["training"]
+    assert capabilities["mode"] == "reference_simulation"
+    assert capabilities["simulation"] and not capabilities["training"]
     paths = client.get("/openapi.json").json()["paths"]
     assert f"{PREFIX}/sessions" in paths
     assert not any("/stream" in path for path in paths)
@@ -62,31 +72,30 @@ def test_stream_reset_ack_idempotency_stale_generation_and_invalid_messages(clie
         assert snapshot["kind"] == "snapshot" and snapshot["tick"] == 0
         command = {
             "api_version": "1",
-            "kind": "reset_preview",
+            "kind": "reset",
             "session_id": session["session_id"],
             "generation": 0,
             "request_id": "reset-1",
-            "seed": 9,
         }
         socket.send_json(command)
-        ack = receive(socket)
+        ack = matching(socket, "ack", "reset-1")
         assert ack["accepted"] and ack["generation"] == 1
-        reset = receive(socket)
-        assert reset["seed"] == 9 and reset["generation"] == 1
+        reset = matching(socket, "snapshot")
+        assert reset["seed"] == 42 and reset["generation"] == 1
         socket.send_json(command)
-        assert receive(socket) == ack
-        assert receive(socket)["generation"] == 1
+        assert matching(socket, "ack", "reset-1") == ack
+        assert matching(socket, "snapshot")["generation"] == 1
         socket.send_json({**command, "request_id": "stale-1"})
-        rejected = receive(socket)
+        rejected = matching(socket, "ack", "stale-1")
         assert not rejected["accepted"] and rejected["reason"] == "stale_generation"
         socket.send_text('{"api_version":"2"}')
-        assert receive(socket)["kind"] == "error"
+        assert matching(socket, "error")["code"] == "invalid_message"
         socket.send_text("x" * 4097)
-        assert receive(socket)["kind"] == "error"
+        assert matching(socket, "error")["code"] == "invalid_message"
         # A valid connection survives invalid input; reconnect sees latest generation.
     with client.websocket_connect(address) as socket:
         assert receive(socket)["generation"] == 1
-        assert receive(socket)["seed"] == 9
+        assert receive(socket)["seed"] == 42
 
 
 def test_session_mismatch_and_rate_limit(client):
@@ -150,3 +159,61 @@ def test_client_schema_rejects_unknown_keys():
         client_adapter.validate_json(
             '{"api_version":"1","kind":"ping","session_id":"x","generation":0,"request_id":"x","extra":true}'
         )
+
+
+def test_live_clock_pause_reset_new_seed_and_disconnect(client):
+    session = create(client)
+    session_id = session["session_id"]
+    address = f"{PREFIX}/sessions/{session_id}/stream"
+
+    def send(socket, kind, request_id, generation=0):
+        socket.send_json(
+            {
+                "api_version": "1",
+                "kind": kind,
+                "request_id": request_id,
+                "session_id": session_id,
+                "generation": generation,
+            }
+        )
+
+    with client.websocket_connect(address) as socket:
+        matching(socket, "snapshot")
+        send(socket, "start", "start-1")
+        assert matching(socket, "ack", "start-1")["accepted"]
+        snapshot = matching(socket, "snapshot")
+        while snapshot["tick"] < 4:
+            snapshot = matching(socket, "snapshot")
+        assert snapshot["scene"]["status"] == "running"
+        send(socket, "pause", "pause-1")
+        assert matching(socket, "ack", "pause-1")["accepted"]
+        paused = matching(socket, "snapshot")
+        while paused["scene"]["status"] != "paused":
+            paused = matching(socket, "snapshot")
+        time.sleep(0.16)
+        assert client.get(f"{PREFIX}/sessions/{session_id}").json()["tick"] == paused["tick"]
+        send(socket, "reset", "reset-2")
+        assert matching(socket, "ack", "reset-2")["generation"] == 1
+        reset = matching(socket, "snapshot")
+        assert reset["tick"] == 0 and reset["scene"]["status"] == "ready"
+        assert reset["scene"] == session["scene"]
+        send(socket, "start", "old-start")
+        assert matching(socket, "ack", "old-start")["reason"] == "stale_generation"
+        time.sleep(0.12)
+        send(socket, "new_seed", "new-seed", 1)
+        assert matching(socket, "ack", "new-seed")["generation"] == 2
+        changed = matching(socket, "snapshot")
+        assert changed["seed"] != 42 and changed["scene"]["capsule"] != reset["scene"]["capsule"]
+        time.sleep(0.12)
+        send(socket, "start", "start-2", 2)
+        assert matching(socket, "ack", "start-2")["accepted"]
+        times = []
+        for _ in range(6):
+            matching(socket, "snapshot")
+            times.append(time.monotonic())
+        # Latest-state publication is capped at 10 Hz; no queued catch-up frames.
+        assert all(b - a >= 0.07 for a, b in zip(times[:-1], times[1:], strict=True))
+    after = client.get(f"{PREFIX}/sessions/{session_id}").json()
+    assert after["scene"]["status"] == "paused"
+    time.sleep(0.12)
+    assert client.get(f"{PREFIX}/sessions/{session_id}").json()["tick"] == after["tick"]
