@@ -1,6 +1,6 @@
 # Greenhouse Caretaker
 
-Phase 5 frontend for Robotics Lab's robot-learning project. React Three Fiber and Drei render an authored Blender greenhouse and articulated caretaker using actual Three.js WebGPU; Tailwind and shadcn/ui with Base UI provide the interface. Python runs the authoritative MuJoCo world. Reference and manual teaching controllers can produce versioned demonstrations; a separate PyTorch worker trains saved policies for live learned execution.
+Phase 6 frontend for Robotics Lab's robot-learning project. React Three Fiber and Drei render an authored Blender greenhouse and articulated caretaker using actual Three.js WebGPU; Tailwind and shadcn/ui with Base UI provide the interface. Python runs the authoritative MuJoCo world. Reference and manual teaching controllers can produce versioned demonstrations; a separate PyTorch worker trains saved policies for live learned execution.
 
 From the repository root:
 
@@ -34,7 +34,15 @@ Prepare reviewed eligible demonstrations, then use **Train policy** in **Teach, 
 
 Choose a saved checkpoint, then **Use selected checkpoint** while ready/paused and **Start collection**. The learned controller and checkpoint ID remain explicit. Learned execution has no reference-controller recovery and cannot be recorded as a Phase 4 demonstration. Validation review plays recorded states independently of live simulation.
 
-The selected local checkpoint delivers on 29/30 validation seeds, 28 clean, compared with 30/30 clean reference runs. Local weights are ignored; a fresh checkout needs data and training. See the [Phase 5 review](../../docs/greenhouse-demo/phase5/README.md) for reproducibility, normalization/loss, remaining failures and screenshots. Reinforcement learning and LangGraph missions remain later phases.
+The selected local checkpoint delivers on 29/30 validation seeds, 28 clean, compared with 30/30 clean reference runs. Local weights are ignored; a fresh checkout needs data and training. See the [Phase 5 review](../../docs/greenhouse-demo/phase5/README.md) for reproducibility, normalization/loss, remaining failures and screenshots. PPO practice is now implemented in Phase 6; LangGraph missions remain a later phase.
+
+## Practice and compare
+
+Select a BC checkpoint and choose **Practice selected imitation policy** for a bounded PPO run. The practice panel shows curriculum stage, steps, reward components, losses and validation selection. BC weights remain available; practice does not overwrite them. Default runs use 36,864 training steps and a 240-second budget in a separate Python process.
+
+**Compare policies** measures two chosen checkpoints and the reference on the same validation seed, then offers recorded playback for each outcome. Seed 10000 shows delivery; seed 10006 exposes a learned pickup failure. Scrubbing and switching recordings sends no live actions. Pause the live world before comparing, then use **Return to live** to resume its controls.
+
+The frozen final-test result is 93/100 delivered, 92 clean for both selected PPO and BC, versus 100/100 clean reference. Selected PPO reduces rejected actions from 917 to 2; completion has not improved. See the [Phase 6 review](../../docs/greenhouse-demo/phase6/README.md) for the three-seed comparison, remaining failures, final-test seal/audit and screenshots.
 
 ## Development and contracts
 
@@ -54,7 +62,7 @@ The connection hook owns transport state, an abortable four-second HTTP startup 
 
 ## Browser checks and captures
 
-Playwright uses local Chrome with WebGPU support. It starts the paired development command if the app is not already running, and uses graceful shutdown to stop both services afterward. Fourteen checks cover the previous collection/connection/asset/camera/motion/sound cases, plus manual recording, focus/release stopping, source-preserving review, exact recorded playback, expert collection, validation and export/import, learned checkpoint delivery and active-training responsiveness/cancellation. The two checkpoint-dependent cases explicitly skip without a completed local checkpoint. Teaching tests save automated attempts; use a separate `GREENHOUSE_DATASET_DIR` for an isolated test service when keeping them out of your normal library. The root test command also validates GLB geometry/pivots/resources and manifest alignment with compiled MuJoCo geometry.
+Playwright uses local Chrome with WebGPU support. It starts the paired development command if the app is not already running, and uses graceful shutdown to stop both services afterward. Fifteen checks cover the previous collection/connection/asset/camera/motion/sound cases, plus manual recording, focus/release stopping, source-preserving review, exact recorded playback, expert collection, validation and export/import, learned checkpoint delivery and active-training responsiveness/cancellation, and same-scenario BC/PPO/reference playback with no live commands. The two Phase 5 checkpoint-dependent cases and the BC/PPO comparison case explicitly skip when their local artifacts are unavailable. Teaching tests save automated attempts; use a separate `GREENHOUSE_DATASET_DIR` for an isolated test service when keeping them out of your normal library. The root test command also validates GLB geometry/pivots/resources and manifest alignment with compiled MuJoCo geometry.
 
 ```sh
 GREENHOUSE_CAPTURE=1 pnpm test:e2e:greenhouse

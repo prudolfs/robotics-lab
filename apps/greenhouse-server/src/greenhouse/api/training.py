@@ -4,11 +4,17 @@ import asyncio
 
 from fastapi import APIRouter, HTTPException, Request
 
-from greenhouse.api.contracts import PolicyDetail
+from greenhouse.api.contracts import ComparisonDetail, PolicyDetail
 from greenhouse.api.datasets import errors
 from greenhouse.api.sessions import scene_from_state
 from greenhouse.training.manager import TrainingManager
-from greenhouse.training.models import Job, TrainingCatalog, TrainRequest
+from greenhouse.training.models import (
+    ComparedRollout,
+    ComparisonRequest,
+    Job,
+    TrainingCatalog,
+    TrainRequest,
+)
 
 router = APIRouter(prefix="/api/v1/greenhouse/training")
 
@@ -66,3 +72,43 @@ async def checkpoint(checkpoint_id: str, request: Request) -> PolicyDetail:
 
     with errors():
         return await asyncio.to_thread(read)
+
+
+@router.post("/compare", response_model=ComparisonDetail)
+async def compare(body: ComparisonRequest, request: Request) -> ComparisonDetail:
+    service = manager(request)
+    if service.comparison_lock.locked():
+        raise HTTPException(409, "A comparison is already running.")
+    if len(set(body.checkpoint_ids)) != 2:
+        raise HTTPException(422, "Choose two distinct checkpoints.")
+
+    def measure() -> ComparisonDetail:
+        from greenhouse.simulation.reference import Reference
+        from greenhouse.training.evaluation import rollout
+
+        entries = []
+        for checkpoint_id in body.checkpoint_ids:
+            info = service.checkpoint(checkpoint_id)
+            policy = service.load(checkpoint_id)
+            entries.append(
+                ComparedRollout(
+                    label=f"{info.algorithm.upper()} · {checkpoint_id[:8]} · round {info.round}",
+                    checkpoint_id=checkpoint_id,
+                    rollout=rollout(body.seed, policy, record=True),
+                )
+            )
+        reference = rollout(body.seed, Reference(), record=True)
+        entries.append(
+            ComparedRollout(label="Scripted reference", checkpoint_id=None, rollout=reference)
+        )
+        if reference.initial is None:
+            raise ValueError("Comparison has no recorded state.")
+        return ComparisonDetail(
+            seed=body.seed,
+            template=scene_from_state(reference.initial, "learned", "learned_policy"),
+            entries=entries,
+        )
+
+    async with service.comparison_lock:
+        with errors():
+            return await asyncio.to_thread(measure)

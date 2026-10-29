@@ -53,6 +53,11 @@ def run(directory: Path) -> int:
             validate_episode(entry.episode)
         if sha256(directory / "dataset.json") != specification.dataset_sha256:
             raise ValueError("Frozen dataset snapshot checksum mismatch.")
+        if request.algorithm == "ppo":
+            from greenhouse.practice.worker import run_practice
+
+            run_practice(directory, specification, cancelled, publish)
+            return 0
         torch.manual_seed(request.random_seed)
         torch.use_deterministic_algorithms(True)
         network = Network()

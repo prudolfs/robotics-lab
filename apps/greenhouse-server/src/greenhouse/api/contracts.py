@@ -18,6 +18,8 @@ from greenhouse.datasets.models import (
 from greenhouse.training.models import (
     CheckpointId,
     CheckpointInfo,
+    ComparedRollout,
+    ComparisonRequest,
     Evaluation,
     Job,
     TrainingCatalog,
@@ -157,6 +159,12 @@ class PolicyDetail(Contract):
     template: Scene
 
 
+class ComparisonDetail(Contract):
+    seed: int
+    template: Scene
+    entries: list[ComparedRollout]
+
+
 class HttpModels(Contract):
     """Schema bundle for TypeScript generation; not a synthetic HTTP endpoint."""
 
@@ -171,6 +179,8 @@ class HttpModels(Contract):
     expert_request: ExpertRequest
     import_result: ImportResult
     validation: ValidationReport
+    comparison_request: ComparisonRequest
+    comparison_detail: ComparisonDetail
     training_request: TrainRequest
     training_job: Job
     training_catalog: TrainingCatalog

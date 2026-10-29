@@ -5,6 +5,7 @@ import contextlib
 import hashlib
 import os
 import re
+import shutil
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -43,6 +44,7 @@ class TrainingManager:
         self.monitor: asyncio.Task[None] | None = None
         self.active_job: str | None = None
         self.lock = asyncio.Lock()
+        self.comparison_lock = asyncio.Lock()
         self.cache: dict[str, LearnedPolicy] = {}
         self.cache_hashes: dict[str, str] = {}
         for path in self.root.glob("*/status.json"):
@@ -135,6 +137,18 @@ class TrainingManager:
                 raise ValueError(
                     "A training worker is already active. Cancel it or wait for completion."
                 )
+            parent = None
+            if request.algorithm == "ppo":
+                if not request.parent_checkpoint:
+                    raise ValueError("PPO requires an explicit compatible imitation checkpoint.")
+                parent = await asyncio.to_thread(self.checkpoint, request.parent_checkpoint)
+                if parent.algorithm != "bc":
+                    raise ValueError(
+                        "PPO starts from an imitation checkpoint, not another PPO run."
+                    )
+                await asyncio.to_thread(self.load, request.parent_checkpoint)
+            elif request.parent_checkpoint:
+                raise ValueError("Imitation fitting does not take a parent checkpoint.")
             bundle = await asyncio.to_thread(self.snapshot, request)
             payload = bundle.model_dump_json().encode()
             size = await asyncio.to_thread(
@@ -173,6 +187,12 @@ class TrainingManager:
                 atomic_model(directory / "status.json", job)
                 atomic_model(directory / "input.json", specification)
                 (directory / "dataset.json").write_bytes(payload)
+                if parent is not None:
+                    weights = self.checkpoint_path(parent.checkpoint_id).with_suffix(".pt")
+                    shutil.copyfile(weights, directory / "parent.pt")
+                    if sha256(directory / "parent.pt") != parent.weights_sha256:
+                        raise ValueError("Parent checkpoint changed during snapshot preparation.")
+                    atomic_model(directory / "parent.json", parent)
 
             await asyncio.to_thread(prepare)
             self.active_job = job_id

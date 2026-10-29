@@ -1,0 +1,225 @@
+{
+  "parent": "0a17479f7622474c97922b9b0c5bd9b4-r3",
+  "training_seeds": [
+    7,
+    17,
+    27
+  ],
+  "steps_per_run": 36864,
+  "final_test_used": false,
+  "runs": [
+    {
+      "seed": 7,
+      "job_id": "a95a6dceb4a7432e9f31b25a023fae54",
+      "selected": "a95a6dceb4a7432e9f31b25a023fae54-r1",
+      "seconds": 25.335456959030125,
+      "peak_rss_mb": 398.65625,
+      "candidates": [
+        {
+          "checkpoint": "a95a6dceb4a7432e9f31b25a023fae54-r3",
+          "steps": 36864,
+          "successes": 28,
+          "clean_successes": 28,
+          "total": 30,
+          "collisions": 0,
+          "invalid_actions": 0,
+          "mean_seconds": 11.146666666666668,
+          "failure_counts": {
+            "none": 28,
+            "pickup_not_completed": 1,
+            "delivery_timeout": 1
+          },
+          "final_test_evaluated": false
+        },
+        {
+          "checkpoint": "a95a6dceb4a7432e9f31b25a023fae54-r2",
+          "steps": 24576,
+          "successes": 28,
+          "clean_successes": 27,
+          "total": 30,
+          "collisions": 0,
+          "invalid_actions": 1,
+          "mean_seconds": 11.130000000000003,
+          "failure_counts": {
+            "none": 28,
+            "pickup_not_completed": 1,
+            "delivery_timeout": 1
+          },
+          "final_test_evaluated": false
+        },
+        {
+          "checkpoint": "a95a6dceb4a7432e9f31b25a023fae54-r0",
+          "steps": 0,
+          "successes": 29,
+          "clean_successes": 28,
+          "total": 30,
+          "collisions": 0,
+          "invalid_actions": 1,
+          "mean_seconds": 10.520000000000001,
+          "failure_counts": {
+            "none": 29,
+            "pickup_not_completed": 1
+          },
+          "final_test_evaluated": false
+        },
+        {
+          "checkpoint": "a95a6dceb4a7432e9f31b25a023fae54-r1",
+          "steps": 12288,
+          "successes": 29,
+          "clean_successes": 28,
+          "total": 30,
+          "collisions": 0,
+          "invalid_actions": 1,
+          "mean_seconds": 10.501666666666665,
+          "failure_counts": {
+            "none": 29,
+            "pickup_not_completed": 1
+          },
+          "final_test_evaluated": false
+        }
+      ]
+    },
+    {
+      "seed": 17,
+      "job_id": "1ab72b30ccbd4b45bc300bcb50c03330",
+      "selected": "0a17479f7622474c97922b9b0c5bd9b4-r3",
+      "seconds": 26.316918249998707,
+      "peak_rss_mb": 395.703125,
+      "candidates": [
+        {
+          "checkpoint": "1ab72b30ccbd4b45bc300bcb50c03330-r3",
+          "steps": 36864,
+          "successes": 28,
+          "clean_successes": 28,
+          "total": 30,
+          "collisions": 0,
+          "invalid_actions": 0,
+          "mean_seconds": 11.165,
+          "failure_counts": {
+            "none": 28,
+            "pickup_not_completed": 1,
+            "delivery_timeout": 1
+          },
+          "final_test_evaluated": false
+        },
+        {
+          "checkpoint": "1ab72b30ccbd4b45bc300bcb50c03330-r2",
+          "steps": 24576,
+          "successes": 27,
+          "clean_successes": 26,
+          "total": 30,
+          "collisions": 0,
+          "invalid_actions": 1,
+          "mean_seconds": 11.848333333333333,
+          "failure_counts": {
+            "none": 27,
+            "pickup_not_completed": 1,
+            "delivery_timeout": 2
+          },
+          "final_test_evaluated": false
+        },
+        {
+          "checkpoint": "1ab72b30ccbd4b45bc300bcb50c03330-r0",
+          "steps": 0,
+          "successes": 29,
+          "clean_successes": 28,
+          "total": 30,
+          "collisions": 0,
+          "invalid_actions": 1,
+          "mean_seconds": 10.520000000000001,
+          "failure_counts": {
+            "none": 29,
+            "pickup_not_completed": 1
+          },
+          "final_test_evaluated": false
+        },
+        {
+          "checkpoint": "1ab72b30ccbd4b45bc300bcb50c03330-r1",
+          "steps": 12288,
+          "successes": 27,
+          "clean_successes": 27,
+          "total": 30,
+          "collisions": 0,
+          "invalid_actions": 0,
+          "mean_seconds": 11.858333333333333,
+          "failure_counts": {
+            "none": 27,
+            "pickup_not_completed": 1,
+            "delivery_timeout": 2
+          },
+          "final_test_evaluated": false
+        }
+      ]
+    },
+    {
+      "seed": 27,
+      "job_id": "233d6903fb874d658551770f1e5efb60",
+      "selected": "233d6903fb874d658551770f1e5efb60-r2",
+      "seconds": 26.174378415977117,
+      "peak_rss_mb": 395.53125,
+      "candidates": [
+        {
+          "checkpoint": "233d6903fb874d658551770f1e5efb60-r3",
+          "steps": 36864,
+          "successes": 29,
+          "clean_successes": 28,
+          "total": 30,
+          "collisions": 0,
+          "invalid_actions": 1,
+          "mean_seconds": 10.476666666666665,
+          "failure_counts": {
+            "none": 29,
+            "pickup_not_completed": 1
+          },
+          "final_test_evaluated": false
+        },
+        {
+          "checkpoint": "233d6903fb874d658551770f1e5efb60-r2",
+          "steps": 24576,
+          "successes": 29,
+          "clean_successes": 28,
+          "total": 30,
+          "collisions": 0,
+          "invalid_actions": 1,
+          "mean_seconds": 10.458333333333337,
+          "failure_counts": {
+            "none": 29,
+            "pickup_not_completed": 1
+          },
+          "final_test_evaluated": false
+        },
+        {
+          "checkpoint": "233d6903fb874d658551770f1e5efb60-r0",
+          "steps": 0,
+          "successes": 29,
+          "clean_successes": 28,
+          "total": 30,
+          "collisions": 0,
+          "invalid_actions": 1,
+          "mean_seconds": 10.520000000000001,
+          "failure_counts": {
+            "none": 29,
+            "pickup_not_completed": 1
+          },
+          "final_test_evaluated": false
+        },
+        {
+          "checkpoint": "233d6903fb874d658551770f1e5efb60-r1",
+          "steps": 12288,
+          "successes": 28,
+          "clean_successes": 28,
+          "total": 30,
+          "collisions": 0,
+          "invalid_actions": 0,
+          "mean_seconds": 11.163333333333332,
+          "failure_counts": {
+            "none": 28,
+            "pickup_not_completed": 1,
+            "delivery_timeout": 1
+          },
+          "final_test_evaluated": false
+        }
+      ]
+    }
+  ]
+}

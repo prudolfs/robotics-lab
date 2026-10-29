@@ -133,6 +133,15 @@
     "CheckpointInfo": {
       "additionalProperties": false,
       "properties": {
+        "algorithm": {
+          "default": "bc",
+          "enum": [
+            "bc",
+            "ppo"
+          ],
+          "title": "Algorithm",
+          "type": "string"
+        },
         "architecture": {
           "title": "Architecture",
           "type": "string"
@@ -206,12 +215,42 @@
           "title": "Job Id",
           "type": "string"
         },
+        "parent_checkpoint": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{32}-r[0-3]$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Checkpoint"
+        },
         "policy_version": {
           "title": "Policy Version",
           "type": "string"
         },
+        "practice_steps": {
+          "default": 0,
+          "title": "Practice Steps",
+          "type": "integer"
+        },
         "reference": {
           "$ref": "#/$defs/EvaluationSummary"
+        },
+        "reward_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reward Version"
         },
         "round": {
           "title": "Round",
@@ -257,6 +296,90 @@
         "reference"
       ],
       "title": "CheckpointInfo",
+      "type": "object"
+    },
+    "ComparedRollout": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{32}-r[0-3]$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Checkpoint Id"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "rollout": {
+          "$ref": "#/$defs/Rollout"
+        }
+      },
+      "required": [
+        "label",
+        "checkpoint_id",
+        "rollout"
+      ],
+      "title": "ComparedRollout",
+      "type": "object"
+    },
+    "ComparisonDetail": {
+      "additionalProperties": false,
+      "properties": {
+        "entries": {
+          "items": {
+            "$ref": "#/$defs/ComparedRollout"
+          },
+          "title": "Entries",
+          "type": "array"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        },
+        "template": {
+          "$ref": "#/$defs/Scene"
+        }
+      },
+      "required": [
+        "seed",
+        "template",
+        "entries"
+      ],
+      "title": "ComparisonDetail",
+      "type": "object"
+    },
+    "ComparisonRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_ids": {
+          "items": {
+            "pattern": "^[a-f0-9]{32}-r[0-3]$",
+            "type": "string"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Checkpoint Ids",
+          "type": "array"
+        },
+        "seed": {
+          "default": 10000,
+          "maximum": 10029,
+          "minimum": 10000,
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "checkpoint_ids"
+      ],
+      "title": "ComparisonRequest",
       "type": "object"
     },
     "Configuration": {
@@ -1000,10 +1123,25 @@
             "fitting",
             "evaluating",
             "corrections",
+            "practicing",
             "finished"
           ],
           "title": "Phase",
           "type": "string"
+        },
+        "practice_history": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PracticePoint"
+          },
+          "maxItems": 96,
+          "title": "Practice History",
+          "type": "array"
+        },
+        "practice_steps": {
+          "default": 0,
+          "title": "Practice Steps",
+          "type": "integer"
         },
         "request": {
           "$ref": "#/$defs/TrainRequest"
@@ -1156,6 +1294,68 @@
         "action"
       ],
       "title": "PolicyFrame",
+      "type": "object"
+    },
+    "PracticePoint": {
+      "additionalProperties": false,
+      "properties": {
+        "approximate_kl": {
+          "title": "Approximate Kl",
+          "type": "number"
+        },
+        "clip_fraction": {
+          "title": "Clip Fraction",
+          "type": "number"
+        },
+        "completed_episodes": {
+          "title": "Completed Episodes",
+          "type": "integer"
+        },
+        "deliveries": {
+          "title": "Deliveries",
+          "type": "integer"
+        },
+        "entropy": {
+          "title": "Entropy",
+          "type": "number"
+        },
+        "policy_loss": {
+          "title": "Policy Loss",
+          "type": "number"
+        },
+        "reward_components": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Reward Components",
+          "type": "object"
+        },
+        "stage": {
+          "title": "Stage",
+          "type": "string"
+        },
+        "steps": {
+          "title": "Steps",
+          "type": "integer"
+        },
+        "value_loss": {
+          "title": "Value Loss",
+          "type": "number"
+        }
+      },
+      "required": [
+        "steps",
+        "stage",
+        "policy_loss",
+        "value_loss",
+        "entropy",
+        "approximate_kl",
+        "clip_fraction",
+        "reward_components",
+        "completed_episodes",
+        "deliveries"
+      ],
+      "title": "PracticePoint",
       "type": "object"
     },
     "Review": {
@@ -1748,6 +1948,15 @@
     "TrainRequest": {
       "additionalProperties": false,
       "properties": {
+        "algorithm": {
+          "default": "bc",
+          "enum": [
+            "bc",
+            "ppo"
+          ],
+          "title": "Algorithm",
+          "type": "string"
+        },
         "budget_seconds": {
           "default": 180,
           "maximum": 600,
@@ -1784,6 +1993,27 @@
           "maximum": 300,
           "minimum": 10,
           "title": "Epochs",
+          "type": "integer"
+        },
+        "parent_checkpoint": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{32}-r[0-3]$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Checkpoint"
+        },
+        "ppo_steps": {
+          "default": 36864,
+          "maximum": 98304,
+          "minimum": 3072,
+          "multipleOf": 3072,
+          "title": "Ppo Steps",
           "type": "integer"
         },
         "random_seed": {
@@ -1918,6 +2148,12 @@
     "capabilities": {
       "$ref": "#/$defs/Capabilities"
     },
+    "comparison_detail": {
+      "$ref": "#/$defs/ComparisonDetail"
+    },
+    "comparison_request": {
+      "$ref": "#/$defs/ComparisonRequest"
+    },
     "create_session": {
       "$ref": "#/$defs/CreateSession"
     },
@@ -1970,6 +2206,8 @@
     "expert_request",
     "import_result",
     "validation",
+    "comparison_request",
+    "comparison_detail",
     "training_request",
     "training_job",
     "training_catalog",

@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useComparison } from './api/use-comparison'
 import { useDemonstrations } from './api/use-demonstrations'
 import { useSession } from './api/use-session'
 import { useTraining } from './api/use-training'
 import { DemonstrationLibrary, PlaybackControls } from './components/demonstration-library'
 import { type CameraMode, GreenhouseScene } from './components/greenhouse-scene'
+import { ComparisonPlayback, PracticePanel } from './components/practice-panel'
 import { TeachingControls } from './components/teaching-controls'
 import { TrainingPanel, TrainingPlayback } from './components/training-panel'
 import { Button } from './components/ui/button'
@@ -28,9 +30,10 @@ export function App() {
 	const connected = connection.status === 'connected'
 	const library = useDemonstrations(connected, connection.session?.last_episode_id)
 	const training = useTraining(connected)
-	const playback = !!library.selected || !!training.scene
+	const comparison = useComparison()
+	const playback = !!library.selected || !!training.scene || !!comparison.scene
 	const liveScene = connection.session?.scene
-	const scene = library.scene ?? training.scene ?? liveScene
+	const scene = library.scene ?? comparison.scene ?? training.scene ?? liveScene
 	const sound = useCaretakerSound(
 		playback ? undefined : liveScene,
 		playback ? -1 : (connection.session?.generation ?? 0),
@@ -47,10 +50,11 @@ export function App() {
 						A small robot learning to lend a hand.
 					</p>
 				</div>
-				<p className="text-muted-foreground text-sm">Robotics Lab · Phase 5</p>
+				<p className="text-muted-foreground text-sm">Robotics Lab · Phase 6</p>
 			</header>
 			<PlaybackControls library={library} />
 			<TrainingPlayback training={training} />
+			<ComparisonPlayback comparison={comparison} />
 			<div
 				id="greenhouse-view"
 				className="flex min-h-[580px] flex-col lg:h-[calc(100vh-128px)] lg:flex-row"
@@ -60,9 +64,11 @@ export function App() {
 					generation={
 						library.selected
 							? library.generation
-							: training.scene
-								? training.generation
-								: (connection.session?.generation ?? 0)
+							: comparison.scene
+								? comparison.generation
+								: training.scene
+									? training.generation
+									: (connection.session?.generation ?? 0)
 					}
 					cameraMode={cameraMode}
 				/>
@@ -239,7 +245,7 @@ export function App() {
 													: 'Collecting'}
 								</p>
 								<p data-testid="task-stage" className="text-muted-foreground text-sm">
-									{stageLabels[scene.stage]}
+									{comparison.scene ? 'Recorded comparison' : stageLabels[scene.stage]}
 								</p>
 								<p data-testid="delivery-count" className="text-muted-foreground text-sm">
 									{scene.delivered ? 1 : 0} / 1 delivered
@@ -250,29 +256,35 @@ export function App() {
 								<dt className="text-muted-foreground">Seed</dt>
 								<dd data-testid="session-seed">
 									{library.selected?.entry.episode.seed ??
-										training.rollout?.seed ??
+										(comparison.scene ? comparison.data?.seed : training.rollout?.seed) ??
 										connection.session?.seed}
 								</dd>
 								<dt className="text-muted-foreground">
-									{training.scene
-										? 'Checkpoint round'
-										: playback
-											? 'Recording version'
-											: 'Generation'}
+									{comparison.scene
+										? 'Playback'
+										: training.scene
+											? 'Checkpoint round'
+											: playback
+												? 'Recording version'
+												: 'Generation'}
 								</dt>
 								<dd data-testid="session-generation">
-									{training.scene
-										? training.detail?.checkpoint.round
-										: (library.selected?.entry.episode.schema_version ??
-											connection.session?.generation)}
+									{comparison.scene
+										? 'Comparison'
+										: training.scene
+											? training.detail?.checkpoint.round
+											: (library.selected?.entry.episode.schema_version ??
+												connection.session?.generation)}
 								</dd>
 								<dt className="text-muted-foreground">Simulation tick</dt>
 								<dd data-testid="simulation-tick">
 									{library.selected
 										? library.index
-										: training.scene
-											? training.index
-											: connection.session?.tick}
+										: comparison.scene
+											? comparison.index
+											: training.scene
+												? training.index
+												: connection.session?.tick}
 								</dd>
 								<dt className="text-muted-foreground">Elapsed</dt>
 								<dd>{scene.elapsed_seconds.toFixed(1)} s</dd>
@@ -310,6 +322,22 @@ export function App() {
 					</Button>
 				</aside>
 			</div>
+			<PracticePanel
+				training={training}
+				comparison={comparison}
+				connected={connected}
+				canReview={
+					liveScene?.status !== 'running' &&
+					!connection.session?.recording &&
+					!connection.pending &&
+					!library.selected
+				}
+				onCompare={(seed, ids) => {
+					library.close()
+					training.closeReplay()
+					void comparison.compare(seed, ids)
+				}}
+			/>
 			<TrainingPanel
 				training={training}
 				connected={connected}
@@ -326,12 +354,16 @@ export function App() {
 				}}
 				onReplay={(seed) => {
 					if (library.selected) library.close()
+					comparison.close()
 					training.openReplay(seed)
 					document.getElementById('greenhouse-view')?.scrollIntoView({ behavior: 'instant' })
 				}}
 			/>
 			<DemonstrationLibrary
-				onReview={training.closeReplay}
+				onReview={() => {
+					training.closeReplay()
+					comparison.close()
+				}}
 				library={library}
 				connected={connected}
 				canReview={liveScene?.status !== 'running' && !connection.session?.recording}

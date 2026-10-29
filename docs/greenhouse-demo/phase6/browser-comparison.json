@@ -1,0 +1,43 @@
+{
+  "seed": 10006,
+  "policies": [
+    {
+      "label": "BC · 0a17479f · round 3",
+      "checkpoint_id": "0a17479f7622474c97922b9b0c5bd9b4-r3",
+      "seed": 10006,
+      "success": false,
+      "clean_success": false,
+      "ticks": 600,
+      "seconds": 30,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "failure": "pickup_not_completed"
+    },
+    {
+      "label": "PPO · 1ab72b30 · round 3",
+      "checkpoint_id": "1ab72b30ccbd4b45bc300bcb50c03330-r3",
+      "seed": 10006,
+      "success": false,
+      "clean_success": false,
+      "ticks": 600,
+      "seconds": 30,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "failure": "pickup_not_completed"
+    },
+    {
+      "label": "Scripted reference",
+      "checkpoint_id": null,
+      "seed": 10006,
+      "success": true,
+      "clean_success": true,
+      "ticks": 211,
+      "seconds": 10.55,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "failure": "none"
+    }
+  ],
+  "page_errors": [],
+  "no_live_actions": true
+}

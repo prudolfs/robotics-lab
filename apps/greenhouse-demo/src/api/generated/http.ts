@@ -200,28 +200,27 @@ export type Mode = "reference_simulation";
 export type Simulation = boolean;
 export type SnapshotHz = number;
 export type Training = boolean;
-export type Seed2 = number;
-export type ArtifactLocation = string;
-export type EligibleTrain = number;
-export type EpisodeId1 = string;
-export type Interventions = number;
-export type Outcome1 = "success" | "failure" | "incomplete";
+export type CheckpointId = string | null;
+export type Label1 = string;
+export type CleanSuccess = boolean;
+export type Collisions1 = number;
+export type Failure = "none" | "collision" | "pickup_not_completed" | "invalid_grasp_or_release" | "delivery_timeout";
+/**
+ * @maxItems 600
+ */
+export type Frames1 = PolicyFrame[];
+export type InvalidActions1 = number;
 export type Seconds = number;
+export type Seed2 = number;
+export type Success = boolean;
+export type Ticks = number;
+export type Entries = ComparedRollout[];
 export type Seed3 = number;
-export type Sha2561 = string;
-export type Source1 = "scripted_expert" | "user" | "mixed";
-export type Split1 = "train" | "validation" | "reserved_test" | "unassigned";
-export type Steps = number;
-export type Episodes1 = EpisodeSummary[];
-export type MaxEpisodes = number;
-export type MaxImportBytes = number;
-export type SchemaVersion2 = 1;
-export type TotalSteps = number;
 export type Id = string;
 export type X1 = number;
 export type Y1 = number;
 export type Z = number;
-export type Collisions1 = number;
+export type Collisions2 = number;
 export type Controller1 = "scripted_reference" | "manual" | "learned_policy";
 export type Delivered1 = boolean;
 export type ElapsedSeconds = number;
@@ -229,7 +228,7 @@ export type Kind1 = "info" | "success" | "warning";
 export type Text1 = string;
 export type Tick3 = number;
 export type Events1 = TaskEvent[];
-export type InvalidActions1 = number;
+export type InvalidActions2 = number;
 export type Mode1 = "reference_simulation";
 export type Pickups1 = number;
 export type Pots = SceneObject[];
@@ -248,6 +247,29 @@ export type Status1 = "ready" | "running" | "paused" | "complete" | "failed";
 export type Id2 = string;
 export type Walls = Obstacle[];
 /**
+ * @minItems 2
+ * @maxItems 2
+ */
+export type CheckpointIds = [string, string];
+export type Seed4 = number;
+export type Seed5 = number;
+export type ArtifactLocation = string;
+export type EligibleTrain = number;
+export type EpisodeId1 = string;
+export type Interventions = number;
+export type Outcome1 = "success" | "failure" | "incomplete";
+export type Seconds1 = number;
+export type Seed6 = number;
+export type Sha2561 = string;
+export type Source1 = "scripted_expert" | "user" | "mixed";
+export type Split1 = "train" | "validation" | "reserved_test" | "unassigned";
+export type Steps = number;
+export type Episodes1 = EpisodeSummary[];
+export type MaxEpisodes = number;
+export type MaxImportBytes = number;
+export type SchemaVersion2 = 1;
+export type TotalSteps = number;
+/**
  * @minItems 1
  * @maxItems 100
  */
@@ -257,8 +279,9 @@ export type ServerVersion = string;
 export type Status2 = "ok";
 export type Duplicates = number;
 export type Imported = number;
+export type Algorithm = "bc" | "ppo";
 export type Architecture = string;
-export type CheckpointId = string;
+export type CheckpointId1 = string;
 export type Compatible = boolean;
 export type CorrectionSamples = number;
 export type CorrectionSeeds = number[];
@@ -267,46 +290,37 @@ export type DatasetSha256 = string;
 export type EpisodeIds = string[];
 export type EpisodeSha256 = string[];
 export type CleanSuccesses = number;
-export type Collisions2 = number;
+export type Collisions3 = number;
 export type FinalTestEvaluated = false;
-export type InvalidActions2 = number;
+export type InvalidActions3 = number;
 export type MeanSeconds = number;
 export type Successes = number;
 export type Total = number;
 export type Features = string[];
 export type FittingLoss = number;
 export type JobId = string;
+export type ParentCheckpoint = string | null;
 export type PolicyVersion = string;
+export type PracticeSteps = number;
+export type RewardVersion = string | null;
 export type Round = number;
 export type TorchVersion = string;
 export type TrainingSamples = number;
 export type TrainingSha256 = string;
 export type WeightsSha256 = string;
-export type CleanSuccess = boolean;
-export type Collisions3 = number;
-export type Failure = "none" | "collision" | "pickup_not_completed" | "invalid_grasp_or_release" | "delivery_timeout";
-/**
- * @maxItems 600
- */
-export type Frames1 = PolicyFrame[];
-export type InvalidActions3 = number;
-export type Seconds1 = number;
-export type Seed4 = number;
-export type Success = boolean;
-export type Ticks = number;
 /**
  * @maxItems 30
  */
 export type Episodes2 = Rollout[];
 export type Seeds1 = number[];
 export type ApiVersion2 = "1";
-export type CheckpointId1 = string | null;
+export type CheckpointId2 = string | null;
 export type ControllerError = string | null;
 export type Generation = number;
 export type LastEpisodeId = string | null;
 export type Recording = boolean;
 export type RecordingError = string | null;
-export type Seed5 = number;
+export type Seed7 = number;
 export type SessionId = string;
 export type Tick4 = number;
 export type ActiveJob = string | null;
@@ -328,11 +342,28 @@ export type History = FitPoint[];
 export type JobId1 = string;
 export type Message = string;
 export type PeakWorkerRssMb = number;
-export type Phase = "snapshot" | "fitting" | "evaluating" | "corrections" | "finished";
+export type Phase = "snapshot" | "fitting" | "evaluating" | "corrections" | "practicing" | "finished";
+export type ApproximateKl = number;
+export type ClipFraction = number;
+export type CompletedEpisodes = number;
+export type Deliveries = number;
+export type Entropy = number;
+export type PolicyLoss = number;
+export type Stage2 = string;
+export type Steps1 = number;
+export type ValueLoss = number;
+/**
+ * @maxItems 96
+ */
+export type PracticeHistory = PracticePoint[];
+export type PracticeSteps1 = number;
+export type Algorithm1 = "bc" | "ppo";
 export type BudgetSeconds = number;
 export type CorrectionRounds = number;
 export type EpisodeIds1 = string[] | null;
 export type Epochs = number;
+export type ParentCheckpoint1 = string | null;
+export type PpoSteps = number;
 export type RandomSeed = number;
 export type Round2 = number;
 export type SelectedCheckpoint = string | null;
@@ -350,6 +381,8 @@ export type Skipped = string[];
 export interface HttpModels {
   bundle: Bundle;
   capabilities: Capabilities;
+  comparison_detail: ComparisonDetail;
+  comparison_request: ComparisonRequest;
   create_session: CreateSession;
   dataset: DatasetSummary;
   episode: EpisodeDetail;
@@ -476,42 +509,41 @@ export interface Capabilities {
   snapshot_hz?: SnapshotHz;
   training?: Training;
 }
-export interface CreateSession {
-  seed?: Seed2;
-}
-export interface DatasetSummary {
-  artifact_location: ArtifactLocation;
-  eligible_train: EligibleTrain;
-  episodes: Episodes1;
-  max_episodes: MaxEpisodes;
-  max_import_bytes: MaxImportBytes;
-  schema_version?: SchemaVersion2;
-  total_steps: TotalSteps;
-}
-export interface EpisodeSummary {
-  episode_id: EpisodeId1;
-  interventions: Interventions;
-  outcome: Outcome1;
-  review: Review;
-  seconds: Seconds;
+export interface ComparisonDetail {
+  entries: Entries;
   seed: Seed3;
-  sha256: Sha2561;
-  source: Source1;
-  split: Split1;
-  steps: Steps;
-}
-export interface EpisodeDetail {
-  entry: Entry;
   template: Scene;
+}
+export interface ComparedRollout {
+  checkpoint_id: CheckpointId;
+  label: Label1;
+  rollout: Rollout;
+}
+export interface Rollout {
+  clean_success: CleanSuccess;
+  collisions: Collisions1;
+  failure: Failure;
+  final?: StateData | null;
+  frames?: Frames1;
+  initial?: StateData | null;
+  invalid_actions: InvalidActions1;
+  seconds: Seconds;
+  seed: Seed2;
+  success: Success;
+  ticks: Ticks;
+}
+export interface PolicyFrame {
+  action: ActionData;
+  state: StateData;
 }
 export interface Scene {
   capsule: SceneObject;
-  collisions: Collisions1;
+  collisions: Collisions2;
   controller: Controller1;
   delivered: Delivered1;
   elapsed_seconds: ElapsedSeconds;
   events: Events1;
-  invalid_actions: InvalidActions1;
+  invalid_actions: InvalidActions2;
   mode: Mode1;
   observation: ObservationData;
   pickups: Pickups1;
@@ -553,6 +585,38 @@ export interface Obstacle {
   id: Id2;
   position: Vector3;
 }
+export interface ComparisonRequest {
+  checkpoint_ids: CheckpointIds;
+  seed?: Seed4;
+}
+export interface CreateSession {
+  seed?: Seed5;
+}
+export interface DatasetSummary {
+  artifact_location: ArtifactLocation;
+  eligible_train: EligibleTrain;
+  episodes: Episodes1;
+  max_episodes: MaxEpisodes;
+  max_import_bytes: MaxImportBytes;
+  schema_version?: SchemaVersion2;
+  total_steps: TotalSteps;
+}
+export interface EpisodeSummary {
+  episode_id: EpisodeId1;
+  interventions: Interventions;
+  outcome: Outcome1;
+  review: Review;
+  seconds: Seconds1;
+  seed: Seed6;
+  sha256: Sha2561;
+  source: Source1;
+  split: Split1;
+  steps: Steps;
+}
+export interface EpisodeDetail {
+  entry: Entry;
+  template: Scene;
+}
 export interface ExpertRequest {
   seeds?: Seeds;
 }
@@ -571,8 +635,9 @@ export interface PolicyDetail {
   template: Scene;
 }
 export interface CheckpointInfo {
+  algorithm?: Algorithm;
   architecture: Architecture;
-  checkpoint_id: CheckpointId;
+  checkpoint_id: CheckpointId1;
   compatible?: Compatible;
   configuration: Configuration;
   correction_samples: CorrectionSamples;
@@ -585,8 +650,11 @@ export interface CheckpointInfo {
   features: Features;
   fitting_loss: FittingLoss;
   job_id: JobId;
+  parent_checkpoint?: ParentCheckpoint;
   policy_version: PolicyVersion;
+  practice_steps?: PracticeSteps;
   reference: EvaluationSummary;
+  reward_version?: RewardVersion;
   round: Round;
   torch_version: TorchVersion;
   training_samples: TrainingSamples;
@@ -595,10 +663,10 @@ export interface CheckpointInfo {
 }
 export interface EvaluationSummary {
   clean_successes: CleanSuccesses;
-  collisions: Collisions2;
+  collisions: Collisions3;
   failure_counts: FailureCounts;
   final_test_evaluated?: FinalTestEvaluated;
-  invalid_actions: InvalidActions2;
+  invalid_actions: InvalidActions3;
   mean_seconds: MeanSeconds;
   successes: Successes;
   total?: Total;
@@ -611,33 +679,16 @@ export interface Evaluation {
   seeds: Seeds1;
   summary: EvaluationSummary;
 }
-export interface Rollout {
-  clean_success: CleanSuccess;
-  collisions: Collisions3;
-  failure: Failure;
-  final?: StateData | null;
-  frames?: Frames1;
-  initial?: StateData | null;
-  invalid_actions: InvalidActions3;
-  seconds: Seconds1;
-  seed: Seed4;
-  success: Success;
-  ticks: Ticks;
-}
-export interface PolicyFrame {
-  action: ActionData;
-  state: StateData;
-}
 export interface SessionView {
   api_version?: ApiVersion2;
-  checkpoint_id?: CheckpointId1;
+  checkpoint_id?: CheckpointId2;
   controller_error?: ControllerError;
   generation: Generation;
   last_episode_id?: LastEpisodeId;
   recording?: Recording;
   recording_error?: RecordingError;
   scene: Scene;
-  seed: Seed5;
+  seed: Seed7;
   session_id: SessionId;
   tick: Tick4;
 }
@@ -659,6 +710,8 @@ export interface Job {
   message: Message;
   peak_worker_rss_mb?: PeakWorkerRssMb;
   phase: Phase;
+  practice_history?: PracticeHistory;
+  practice_steps?: PracticeSteps1;
   request: TrainRequest;
   round?: Round2;
   selected_checkpoint?: SelectedCheckpoint;
@@ -669,11 +722,29 @@ export interface FitPoint {
   loss: Loss;
   round: Round1;
 }
+export interface PracticePoint {
+  approximate_kl: ApproximateKl;
+  clip_fraction: ClipFraction;
+  completed_episodes: CompletedEpisodes;
+  deliveries: Deliveries;
+  entropy: Entropy;
+  policy_loss: PolicyLoss;
+  reward_components: RewardComponents;
+  stage: Stage2;
+  steps: Steps1;
+  value_loss: ValueLoss;
+}
+export interface RewardComponents {
+  [k: string]: number;
+}
 export interface TrainRequest {
+  algorithm?: Algorithm1;
   budget_seconds?: BudgetSeconds;
   correction_rounds?: CorrectionRounds;
   episode_ids?: EpisodeIds1;
   epochs?: Epochs;
+  parent_checkpoint?: ParentCheckpoint1;
+  ppo_steps?: PpoSteps;
   random_seed?: RandomSeed;
 }
 export interface ValidationReport {

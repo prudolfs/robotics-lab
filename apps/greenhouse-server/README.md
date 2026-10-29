@@ -1,6 +1,6 @@
 # Greenhouse server
 
-Project-owned Python service for Greenhouse Caretaker. Phase 2 provides an independent fixed-step MuJoCo world, a scripted collection controller, ephemeral sessions and validated live WebSocket commands. Phase 5 adds separate-process PyTorch training and saved learned policies; LangGraph missions remain a later phase.
+Project-owned Python service for Greenhouse Caretaker. Phase 2 provides an independent fixed-step MuJoCo world, a scripted collection controller, ephemeral sessions and validated live WebSocket commands. Phase 5 adds separate-process PyTorch training and saved learned policies. Phase 6 adds Gymnasium/PPO practice, a staged curriculum and sealed evaluation; LangGraph missions remain a later phase.
 
 Phase 3 adds Blender-authored presentation in the frontend without changing the simulation or API. The server suite checks the asset manifest against the compiled MuJoCo chassis, wheels, pots, walls and task dimensions. See the [Phase 3 review](../../docs/greenhouse-demo/phase3/README.md).
 
@@ -93,11 +93,19 @@ Saved datasets persist across restarts; live sessions and an unsaved in-memory r
 
 ## Learned policies and training
 
-Phase 5 implements a small CPU PyTorch behavior-cloning policy, training-only corrective labels, complete validation episodes, persisted checkpoints and explicit live learned selection. The selected local checkpoint delivers on 29/30 validation seeds, 28 clean; the reference achieves 30/30 clean. Final-test seeds remain reserved.
+Phase 5 implements a small CPU PyTorch behavior-cloning policy, training-only corrective labels, complete validation episodes, persisted checkpoints and explicit live learned selection. The selected local checkpoint delivers on 29/30 validation seeds, 28 clean; the reference achieves 30/30 clean. Phase 6 has since evaluated the reserved test suite once under a frozen selection; see below.
 
 The `/training` catalog and `/training/jobs` start/status/cancel routes manage one owned subprocess. `/training/checkpoints/{id}` exposes evaluated metadata and recorded validation states. `set_controller` also accepts `learned_policy` with `checkpoint_id` while ready/paused. Learned execution is separate from the unchanged Phase 4 demonstration schema and cannot be recorded into it. Inference uses no reference recovery.
 
 `GREENHOUSE_TRAINING_DIR` overrides `runtime/training/v1/`. Models are local ignored artifacts, so a fresh checkout must prepare eligible demonstrations and train. Checkpoint activation verifies versions, features, configuration and weights integrity. CPU training is bounded and cancellation/shutdown stops its owned worker. See the [Phase 5 guide](../../docs/greenhouse-demo/phase5/README.md) for commands, model/loss, artifact identities, exact limits, remaining failures and measured evidence.
+
+## PPO practice and comparison
+
+Phase 6 extends training requests with `algorithm: "ppo"`, an explicit BC `parent_checkpoint`, and `ppo_steps` (3,072–98,304 in multiples of 3,072; default 36,864). The UI uses a 240-second budget. A separate CPU worker fine-tunes the exact actor format with hybrid PPO-Clip and a training-only value head; the original remains available, and a regressing job retains its BC parent. Job histories include reward components, losses, KL, steps and curriculum stages. `node scripts/greenhouse-phase6/train.mjs` runs/reuses the documented three-seed experiment through the API.
+
+`POST /api/v1/greenhouse/training/compare` accepts two distinct checkpoint IDs and a validation seed 10000–10029. It measures two independent learned runs and a fresh reference from the same initial world, returning recorded states and outcomes for playback. Training and comparison run outside the API event loop with bounded concurrency.
+
+The Gymnasium wrapper leaves the base physics/configuration unchanged and restricts practice to scenario seeds 0–99. Final-test access is confined to the offline sealed evaluation runner. The selected PPO and BC both deliver on 93/100 final-test seeds, 92 clean; the reference achieves 100/100 clean. PPO reduces rejected actions from 917 to 2 without improving completion. These test seeds are now inspected, so future tuning requires a fresh evaluation suite or explicit disclosure of reuse. See the [Phase 6 guide](../../docs/greenhouse-demo/phase6/README.md) for initialization, PPO/reward settings, budgets, candidate regressions, the audited reference-runner correction and complete evidence.
 
 ## Checks
 

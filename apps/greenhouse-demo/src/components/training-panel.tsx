@@ -68,7 +68,7 @@ export function TrainingPanel({
 }) {
 	const [epochs, setEpochs] = useState(120)
 	const [corrections, setCorrections] = useState(3)
-	const job = training.latest
+	const job = training.data?.jobs.find((item) => item.request.algorithm === 'bc')
 	const checkpoint = training.detail?.checkpoint
 	const disabled = !connected || training.busy
 	const valid =
@@ -161,7 +161,8 @@ export function TrainingPanel({
 								value={item.checkpoint_id}
 								disabled={!item.compatible}
 							>
-								{item.job_id.slice(0, 8)} · round {item.round} · {item.evaluation.clean_successes}
+								{item.algorithm?.toUpperCase()} {item.job_id.slice(0, 8)} · round {item.round} ·{' '}
+								{item.evaluation.clean_successes}
 								/30 clean{item.compatible ? '' : ' · incompatible'}
 							</NativeSelectOption>
 						))}
@@ -180,7 +181,7 @@ export function TrainingPanel({
 				<div className="grid gap-5 lg:grid-cols-2">
 					<div className="flex flex-col gap-2">
 						<p data-testid="training-status" className="font-medium text-sm">
-							{job.state} · {job.phase} · round {job.round} · epoch {job.epoch}
+							Imitation fit: {job.state} · {job.phase} · round {job.round} · epoch {job.epoch}
 						</p>
 						<p className="text-muted-foreground text-sm">{job.message}</p>
 						<p className="text-muted-foreground text-xs">
@@ -256,16 +257,18 @@ export function TrainingPanel({
 					<p className="text-muted-foreground text-sm">
 						{checkpoint.evaluation.collisions} collisions · {checkpoint.evaluation.invalid_actions}{' '}
 						invalid actions · {checkpoint.training_samples} labeled states (
-						{checkpoint.correction_samples} corrective). Dataset{' '}
+						{checkpoint.correction_samples} corrective inherited labels). Artifact identity{' '}
 						{checkpoint.training_sha256.slice(0, 12)}…
 					</p>
 					<div className="overflow-auto">
 						<table className="w-full text-left text-sm">
-							<caption className="sr-only">Evaluated behavior-cloning rounds</caption>
+							<caption className="sr-only">Evaluated checkpoint rounds</caption>
 							<thead>
 								<tr className="border-border border-b">
 									<th className="p-2">Round</th>
-									<th className="p-2">Fitting loss</th>
+									<th className="p-2">
+										{checkpoint.algorithm === 'ppo' ? 'Practice steps' : 'Fitting loss'}
+									</th>
 									<th className="p-2">Delivered</th>
 									<th className="p-2">Clean</th>
 									<th className="p-2">Invalid</th>
@@ -275,7 +278,11 @@ export function TrainingPanel({
 								{candidates.map((item) => (
 									<tr key={item.checkpoint_id}>
 										<td className="p-2">{item.round}</td>
-										<td className="p-2">{item.fitting_loss.toFixed(4)}</td>
+										<td className="p-2">
+											{item.algorithm === 'ppo'
+												? item.practice_steps
+												: item.fitting_loss.toFixed(4)}
+										</td>
 										<td className="p-2">{item.evaluation.successes}/30</td>
 										<td className="p-2">{item.evaluation.clean_successes}/30</td>
 										<td className="p-2">{item.evaluation.invalid_actions}</td>

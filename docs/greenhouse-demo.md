@@ -2,7 +2,7 @@
 
 > Proposed implementation plan for the next Robotics Lab project: an expressive robot that learns useful tasks in a simulated greenhouse.
 >
-> Status: Phases 0–5 complete; awaiting user review of [Phase 5 learned collection](greenhouse-demo/phase5/README.md). Later phases remain unchecked. Stop before starting Phase 6.
+> Status: Phases 0–6 complete; awaiting user review of [Phase 6 PPO practice and comparison](greenhouse-demo/phase6/README.md). Later phases remain unchecked. Stop before starting Phase 7.
 
 ## Goal and experience
 
@@ -57,7 +57,7 @@ Proposed root commands are `pnpm setup:greenhouse`, `pnpm dev:greenhouse`, `pnpm
 | Simulation | Python-only, fixed-timestep environment with seeded reset, step, observation, reward, termination and snapshot interfaces. No dependency on FastAPI, LangGraph or rendering. |
 | Physics | MuJoCo 3.17.0, verified in Phases 0–2. Python owns fixed-step planar motion and contacts; constrained pickup, idealized sensing and wheel/traction limits are documented explicitly. |
 | API | FastAPI owns interactive session commands, snapshot streaming, dataset metadata, job control and artifacts. Stream render snapshots at a bounded rate separately from physics stepping. |
-| Training | PyTorch behavior cloning first; Gymnasium and Stable-Baselines3 PPO for the later practice experiment. Training interacts directly with the environment. |
+| Training | PyTorch behavior cloning and Gymnasium with a repository-owned hybrid PPO-Clip implementation. Phase 6 explicitly initializes the checked BC actor and preserves its decoder; no assumed Stable-Baselines3 checkpoint conversion. Training interacts directly with the environment. |
 | Jobs | A separate worker process performs training/evaluation. Persist job state, metrics and checkpoint references so CPU-heavy work does not block API requests. |
 | Missions | LangGraph coordinates skill execution and bounded recovery. Use LangChain model/tool integrations where useful; model calls remain above the motor-control loop. |
 | Contracts | Generate shared TypeScript HTTP model types directly from Pydantic JSON Schema and use a small typed fetch client with runtime validation. Keep TypeScript 7. FastAPI's OpenAPI remains automatic HTTP documentation; the frontend does not depend on an OpenAPI generator. Export and validate WebSocket envelopes separately. |
@@ -175,16 +175,16 @@ Exit verified: the [Phase 5 review](greenhouse-demo/phase5/README.md) records a 
 
 ### Phase 6 — Reinforcement-learning practice and curriculum
 
-- [ ] Wrap the same Python environment in Gymnasium and validate its observation/action spaces, reset and termination behavior.
-- [ ] Add a reproducible PPO training configuration and decide explicitly how to compare with or initialize from the imitation policy; do not assume checkpoint compatibility.
-- [ ] Implement reward components for valid task progress, successful delivery, collisions and time; log each component separately.
-- [ ] Add a staged curriculum for target distance, placement variation and a small number of obstacles, keeping tasks feasible.
-- [ ] Run a bounded training experiment within a documented compute budget, recording throughput and resource use.
-- [ ] Evaluate candidates on validation scenarios, inspect reward exploitation and regressions, and preserve the best validated policy even if PPO does not improve it.
-- [ ] Compare selected checkpoints on the untouched final test set using the Phase 0 metrics; report sample counts and variability across training seeds where practical.
-- [ ] Add a browser comparison flow that replays the same scenario with chosen policies and explains failure outcomes.
+- [x] Wrap the same Python environment in Gymnasium and validate its observation/action spaces, reset and termination behavior.
+- [x] Add a reproducible PPO training configuration and decide explicitly how to compare with or initialize from the imitation policy; do not assume checkpoint compatibility.
+- [x] Implement reward components for valid task progress, successful delivery, collisions and time; log each component separately.
+- [x] Add a staged curriculum for target distance, placement variation and a small number of obstacles, keeping tasks feasible.
+- [x] Run a bounded training experiment within a documented compute budget, recording throughput and resource use.
+- [x] Evaluate candidates on validation scenarios, inspect reward exploitation and regressions, and preserve the best validated policy even if PPO does not improve it.
+- [x] Compare selected checkpoints on the untouched final test set using the Phase 0 metrics; report sample counts and variability across training seeds where practical.
+- [x] Add a browser comparison flow that replays the same scenario with chosen policies and explains failure outcomes.
 
-Exit: measured evidence of what practice improves or fails to improve, with reproducible artifacts and an honest controller comparison. Stop for user review before Phase 7.
+Exit verified: the [Phase 6 review](greenhouse-demo/phase6/README.md) records three bounded PPO runs, a Gymnasium curriculum, reward ledgers, candidate regressions and same-seed browser playback. Frozen final test: selected PPO and BC both deliver 93/100 (92 clean), reference 100/100 clean; selected PPO reduces invalid actions from 917 to 2. The reference-only runner correction is audited and the original report preserved. Final-test seeds are now inspected and cannot be called untouched for later tuning. Stop for user review before Phase 7.
 
 ### Phase 7 — LangGraph greenhouse missions
 
@@ -207,7 +207,7 @@ Exit: the caretaker completes a multi-step greenhouse routine with visible, pers
 - [ ] Finalize session ownership, disconnect/reconnect behavior, stale responses, concurrent-job limits and clean worker shutdown.
 - [ ] Verify bounded recording/snapshot memory, artifact retention and repeated start/reset/train/cancel cycles.
 - [ ] Run targeted Python simulation/training/API checks, frontend typecheck/build, relevant shared-package checks and a small public-UI end-to-end suite.
-- [ ] Evaluate the final checkpoints on the fixed test set and publish metrics, training cost, sensing assumptions and remaining limits.
+- [ ] Evaluate final checkpoints on a newly reserved test suite after further tuning, or explicitly disclose reuse of the inspected Phase 6 suite; publish metrics, training cost, sensing assumptions and remaining limits.
 - [ ] Document architecture, local setup, asset exports, dataset formats, training reproduction, mission configuration and backend deployment requirements.
 - [ ] Add app READMEs and root README links/launch commands, then capture current screenshots and a short task/learning comparison video.
 - [ ] Verify a fresh checkout can start both services, run a reference task, execute a saved learned policy and reproduce a documented small training run.

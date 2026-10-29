@@ -109,6 +109,15 @@
       "CheckpointInfo": {
         "additionalProperties": false,
         "properties": {
+          "algorithm": {
+            "default": "bc",
+            "enum": [
+              "bc",
+              "ppo"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
           "architecture": {
             "title": "Architecture",
             "type": "string"
@@ -182,12 +191,40 @@
             "title": "Job Id",
             "type": "string"
           },
+          "parent_checkpoint": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{32}-r[0-3]$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Checkpoint"
+          },
           "policy_version": {
             "title": "Policy Version",
             "type": "string"
           },
+          "practice_steps": {
+            "default": 0,
+            "title": "Practice Steps",
+            "type": "integer"
+          },
           "reference": {
             "$ref": "#/components/schemas/EvaluationSummary"
+          },
+          "reward_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reward Version"
           },
           "round": {
             "title": "Round",
@@ -233,6 +270,90 @@
           "reference"
         ],
         "title": "CheckpointInfo",
+        "type": "object"
+      },
+      "ComparedRollout": {
+        "additionalProperties": false,
+        "properties": {
+          "checkpoint_id": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{32}-r[0-3]$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checkpoint Id"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "rollout": {
+            "$ref": "#/components/schemas/Rollout"
+          }
+        },
+        "required": [
+          "label",
+          "checkpoint_id",
+          "rollout"
+        ],
+        "title": "ComparedRollout",
+        "type": "object"
+      },
+      "ComparisonDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/ComparedRollout"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "seed": {
+            "title": "Seed",
+            "type": "integer"
+          },
+          "template": {
+            "$ref": "#/components/schemas/Scene"
+          }
+        },
+        "required": [
+          "seed",
+          "template",
+          "entries"
+        ],
+        "title": "ComparisonDetail",
+        "type": "object"
+      },
+      "ComparisonRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "checkpoint_ids": {
+            "items": {
+              "pattern": "^[a-f0-9]{32}-r[0-3]$",
+              "type": "string"
+            },
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Checkpoint Ids",
+            "type": "array"
+          },
+          "seed": {
+            "default": 10000,
+            "maximum": 10029.0,
+            "minimum": 10000.0,
+            "title": "Seed",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "checkpoint_ids"
+        ],
+        "title": "ComparisonRequest",
         "type": "object"
       },
       "Configuration": {
@@ -988,10 +1109,25 @@
               "fitting",
               "evaluating",
               "corrections",
+              "practicing",
               "finished"
             ],
             "title": "Phase",
             "type": "string"
+          },
+          "practice_history": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PracticePoint"
+            },
+            "maxItems": 96,
+            "title": "Practice History",
+            "type": "array"
+          },
+          "practice_steps": {
+            "default": 0,
+            "title": "Practice Steps",
+            "type": "integer"
           },
           "request": {
             "$ref": "#/components/schemas/TrainRequest"
@@ -1143,6 +1279,68 @@
           "action"
         ],
         "title": "PolicyFrame",
+        "type": "object"
+      },
+      "PracticePoint": {
+        "additionalProperties": false,
+        "properties": {
+          "approximate_kl": {
+            "title": "Approximate Kl",
+            "type": "number"
+          },
+          "clip_fraction": {
+            "title": "Clip Fraction",
+            "type": "number"
+          },
+          "completed_episodes": {
+            "title": "Completed Episodes",
+            "type": "integer"
+          },
+          "deliveries": {
+            "title": "Deliveries",
+            "type": "integer"
+          },
+          "entropy": {
+            "title": "Entropy",
+            "type": "number"
+          },
+          "policy_loss": {
+            "title": "Policy Loss",
+            "type": "number"
+          },
+          "reward_components": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Reward Components",
+            "type": "object"
+          },
+          "stage": {
+            "title": "Stage",
+            "type": "string"
+          },
+          "steps": {
+            "title": "Steps",
+            "type": "integer"
+          },
+          "value_loss": {
+            "title": "Value Loss",
+            "type": "number"
+          }
+        },
+        "required": [
+          "steps",
+          "stage",
+          "policy_loss",
+          "value_loss",
+          "entropy",
+          "approximate_kl",
+          "clip_fraction",
+          "reward_components",
+          "completed_episodes",
+          "deliveries"
+        ],
+        "title": "PracticePoint",
         "type": "object"
       },
       "Review": {
@@ -1729,6 +1927,15 @@
       "TrainRequest": {
         "additionalProperties": false,
         "properties": {
+          "algorithm": {
+            "default": "bc",
+            "enum": [
+              "bc",
+              "ppo"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
           "budget_seconds": {
             "default": 180,
             "maximum": 600.0,
@@ -1764,6 +1971,26 @@
             "maximum": 300.0,
             "minimum": 10.0,
             "title": "Epochs",
+            "type": "integer"
+          },
+          "parent_checkpoint": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{32}-r[0-3]$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Checkpoint"
+          },
+          "ppo_steps": {
+            "default": 36864,
+            "maximum": 98304.0,
+            "minimum": 3072.0,
+            "multipleOf": 3072.0,
+            "title": "Ppo Steps",
             "type": "integer"
           },
           "random_seed": {
@@ -2362,6 +2589,44 @@
           }
         },
         "summary": "Checkpoint"
+      }
+    },
+    "/api/v1/greenhouse/training/compare": {
+      "post": {
+        "operationId": "compare_api_v1_greenhouse_training_compare_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComparisonRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComparisonDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Compare"
       }
     },
     "/api/v1/greenhouse/training/jobs": {

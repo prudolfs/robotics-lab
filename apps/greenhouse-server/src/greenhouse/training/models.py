@@ -15,6 +15,9 @@ CheckpointId = Annotated[str, Field(pattern=r"^[a-f0-9]{32}-r[0-3]$")]
 
 
 class TrainRequest(Model):
+    algorithm: Literal["bc", "ppo"] = "bc"
+    parent_checkpoint: CheckpointId | None = None
+    ppo_steps: Annotated[int, Field(ge=3072, le=98304, multiple_of=3072)] = 36864
     epochs: Annotated[int, Field(ge=10, le=300)] = 120
     correction_rounds: Annotated[int, Field(ge=0, le=3)] = 3
     random_seed: Annotated[int, Field(ge=0, le=2_147_483_647)] = 7
@@ -64,7 +67,24 @@ class FitPoint(Model):
     loss: float
 
 
+class PracticePoint(Model):
+    steps: int
+    stage: str
+    policy_loss: float
+    value_loss: float
+    entropy: float
+    approximate_kl: float
+    clip_fraction: float
+    reward_components: dict[str, float]
+    completed_episodes: int
+    deliveries: int
+
+
 class CheckpointInfo(Model):
+    algorithm: Literal["bc", "ppo"] = "bc"
+    parent_checkpoint: CheckpointId | None = None
+    practice_steps: int = 0
+    reward_version: str | None = None
     checkpoint_id: CheckpointId
     job_id: ArtifactId
     round: int
@@ -91,7 +111,7 @@ class CheckpointInfo(Model):
 class Job(Model):
     job_id: ArtifactId
     state: Literal["preparing", "running", "completed", "cancelled", "failed"]
-    phase: Literal["snapshot", "fitting", "evaluating", "corrections", "finished"]
+    phase: Literal["snapshot", "fitting", "evaluating", "corrections", "practicing", "finished"]
     request: TrainRequest
     created_at: str
     elapsed_seconds: float = 0.0
@@ -104,6 +124,8 @@ class Job(Model):
     message: str
     cancel_requested: bool = False
     peak_worker_rss_mb: float = 0.0
+    practice_history: Annotated[list[PracticePoint], Field(max_length=96)] = []
+    practice_steps: int = 0
 
 
 class TrainingCatalog(Model):
@@ -119,3 +141,14 @@ class WorkerInput(Model):
     dataset_sha256: str
     episode_ids: list[ArtifactId]
     episode_sha256: list[str]
+
+
+class ComparisonRequest(Model):
+    seed: Annotated[int, Field(ge=10000, le=10029)] = 10000
+    checkpoint_ids: Annotated[list[CheckpointId], Field(min_length=2, max_length=2)]
+
+
+class ComparedRollout(Model):
+    label: str
+    checkpoint_id: CheckpointId | None
+    rollout: Rollout

@@ -40,10 +40,27 @@ export function validationScene(
 	index: number,
 	playing: boolean,
 ): Scene {
+	return recordedScene(
+		detail.template,
+		rollout,
+		index,
+		playing,
+		detail.checkpoint.configuration.control_dt,
+	)
+}
+
+export function recordedScene(
+	template: Scene,
+	rollout: ValidationRollout,
+	index: number,
+	playing: boolean,
+	controlDt: number,
+	controller: Scene['controller'] = 'learned_policy',
+): Scene {
 	const state = index > 0 ? rollout.frames?.[index - 1]?.state : rollout.initial
 	if (!state) throw new Error('This validation episode has no saved playback states.')
 	const target = state.holding
-		? [detail.template.tray.position.x, detail.template.tray.position.y]
+		? [template.tray.position.x, template.tray.position.y]
 		: state.capsule
 	const dx = target[0] - state.x,
 		dy = target[1] - state.y
@@ -52,8 +69,8 @@ export function validationScene(
 	const forward = c * dx + s * dy,
 		left = -s * dx + c * dy
 	return {
-		...detail.template,
-		controller: 'learned_policy',
+		...template,
+		controller,
 		stage: state.delivered ? 'done' : 'learned',
 		status:
 			state.status === 'complete' || state.status === 'failed'
@@ -61,7 +78,7 @@ export function validationScene(
 				: playing
 					? 'running'
 					: 'paused',
-		elapsed_seconds: state.tick * detail.checkpoint.configuration.control_dt,
+		elapsed_seconds: state.tick * controlDt,
 		observation: {
 			target_forward: forward,
 			target_left: left,

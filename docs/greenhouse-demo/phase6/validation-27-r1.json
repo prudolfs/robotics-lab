@@ -1,0 +1,500 @@
+{
+  "checkpoint": {
+    "algorithm": "ppo",
+    "parent_checkpoint": "0a17479f7622474c97922b9b0c5bd9b4-r3",
+    "practice_steps": 12288,
+    "reward_version": "practice-ledger-v1",
+    "checkpoint_id": "233d6903fb874d658551770f1e5efb60-r1",
+    "job_id": "233d6903fb874d658551770f1e5efb60",
+    "round": 1,
+    "policy_version": "bc-masked-motors-v1",
+    "features": [
+      "target_forward/4",
+      "target_left/4",
+      "distance/4",
+      "sin(bearing)",
+      "cos(bearing)",
+      "speed/0.6",
+      "yaw_speed/1.6",
+      "(lift_height-0.05)/0.23",
+      "holding"
+    ],
+    "architecture": "9 -> 96 tanh -> 96 tanh -> 10 (motor2, active2, lift3, grip3)",
+    "torch_version": "2.15.0",
+    "weights_sha256": "a5685d58a59ec9a1c3e9af0387cb3971757955a811e9eb9c0a2825d5c6d28202",
+    "configuration": {
+      "simulator_version": "greenhouse-world-v1",
+      "world_fingerprint": "35de02c6c459750cff592b71ffd279f8e598f364920dc4bc0e260a47846ebd42",
+      "mujoco_version": "3.17.0",
+      "observation_version": "relative-target-v1",
+      "action_version": "base-lift-grip-v1",
+      "control_dt": 0.05,
+      "physics_dt": 0.005,
+      "max_ticks": 600,
+      "gripper_reach": 0.34,
+      "capsule_radius": 0.05,
+      "lift_limits": [
+        0.05,
+        0.28
+      ],
+      "tray": [
+        1.65,
+        0.65
+      ],
+      "tray_radius": 0.2
+    },
+    "dataset_sha256": "c479f14e82d4893c9fd3bc2d405b68c6816e3449c6e31d33923dc4b3506ca7d5",
+    "training_sha256": "808bd3737856988dfbe76acc314ec9f4835384cc7405a8e66d75918111c5b9ec",
+    "correction_sha256": [
+      "3c51260f8f49d8814419a48c09348231707e1b7493d7ef78dbc38c09af59ef2a",
+      "70825e1cdb1d6f13ea881964df9ee9e9aa95bb54f5d80980ff189f16ff7b9e2b",
+      "00cdc8ec4620680766e30a71cc7acf65d1b61e3e328407bff5c181ce24a43190"
+    ],
+    "episode_ids": [
+      "08ec0c4714c64321a6eeae839a027483",
+      "17e2795806dc4489b770ccd61447fd4b",
+      "29418af8ab5c4b03b878d2e049353db3",
+      "383f0964f01a47c6a2a601adf56a7618",
+      "3cf2b6926a824fcf922a0eea47211ac5",
+      "61d902e5468e4f1abc3ba9f10152dff6",
+      "8232730e45b34746b275dfbf2ad1e193",
+      "902db74879834da69bd5c044a9695ea1",
+      "933cf80cf65149ba95b049adb749c9f8",
+      "96b58686cf5444d1a5386483e9333683",
+      "9c93f3cebb864d739727aed73ce14188",
+      "a06400b7b8be48218d79f7c44445e65f",
+      "a5005fa16d774e25a2e34792bfbce648",
+      "b64bb282a8c54162ac019e137e46093e",
+      "bde50816c4bf47748e4889fe80bf9427",
+      "c0549785f8cf40e8b19cea9109004c56",
+      "c8be3c7df3f549f1a87ae69aefbc6828",
+      "d31419375917402a8c121ab49a663ea4",
+      "f7bb6d58e2f44515a86f25c919fafee6",
+      "fe6585fce6854da9aeec7788088b8bd0"
+    ],
+    "episode_sha256": [
+      "32b1ced695cc97a277ef5800ef254c9148517d88e365be10560379f1ac4fe450",
+      "473aa50ffa68c453af30701480c7fde09a0fd356ba7ae0d68681e3bc764851d8",
+      "5aca83b04df3bda792e029fe14db3b50a4ad433f528b7f2bd5976468f173f0e9",
+      "2a24ffe2239f4c422847587d70aa746e2d8ab3e6b065470b4e8d3bfb356bae5d",
+      "fd6a0d668eccbcd8eca6f2e0a147d459248b4af4ae43a5feb50c7f4521c59058",
+      "daeb804b10f6c51eab373c322205c1936405cea4c539ee7fe9e5653a1cbfd10b",
+      "ca9cd94469237227060f21eeaa69b5bff707b91fc5468916c90435790003c636",
+      "64a61b678464a544ebaaab69181fad3cc8512a7d92e6cf55a26e99187e1a78e4",
+      "98a2415542e507b74138dbb764b7b1e5ca8c3880d11aefc22c59b2ed698a65dc",
+      "12e02d845acb846b5e82f92af86e5b5affb98034b216811438a64ee9b7a5eab4",
+      "0f81d463cbdcb752ab6309f02a00b85ba2d4573fe0011756efa7cb62ab0dc188",
+      "e73fbf15330bbe22c65257524a8bea85c0c1272f79b190329ccc8446170395fc",
+      "39b7ac2291d576236576cb2fcc26e9b5fdb68f7ea6879d2cd0da1783e7253c02",
+      "6e8f1c04637481dd5697bb4652534f87d310a92e90f1c4f2fa50ba1d61d5b068",
+      "f0981322a9f27654fc89e45cc153a7282eb3da20db4f0560ee4310c05f644385",
+      "397e6b59ef8ee0ca0bde47caf813e35f18e7a2e86b678badd31c15e6e9a5afa0",
+      "39a7f74f9c9a1fc0b6b2a544724486ffcc559a6df434476d1cbe7d43e4e45f89",
+      "a4b3a04aa4f8a497e1a106e1994076566402c0da107a9a139f100bf19d55bc78",
+      "a023ebd9049ca9479fedcedc7781a48ae1c6f34809e777a3a1032c8707f5446a",
+      "6b8aaf4ae5aae5963d237ee4b932cc6045dc5e598157a3556d4a288064f63c74"
+    ],
+    "training_samples": 30513,
+    "correction_samples": 26244,
+    "correction_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "fitting_loss": 0.04124346270469173,
+    "evaluation": {
+      "successes": 28,
+      "clean_successes": 28,
+      "total": 30,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "mean_seconds": 11.163333333333332,
+      "failure_counts": {
+        "none": 28,
+        "pickup_not_completed": 1,
+        "delivery_timeout": 1
+      },
+      "final_test_evaluated": false
+    },
+    "reference": {
+      "successes": 30,
+      "clean_successes": 30,
+      "total": 30,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "mean_seconds": 10.553333333333336,
+      "failure_counts": {
+        "none": 30
+      },
+      "final_test_evaluated": false
+    },
+    "compatible": true
+  },
+  "evaluation": {
+    "seeds": [
+      10000,
+      10001,
+      10002,
+      10003,
+      10004,
+      10005,
+      10006,
+      10007,
+      10008,
+      10009,
+      10010,
+      10011,
+      10012,
+      10013,
+      10014,
+      10015,
+      10016,
+      10017,
+      10018,
+      10019,
+      10020,
+      10021,
+      10022,
+      10023,
+      10024,
+      10025,
+      10026,
+      10027,
+      10028,
+      10029
+    ],
+    "summary": {
+      "successes": 28,
+      "clean_successes": 28,
+      "total": 30,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "mean_seconds": 11.163333333333332,
+      "failure_counts": {
+        "none": 28,
+        "pickup_not_completed": 1,
+        "delivery_timeout": 1
+      },
+      "final_test_evaluated": false
+    },
+    "episodes": [
+      {
+        "seed": 10000,
+        "success": true,
+        "clean_success": true,
+        "ticks": 187,
+        "seconds": 9.35,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10001,
+        "success": true,
+        "clean_success": true,
+        "ticks": 190,
+        "seconds": 9.5,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10002,
+        "success": true,
+        "clean_success": true,
+        "ticks": 215,
+        "seconds": 10.75,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10003,
+        "success": true,
+        "clean_success": true,
+        "ticks": 192,
+        "seconds": 9.600000000000001,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10004,
+        "success": true,
+        "clean_success": true,
+        "ticks": 186,
+        "seconds": 9.3,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10005,
+        "success": true,
+        "clean_success": true,
+        "ticks": 178,
+        "seconds": 8.9,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10006,
+        "success": false,
+        "clean_success": false,
+        "ticks": 600,
+        "seconds": 30,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "pickup_not_completed"
+      },
+      {
+        "seed": 10007,
+        "success": true,
+        "clean_success": true,
+        "ticks": 200,
+        "seconds": 10,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10008,
+        "success": true,
+        "clean_success": true,
+        "ticks": 200,
+        "seconds": 10,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10009,
+        "success": true,
+        "clean_success": true,
+        "ticks": 200,
+        "seconds": 10,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10010,
+        "success": true,
+        "clean_success": true,
+        "ticks": 186,
+        "seconds": 9.3,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10011,
+        "success": true,
+        "clean_success": true,
+        "ticks": 207,
+        "seconds": 10.350000000000001,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10012,
+        "success": true,
+        "clean_success": true,
+        "ticks": 221,
+        "seconds": 11.05,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10013,
+        "success": true,
+        "clean_success": true,
+        "ticks": 205,
+        "seconds": 10.25,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10014,
+        "success": true,
+        "clean_success": true,
+        "ticks": 192,
+        "seconds": 9.600000000000001,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10015,
+        "success": true,
+        "clean_success": true,
+        "ticks": 200,
+        "seconds": 10,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10016,
+        "success": true,
+        "clean_success": true,
+        "ticks": 190,
+        "seconds": 9.5,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10017,
+        "success": true,
+        "clean_success": true,
+        "ticks": 190,
+        "seconds": 9.5,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10018,
+        "success": true,
+        "clean_success": true,
+        "ticks": 192,
+        "seconds": 9.600000000000001,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10019,
+        "success": true,
+        "clean_success": true,
+        "ticks": 189,
+        "seconds": 9.450000000000001,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10020,
+        "success": true,
+        "clean_success": true,
+        "ticks": 207,
+        "seconds": 10.350000000000001,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10021,
+        "success": true,
+        "clean_success": true,
+        "ticks": 191,
+        "seconds": 9.55,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10022,
+        "success": true,
+        "clean_success": true,
+        "ticks": 177,
+        "seconds": 8.85,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10023,
+        "success": true,
+        "clean_success": true,
+        "ticks": 189,
+        "seconds": 9.450000000000001,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10024,
+        "success": true,
+        "clean_success": true,
+        "ticks": 208,
+        "seconds": 10.4,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10025,
+        "success": true,
+        "clean_success": true,
+        "ticks": 193,
+        "seconds": 9.65,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10026,
+        "success": true,
+        "clean_success": true,
+        "ticks": 192,
+        "seconds": 9.600000000000001,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10027,
+        "success": true,
+        "clean_success": true,
+        "ticks": 220,
+        "seconds": 11,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10028,
+        "success": true,
+        "clean_success": true,
+        "ticks": 201,
+        "seconds": 10.05,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "none"
+      },
+      {
+        "seed": 10029,
+        "success": false,
+        "clean_success": false,
+        "ticks": 600,
+        "seconds": 30,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "failure": "delivery_timeout"
+      }
+    ]
+  }
+}

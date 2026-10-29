@@ -18,10 +18,15 @@ class Actor(Protocol):
 
 
 def rollout(
-    seed: int, actor: Actor, cancelled: Callable[[], bool] = lambda: False, record: bool = False
+    seed: int,
+    actor: Actor,
+    cancelled: Callable[[], bool] = lambda: False,
+    record: bool = False,
+    *,
+    final_test: bool = False,
 ) -> Rollout:
-    if 20000 <= seed <= 20099:
-        raise ValueError("Final test seeds remain reserved until Phase 6.")
+    if 20000 <= seed <= 20099 and not final_test:
+        raise ValueError("Final test seeds require the sealed Phase 6 evaluation runner.")
     world = World(seed)
     initial = capture(world.state())
     frames = []
