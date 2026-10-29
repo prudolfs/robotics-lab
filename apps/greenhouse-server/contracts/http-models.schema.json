@@ -1,5 +1,68 @@
 {
   "$defs": {
+    "ActionData": {
+      "additionalProperties": false,
+      "properties": {
+        "grip": {
+          "default": "hold",
+          "enum": [
+            "hold",
+            "close",
+            "open"
+          ],
+          "title": "Grip",
+          "type": "string"
+        },
+        "lift": {
+          "default": 0.0,
+          "maximum": 1,
+          "minimum": -1,
+          "title": "Lift",
+          "type": "number"
+        },
+        "throttle": {
+          "default": 0.0,
+          "maximum": 1,
+          "minimum": -1,
+          "title": "Throttle",
+          "type": "number"
+        },
+        "turn": {
+          "default": 0.0,
+          "maximum": 1,
+          "minimum": -1,
+          "title": "Turn",
+          "type": "number"
+        }
+      },
+      "title": "ActionData",
+      "type": "object"
+    },
+    "Bundle": {
+      "additionalProperties": false,
+      "properties": {
+        "episodes": {
+          "items": {
+            "$ref": "#/$defs/Entry"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Episodes",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "episodes"
+      ],
+      "title": "Bundle",
+      "type": "object"
+    },
     "Capabilities": {
       "additionalProperties": false,
       "properties": {
@@ -15,16 +78,13 @@
             "start",
             "pause",
             "reset",
-            "new_seed"
+            "new_seed",
+            "set_controller",
+            "manual",
+            "record",
+            "stop_recording"
           ],
           "items": {
-            "enum": [
-              "ping",
-              "start",
-              "pause",
-              "reset",
-              "new_seed"
-            ],
             "type": "string"
           },
           "title": "Commands",
@@ -70,6 +130,88 @@
       "title": "Capabilities",
       "type": "object"
     },
+    "Configuration": {
+      "additionalProperties": false,
+      "properties": {
+        "action_version": {
+          "const": "base-lift-grip-v1",
+          "default": "base-lift-grip-v1",
+          "title": "Action Version",
+          "type": "string"
+        },
+        "capsule_radius": {
+          "title": "Capsule Radius",
+          "type": "number"
+        },
+        "control_dt": {
+          "title": "Control Dt",
+          "type": "number"
+        },
+        "gripper_reach": {
+          "title": "Gripper Reach",
+          "type": "number"
+        },
+        "lift_limits": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Lift Limits",
+          "type": "array"
+        },
+        "max_ticks": {
+          "title": "Max Ticks",
+          "type": "integer"
+        },
+        "mujoco_version": {
+          "title": "Mujoco Version",
+          "type": "string"
+        },
+        "observation_version": {
+          "const": "relative-target-v1",
+          "default": "relative-target-v1",
+          "title": "Observation Version",
+          "type": "string"
+        },
+        "physics_dt": {
+          "title": "Physics Dt",
+          "type": "number"
+        },
+        "simulator_version": {
+          "title": "Simulator Version",
+          "type": "string"
+        },
+        "tray": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Tray",
+          "type": "array"
+        },
+        "tray_radius": {
+          "title": "Tray Radius",
+          "type": "number"
+        },
+        "world_fingerprint": {
+          "title": "World Fingerprint",
+          "type": "string"
+        }
+      },
+      "required": [
+        "simulator_version",
+        "world_fingerprint",
+        "mujoco_version",
+        "control_dt",
+        "physics_dt",
+        "max_ticks",
+        "gripper_reach",
+        "capsule_radius",
+        "lift_limits",
+        "tray",
+        "tray_radius"
+      ],
+      "title": "Configuration",
+      "type": "object"
+    },
     "CreateSession": {
       "additionalProperties": false,
       "properties": {
@@ -82,6 +224,427 @@
         }
       },
       "title": "CreateSession",
+      "type": "object"
+    },
+    "DatasetSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_location": {
+          "title": "Artifact Location",
+          "type": "string"
+        },
+        "eligible_train": {
+          "title": "Eligible Train",
+          "type": "integer"
+        },
+        "episodes": {
+          "items": {
+            "$ref": "#/$defs/EpisodeSummary"
+          },
+          "title": "Episodes",
+          "type": "array"
+        },
+        "max_episodes": {
+          "title": "Max Episodes",
+          "type": "integer"
+        },
+        "max_import_bytes": {
+          "title": "Max Import Bytes",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "total_steps": {
+          "title": "Total Steps",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "episodes",
+        "total_steps",
+        "eligible_train",
+        "artifact_location",
+        "max_import_bytes",
+        "max_episodes"
+      ],
+      "title": "DatasetSummary",
+      "type": "object"
+    },
+    "Entry": {
+      "additionalProperties": false,
+      "properties": {
+        "episode": {
+          "$ref": "#/$defs/Episode"
+        },
+        "review": {
+          "$ref": "#/$defs/Review"
+        },
+        "sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "episode",
+        "sha256",
+        "review"
+      ],
+      "title": "Entry",
+      "type": "object"
+    },
+    "Episode": {
+      "additionalProperties": false,
+      "properties": {
+        "configuration": {
+          "$ref": "#/$defs/Configuration"
+        },
+        "created_at": {
+          "maxLength": 40,
+          "title": "Created At",
+          "type": "string"
+        },
+        "end_reason": {
+          "enum": [
+            "terminal",
+            "stopped",
+            "reset",
+            "disconnected",
+            "closed"
+          ],
+          "title": "End Reason",
+          "type": "string"
+        },
+        "episode_id": {
+          "pattern": "^[a-f0-9]{32}$",
+          "title": "Episode Id",
+          "type": "string"
+        },
+        "final_state": {
+          "$ref": "#/$defs/StateData"
+        },
+        "frames": {
+          "items": {
+            "$ref": "#/$defs/Frame"
+          },
+          "maxItems": 600,
+          "minItems": 1,
+          "title": "Frames",
+          "type": "array"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/StateData"
+        },
+        "outcome": {
+          "enum": [
+            "success",
+            "failure",
+            "incomplete"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "seed": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "source": {
+          "enum": [
+            "scripted_expert",
+            "user",
+            "mixed"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "split": {
+          "enum": [
+            "train",
+            "validation",
+            "reserved_test",
+            "unassigned"
+          ],
+          "title": "Split",
+          "type": "string"
+        }
+      },
+      "required": [
+        "episode_id",
+        "created_at",
+        "seed",
+        "split",
+        "source",
+        "configuration",
+        "initial_state",
+        "frames",
+        "final_state",
+        "outcome",
+        "end_reason"
+      ],
+      "title": "Episode",
+      "type": "object"
+    },
+    "EpisodeDetail": {
+      "additionalProperties": false,
+      "properties": {
+        "entry": {
+          "$ref": "#/$defs/Entry"
+        },
+        "template": {
+          "$ref": "#/$defs/Scene"
+        }
+      },
+      "required": [
+        "entry",
+        "template"
+      ],
+      "title": "EpisodeDetail",
+      "type": "object"
+    },
+    "EpisodeSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "episode_id": {
+          "pattern": "^[a-f0-9]{32}$",
+          "title": "Episode Id",
+          "type": "string"
+        },
+        "interventions": {
+          "title": "Interventions",
+          "type": "integer"
+        },
+        "outcome": {
+          "enum": [
+            "success",
+            "failure",
+            "incomplete"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "review": {
+          "$ref": "#/$defs/Review"
+        },
+        "seconds": {
+          "title": "Seconds",
+          "type": "number"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        },
+        "sha256": {
+          "title": "Sha256",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "scripted_expert",
+            "user",
+            "mixed"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "split": {
+          "enum": [
+            "train",
+            "validation",
+            "reserved_test",
+            "unassigned"
+          ],
+          "title": "Split",
+          "type": "string"
+        },
+        "steps": {
+          "title": "Steps",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "episode_id",
+        "seed",
+        "split",
+        "source",
+        "outcome",
+        "steps",
+        "seconds",
+        "interventions",
+        "sha256",
+        "review"
+      ],
+      "title": "EpisodeSummary",
+      "type": "object"
+    },
+    "EventData": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "info",
+            "success",
+            "warning"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 300,
+          "title": "Text",
+          "type": "string"
+        },
+        "tick": {
+          "maximum": 600,
+          "minimum": 0,
+          "title": "Tick",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tick",
+        "kind",
+        "text"
+      ],
+      "title": "EventData",
+      "type": "object"
+    },
+    "ExpertRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "seeds": {
+          "default": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "items": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Seeds",
+          "type": "array"
+        }
+      },
+      "title": "ExpertRequest",
+      "type": "object"
+    },
+    "Frame": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "controller": {
+          "enum": [
+            "scripted_reference",
+            "manual"
+          ],
+          "title": "Controller",
+          "type": "string"
+        },
+        "intervention": {
+          "title": "Intervention",
+          "type": "boolean"
+        },
+        "next_observation": {
+          "$ref": "#/$defs/ObservationData"
+        },
+        "observation": {
+          "$ref": "#/$defs/ObservationData"
+        },
+        "reward": {
+          "title": "Reward",
+          "type": "number"
+        },
+        "simulated_seconds": {
+          "title": "Simulated Seconds",
+          "type": "number"
+        },
+        "stage": {
+          "enum": [
+            "approach",
+            "grasp",
+            "lift",
+            "deliver",
+            "lower",
+            "release",
+            "done",
+            "manual"
+          ],
+          "title": "Stage",
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/$defs/StateData"
+        },
+        "terminated": {
+          "title": "Terminated",
+          "type": "boolean"
+        },
+        "tick": {
+          "maximum": 600,
+          "minimum": 1,
+          "title": "Tick",
+          "type": "integer"
+        },
+        "truncated": {
+          "title": "Truncated",
+          "type": "boolean"
+        },
+        "wall_seconds": {
+          "minimum": 0,
+          "title": "Wall Seconds",
+          "type": "number"
+        }
+      },
+      "required": [
+        "tick",
+        "simulated_seconds",
+        "wall_seconds",
+        "controller",
+        "intervention",
+        "stage",
+        "observation",
+        "action",
+        "next_observation",
+        "state",
+        "reward",
+        "terminated",
+        "truncated"
+      ],
+      "title": "Frame",
       "type": "object"
     },
     "Health": {
@@ -110,6 +673,74 @@
       "title": "Health",
       "type": "object"
     },
+    "ImportResult": {
+      "additionalProperties": false,
+      "properties": {
+        "duplicates": {
+          "title": "Duplicates",
+          "type": "integer"
+        },
+        "imported": {
+          "title": "Imported",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "imported",
+        "duplicates"
+      ],
+      "title": "ImportResult",
+      "type": "object"
+    },
+    "ObservationData": {
+      "additionalProperties": false,
+      "properties": {
+        "bearing": {
+          "title": "Bearing",
+          "type": "number"
+        },
+        "distance": {
+          "title": "Distance",
+          "type": "number"
+        },
+        "holding": {
+          "title": "Holding",
+          "type": "boolean"
+        },
+        "lift_height": {
+          "title": "Lift Height",
+          "type": "number"
+        },
+        "speed": {
+          "title": "Speed",
+          "type": "number"
+        },
+        "target_forward": {
+          "title": "Target Forward",
+          "type": "number"
+        },
+        "target_left": {
+          "title": "Target Left",
+          "type": "number"
+        },
+        "yaw_speed": {
+          "title": "Yaw Speed",
+          "type": "number"
+        }
+      },
+      "required": [
+        "target_forward",
+        "target_left",
+        "distance",
+        "bearing",
+        "speed",
+        "yaw_speed",
+        "lift_height",
+        "holding"
+      ],
+      "title": "ObservationData",
+      "type": "object"
+    },
     "Obstacle": {
       "additionalProperties": false,
       "properties": {
@@ -130,6 +761,34 @@
         "half_size"
       ],
       "title": "Obstacle",
+      "type": "object"
+    },
+    "Review": {
+      "additionalProperties": false,
+      "properties": {
+        "excluded": {
+          "default": true,
+          "title": "Excluded",
+          "type": "boolean"
+        },
+        "label": {
+          "default": "unreviewed",
+          "enum": [
+            "unreviewed",
+            "usable",
+            "needs_work"
+          ],
+          "title": "Label",
+          "type": "string"
+        },
+        "note": {
+          "default": "",
+          "maxLength": 500,
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "title": "Review",
       "type": "object"
     },
     "Robot": {
@@ -194,7 +853,10 @@
           "type": "integer"
         },
         "controller": {
-          "const": "scripted_reference",
+          "enum": [
+            "scripted_reference",
+            "manual"
+          ],
           "title": "Controller",
           "type": "string"
         },
@@ -222,6 +884,9 @@
           "const": "reference_simulation",
           "title": "Mode",
           "type": "string"
+        },
+        "observation": {
+          "$ref": "#/$defs/ObservationData"
         },
         "pickups": {
           "minimum": 0,
@@ -261,7 +926,8 @@
             "deliver",
             "lower",
             "release",
-            "done"
+            "done",
+            "manual"
           ],
           "title": "Stage",
           "type": "string"
@@ -303,6 +969,7 @@
         "events",
         "walls",
         "pots",
+        "observation",
         "robot",
         "capsule",
         "tray"
@@ -342,6 +1009,35 @@
           "title": "Generation",
           "type": "integer"
         },
+        "last_episode_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Episode Id"
+        },
+        "recording": {
+          "default": false,
+          "title": "Recording",
+          "type": "boolean"
+        },
+        "recording_error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recording Error"
+        },
         "scene": {
           "$ref": "#/$defs/Scene"
         },
@@ -369,6 +1065,145 @@
         "scene"
       ],
       "title": "SessionView",
+      "type": "object"
+    },
+    "StateData": {
+      "additionalProperties": false,
+      "properties": {
+        "capsule": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "title": "Capsule",
+          "type": "array"
+        },
+        "collisions": {
+          "minimum": 0,
+          "title": "Collisions",
+          "type": "integer"
+        },
+        "delivered": {
+          "title": "Delivered",
+          "type": "boolean"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/$defs/EventData"
+          },
+          "maxItems": 16,
+          "title": "Events",
+          "type": "array"
+        },
+        "heading": {
+          "title": "Heading",
+          "type": "number"
+        },
+        "holding": {
+          "title": "Holding",
+          "type": "boolean"
+        },
+        "invalid_actions": {
+          "minimum": 0,
+          "title": "Invalid Actions",
+          "type": "integer"
+        },
+        "left_wheel_angle": {
+          "title": "Left Wheel Angle",
+          "type": "number"
+        },
+        "lift_height": {
+          "title": "Lift Height",
+          "type": "number"
+        },
+        "pickups": {
+          "minimum": 0,
+          "title": "Pickups",
+          "type": "integer"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "right_wheel_angle": {
+          "title": "Right Wheel Angle",
+          "type": "number"
+        },
+        "seed": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "speed": {
+          "title": "Speed",
+          "type": "number"
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "running",
+            "paused",
+            "complete",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "tick": {
+          "maximum": 600,
+          "minimum": 0,
+          "title": "Tick",
+          "type": "integer"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        },
+        "yaw_speed": {
+          "title": "Yaw Speed",
+          "type": "number"
+        }
+      },
+      "required": [
+        "version",
+        "seed",
+        "tick",
+        "status",
+        "x",
+        "y",
+        "heading",
+        "speed",
+        "yaw_speed",
+        "lift_height",
+        "left_wheel_angle",
+        "right_wheel_angle",
+        "holding",
+        "capsule",
+        "delivered",
+        "pickups",
+        "collisions",
+        "invalid_actions",
+        "reason",
+        "events"
+      ],
+      "title": "StateData",
       "type": "object"
     },
     "TaskEvent": {
@@ -401,6 +1236,50 @@
       "title": "TaskEvent",
       "type": "object"
     },
+    "ValidationReport": {
+      "additionalProperties": false,
+      "properties": {
+        "checked": {
+          "title": "Checked",
+          "type": "integer"
+        },
+        "eligible_train_ids": {
+          "items": {
+            "pattern": "^[a-f0-9]{32}$",
+            "type": "string"
+          },
+          "title": "Eligible Train Ids",
+          "type": "array"
+        },
+        "errors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "ready_for_training": {
+          "title": "Ready For Training",
+          "type": "boolean"
+        },
+        "skipped": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Skipped",
+          "type": "array"
+        }
+      },
+      "required": [
+        "checked",
+        "ready_for_training",
+        "eligible_train_ids",
+        "skipped",
+        "errors"
+      ],
+      "title": "ValidationReport",
+      "type": "object"
+    },
     "Vector3": {
       "additionalProperties": false,
       "properties": {
@@ -429,24 +1308,52 @@
   "additionalProperties": false,
   "description": "Schema bundle for TypeScript generation; not a synthetic HTTP endpoint.",
   "properties": {
+    "bundle": {
+      "$ref": "#/$defs/Bundle"
+    },
     "capabilities": {
       "$ref": "#/$defs/Capabilities"
     },
     "create_session": {
       "$ref": "#/$defs/CreateSession"
     },
+    "dataset": {
+      "$ref": "#/$defs/DatasetSummary"
+    },
+    "episode": {
+      "$ref": "#/$defs/EpisodeDetail"
+    },
+    "expert_request": {
+      "$ref": "#/$defs/ExpertRequest"
+    },
     "health": {
       "$ref": "#/$defs/Health"
     },
+    "import_result": {
+      "$ref": "#/$defs/ImportResult"
+    },
+    "review": {
+      "$ref": "#/$defs/Review"
+    },
     "session": {
       "$ref": "#/$defs/SessionView"
+    },
+    "validation": {
+      "$ref": "#/$defs/ValidationReport"
     }
   },
   "required": [
     "health",
     "capabilities",
     "create_session",
-    "session"
+    "session",
+    "dataset",
+    "episode",
+    "bundle",
+    "review",
+    "expert_request",
+    "import_result",
+    "validation"
   ],
   "title": "HttpModels",
   "type": "object"

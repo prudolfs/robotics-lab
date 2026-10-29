@@ -92,7 +92,9 @@ async def stream_session(websocket: WebSocket, session_id: str) -> None:
                 continue
             ack = session.execute(command)
             await send(ack)
-            if ack.accepted and command.kind != "ping":
+            # Continuous input must never wait behind the 10 Hz snapshot gate.
+            # The publisher streams its resulting physics state independently.
+            if ack.accepted and command.kind not in ("ping", "manual"):
                 await snapshot()
 
     tasks: list[asyncio.Task[None]] = []

@@ -132,11 +132,11 @@ class World:
     def event(self, kind: Literal["info", "success", "warning"], text: str) -> None:
         self.events.append(Event(self.tick, kind, text))
 
-    def start(self) -> bool:
+    def start(self, message: str = "Scripted reference controller running.") -> bool:
         if self.status not in ("ready", "paused"):
             return False
         self.status = "running"
-        self.event("info", "Scripted reference controller running.")
+        self.event("info", message)
         return True
 
     def pause(self, reason: str = "Collection paused.") -> bool:

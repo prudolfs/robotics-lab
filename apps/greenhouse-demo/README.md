@@ -1,6 +1,6 @@
 # Greenhouse Caretaker
 
-Phase 3 frontend for Robotics Lab's robot-learning project. React Three Fiber and Drei render an authored Blender greenhouse and articulated caretaker using actual Three.js WebGPU; Tailwind and shadcn/ui with Base UI provide the interface. Python runs the authoritative MuJoCo world. The current controller is a scripted reference; learned policies arrive in later phases.
+Phase 4 frontend for Robotics Lab's robot-learning project. React Three Fiber and Drei render an authored Blender greenhouse and articulated caretaker using actual Three.js WebGPU; Tailwind and shadcn/ui with Base UI provide the interface. Python runs the authoritative MuJoCo world. Reference and manual teaching controllers can produce versioned demonstrations; learned policies arrive in Phase 5.
 
 From the repository root:
 
@@ -17,6 +17,16 @@ The app connects automatically and creates a ready seed-42 world. **Start collec
 **Reconnect** releases the old session and creates a fresh one. Lost or unavailable servers display retry instructions; disconnecting pauses a running world. A missing WebGPU adapter prevents rendering while connection controls remain usable. The controller, idealized target sensing and abstract grasp are labeled explicitly.
 
 The scene loads six local GLBs: the cutaway greenhouse, Pip caretaker, capsule and three plant variants. **Robot eye** adds inspection from the articulated head mount; it is not controller perception. Head attention/nods, blinking and status lighting are authored. System reduced-motion changes disable decorative head/blink motion and camera easing. **Sound off/on** controls local pickup/delivery cues and defaults off. Asset loading and failure are visible without disabling server reconnection controls. Blender is needed only to rebuild the assets; see the [editable kit guide](../../assets/greenhouse-demo/README.md).
+
+## Teach and review
+
+Choose **Teach manually** while ready/paused, then **Record demonstration** from a reset world. Hold the movement/lift buttons or focus the teaching panel and use W/S, A/D, Q/E, with G/R for close/open. Key release, focus loss and hiding the page clear input; a 250 ms server lease also prevents stale movement. The panel shows measured speed, target range/bearing, lift and holding state. Pause before switching controllers; executed reference/manual transitions are marked as interventions.
+
+Recording captures all executed 20 Hz control steps, before/after observations, actions, physical states, events, both simulated/wall timing, configuration and task outcome. Stop/save retains partial attempts; delivery/failure saves automatically. Reset/disconnect seals the old recording. Live demonstrations start unreviewed and excluded. New random seeds stay within training seeds 0–99.
+
+The library can prepare 20 verified expert demonstrations, load recorded-state playback, scrub frames, inspect actions/observations, save quality notes, include/exclude entries, validate compatibility/splits and export/import portable JSON. Reviews are sidecars and do not rewrite source episodes. Failed/incomplete attempts remain inspectable and cannot be marked usable. Repeating expert collection preserves existing seed episodes and review choices.
+
+Playback uses recorded states and disables live controls; it never re-simulates or sends recorded actions to the robot. The backend separately verifies trajectories by replaying executed actions through MuJoCo. Full local artifacts live under `apps/greenhouse-server/runtime/datasets/v1/`; uploads/exports are limited to 20 MiB, individual episodes to 4 MiB/600 steps, and the store to 200 episodes/256 MiB. `GREENHOUSE_DATASET_DIR` selects another server-side directory. See the [Phase 4 review](../../docs/greenhouse-demo/phase4/README.md) for the workflow, schema, seed rules and current evidence.
 
 ## Development and contracts
 
@@ -36,12 +46,12 @@ The connection hook owns transport state, an abortable four-second HTTP startup 
 
 ## Browser checks and captures
 
-Playwright uses local Chrome with WebGPU support. It starts the paired development command if the app is not already running, and uses graceful shutdown to stop both services afterward. Ten checks cover a complete live delivery with pause/resume and following, active-run reset/new seed, keyboard reset, loading, incompatible HTTP responses, missing-server retry, real session closure/reconnect, unavailable WebGPU, failed GLBs, robot-eye inspection, reduced-motion changes and sound controls. The root test command also validates GLB geometry/pivots/resources and manifest alignment with compiled MuJoCo geometry.
+Playwright uses local Chrome with WebGPU support. It starts the paired development command if the app is not already running, and uses graceful shutdown to stop both services afterward. Twelve checks cover the previous collection/connection/asset/camera/motion/sound cases, plus manual recording, focus/release stopping, source-preserving review, exact recorded playback, expert collection, validation and export/import. Teaching tests save automated attempts; use a separate `GREENHOUSE_DATASET_DIR` for an isolated test service when keeping them out of your normal library. The root test command also validates GLB geometry/pivots/resources and manifest alignment with compiled MuJoCo geometry.
 
 ```sh
 GREENHOUSE_CAPTURE=1 pnpm test:e2e:greenhouse
 ```
 
-This additionally writes overview/mobile/failure views, carrying and delivery screenshots, and live browser evidence to `docs/greenhouse-demo/phase3/`. `node scripts/greenhouse-assets/review.mjs` from the repository root captures the three cameras, delivery detail and bounded reset/performance evidence. See the [Phase 3 review](../../docs/greenhouse-demo/phase3/README.md), [implementation plan](../../docs/greenhouse-demo.md) and [server guide](../greenhouse-server/README.md).
+This additionally writes current captures and portable demonstration examples to `docs/greenhouse-demo/phase4/`. `node scripts/greenhouse-phase4/review.mjs` prepares/reuses the expert set, imports the explicitly excluded automated manual example, validates the library and captures desktop/mobile review views. Prior Phase 3 asset/performance evidence remains archived. See the [Phase 4 review](../../docs/greenhouse-demo/phase4/README.md), [implementation plan](../../docs/greenhouse-demo.md) and [server guide](../greenhouse-server/README.md).
 
 To check the production bundle, start `pnpm -C apps/greenhouse-server start` and `pnpm -C apps/greenhouse-demo preview` in separate terminals, then run `GREENHOUSE_E2E_URL=http://127.0.0.1:4186 pnpm test:e2e:greenhouse`. Setting that URL skips Playwright's automatic development-server startup.

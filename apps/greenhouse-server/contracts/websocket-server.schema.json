@@ -18,7 +18,11 @@
             "start",
             "pause",
             "reset",
-            "new_seed"
+            "new_seed",
+            "set_controller",
+            "manual",
+            "record",
+            "stop_recording"
           ],
           "title": "Command",
           "type": "string"
@@ -40,7 +44,8 @@
                 "stale_generation",
                 "session_mismatch",
                 "rate_limited",
-                "invalid_state"
+                "invalid_state",
+                "storage_error"
               ],
               "type": "string"
             },
@@ -163,6 +168,55 @@
       "title": "Hello",
       "type": "object"
     },
+    "ObservationData": {
+      "additionalProperties": false,
+      "properties": {
+        "bearing": {
+          "title": "Bearing",
+          "type": "number"
+        },
+        "distance": {
+          "title": "Distance",
+          "type": "number"
+        },
+        "holding": {
+          "title": "Holding",
+          "type": "boolean"
+        },
+        "lift_height": {
+          "title": "Lift Height",
+          "type": "number"
+        },
+        "speed": {
+          "title": "Speed",
+          "type": "number"
+        },
+        "target_forward": {
+          "title": "Target Forward",
+          "type": "number"
+        },
+        "target_left": {
+          "title": "Target Left",
+          "type": "number"
+        },
+        "yaw_speed": {
+          "title": "Yaw Speed",
+          "type": "number"
+        }
+      },
+      "required": [
+        "target_forward",
+        "target_left",
+        "distance",
+        "bearing",
+        "speed",
+        "yaw_speed",
+        "lift_height",
+        "holding"
+      ],
+      "title": "ObservationData",
+      "type": "object"
+    },
     "Obstacle": {
       "additionalProperties": false,
       "properties": {
@@ -247,7 +301,10 @@
           "type": "integer"
         },
         "controller": {
-          "const": "scripted_reference",
+          "enum": [
+            "scripted_reference",
+            "manual"
+          ],
           "title": "Controller",
           "type": "string"
         },
@@ -275,6 +332,9 @@
           "const": "reference_simulation",
           "title": "Mode",
           "type": "string"
+        },
+        "observation": {
+          "$ref": "#/$defs/ObservationData"
         },
         "pickups": {
           "minimum": 0,
@@ -314,7 +374,8 @@
             "deliver",
             "lower",
             "release",
-            "done"
+            "done",
+            "manual"
           ],
           "title": "Stage",
           "type": "string"
@@ -356,6 +417,7 @@
         "events",
         "walls",
         "pots",
+        "observation",
         "robot",
         "capsule",
         "tray"
@@ -398,6 +460,35 @@
           "const": "snapshot",
           "title": "Kind",
           "type": "string"
+        },
+        "last_episode_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Episode Id"
+        },
+        "recording": {
+          "default": false,
+          "title": "Recording",
+          "type": "boolean"
+        },
+        "recording_error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recording Error"
         },
         "scene": {
           "$ref": "#/$defs/Scene"

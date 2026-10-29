@@ -2,7 +2,7 @@
 
 > Proposed implementation plan for the next Robotics Lab project: an expressive robot that learns useful tasks in a simulated greenhouse.
 >
-> Status: Phases 0–3 complete; awaiting user review of the [Phase 3 greenhouse and caretaker](greenhouse-demo/phase3/README.md). Later phases remain unchecked. Stop before starting Phase 4.
+> Status: Phases 0–4 complete; awaiting user review of [Phase 4 teaching and demonstration datasets](greenhouse-demo/phase4/README.md). Later phases remain unchecked. Stop before starting Phase 5.
 
 ## Goal and experience
 
@@ -150,15 +150,15 @@ Exit verified: the [Phase 3 review](greenhouse-demo/phase3/README.md) records th
 
 ### Phase 4 — Teaching and demonstration datasets
 
-- [ ] Add explicit manual teaching controls for motion, lift and grasp, with visible task and robot state.
-- [ ] Record observations, executed actions, task events, timing, seed and configuration as versioned episodes.
-- [ ] Collect scripted expert demonstrations and user demonstrations; keep source labels and intervention markers.
-- [ ] Support reviewing, replaying, labeling and excluding failed or low-quality demonstrations without silently rewriting source episodes.
-- [ ] Validate dataset schema compatibility, task completion labels and split membership before training.
-- [ ] Add dataset summaries and export/import with explicit size limits and local artifact locations.
-- [ ] Verify that replay corresponds to the recorded episode and identify stored-state playback separately from re-simulation.
+- [x] Add explicit manual teaching controls for motion, lift and grasp, with visible task and robot state.
+- [x] Record observations, executed actions, task events, timing, seed and configuration as versioned episodes.
+- [x] Collect scripted expert demonstrations and user demonstrations; keep source labels and intervention markers.
+- [x] Support reviewing, replaying, labeling and excluding failed or low-quality demonstrations without silently rewriting source episodes.
+- [x] Validate dataset schema compatibility, task completion labels and split membership before training.
+- [x] Add dataset summaries and export/import with explicit size limits and local artifact locations.
+- [x] Verify that replay corresponds to the recorded episode and identify stored-state playback separately from re-simulation.
 
-Exit: inspectable demonstrations and a versioned dataset suitable for the first real training run. Stop for user review before Phase 5.
+Exit verified: the [Phase 4 review](greenhouse-demo/phase4/README.md) records 20 clean expert training episodes, a preserved/excluded automated manual-input example (not a human-collected demonstration), manual/mixed recording checks, immutable-source reviews, deterministic validation and exact stored-state playback checks. Your own human demonstrations can now be recorded in the UI. Stop for user review before Phase 5.
 
 ### Phase 5 — First learned skill through imitation
 

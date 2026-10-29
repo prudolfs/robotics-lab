@@ -1,0 +1,383 @@
+{
+  "endpoint": "http://127.0.0.1:8086",
+  "browser": "156.0.8078.49",
+  "healthDuringCollectionMs": 11,
+  "dataset": {
+    "schema_version": 1,
+    "episodes": [
+      {
+        "episode_id": "08ec0c4714c64321a6eeae839a027483",
+        "seed": 4,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 221,
+        "seconds": 11.05,
+        "interventions": 0,
+        "sha256": "32b1ced695cc97a277ef5800ef254c9148517d88e365be10560379f1ac4fe450",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "0fe7016b836446718b84c9d14c92101f",
+        "seed": 42,
+        "split": "train",
+        "source": "user",
+        "outcome": "incomplete",
+        "steps": 45,
+        "seconds": 2.25,
+        "interventions": 1,
+        "sha256": "edb36173be975ac35dced6c61f1245111d73fd9275326fe71499525c9977376c",
+        "review": {
+          "label": "needs_work",
+          "excluded": true,
+          "note": "Automated manual-input check; incomplete, excluded from training."
+        }
+      },
+      {
+        "episode_id": "17e2795806dc4489b770ccd61447fd4b",
+        "seed": 13,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 232,
+        "seconds": 11.600000000000001,
+        "interventions": 0,
+        "sha256": "473aa50ffa68c453af30701480c7fde09a0fd356ba7ae0d68681e3bc764851d8",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "29418af8ab5c4b03b878d2e049353db3",
+        "seed": 14,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 230,
+        "seconds": 11.5,
+        "interventions": 0,
+        "sha256": "5aca83b04df3bda792e029fe14db3b50a4ad433f528b7f2bd5976468f173f0e9",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "383f0964f01a47c6a2a601adf56a7618",
+        "seed": 1,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 222,
+        "seconds": 11.100000000000001,
+        "interventions": 0,
+        "sha256": "2a24ffe2239f4c422847587d70aa746e2d8ab3e6b065470b4e8d3bfb356bae5d",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "3cf2b6926a824fcf922a0eea47211ac5",
+        "seed": 18,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 211,
+        "seconds": 10.55,
+        "interventions": 0,
+        "sha256": "fd6a0d668eccbcd8eca6f2e0a147d459248b4af4ae43a5feb50c7f4521c59058",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "61d902e5468e4f1abc3ba9f10152dff6",
+        "seed": 9,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 227,
+        "seconds": 11.350000000000001,
+        "interventions": 0,
+        "sha256": "daeb804b10f6c51eab373c322205c1936405cea4c539ee7fe9e5653a1cbfd10b",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "8232730e45b34746b275dfbf2ad1e193",
+        "seed": 11,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 209,
+        "seconds": 10.450000000000001,
+        "interventions": 0,
+        "sha256": "ca9cd94469237227060f21eeaa69b5bff707b91fc5468916c90435790003c636",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "902db74879834da69bd5c044a9695ea1",
+        "seed": 2,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 185,
+        "seconds": 9.25,
+        "interventions": 0,
+        "sha256": "64a61b678464a544ebaaab69181fad3cc8512a7d92e6cf55a26e99187e1a78e4",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "933cf80cf65149ba95b049adb749c9f8",
+        "seed": 15,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 214,
+        "seconds": 10.700000000000001,
+        "interventions": 0,
+        "sha256": "98a2415542e507b74138dbb764b7b1e5ca8c3880d11aefc22c59b2ed698a65dc",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "96b58686cf5444d1a5386483e9333683",
+        "seed": 7,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 208,
+        "seconds": 10.4,
+        "interventions": 0,
+        "sha256": "12e02d845acb846b5e82f92af86e5b5affb98034b216811438a64ee9b7a5eab4",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "9c93f3cebb864d739727aed73ce14188",
+        "seed": 5,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 195,
+        "seconds": 9.75,
+        "interventions": 0,
+        "sha256": "0f81d463cbdcb752ab6309f02a00b85ba2d4573fe0011756efa7cb62ab0dc188",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "a06400b7b8be48218d79f7c44445e65f",
+        "seed": 6,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 232,
+        "seconds": 11.600000000000001,
+        "interventions": 0,
+        "sha256": "e73fbf15330bbe22c65257524a8bea85c0c1272f79b190329ccc8446170395fc",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "a5005fa16d774e25a2e34792bfbce648",
+        "seed": 10,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 196,
+        "seconds": 9.8,
+        "interventions": 0,
+        "sha256": "39b7ac2291d576236576cb2fcc26e9b5fdb68f7ea6879d2cd0da1783e7253c02",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "b64bb282a8c54162ac019e137e46093e",
+        "seed": 8,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 240,
+        "seconds": 12,
+        "interventions": 0,
+        "sha256": "6e8f1c04637481dd5697bb4652534f87d310a92e90f1c4f2fa50ba1d61d5b068",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "bde50816c4bf47748e4889fe80bf9427",
+        "seed": 3,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 206,
+        "seconds": 10.3,
+        "interventions": 0,
+        "sha256": "f0981322a9f27654fc89e45cc153a7282eb3da20db4f0560ee4310c05f644385",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "c0549785f8cf40e8b19cea9109004c56",
+        "seed": 12,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 236,
+        "seconds": 11.8,
+        "interventions": 0,
+        "sha256": "397e6b59ef8ee0ca0bde47caf813e35f18e7a2e86b678badd31c15e6e9a5afa0",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "c8be3c7df3f549f1a87ae69aefbc6828",
+        "seed": 19,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 204,
+        "seconds": 10.200000000000001,
+        "interventions": 0,
+        "sha256": "39a7f74f9c9a1fc0b6b2a544724486ffcc559a6df434476d1cbe7d43e4e45f89",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "d31419375917402a8c121ab49a663ea4",
+        "seed": 17,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 203,
+        "seconds": 10.15,
+        "interventions": 0,
+        "sha256": "a4b3a04aa4f8a497e1a106e1994076566402c0da107a9a139f100bf19d55bc78",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "f7bb6d58e2f44515a86f25c919fafee6",
+        "seed": 0,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 191,
+        "seconds": 9.55,
+        "interventions": 0,
+        "sha256": "a023ebd9049ca9479fedcedc7781a48ae1c6f34809e777a3a1032c8707f5446a",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      },
+      {
+        "episode_id": "fe6585fce6854da9aeec7788088b8bd0",
+        "seed": 16,
+        "split": "train",
+        "source": "scripted_expert",
+        "outcome": "success",
+        "steps": 207,
+        "seconds": 10.350000000000001,
+        "interventions": 0,
+        "sha256": "6b8aaf4ae5aae5963d237ee4b932cc6045dc5e598157a3556d4a288064f63c74",
+        "review": {
+          "label": "usable",
+          "excluded": false,
+          "note": "Scripted expert; verified action re-simulation and clean delivery."
+        }
+      }
+    ],
+    "total_steps": 4314,
+    "eligible_train": 20,
+    "artifact_location": "/Users/rudolfspukitis/Code/robotics-lab/apps/greenhouse-server/runtime/datasets/v1",
+    "max_import_bytes": 20971520,
+    "max_episodes": 200
+  },
+  "validation": {
+    "checked": 21,
+    "ready_for_training": true,
+    "eligible_train_ids": [
+      "08ec0c4714c64321a6eeae839a027483",
+      "17e2795806dc4489b770ccd61447fd4b",
+      "29418af8ab5c4b03b878d2e049353db3",
+      "383f0964f01a47c6a2a601adf56a7618",
+      "3cf2b6926a824fcf922a0eea47211ac5",
+      "61d902e5468e4f1abc3ba9f10152dff6",
+      "8232730e45b34746b275dfbf2ad1e193",
+      "902db74879834da69bd5c044a9695ea1",
+      "933cf80cf65149ba95b049adb749c9f8",
+      "96b58686cf5444d1a5386483e9333683",
+      "9c93f3cebb864d739727aed73ce14188",
+      "a06400b7b8be48218d79f7c44445e65f",
+      "a5005fa16d774e25a2e34792bfbce648",
+      "b64bb282a8c54162ac019e137e46093e",
+      "bde50816c4bf47748e4889fe80bf9427",
+      "c0549785f8cf40e8b19cea9109004c56",
+      "c8be3c7df3f549f1a87ae69aefbc6828",
+      "d31419375917402a8c121ab49a663ea4",
+      "f7bb6d58e2f44515a86f25c919fafee6",
+      "fe6585fce6854da9aeec7788088b8bd0"
+    ],
+    "skipped": [
+      "0fe7016b836446718b84c9d14c92101f: train, incomplete, needs_work, excluded=True"
+    ],
+    "errors": []
+  },
+  "manual_example_provenance": "Automated manual keyboard-input fixture from the browser regression suite; not a human-collected demonstration. Excluded from training.",
+  "errors": []
+}

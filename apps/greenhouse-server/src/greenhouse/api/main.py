@@ -1,8 +1,10 @@
 import asyncio
 import contextlib
 import logging
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request, Response, WebSocket
 
@@ -13,8 +15,10 @@ from greenhouse.api.contracts import (
     Health,
     SessionView,
 )
+from greenhouse.api.datasets import router as dataset_router
 from greenhouse.api.sessions import Sessions
 from greenhouse.api.stream import stream_session
+from greenhouse.datasets.store import DatasetStore
 from greenhouse.simulation.model import CONTROL_DT
 
 PREFIX = "/api/v1/greenhouse"
@@ -22,7 +26,10 @@ PREFIX = "/api/v1/greenhouse"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    registry = Sessions()
+    artifact_root = Path(os.environ.get("GREENHOUSE_DATASET_DIR", "runtime/datasets/v1"))
+    app.state.datasets = await asyncio.to_thread(lambda: DatasetStore(artifact_root.resolve()))
+    app.state.dataset_job = asyncio.Lock()
+    registry = Sessions(store=app.state.datasets)
     app.state.sessions = registry
 
     async def sweep() -> None:
@@ -58,10 +65,14 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         for task in tasks:
             with contextlib.suppress(asyncio.CancelledError):
                 await task
+        for session in registry.items.values():
+            if not session.finish_recording("closed"):
+                logging.getLogger(__name__).error(session.recording_error)
         registry.items.clear()
 
 
 app = FastAPI(title="Greenhouse Caretaker API", version=__version__, lifespan=lifespan)
+app.include_router(dataset_router)
 
 
 @app.get(f"{PREFIX}/health", response_model=Health, operation_id="get_health")
@@ -100,6 +111,11 @@ async def get_session(session_id: str, request: Request) -> SessionView:
 @app.delete(f"{PREFIX}/sessions/{{session_id}}", status_code=204, operation_id="delete_session")
 async def delete_session(session_id: str, request: Request) -> Response:
     registry: Sessions = request.app.state.sessions
+    session = registry.items.get(session_id)
+    if session and not session.finish_recording(
+        "terminal" if session.world.status in ("complete", "failed") else "closed"
+    ):
+        raise HTTPException(409, session.recording_error)
     registry.items.pop(session_id, None)
     return Response(status_code=204)
 

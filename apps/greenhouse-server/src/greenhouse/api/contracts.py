@@ -4,6 +4,19 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, FiniteFloat, TypeAdapter
 
+from greenhouse.datasets.models import (
+    ActionData,
+    Bundle,
+    Controller,
+    DatasetSummary,
+    Entry,
+    ExpertRequest,
+    ImportResult,
+    ObservationData,
+    Review,
+    ValidationReport,
+)
+
 API_VERSION = "1"
 Seed = Annotated[int, Field(ge=0, le=2_147_483_647)]
 Count = Annotated[int, Field(ge=0)]
@@ -29,12 +42,16 @@ class Capabilities(Contract):
     heartbeat_hz: int = 1
     max_sessions: int = 16
     snapshot_hz: int = 10
-    commands: list[Literal["ping", "start", "pause", "reset", "new_seed"]] = [
+    commands: list[str] = [
         "ping",
         "start",
         "pause",
         "reset",
         "new_seed",
+        "set_controller",
+        "manual",
+        "record",
+        "stop_recording",
     ]
 
 
@@ -75,9 +92,9 @@ class TaskEvent(Contract):
 class Scene(Contract):
     mode: Literal["reference_simulation"]
     simulator_version: str
-    controller: Literal["scripted_reference"]
+    controller: Controller
     status: Literal["ready", "running", "paused", "complete", "failed"]
-    stage: Literal["approach", "grasp", "lift", "deliver", "lower", "release", "done"]
+    stage: Literal["approach", "grasp", "lift", "deliver", "lower", "release", "done", "manual"]
     elapsed_seconds: FiniteFloat
     delivered: bool
     pickups: Count
@@ -87,6 +104,7 @@ class Scene(Contract):
     events: list[TaskEvent]
     walls: list[Obstacle]
     pots: list[SceneObject]
+    observation: ObservationData
     robot: Robot
     capsule: SceneObject
     tray: SceneObject
@@ -103,12 +121,20 @@ class SessionView(Contract):
     tick: Count
     seed: Seed
     scene: Scene
+    recording: bool = False
+    last_episode_id: str | None = None
+    recording_error: str | None = None
 
 
 class Envelope(Contract):
     api_version: Literal["1"]
     session_id: str
     generation: Count
+
+
+class EpisodeDetail(Contract):
+    entry: Entry
+    template: Scene
 
 
 class HttpModels(Contract):
@@ -118,6 +144,13 @@ class HttpModels(Contract):
     capabilities: Capabilities
     create_session: CreateSession
     session: SessionView
+    dataset: DatasetSummary
+    episode: EpisodeDetail
+    bundle: Bundle
+    review: Review
+    expert_request: ExpertRequest
+    import_result: ImportResult
+    validation: ValidationReport
 
 
 class Ping(Envelope):
@@ -131,11 +164,25 @@ class Reset(Envelope):
 
 
 class Control(Envelope):
-    kind: Literal["start", "pause", "new_seed"]
+    kind: Literal["start", "pause", "new_seed", "record", "stop_recording"]
     request_id: RequestId
 
 
-ClientMessage = Annotated[Ping | Reset | Control, Field(discriminator="kind")]
+class SetController(Envelope):
+    kind: Literal["set_controller"]
+    request_id: RequestId
+    controller: Controller
+
+
+class Manual(Envelope):
+    kind: Literal["manual"]
+    request_id: RequestId
+    action: ActionData
+
+
+ClientMessage = Annotated[
+    Ping | Reset | Control | SetController | Manual, Field(discriminator="kind")
+]
 client_adapter = TypeAdapter[ClientMessage](ClientMessage)
 
 
@@ -152,19 +199,34 @@ class Snapshot(ServerEnvelope):
     kind: Literal["snapshot"]
     seed: Seed
     scene: Scene
+    recording: bool = False
+    last_episode_id: str | None = None
+    recording_error: str | None = None
 
 
 class Heartbeat(ServerEnvelope):
     kind: Literal["heartbeat"]
 
 
-Rejection = Literal["stale_generation", "session_mismatch", "rate_limited", "invalid_state"]
+Rejection = Literal[
+    "stale_generation", "session_mismatch", "rate_limited", "invalid_state", "storage_error"
+]
 
 
 class Ack(ServerEnvelope):
     kind: Literal["ack"]
     request_id: RequestId
-    command: Literal["ping", "start", "pause", "reset", "new_seed"]
+    command: Literal[
+        "ping",
+        "start",
+        "pause",
+        "reset",
+        "new_seed",
+        "set_controller",
+        "manual",
+        "record",
+        "stop_recording",
+    ]
     accepted: bool
     reason: Rejection | None
 

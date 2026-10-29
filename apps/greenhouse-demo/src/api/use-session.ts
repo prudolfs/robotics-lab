@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { api, type SessionView } from './client'
+import type { ActionData, Controller } from './generated/http'
 import type { ClientMessage } from './generated/websocket-client'
 import { encodeCommand, isCurrentMessage, parseServerMessage } from './protocol'
 
-export type SimulationCommand = Exclude<ClientMessage['kind'], 'ping'>
+export type SimulationCommand = Exclude<ClientMessage['kind'], 'ping' | 'manual' | 'set_controller'>
 
 type Connection = {
 	status: 'connecting' | 'connected' | 'unavailable' | 'error'
@@ -95,6 +96,9 @@ export function useSession() {
 								tick: message.tick,
 								seed: message.seed,
 								scene: message.scene,
+								recording: message.recording,
+								last_episode_id: message.last_episode_id,
+								recording_error: message.recording_error,
 							}
 							current.current = session
 							setState((previous) => ({
@@ -112,7 +116,14 @@ export function useSession() {
 							pending.current.id === message.request_id
 						) {
 							clearTimeout(pending.current.timer)
-							pending.current = null
+							const acknowledged = pending.current
+							// Keep state controls disabled through the server's 100 ms
+							// command interval; manual renewals use their own bounded lane.
+							acknowledged.timer = setTimeout(() => {
+								if (pending.current?.id !== acknowledged.id) return
+								pending.current = null
+								setState((previous) => ({ ...previous, pending: false }))
+							}, 110)
 							if (message.accepted)
 								current.current = {
 									...view,
@@ -124,7 +135,7 @@ export function useSession() {
 								}
 							setState((previous) => ({
 								...previous,
-								pending: false,
+								pending: true,
 								message: message.accepted
 									? {
 											start: 'Collection started.',
@@ -132,9 +143,19 @@ export function useSession() {
 											reset: 'Scenario reset.',
 											new_seed: 'New scenario ready.',
 											ping: 'Connection confirmed.',
+											record: 'Recording demonstration.',
+											stop_recording: 'Recording stopped and saved.',
+											set_controller: 'Controller selected.',
+											manual: 'Manual controls received.',
 										}[message.command]
 									: `Command rejected: ${message.reason}.`,
 							}))
+						} else if (message.kind === 'ack' && message.command === 'manual') {
+							if (!message.accepted && message.reason !== 'rate_limited')
+								setState((previous) => ({
+									...previous,
+									message: `Manual command rejected: ${message.reason}.`,
+								}))
 						} else if (message.kind === 'error') {
 							fail(message.message, 'error')
 							socket?.close()
@@ -189,7 +210,9 @@ export function useSession() {
 		}
 	}, [attempt])
 
-	function command(kind: SimulationCommand) {
+	function sendCommand(
+		payload: { kind: SimulationCommand } | { kind: 'set_controller'; controller: Controller },
+	) {
 		const view = current.current
 		const socket = socketRef.current
 		if (!view || socket?.readyState !== WebSocket.OPEN || pending.current) return
@@ -209,7 +232,7 @@ export function useSession() {
 		socket.send(
 			encodeCommand({
 				api_version: '1',
-				kind,
+				...payload,
 				request_id: id,
 				session_id: view.session_id,
 				generation: view.generation,
@@ -217,5 +240,33 @@ export function useSession() {
 		)
 	}
 
-	return { ...state, command, reconnect: () => setAttempt((value) => value + 1) }
+	const manual = useCallback((action: ActionData) => {
+		const view = current.current
+		const socket = socketRef.current
+		if (
+			!view ||
+			pending.current ||
+			socket?.readyState !== WebSocket.OPEN ||
+			view.scene.controller !== 'manual' ||
+			view.scene.status !== 'running'
+		)
+			return
+		socket.send(
+			encodeCommand({
+				api_version: '1',
+				kind: 'manual',
+				request_id: crypto.randomUUID(),
+				session_id: view.session_id,
+				generation: view.generation,
+				action,
+			}),
+		)
+	}, [])
+	return {
+		...state,
+		command: (kind: SimulationCommand) => sendCommand({ kind }),
+		setController: (controller: Controller) => sendCommand({ kind: 'set_controller', controller }),
+		manual,
+		reconnect: () => setAttempt((value) => value + 1),
+	}
 }

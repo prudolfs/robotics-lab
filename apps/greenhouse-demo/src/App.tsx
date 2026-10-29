@@ -1,6 +1,9 @@
 import { useState } from 'react'
+import { useDemonstrations } from './api/use-demonstrations'
 import { useSession } from './api/use-session'
+import { DemonstrationLibrary, PlaybackControls } from './components/demonstration-library'
 import { type CameraMode, GreenhouseScene } from './components/greenhouse-scene'
+import { TeachingControls } from './components/teaching-controls'
 import { Button } from './components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group'
 import { useCaretakerSound } from './components/use-caretaker-sound'
@@ -13,17 +16,24 @@ const stageLabels = {
 	lower: 'Lowering the capsule',
 	release: 'Releasing into the tray',
 	done: 'Delivery complete',
+	manual: 'Manual teaching',
 }
 
 export function App() {
 	const connection = useSession()
 	const [cameraMode, setCameraMode] = useState<CameraMode>('overview')
 	const connected = connection.status === 'connected'
-	const scene = connection.session?.scene
-	const sound = useCaretakerSound(scene, connection.session?.generation ?? 0)
+	const library = useDemonstrations(connected, connection.session?.last_episode_id)
+	const playback = !!library.selected
+	const liveScene = connection.session?.scene
+	const scene = library.scene ?? liveScene
+	const sound = useCaretakerSound(
+		playback ? undefined : liveScene,
+		playback ? -1 : (connection.session?.generation ?? 0),
+	)
 	const running = scene?.status === 'running'
 	const terminal = scene?.status === 'complete' || scene?.status === 'failed'
-	const disabled = !connected || connection.pending
+	const disabled = !connected || connection.pending || playback
 	return (
 		<main className="flex min-h-screen flex-col bg-background text-foreground">
 			<header className="flex flex-wrap items-center justify-between gap-4 border-border border-b px-6 py-5">
@@ -33,20 +43,21 @@ export function App() {
 						A small robot learning to lend a hand.
 					</p>
 				</div>
-				<p className="text-muted-foreground text-sm">Robotics Lab · Phase 3</p>
+				<p className="text-muted-foreground text-sm">Robotics Lab · Phase 4</p>
 			</header>
+			<PlaybackControls library={library} />
 			<div
-				className="flex min-h-[580px] flex-1 flex-col lg:flex-row"
-				style={{ minHeight: 'calc(100vh - 200px)' }}
+				id="greenhouse-view"
+				className="flex min-h-[580px] flex-col lg:h-[calc(100vh-128px)] lg:flex-row"
 			>
 				<GreenhouseScene
 					scene={scene ?? null}
-					generation={connection.session?.generation ?? 0}
+					generation={playback ? library.generation : (connection.session?.generation ?? 0)}
 					cameraMode={cameraMode}
 				/>
 				<aside
 					aria-label="Caretaker session"
-					className="flex w-full flex-col gap-5 border-border border-t p-6 lg:w-80 lg:shrink-0 lg:border-t-0 lg:border-l"
+					className="flex w-full flex-col gap-5 border-border border-t p-6 lg:w-80 lg:shrink-0 lg:overflow-y-auto lg:border-t-0 lg:border-l"
 				>
 					<div>
 						<h2 className="font-medium text-lg">A little help in the greenhouse</h2>
@@ -72,6 +83,25 @@ export function App() {
 								Run <code>pnpm dev:greenhouse</code> from the repository, then retry.
 							</p>
 						)}
+					</div>
+					<div className="flex flex-col gap-2">
+						<h3 className="font-medium text-sm">Controller</h3>
+						<ToggleGroup
+							aria-label="Controller mode"
+							variant="outline"
+							value={[scene?.controller ?? 'scripted_reference']}
+							disabled={disabled || liveScene?.status === 'running' || terminal}
+							onValueChange={(value) => {
+								if (value[0] === 'manual' || value[0] === 'scripted_reference')
+									connection.setController(value[0])
+							}}
+						>
+							<ToggleGroupItem value="scripted_reference">Reference</ToggleGroupItem>
+							<ToggleGroupItem value="manual">Teach manually</ToggleGroupItem>
+						</ToggleGroup>
+						<p className="text-muted-foreground text-xs">
+							Pause before changing controller. New seeds stay in the training range 0–99.
+						</p>
 					</div>
 					<div className="flex flex-col gap-3">
 						<Button
@@ -105,6 +135,40 @@ export function App() {
 							</Button>
 						</div>
 					</div>
+					<div className="flex flex-col gap-2">
+						<Button
+							variant="secondary"
+							disabled={
+								disabled || (!connection.session?.recording && liveScene?.status !== 'ready')
+							}
+							onClick={() =>
+								connection.command(connection.session?.recording ? 'stop_recording' : 'record')
+							}
+						>
+							{connection.session?.recording ? 'Stop and save recording' : 'Record demonstration'}
+						</Button>
+						<p
+							data-testid="recording-status"
+							aria-live="polite"
+							className="text-muted-foreground text-xs"
+						>
+							{connection.session?.recording
+								? 'Recording every executed control step.'
+								: connection.session?.last_episode_id
+									? 'Demonstration saved in the library.'
+									: 'Recording starts a fresh episode. Reset first if needed.'}
+						</p>
+						{connection.session?.recording_error && (
+							<p className="text-destructive text-xs">{connection.session.recording_error}</p>
+						)}
+					</div>
+					{liveScene?.controller === 'manual' && !playback && (
+						<TeachingControls
+							scene={liveScene}
+							enabled={!disabled && liveScene.status === 'running'}
+							send={connection.manual}
+						/>
+					)}
 					<div className="flex flex-col gap-2">
 						<h3 className="font-medium text-sm">View</h3>
 						<ToggleGroup
@@ -158,11 +222,19 @@ export function App() {
 							</div>
 							<dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
 								<dt className="text-muted-foreground">Seed</dt>
-								<dd data-testid="session-seed">{connection.session?.seed}</dd>
-								<dt className="text-muted-foreground">Generation</dt>
-								<dd data-testid="session-generation">{connection.session?.generation}</dd>
+								<dd data-testid="session-seed">
+									{library.selected?.entry.episode.seed ?? connection.session?.seed}
+								</dd>
+								<dt className="text-muted-foreground">
+									{playback ? 'Recording version' : 'Generation'}
+								</dt>
+								<dd data-testid="session-generation">
+									{library.selected?.entry.episode.schema_version ?? connection.session?.generation}
+								</dd>
 								<dt className="text-muted-foreground">Simulation tick</dt>
-								<dd data-testid="simulation-tick">{connection.session?.tick}</dd>
+								<dd data-testid="simulation-tick">
+									{playback ? library.index : connection.session?.tick}
+								</dd>
 								<dt className="text-muted-foreground">Elapsed</dt>
 								<dd>{scene.elapsed_seconds.toFixed(1)} s</dd>
 								<dt className="text-muted-foreground">Collisions</dt>
@@ -181,8 +253,13 @@ export function App() {
 						</>
 					)}
 					<p className="mt-auto text-muted-foreground text-xs leading-relaxed">
-						Scripted reference controller. Ideal target sensing and a simplified grasp; learning
-						arrives in later phases. Head gestures and expressions are authored.
+						{playback
+							? 'Stored-state playback.'
+							: liveScene?.controller === 'manual'
+								? 'Manual teaching controller.'
+								: 'Scripted reference controller.'}{' '}
+						Ideal target sensing and a simplified grasp; learning arrives in later phases. Head
+						gestures and expressions are authored.
 					</p>
 					<Button
 						variant="ghost"
@@ -193,6 +270,11 @@ export function App() {
 					</Button>
 				</aside>
 			</div>
+			<DemonstrationLibrary
+				library={library}
+				connected={connected}
+				canReview={liveScene?.status !== 'running' && !connection.session?.recording}
+			/>
 			<footer className="border-border border-t px-6 py-4 text-muted-foreground text-sm">
 				One caretaker, one greenhouse. Built to learn a useful task, one skill at a time.
 			</footer>

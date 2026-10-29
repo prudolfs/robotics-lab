@@ -4,6 +4,8 @@ Project-owned Python service for Greenhouse Caretaker. Phase 2 provides an indep
 
 Phase 3 adds Blender-authored presentation in the frontend without changing the simulation or API. The server suite checks the asset manifest against the compiled MuJoCo chassis, wheels, pots, walls and task dimensions. See the [Phase 3 review](../../docs/greenhouse-demo/phase3/README.md).
 
+Phase 4 adds manual control, full-resolution episode recording, a persistent local demonstration library, source-preserving reviews, schema/split/trajectory validation and portable JSON export/import. No model training is implemented yet. See the [Phase 4 review](../../docs/greenhouse-demo/phase4/README.md).
+
 From the repository root:
 
 ```sh
@@ -49,7 +51,13 @@ Example command after creating a session and receiving its initial state:
 
 Supported command kinds are `start`, `pause`, `reset`, `new_seed` and `ping`. Start/resume is valid only for ready/paused worlds; pause is valid only while running. Reset restores the current seed; new_seed chooses a different seed. Both increment the generation and return a ready world. Ping only acknowledges connectivity.
 
+Phase 4 adds `set_controller` (`controller: "manual" | "scripted_reference"`) while ready/paused, `record` from a fresh ready world, `stop_recording`, and `manual` with an `action` object. Manual axes `throttle`, `turn`, `lift` lie in `[-1,1]`; `grip` is `hold`, `close` or `open`. Actions renew a 250 ms input lease, and grip requests are consumed once. Pause/reset/disconnect clear inputs. Neutral stop is accepted without waiting for the manual rate gate; stale generations and non-running/manual states still reject input. New random seeds now use the declared training range 0–99. Session views/snapshots include recording state, the latest saved episode ID, save errors and structured observations.
+
+Recordings retain every executed 20 Hz step independently of 10 Hz browser snapshots. Controller transitions mark executed interventions; reference/manual runs are labeled separately or mixed. Successful/failing terminal states auto-save; explicit stop, reset and disconnect seal partial attempts. Save failures remain visible and block destructive reset while retaining the in-memory recording. Empty zero-step attempts are not saved. Successful files persist independently of ephemeral sessions.
+
 Stale generations, mismatched sessions and invalid state transitions are rejected. Request IDs are idempotent within a bounded cache of 64 acknowledgments; reuse means retrying the same operation, not submitting a different command. Accepted commands are rate-limited to 10 Hz. Unknown/oversized/binary input receives a protocol error. Each session allows one stream.
+
+State commands retain the 10 Hz gate. Continuous manual inputs have their own 20 Hz maximum lane (the browser sends at 10 Hz), and do not wait for snapshot publication before the receiver can accept the next input. The publisher streams their resulting physics state independently. The frontend keeps state controls disabled briefly after acknowledgment so a quick mode-selection/record sequence does not violate the state-command interval.
 
 The lifespan clock advances connected running worlds at 20 control Hz. Publication sends latest state at no more than 10 Hz; it does not queue historical frames for slow clients. Sends are serialized, have a two-second timeout, and a failed/closed stream pauses its world. If processing falls behind, simulated time slows instead of skipping steps or accumulating an unbounded catch-up batch.
 
@@ -63,7 +71,25 @@ This is a loopback development service with random session IDs, not an authentic
 
 The base has planar support and velocity servos; wheel angles visualize measured body motion. There is no rolling/slip or actuator-fidelity claim. Pickup is a constrained attachment with measured-speed, alignment and height gates. Floor, wall and pot contacts are real MuJoCo contacts for the applicable collision groups; the base's planar joints support it without wheel/floor traction. The floor-level tray is a delivery region, not a raised receptacle with walls. Camera perception, physical fingers, carried-load force transfer and plant manipulation remain later work.
 
-Workers and persistent experiment artifacts remain later phases. Future local outputs belong under the ignored `runtime/` directory, not source control.
+## Demonstration datasets
+
+| Route | Behavior |
+| --- | --- |
+| `GET /dataset` | Summaries, source/split/outcome/review state, eligible count and local limits/location |
+| `POST /dataset/expert` | Prepare unique training seeds, body `{"seeds":[0,1,2]}`; default 0–19; existing expert episodes/reviews preserved |
+| `GET /episodes/{id}` | Versioned source entry and a static scene template for recorded-state playback |
+| `PATCH /episodes/{id}/review` | Separate `label`, `excluded`, `note` sidecar; never rewrites the raw episode |
+| `POST /dataset/validate` | Re-simulation, schema/configuration, source/completion/split checks; explicit eligible training IDs and skipped/error reasons |
+| `GET /dataset/export` | Portable JSON bundle; optional repeated `ids` query parameters select smaller exports |
+| `POST /dataset/import` | Bounded streamed JSON upload; full validation before new artifacts are written; identical IDs preserve existing reviews |
+
+Routes use the same `/api/v1/greenhouse` prefix. Models are exported through the existing Pydantic JSON Schema → TypeScript flow. HTTP error details explain incompatible configurations, checksum conflicts, invalid split labels and storage/size limits. Bulk collection, validation and import run in a worker thread; a single dataset-operation lock bounds simultaneous jobs. This is not the future training worker.
+
+Default artifacts are `runtime/datasets/v1/<id>.json` with separate `<id>.review.json`, relative to the server working directory used by pnpm. `GREENHOUSE_DATASET_DIR` overrides the directory. Limits are 600 steps/4 MiB per episode, 20 MiB/100 episodes per import/export, and 200 episodes/256 MiB per store. Raw episodes are immutable through the API; hashes cover canonical episode serialization, while reviews remain mutable. Imports do not overwrite existing conflicting sources or review decisions.
+
+Seeds 0–99 are training, 10000–10029 validation, and 20000–20099 reserved final test. Recording/import refuses final test scenarios; unknown seeds remain unassigned and ineligible. Training readiness requires current configuration, matching seeded action/state trajectories, correct expert/intervention/source and completion labels, a clean successful training episode, usable quality and explicit inclusion. Older Phase 0 feasibility data is incompatible and is not silently converted. Documentation contains a small expert example and an excluded automated manual-input example; they are not claimed as human demonstrations.
+
+Saved datasets persist across restarts; live sessions and an unsaved in-memory recording do not. Keep one API worker and one writer per artifact directory. Large model training, checkpoints, a separate training worker and persistent job orchestration remain later phases. Generated local datasets/experiments belong under ignored `runtime/`; only small schema/review fixtures and evidence are committed in docs.
 
 ## Checks
 

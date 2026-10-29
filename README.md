@@ -18,7 +18,7 @@ roadmap. The application plans live in
 [`docs/slam-demo.md`](./docs/slam-demo.md) and
 [`docs/warehouse-demo.md`](./docs/warehouse-demo.md).
 The next project, [Greenhouse Caretaker](./docs/greenhouse-demo.md), now has a
-live Python simulation, an authored Blender greenhouse and a scripted collection task through Phase 3.
+live Python simulation, an authored Blender greenhouse and manual teaching/demonstration datasets through Phase 4.
 
 ---
 
@@ -60,16 +60,18 @@ headlessly in Python and is independent of FastAPI and React.
 
 ### [Greenhouse Caretaker](./apps/greenhouse-demo)
 
-A robot-learning project in development. Phase 3 provides a React Three Fiber /
+A robot-learning project in development. Phase 4 provides a React Three Fiber /
 Drei WebGPU scene, Tailwind and shadcn with Base UI, and a project-owned FastAPI
 service running MuJoCo. A scripted reference controller collects a capsule and
 delivers it to a floor-level tray in an authored Blender greenhouse, with pause/resume,
 seeded resets, follow/robot-eye views, reduced-motion expressions and optional sound.
-The UI labels the ideal sensing and simplified grasp; learned policies come later.
+Manual teaching adds held movement/lift controls, recorded demonstrations,
+source-preserving review, stored-state playback and dataset validation/export/import.
+The UI labels ideal sensing and simplified grasp; learned policies begin in Phase 5.
 With uv installed, run `pnpm setup:greenhouse` and `pnpm dev:greenhouse` after the
 normal `pnpm install`. Open `http://127.0.0.1:8086/`. See the
 [server guide](./apps/greenhouse-server/README.md) and
-[Phase 3 review](./docs/greenhouse-demo/phase3/README.md).
+[Phase 4 review](./docs/greenhouse-demo/phase4/README.md).
 
 ### [Robot Simulator](./apps/simulator)
 

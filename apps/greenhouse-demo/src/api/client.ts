@@ -7,23 +7,27 @@ export type Scene = SessionView['scene']
 const prefix = '/api/v1/greenhouse'
 const ajv = new Ajv({ strict: false })
 
-function model<T>(name: string): ValidateFunction<T> {
+export function model<T>(name: string): ValidateFunction<T> {
 	return ajv.compile<T>({ $ref: `#/$defs/${name}`, $defs: httpSchema.$defs })
 }
 const health = model<HttpModels['health']>('Health')
 const capabilities = model<HttpModels['capabilities']>('Capabilities')
 const session = model<SessionView>('SessionView')
 
-async function request<T>(
+export async function request<T>(
 	path: string,
 	options: RequestInit,
 	validate: ValidateFunction<T>,
 ): Promise<T> {
 	const response = await fetch(`${prefix}${path}`, options)
-	if (!response.ok)
+	if (!response.ok) {
+		const body = (await response.json().catch(() => null)) as { detail?: unknown } | null
 		throw new Error(
-			`The greenhouse server returned HTTP ${response.status}. Check the server and retry.`,
+			typeof body?.detail === 'string'
+				? body.detail
+				: `The greenhouse server returned HTTP ${response.status}. Check the server and retry.`,
 		)
+	}
 	const data: unknown = await response.json()
 	if (!validate(data)) throw new Error('The greenhouse server sent an incompatible HTTP response.')
 	return data

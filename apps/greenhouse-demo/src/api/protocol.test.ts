@@ -21,6 +21,16 @@ const snapshot = {
 		invalid_actions: 0,
 		reason: null,
 		events: [],
+		observation: {
+			target_forward: 1,
+			target_left: 0,
+			distance: 1,
+			bearing: 0,
+			speed: 0,
+			yaw_speed: 0,
+			lift_height: 0.05,
+			holding: false,
+		},
 		walls: [],
 		pots: [],
 		robot: {

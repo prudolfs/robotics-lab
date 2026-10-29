@@ -1,5 +1,43 @@
 {
   "$defs": {
+    "ActionData": {
+      "additionalProperties": false,
+      "properties": {
+        "grip": {
+          "default": "hold",
+          "enum": [
+            "hold",
+            "close",
+            "open"
+          ],
+          "title": "Grip",
+          "type": "string"
+        },
+        "lift": {
+          "default": 0.0,
+          "maximum": 1,
+          "minimum": -1,
+          "title": "Lift",
+          "type": "number"
+        },
+        "throttle": {
+          "default": 0.0,
+          "maximum": 1,
+          "minimum": -1,
+          "title": "Throttle",
+          "type": "number"
+        },
+        "turn": {
+          "default": 0.0,
+          "maximum": 1,
+          "minimum": -1,
+          "title": "Turn",
+          "type": "number"
+        }
+      },
+      "title": "ActionData",
+      "type": "object"
+    },
     "Control": {
       "additionalProperties": false,
       "properties": {
@@ -17,7 +55,9 @@
           "enum": [
             "start",
             "pause",
-            "new_seed"
+            "new_seed",
+            "record",
+            "stop_recording"
           ],
           "title": "Kind",
           "type": "string"
@@ -42,6 +82,50 @@
         "request_id"
       ],
       "title": "Control",
+      "type": "object"
+    },
+    "Manual": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "api_version": {
+          "const": "1",
+          "title": "Api Version",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "manual",
+          "title": "Kind",
+          "type": "string"
+        },
+        "request_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "api_version",
+        "session_id",
+        "generation",
+        "kind",
+        "request_id",
+        "action"
+      ],
+      "title": "Manual",
       "type": "object"
     },
     "Ping": {
@@ -123,15 +207,68 @@
       ],
       "title": "Reset",
       "type": "object"
+    },
+    "SetController": {
+      "additionalProperties": false,
+      "properties": {
+        "api_version": {
+          "const": "1",
+          "title": "Api Version",
+          "type": "string"
+        },
+        "controller": {
+          "enum": [
+            "scripted_reference",
+            "manual"
+          ],
+          "title": "Controller",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "set_controller",
+          "title": "Kind",
+          "type": "string"
+        },
+        "request_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "api_version",
+        "session_id",
+        "generation",
+        "kind",
+        "request_id",
+        "controller"
+      ],
+      "title": "SetController",
+      "type": "object"
     }
   },
   "discriminator": {
     "mapping": {
+      "manual": "#/$defs/Manual",
       "new_seed": "#/$defs/Control",
       "pause": "#/$defs/Control",
       "ping": "#/$defs/Ping",
+      "record": "#/$defs/Control",
       "reset": "#/$defs/Reset",
-      "start": "#/$defs/Control"
+      "set_controller": "#/$defs/SetController",
+      "start": "#/$defs/Control",
+      "stop_recording": "#/$defs/Control"
     },
     "propertyName": "kind"
   },
@@ -144,6 +281,12 @@
     },
     {
       "$ref": "#/$defs/Control"
+    },
+    {
+      "$ref": "#/$defs/SetController"
+    },
+    {
+      "$ref": "#/$defs/Manual"
     }
   ]
 }
