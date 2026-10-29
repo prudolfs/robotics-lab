@@ -1,0 +1,27 @@
+{
+  "python_tests": 98,
+  "frontend_unit_tests": 10,
+  "production_browser_tests": 22,
+  "shared_package_tests": 214,
+  "warehouse_tests": 36,
+  "drone_tests": 30,
+  "slam_tests": 19,
+  "typecheck_lint_contracts_assets_build": "passed",
+  "fresh_install_learning": "fresh-learning.json",
+  "global_gif": {
+    "projects": 5,
+    "frames": 40,
+    "duration_seconds": 36,
+    "greenhouse_first_frame": 32
+  },
+  "local_preview": {
+    "frames": 8,
+    "duration_seconds": 7.2
+  },
+  "post_media": {
+    "square_screenshots": 5,
+    "comparison_video_seconds": 31.666667
+  },
+  "later_possibilities": "deferred",
+  "published": false
+}

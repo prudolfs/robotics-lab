@@ -128,3 +128,9 @@ node scripts/greenhouse/lifecycle.mjs
 The benchmark writes a reference report and seed-42 observation/action/state trace under `docs/greenhouse-demo/phase2/`; it uses seeds 0–99 and 10000–10029, leaving final test seeds untouched. It is a scripted-controller benchmark, not a learning result. See the [Phase 2 review](../../docs/greenhouse-demo/phase2/README.md).
 
 The Python wrappers also expose `test`, `lint`, `typecheck`, `build` and `contracts`. The source package builds a wheel and source archive through `uv build`. Tests cover seeded worlds, task preconditions, timeout/freeze, contacts, complete reference episodes, session lifecycle and bounded streaming. Mypy checks our Python modules strictly; the native MuJoCo binding lacks distributed type stubs and is treated as an untyped library boundary.
+
+## Phase 8 release
+
+See the [release review](../../docs/greenhouse-demo/phase8/README.md) for the clean-checkout reproduction, training cost, measured outcomes and resource-limit table. Worker shutdown requests cancellation, then termination, then kills and reaps an unresponsive owned worker. Tests cover a real process that ignores termination, plus a saturated 600-step recording, 64 acknowledgement entries, 16 retained events and repeated resets.
+
+For local production-style use, build with `pnpm build:greenhouse`, then start `pnpm -C apps/greenhouse-server start` and `pnpm -C apps/greenhouse-demo preview`. Keep one API process, writable artifact directories and the browser origin allowlist. The release guide describes persistent storage, WebSocket proxying and deployment limits; this is not an authenticated public multi-user service.

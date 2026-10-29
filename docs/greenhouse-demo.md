@@ -1,8 +1,8 @@
 # Greenhouse Caretaker
 
-> Proposed implementation plan for the next Robotics Lab project: an expressive robot that learns useful tasks in a simulated greenhouse.
+> Implementation plan and release record for Robotics Lab’s robot-learning project: an expressive robot that learns useful tasks in a simulated greenhouse.
 >
-> Status: Phases 0–7 complete. The current [workspace update](greenhouse-demo/updates/2026-10-29-workspace.md) follows Phase 7; [between-phase updates](greenhouse-demo/updates/README.md) track this work separately. Phase 8 remains unchecked. Stop before starting Phase 8.
+> Status: Phases 0–8 complete. See the [Phase 8 release review](greenhouse-demo/phase8/README.md) and [between-phase updates](greenhouse-demo/updates/README.md). Later possibilities remain deferred; stop for review before publishing or adding scope.
 
 ## Goal and experience
 
@@ -202,30 +202,30 @@ Exit verified: the [Phase 7 review](greenhouse-demo/phase7/README.md) records a 
 
 ### Phase 8 — Learning experience, reliability and release
 
-- [ ] Finish the Watch / Teach / Train / Compare flow, responsive layout, keyboard access, focus states and reduced-motion behavior.
-- [ ] Add an optional observation/reward inspector and failure replay while keeping the main experience uncluttered.
-- [ ] Finalize session ownership, disconnect/reconnect behavior, stale responses, concurrent-job limits and clean worker shutdown.
-- [ ] Verify bounded recording/snapshot memory, artifact retention and repeated start/reset/train/cancel cycles.
-- [ ] Run targeted Python simulation/training/API checks, frontend typecheck/build, relevant shared-package checks and a small public-UI end-to-end suite.
-- [ ] Evaluate final checkpoints on a newly reserved test suite after further tuning, or explicitly disclose reuse of the inspected Phase 6 suite; publish metrics, training cost, sensing assumptions and remaining limits.
-- [ ] Document architecture, local setup, asset exports, dataset formats, training reproduction, mission configuration and backend deployment requirements.
-- [ ] Add app READMEs and root README links/launch commands, then capture current screenshots and a short task/learning comparison video.
-- [ ] Verify a fresh checkout can start both services, run a reference task, execute a saved learned policy and reproduce a documented small training run.
-- [ ] If including an offline showcase, label recorded playback clearly and verify it works without the server.
+- [x] Finish the Watch / Teach / Train / Compare flow, responsive layout, keyboard access, focus states and reduced-motion behavior.
+- [x] Add an optional observation/reward inspector and failure replay while keeping the main experience uncluttered.
+- [x] Finalize session ownership, disconnect/reconnect behavior, stale responses, concurrent-job limits and clean worker shutdown.
+- [x] Verify bounded recording/snapshot memory, artifact retention and repeated start/reset/train/cancel cycles.
+- [x] Run targeted Python simulation/training/API checks, frontend typecheck/build, relevant shared-package checks and a small public-UI end-to-end suite.
+- [x] Evaluate final checkpoints on a newly reserved test suite after further tuning, or explicitly disclose reuse of the inspected Phase 6 suite; publish metrics, training cost, sensing assumptions and remaining limits.
+- [x] Document architecture, local setup, asset exports, dataset formats, training reproduction, mission configuration and backend deployment requirements.
+- [x] Add app READMEs and root README links/launch commands, then capture current screenshots and a short task/learning comparison video.
+- [x] Verify a fresh checkout can start both services, run a reference task, execute a saved learned policy and reproduce a documented small training run.
+- [x] If including an offline showcase, label recorded playback clearly and verify it works without the server.
 
-Exit: a documented, reviewable greenhouse learning project integrated into Robotics Lab. Stop for user review before publishing or adding further scope.
+Exit verified: the [Phase 8 review](greenhouse-demo/phase8/README.md) records the completed learning workspace, resource/worker bounds, clean-checkout learning reproduction, release checks, five-project showcase and post media. No offline application mode is included; standalone recorded media is labeled. Stop for user review before publishing or adding further scope.
 
 ## Completion criteria
 
-- [ ] The browser and project-owned Python server launch through documented monorepo commands with locked dependencies.
-- [ ] The robot visibly collects a capsule and places it in the tray using a saved learned policy.
-- [ ] A visitor can record a demonstration, train a small model and inspect its evaluation results.
-- [ ] Training uses the same authoritative environment as interactive execution and runs without a browser.
-- [ ] Checkpoint comparisons use declared dataset splits, shared scenarios and actual task outcomes.
-- [ ] Scripted behavior, learned skills, idealized sensing, authored expressions and recorded playback are clearly identified.
-- [ ] LangGraph composes supported skills into a greenhouse routine with bounded recovery and inspectable state.
-- [ ] The greenhouse and character meet the agreed visual direction without obscuring task progress or physical limitations.
-- [ ] Existing monorepo applications retain their behavior.
+- [x] The browser and project-owned Python server launch through documented monorepo commands with locked dependencies.
+- [x] The robot visibly collects a capsule and places it in the tray using a saved learned policy.
+- [x] A visitor can record a demonstration, train a small model and inspect its evaluation results.
+- [x] Training uses the same authoritative environment as interactive execution and runs without a browser.
+- [x] Checkpoint comparisons use declared dataset splits, shared scenarios and actual task outcomes.
+- [x] Scripted behavior, learned skills, idealized sensing, authored expressions and recorded playback are clearly identified.
+- [x] LangGraph composes supported skills into a greenhouse routine with bounded recovery and inspectable state.
+- [x] The greenhouse and character meet the agreed visual direction without obscuring task progress or physical limitations.
+- [x] Existing monorepo applications retain their behavior.
 
 ## Later possibilities
 

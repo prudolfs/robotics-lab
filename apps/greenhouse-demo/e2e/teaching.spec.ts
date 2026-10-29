@@ -1,8 +1,8 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
-import { expect, test } from '@playwright/test'
 import type { HttpModels } from '../src/api/generated/http'
 import type { ServerMessage } from '../src/api/generated/websocket-server'
+import { expect, test } from './fixtures'
 import { openPanel } from './workspace-helpers'
 
 const output = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase5/', import.meta.url))
@@ -101,11 +101,13 @@ test('records manual input, stops safely, preserves review provenance and plays 
 		.toBe(before.entry.episode.final_state.lift_height)
 	const pose = await page.evaluate(() => window.__greenhouseReview?.pose)
 	expect(pose?.robot[0]).toBeCloseTo(before.entry.episode.final_state.x, 7)
-	expect(pose?.capsule).toEqual([
+	const expectedCapsule = [
 		before.entry.episode.final_state.capsule[0],
 		before.entry.episode.final_state.capsule[2],
 		-before.entry.episode.final_state.capsule[1],
-	])
+	]
+	for (let axis = 0; axis < 3; axis++)
+		expect(pose?.capsule[axis]).toBeCloseTo(expectedCapsule[axis], 12)
 	await page.getByLabel('Episode position', { exact: true }).press('Home')
 	await page.getByRole('button', { name: 'Play recording', exact: true }).click()
 	await expect

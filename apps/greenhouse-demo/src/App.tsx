@@ -10,6 +10,7 @@ import { useTraining } from './api/use-training'
 import { DemonstrationLibrary, PlaybackControls } from './components/demonstration-library'
 import { GreenhouseScene } from './components/greenhouse-scene'
 import { MissionPanel } from './components/mission-panel'
+import { ObservationInspector } from './components/observation-inspector'
 import { ComparisonPlayback, PracticePanel } from './components/practice-panel'
 import { TeachingControls } from './components/teaching-controls'
 import { TrainingPanel, TrainingPlayback } from './components/training-panel'
@@ -624,6 +625,14 @@ export function App() {
 													))}
 												</ol>
 											</>
+										)}
+										{scene && (
+											<ObservationInspector
+												scene={scene}
+												practice={training.data?.jobs.find(
+													(job) => job.request.algorithm === 'ppo',
+												)}
+											/>
 										)}
 										<p className="mt-auto text-muted-foreground text-xs leading-relaxed">
 											{liveMission && !playback

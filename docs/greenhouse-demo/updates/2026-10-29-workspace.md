@@ -21,7 +21,7 @@ The design takes its tabbed inspector from `apps/simulator` and its split-panel 
 - [x] Install the official shadcn skill and record it in `skills-lock.json`.
 - [x] Remove the obsolete `.claude/skills` link; retain the actual Laya and shadcn skills under `.agents/skills`.
 - [x] Complete final regression checks and record their results below.
-- [ ] User review of the updated workspace in the browser.
+- [x] User review of the updated workspace in the browser (approved before Phase 8).
 
 ## Try the workspace
 

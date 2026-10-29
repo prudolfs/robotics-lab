@@ -33,7 +33,9 @@
 		"video:warehouse:x": "node scripts/capture-warehouse-demo.mjs --video-only",
 		"readme:gif": "node scripts/generate-readme-gif.mjs",
 		"build:slam": "pnpm -C apps/slam-demo build",
-		"test:e2e:slam": "pnpm -C apps/slam-demo test:e2e"
+		"test:e2e:slam": "pnpm -C apps/slam-demo test:e2e",
+		"screenshots:greenhouse": "node scripts/capture-greenhouse-demo.mjs",
+		"verify:greenhouse": "node scripts/greenhouse-release/smoke.mjs"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.2",

@@ -1,6 +1,6 @@
 import { mkdir } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 const capture = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase5/', import.meta.url))
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Captures all four apps sequentially, then atomically replaces the README GIF.
+// Captures all five apps sequentially, then atomically replaces the README GIF.
 // Run from any directory: node scripts/generate-readme-gif.mjs [output.gif]
 import { spawn, spawnSync } from 'node:child_process'
 import { mkdir, mkdtemp, readdir, rename, rm, writeFile } from 'node:fs/promises'
@@ -40,7 +40,7 @@ const frames = resolve(temporary, 'frames')
 await mkdir(frames)
 const framePath = (index) => resolve(frames, `frame-${String(index).padStart(4, '0')}.png`)
 
-async function captureApp(app, port, capture) {
+async function captureApp(app, port, capture, env = process.env) {
 	const cwd = resolve(root, 'apps', app)
 	process.stdout.write(`Building and capturing ${app}…\n`)
 	run('pnpm', ['build'], { cwd })
@@ -55,7 +55,7 @@ async function captureApp(app, port, capture) {
 			String(port),
 			'--strictPort',
 		],
-		{ cwd, stdio: 'inherit' },
+		{ cwd, stdio: 'inherit', env },
 	)
 	const closed = new Promise((resolve) => server.once('exit', resolve))
 	let serverError
@@ -186,7 +186,58 @@ try {
 			await page.screenshot({ path: framePath(count * 3 + i) })
 		}
 	})
-	if ((await readdir(frames)).filter((name) => name.endsWith('.png')).length !== count * 4)
+	// A separate empty-artifact service keeps the showcase reproducible without local weights.
+	run('pnpm', ['-C', 'apps/greenhouse-server', 'setup'])
+	const greenhouse = spawn(
+		resolve(root, 'apps/greenhouse-server/.venv/bin/python'),
+		['-m', 'uvicorn', 'greenhouse.api.main:app', '--host', '127.0.0.1', '--port', '8009'],
+		{
+			cwd: resolve(root, 'apps/greenhouse-server'),
+			stdio: 'inherit',
+			env: {
+				...process.env,
+				GREENHOUSE_DATASET_DIR: resolve(temporary, 'datasets'),
+				GREENHOUSE_TRAINING_DIR: resolve(temporary, 'training'),
+				GREENHOUSE_MISSION_DIR: resolve(temporary, 'missions'),
+				GREENHOUSE_ALLOWED_ORIGINS: 'http://127.0.0.1:4196',
+			},
+		},
+	)
+	const greenhouseClosed = new Promise((resolve) => greenhouse.once('exit', resolve))
+	try {
+		const deadline = Date.now() + 30000
+		while (true) {
+			if (greenhouse.exitCode !== null) throw Error('Greenhouse API exited before capture')
+			try {
+				if ((await fetch('http://127.0.0.1:8009/api/v1/greenhouse/health')).ok) break
+			} catch {}
+			if (Date.now() > deadline) throw Error('Greenhouse API startup timed out')
+			await new Promise((resolve) => setTimeout(resolve, 200))
+		}
+		await captureApp(
+			'greenhouse-demo',
+			4196,
+			async (page) => {
+				await expect(page.getByTestId('renderer-status')).toHaveText('WebGPU active')
+				await expect(
+					page.getByRole('button', { name: 'Start collection', exact: true }),
+				).toBeEnabled()
+				await page.getByRole('button', { name: 'Start collection', exact: true }).click()
+				await page.waitForTimeout(2500)
+				for (let i = 0; i < count; i++) {
+					if (i === Math.floor(count / 2))
+						await page.getByRole('button', { name: 'Follow', exact: true }).click()
+					await page.waitForTimeout(frameMs)
+					await page.screenshot({ path: framePath(count * 4 + i) })
+				}
+			},
+			{ ...process.env, GREENHOUSE_SERVER_ORIGIN: 'http://127.0.0.1:8009' },
+		)
+	} finally {
+		greenhouse.kill('SIGTERM')
+		await greenhouseClosed
+	}
+	if ((await readdir(frames)).filter((name) => name.endsWith('.png')).length !== count * 5)
 		throw Error('Incomplete project capture')
 	const palette = resolve(temporary, 'palette.png')
 	const staged = resolve(temporary, 'header.gif')
@@ -221,15 +272,63 @@ try {
 		'0',
 		staged,
 	])
+	const localPreview = resolve(temporary, 'greenhouse-preview.gif')
+	run('ffmpeg', [
+		'-hide_banner',
+		'-loglevel',
+		'error',
+		'-y',
+		'-framerate',
+		String(fps),
+		'-start_number',
+		String(count * 4),
+		'-i',
+		resolve(frames, 'frame-%04d.png'),
+		'-i',
+		palette,
+		'-filter_complex',
+		`[0:v]scale=${width}:-2:flags=lanczos[x];[x][1:v]paletteuse=dither=sierra2_4a`,
+		'-frames:v',
+		String(count),
+		'-gifflags',
+		'0',
+		'-loop',
+		'0',
+		localPreview,
+	])
+	const localMedia = resolve(root, 'apps/greenhouse-demo/media')
+	await mkdir(localMedia, { recursive: true })
+	await rename(localPreview, resolve(localMedia, 'preview.gif'))
+	await writeFile(
+		resolve(localMedia, 'preview.json'),
+		`${JSON.stringify(
+			{
+				source: 'Same Greenhouse frames as docs/readme-header.gif',
+				controller: 'scripted_reference',
+				firstGlobalFrame: count * 4,
+				frames: count,
+				fps,
+				width,
+			},
+			null,
+			2,
+		)}\n`,
+	)
 	await rename(staged, output)
 	await writeFile(
 		`${output.replace(/\.gif$/i, '')}.json`,
 		`${JSON.stringify(
 			{
 				width,
-				frames: count * 4,
+				frames: count * 5,
 				fps,
-				projects: ['simulator', 'drone-mission-planner', 'slam-demo', 'warehouse-demo'].map((name, i) => ({
+				projects: [
+					'simulator',
+					'drone-mission-planner',
+					'slam-demo',
+					'warehouse-demo',
+					'greenhouse-demo',
+				].map((name, i) => ({
 					name,
 					firstFrame: i * count,
 					frames: count,
@@ -239,7 +338,7 @@ try {
 			2,
 		)}\n`,
 	)
-	process.stdout.write(`Wrote ${output}: ${count * 4} frames across all four projects.\n`)
+	process.stdout.write(`Wrote ${output}: ${count * 5} frames across all five projects.\n`)
 } finally {
 	await rm(temporary, { recursive: true, force: true })
 }

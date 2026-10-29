@@ -334,33 +334,35 @@ export function GreenhouseScene({
 							: 'Preparing 3D preview…'}
 			</p>
 			{capable && scene && (
-				<Boundary onError={() => setStatus('error')}>
-					<Canvas
-						style={{ position: 'absolute', inset: 0 }}
-						shadows
-						camera={{ position: [5.5, 5, 6.1], fov: 44 }}
-						renderer={async (props: { canvas: HTMLCanvasElement }) => {
-							const renderer = new WebGPURenderer({ canvas: props.canvas, antialias: true })
-							await renderer.init()
-							if (!(renderer.backend as { isWebGPUBackend?: boolean }).isWebGPUBackend) {
-								renderer.dispose()
-								setStatus('unsupported')
-								throw new Error('WebGPU is required')
-							}
-							return renderer
-						}}
-					>
-						<ReportBackend onStatus={setStatus} />
-						<Suspense fallback={null}>
-							<World
-								scene={scene}
-								generation={generation}
-								cameraMode={cameraMode}
-								onReady={ready}
-							/>
-						</Suspense>
-					</Canvas>
-				</Boundary>
+				<Suspense fallback={null}>
+					<Boundary onError={() => setStatus('error')}>
+						<Canvas
+							style={{ position: 'absolute', inset: 0 }}
+							shadows
+							camera={{ position: [5.5, 5, 6.1], fov: 44 }}
+							renderer={async (props: { canvas: HTMLCanvasElement }) => {
+								const renderer = new WebGPURenderer({ canvas: props.canvas, antialias: true })
+								await renderer.init()
+								if (!(renderer.backend as { isWebGPUBackend?: boolean }).isWebGPUBackend) {
+									renderer.dispose()
+									setStatus('unsupported')
+									throw new Error('WebGPU is required')
+								}
+								return renderer
+							}}
+						>
+							<ReportBackend onStatus={setStatus} />
+							<Suspense fallback={null}>
+								<World
+									scene={scene}
+									generation={generation}
+									cameraMode={cameraMode}
+									onReady={ready}
+								/>
+							</Suspense>
+						</Canvas>
+					</Boundary>
+				</Suspense>
 			)}
 			{(!scene || status === 'unsupported' || status === 'error') && (
 				<div className="flex h-full min-h-[420px] items-center justify-center px-8">

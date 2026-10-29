@@ -1,7 +1,6 @@
 """Bounded single-process job ownership with persisted snapshots and child workers."""
 
 import asyncio
-import contextlib
 import hashlib
 import os
 import re
@@ -258,8 +257,12 @@ class TrainingManager:
             except TimeoutError:
                 if self.process and self.process.returncode is None:
                     self.process.terminate()
-                with contextlib.suppress(TimeoutError):
+                try:
                     await asyncio.wait_for(asyncio.shield(self.monitor), timeout=3)
+                except TimeoutError:
+                    if self.process and self.process.returncode is None:
+                        self.process.kill()
+                    await self.monitor
 
     def load(self, checkpoint_id: str) -> "LearnedPolicy":
         # Hash and compatibility checks also run on cache hits: changing an artifact

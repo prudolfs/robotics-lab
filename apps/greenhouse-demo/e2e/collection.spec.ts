@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
-import { expect, test } from '@playwright/test'
 import type { ServerMessage } from '../src/api/generated/websocket-server'
+import { expect, test } from './fixtures'
 
 type Snapshot = Extract<ServerMessage, { kind: 'snapshot' }>
 const output = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase5/', import.meta.url))

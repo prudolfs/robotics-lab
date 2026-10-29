@@ -17,15 +17,15 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@robotics-lab/core": "workspace:*",
-    "@robotics-lab/robot": "workspace:*",
     "@robotics-lab/noise": "workspace:*",
+    "@robotics-lab/robot": "workspace:*",
+    "@robotics-lab/sensors": "workspace:*",
+    "@robotics-lab/vision": "workspace:*",
     "lucide-react": "^1.23.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "three": "^0.185.1",
-    "zustand": "^5.0.14",
-    "@robotics-lab/sensors": "workspace:*",
-    "@robotics-lab/vision": "workspace:*"
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
@@ -33,6 +33,7 @@
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.185.0",
     "@vitejs/plugin-react-swc": "^4.3.1",
+    "esbuild": "0.28.1",
     "vite": "^8.1.2"
   }
 }

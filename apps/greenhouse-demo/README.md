@@ -1,6 +1,10 @@
 # Greenhouse Caretaker
 
-Greenhouse workspace for Robotics Lab's robot-learning project through Phase 7. React Three Fiber and Drei render an authored Blender greenhouse and articulated caretaker using actual Three.js WebGPU; Tailwind and shadcn/ui with Base UI provide the interface. Python runs the authoritative MuJoCo world. Reference and manual teaching controllers can produce versioned demonstrations; a separate PyTorch worker trains saved policies for live learned execution.
+![Pip collecting a capsule in the greenhouse](media/preview.gif)
+
+The short preview uses the same eight Greenhouse frames as the global showcase: live scripted-reference collection. [The separate comparison video](media/learning-comparison.mp4) shows recorded BC/PPO/reference validation rollouts and learned failures.
+
+Greenhouse workspace for Robotics Lab's robot-learning project through Phase 8. React Three Fiber and Drei render an authored Blender greenhouse and articulated caretaker using actual Three.js WebGPU; Tailwind and shadcn/ui with Base UI provide the interface. Python runs the authoritative MuJoCo world. Reference and manual teaching controllers can produce versioned demonstrations; a separate PyTorch worker trains saved policies for live learned execution.
 
 From the repository root:
 
@@ -22,7 +26,7 @@ The scene loads six local GLBs: the cutaway greenhouse, Pip caretaker, capsule a
 
 The viewport stays visible beside a tabbed, resizable inspector: **Watch**, **Teach**, **Train**, **Compare**, and **Missions**. On mobile it becomes a vertical split. Use Cmd+P / Ctrl+P to search panels and actions; Cmd/Ctrl+1–5 opens the tabs. Split sizes and checkpoint selection persist locally. Watch contains controller selection; Teach contains recording and the dataset library; Train contains the shared saved-checkpoint selector.
 
-Zustand owns workspace selections and exclusive playback; TanStack Query caches REST data while the WebSocket continues to stream live simulation state. Tables support sorting, filtering and pagination. Selects use shadcn/Base UI, and the training loss chart uses shadcn/Recharts. See the [between-phase update log](../../docs/greenhouse-demo/updates/README.md) for decisions, controls and verification.
+Zustand owns workspace selections and exclusive playback; TanStack Query caches REST data while the WebSocket continues to stream live simulation state. Tables support sorting, filtering and pagination. Selects use shadcn/Base UI, and the training loss chart uses shadcn/Recharts. Watch also includes an optional observation/reward inspector. Validation replay buttons identify failed outcomes. See the [between-phase update log](../../docs/greenhouse-demo/updates/README.md) for decisions, controls and verification.
 
 ## Teach and review
 
@@ -85,3 +89,17 @@ GREENHOUSE_CAPTURE=1 pnpm test:e2e:greenhouse
 This additionally writes current captures and portable demonstration examples to `docs/greenhouse-demo/phase5/`. `node scripts/greenhouse-phase4/review.mjs` prepares/reuses the expert set, imports the explicitly excluded automated manual example, validates the library and captures desktop/mobile review views. Prior Phase 3 asset/performance evidence remains archived. See the [Phase 4 review](../../docs/greenhouse-demo/phase4/README.md), [implementation plan](../../docs/greenhouse-demo.md) and [server guide](../greenhouse-server/README.md).
 
 To check the production bundle, start `pnpm -C apps/greenhouse-server start` and `pnpm -C apps/greenhouse-demo preview` in separate terminals, then run `GREENHOUSE_E2E_URL=http://127.0.0.1:4186 pnpm test:e2e:greenhouse`. Setting that URL skips Playwright's automatic development-server startup.
+
+## Release and post media
+
+Phase 8 is complete. The [release review](../../docs/greenhouse-demo/phase8/README.md) records clean-checkout setup, a fresh training run, service/resource limits and verification. That fresh run achieved 27/30 clean validation deliveries and a successful live seed-42 collection; the historical selected BC actor's 29/30 result and frozen BC/PPO test results remain separate experiments. No new final-test performance is claimed.
+
+Five [square screenshots for a later post](screenshots/README.md) show the workspace, live learned carrying, training, validation failure comparison and mission progress. Regenerate the screenshots and MP4 using:
+
+```sh
+pnpm dev:greenhouse
+# another terminal, after preparing the documented BC/PPO checkpoints:
+pnpm screenshots:greenhouse
+```
+
+Regenerate the short GIF with `pnpm readme:gif`; it shares the global showcase frames. `GREENHOUSE_URL` overrides the frontend URL. Local Chrome/WebGPU and ffmpeg are required. This captures existing policies without retraining them. The app continues to require its Python server: the checked-in GIF/video are viewable offline, but an offline application mode is not included.

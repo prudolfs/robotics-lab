@@ -1,0 +1,54 @@
+{
+  "empty_artifact_start": true,
+  "frontend_proxy_health": true,
+  "reference": {
+    "controller": "scripted_reference",
+    "ticks": 218,
+    "delivered": true,
+    "collisions": 0,
+    "invalid_actions": 0
+  },
+  "request": {
+    "epochs": 120,
+    "correction_rounds": 3,
+    "random_seed": 7,
+    "budget_seconds": 180
+  },
+  "training": {
+    "job_id": "4df4d10ba1384048809bbf46c557ab1a",
+    "checkpoint": "4df4d10ba1384048809bbf46c557ab1a-r3",
+    "elapsed_seconds": 40.56741775001865,
+    "peak_worker_rss_mb": 491.046875,
+    "validation": {
+      "successes": 27,
+      "clean_successes": 27,
+      "total": 30,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "mean_seconds": 12.365,
+      "failure_counts": {
+        "none": 27,
+        "delivery_timeout": 3
+      },
+      "final_test_evaluated": false
+    }
+  },
+  "learned": {
+    "controller": "learned_policy",
+    "ticks": 215,
+    "delivered": true,
+    "collisions": 0,
+    "invalid_actions": 0
+  },
+  "cancellation": [
+    {
+      "state": "cancelled",
+      "concurrent_job_status": 409
+    },
+    {
+      "state": "cancelled",
+      "concurrent_job_status": 409
+    }
+  ],
+  "runtime": "/Users/rudolfspukitis/Code/robotics-lab/.temp/greenhouse-clean-checkout/.temp/greenhouse-release-gYtnwG"
+}

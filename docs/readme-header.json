@@ -1,6 +1,6 @@
 {
   "width": 1200,
-  "frames": 32,
+  "frames": 40,
   "fps": 1.1111111111111112,
   "projects": [
     {
@@ -21,6 +21,11 @@
     {
       "name": "warehouse-demo",
       "firstFrame": 24,
+      "frames": 8
+    },
+    {
+      "name": "greenhouse-demo",
+      "firstFrame": 32,
       "frames": 8
     }
   ]

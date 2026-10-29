@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test'
 import type { HttpModels } from '../src/api/generated/http'
+import { expect, test } from './fixtures'
 import { openPanel, selectChoice } from './workspace-helpers'
 
 const modifier = process.platform === 'darwin' ? 'Meta' : 'Control'
@@ -181,6 +181,49 @@ test('ignores a late episode response after a validation replay takes ownership'
 	)
 	await expect(page.getByRole('region', { name: 'Recorded episode playback' })).toHaveCount(0)
 	await expect(page.getByRole('region', { name: 'Validation rollout playback' })).toBeVisible()
+	await page.getByRole('button', { name: 'Return to live', exact: true }).click()
+	await expect(page.getByRole('button', { name: 'Start collection', exact: true })).toBeEnabled()
+})
+
+test('opens the observation inspector with the keyboard and identifies failed validation playback', async ({
+	page,
+	request,
+}) => {
+	const catalog = (await (
+		await request.get('/api/v1/greenhouse/training')
+	).json()) as HttpModels['training_catalog']
+	const initial = catalog.checkpoints.find(
+		(item) => item.algorithm === 'bc' && item.round === 0 && item.compatible,
+	)
+	test.skip(!initial, 'An initial BC checkpoint is required for failure review.')
+	if (!initial) return
+	await page.goto('/')
+	const inspect = page.getByRole('button', {
+		name: 'Inspect observations and rewards',
+		exact: true,
+	})
+	await inspect.focus()
+	await inspect.press('Enter')
+	await expect(
+		page.getByRole('button', { name: 'Hide learning details', exact: true }),
+	).toHaveAttribute('aria-expanded', 'true')
+	await expect(page.getByLabel('Policy observations', { exact: true })).toContainText(
+		'target forward',
+	)
+	await expect(
+		page.getByText('Aggregate components from the saved training batch', { exact: false }),
+	).toBeVisible()
+	await openPanel(page, 'Train')
+	await selectChoice(page, 'Saved checkpoint', initial.checkpoint_id)
+	const failed = page.getByRole('button', { name: 'Review validation seed 10000', exact: true })
+	await expect(failed).toContainText('pickup not completed')
+	await failed.click()
+	await page.getByLabel('Validation position', { exact: true }).press('End')
+	await expect(page.getByRole('region', { name: 'Validation rollout playback' })).toContainText(
+		'pickup not completed',
+	)
+	await openPanel(page, 'Watch')
+	await expect(page.getByLabel('Policy observations', { exact: true })).toBeVisible()
 	await page.getByRole('button', { name: 'Return to live', exact: true }).click()
 	await expect(page.getByRole('button', { name: 'Start collection', exact: true })).toBeEnabled()
 })

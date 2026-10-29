@@ -234,12 +234,16 @@ export function TrainingPanel({
 							.map((item) => (
 								<Button
 									key={item.seed}
+									aria-label={`Review validation seed ${item.seed}`}
 									size="sm"
 									variant="outline"
 									disabled={!canReview}
 									onClick={() => onReplay(item.seed)}
 								>
 									Review validation seed {item.seed}
+									<span className="text-muted-foreground">
+										{item.success ? ' · delivered' : ` · ${item.failure.replaceAll('_', ' ')}`}
+									</span>
 								</Button>
 							))}
 					</div>

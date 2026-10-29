@@ -27,3 +27,13 @@ The [Phase 4 review](../../docs/warehouse-demo/phase4/README.md) documents the c
 With the app running locally, run `pnpm screenshots:warehouse` from the repository root. It captures four current WebGPU views—[overview](screenshots/overview.png), [dock pickup](screenshots/dock-pickup.png), [follow forklift](screenshots/follow-forklift.png), and [rack placement](screenshots/rack-placement.png)—plus this README GIF and a [short square MP4 for X](media/x-preview.mp4). Run `pnpm video:warehouse:x` to update just the video and GIF from a fresh complete Predictable delivery. Requires local Chrome and ffmpeg. `WAREHOUSE_URL` overrides the capture URL.
 
 See the [Phase 6 review](../../docs/warehouse-demo/phase6/README.md) for production-browser verification, test results and release limits.
+
+### Starting the local decision server
+
+Activate the Python environment where Laya is installed, then run:
+
+```sh
+LAYA_HOST=127.0.0.1 laya-serve
+```
+
+The default port is 8000. Leave it running for Full Laya mode. Predictable mode and the global README animation do not require it.

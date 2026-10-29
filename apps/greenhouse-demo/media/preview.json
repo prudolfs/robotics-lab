@@ -1,0 +1,8 @@
+{
+  "source": "Same Greenhouse frames as docs/readme-header.gif",
+  "controller": "scripted_reference",
+  "firstGlobalFrame": 32,
+  "frames": 8,
+  "fps": 1.1111111111111112,
+  "width": 1200
+}
