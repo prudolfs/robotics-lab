@@ -222,7 +222,7 @@ export type X1 = number;
 export type Y1 = number;
 export type Z = number;
 export type Collisions1 = number;
-export type Controller1 = "scripted_reference" | "manual";
+export type Controller1 = "scripted_reference" | "manual" | "learned_policy";
 export type Delivered1 = boolean;
 export type ElapsedSeconds = number;
 export type Kind1 = "info" | "success" | "warning";
@@ -243,7 +243,7 @@ export type RightWheelAngle1 = number;
 export type X2 = number;
 export type Y2 = number;
 export type SimulatorVersion1 = string;
-export type Stage1 = "approach" | "grasp" | "lift" | "deliver" | "lower" | "release" | "done" | "manual";
+export type Stage1 = "approach" | "grasp" | "lift" | "deliver" | "lower" | "release" | "done" | "manual" | "learned";
 export type Status1 = "ready" | "running" | "paused" | "complete" | "failed";
 export type Id2 = string;
 export type Walls = Obstacle[];
@@ -257,14 +257,87 @@ export type ServerVersion = string;
 export type Status2 = "ok";
 export type Duplicates = number;
 export type Imported = number;
+export type Architecture = string;
+export type CheckpointId = string;
+export type Compatible = boolean;
+export type CorrectionSamples = number;
+export type CorrectionSeeds = number[];
+export type CorrectionSha256 = string[];
+export type DatasetSha256 = string;
+export type EpisodeIds = string[];
+export type EpisodeSha256 = string[];
+export type CleanSuccesses = number;
+export type Collisions2 = number;
+export type FinalTestEvaluated = false;
+export type InvalidActions2 = number;
+export type MeanSeconds = number;
+export type Successes = number;
+export type Total = number;
+export type Features = string[];
+export type FittingLoss = number;
+export type JobId = string;
+export type PolicyVersion = string;
+export type Round = number;
+export type TorchVersion = string;
+export type TrainingSamples = number;
+export type TrainingSha256 = string;
+export type WeightsSha256 = string;
+export type CleanSuccess = boolean;
+export type Collisions3 = number;
+export type Failure = "none" | "collision" | "pickup_not_completed" | "invalid_grasp_or_release" | "delivery_timeout";
+/**
+ * @maxItems 600
+ */
+export type Frames1 = PolicyFrame[];
+export type InvalidActions3 = number;
+export type Seconds1 = number;
+export type Seed4 = number;
+export type Success = boolean;
+export type Ticks = number;
+/**
+ * @maxItems 30
+ */
+export type Episodes2 = Rollout[];
+export type Seeds1 = number[];
 export type ApiVersion2 = "1";
+export type CheckpointId1 = string | null;
+export type ControllerError = string | null;
 export type Generation = number;
 export type LastEpisodeId = string | null;
 export type Recording = boolean;
 export type RecordingError = string | null;
-export type Seed4 = number;
+export type Seed5 = number;
 export type SessionId = string;
 export type Tick4 = number;
+export type ActiveJob = string | null;
+export type ArtifactLocation1 = string;
+export type Checkpoints = CheckpointInfo[];
+export type CancelRequested = boolean;
+export type Checkpoints1 = string[];
+export type CreatedAt1 = string;
+export type ElapsedSeconds1 = number;
+export type Epoch = number;
+export type FittingLoss1 = number | null;
+export type Epoch1 = number;
+export type Loss = number;
+export type Round1 = number;
+/**
+ * @maxItems 160
+ */
+export type History = FitPoint[];
+export type JobId1 = string;
+export type Message = string;
+export type PeakWorkerRssMb = number;
+export type Phase = "snapshot" | "fitting" | "evaluating" | "corrections" | "finished";
+export type BudgetSeconds = number;
+export type CorrectionRounds = number;
+export type EpisodeIds1 = string[] | null;
+export type Epochs = number;
+export type RandomSeed = number;
+export type Round2 = number;
+export type SelectedCheckpoint = string | null;
+export type State = "preparing" | "running" | "completed" | "cancelled" | "failed";
+export type Jobs = Job[];
 export type Checked = number;
 export type EligibleTrainIds = string[];
 export type Errors = string[];
@@ -283,8 +356,12 @@ export interface HttpModels {
   expert_request: ExpertRequest;
   health: Health;
   import_result: ImportResult;
+  policy_detail: PolicyDetail;
   review: Review;
   session: SessionView;
+  training_catalog: TrainingCatalog;
+  training_job: Job;
+  training_request: TrainRequest;
   validation: ValidationReport;
 }
 export interface Bundle {
@@ -488,16 +565,116 @@ export interface ImportResult {
   duplicates: Duplicates;
   imported: Imported;
 }
+export interface PolicyDetail {
+  checkpoint: CheckpointInfo;
+  evaluation: Evaluation;
+  template: Scene;
+}
+export interface CheckpointInfo {
+  architecture: Architecture;
+  checkpoint_id: CheckpointId;
+  compatible?: Compatible;
+  configuration: Configuration;
+  correction_samples: CorrectionSamples;
+  correction_seeds: CorrectionSeeds;
+  correction_sha256: CorrectionSha256;
+  dataset_sha256: DatasetSha256;
+  episode_ids: EpisodeIds;
+  episode_sha256: EpisodeSha256;
+  evaluation: EvaluationSummary;
+  features: Features;
+  fitting_loss: FittingLoss;
+  job_id: JobId;
+  policy_version: PolicyVersion;
+  reference: EvaluationSummary;
+  round: Round;
+  torch_version: TorchVersion;
+  training_samples: TrainingSamples;
+  training_sha256: TrainingSha256;
+  weights_sha256: WeightsSha256;
+}
+export interface EvaluationSummary {
+  clean_successes: CleanSuccesses;
+  collisions: Collisions2;
+  failure_counts: FailureCounts;
+  final_test_evaluated?: FinalTestEvaluated;
+  invalid_actions: InvalidActions2;
+  mean_seconds: MeanSeconds;
+  successes: Successes;
+  total?: Total;
+}
+export interface FailureCounts {
+  [k: string]: number;
+}
+export interface Evaluation {
+  episodes: Episodes2;
+  seeds: Seeds1;
+  summary: EvaluationSummary;
+}
+export interface Rollout {
+  clean_success: CleanSuccess;
+  collisions: Collisions3;
+  failure: Failure;
+  final?: StateData | null;
+  frames?: Frames1;
+  initial?: StateData | null;
+  invalid_actions: InvalidActions3;
+  seconds: Seconds1;
+  seed: Seed4;
+  success: Success;
+  ticks: Ticks;
+}
+export interface PolicyFrame {
+  action: ActionData;
+  state: StateData;
+}
 export interface SessionView {
   api_version?: ApiVersion2;
+  checkpoint_id?: CheckpointId1;
+  controller_error?: ControllerError;
   generation: Generation;
   last_episode_id?: LastEpisodeId;
   recording?: Recording;
   recording_error?: RecordingError;
   scene: Scene;
-  seed: Seed4;
+  seed: Seed5;
   session_id: SessionId;
   tick: Tick4;
+}
+export interface TrainingCatalog {
+  active_job: ActiveJob;
+  artifact_location: ArtifactLocation1;
+  checkpoints: Checkpoints;
+  jobs: Jobs;
+}
+export interface Job {
+  cancel_requested?: CancelRequested;
+  checkpoints?: Checkpoints1;
+  created_at: CreatedAt1;
+  elapsed_seconds?: ElapsedSeconds1;
+  epoch?: Epoch;
+  fitting_loss?: FittingLoss1;
+  history?: History;
+  job_id: JobId1;
+  message: Message;
+  peak_worker_rss_mb?: PeakWorkerRssMb;
+  phase: Phase;
+  request: TrainRequest;
+  round?: Round2;
+  selected_checkpoint?: SelectedCheckpoint;
+  state: State;
+}
+export interface FitPoint {
+  epoch: Epoch1;
+  loss: Loss;
+  round: Round1;
+}
+export interface TrainRequest {
+  budget_seconds?: BudgetSeconds;
+  correction_rounds?: CorrectionRounds;
+  episode_ids?: EpisodeIds1;
+  epochs?: Epochs;
+  random_seed?: RandomSeed;
 }
 export interface ValidationReport {
   checked: Checked;

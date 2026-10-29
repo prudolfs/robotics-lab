@@ -41,7 +41,8 @@ def test_health_capabilities_and_http_schema(client):
     assert client.get(f"{PREFIX}/health").json()["api_version"] == "1"
     capabilities = client.get(f"{PREFIX}/capabilities").json()
     assert capabilities["mode"] == "reference_simulation"
-    assert capabilities["simulation"] and not capabilities["training"]
+    assert capabilities["simulation"] and capabilities["training"]
+    assert not capabilities["language_missions"]
     paths = client.get("/openapi.json").json()["paths"]
     assert f"{PREFIX}/sessions" in paths
     assert not any("/stream" in path for path in paths)

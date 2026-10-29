@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test'
 import type { HttpModels } from '../src/api/generated/http'
 import type { ServerMessage } from '../src/api/generated/websocket-server'
 
-const output = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase4/', import.meta.url))
+const output = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase5/', import.meta.url))
 type Snapshot = Extract<ServerMessage, { kind: 'snapshot' }>
 
 test('records manual input, stops safely, preserves review provenance and plays exact stored poses', async ({

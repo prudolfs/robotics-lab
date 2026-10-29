@@ -1,6 +1,6 @@
 # Greenhouse Caretaker
 
-Phase 4 frontend for Robotics Lab's robot-learning project. React Three Fiber and Drei render an authored Blender greenhouse and articulated caretaker using actual Three.js WebGPU; Tailwind and shadcn/ui with Base UI provide the interface. Python runs the authoritative MuJoCo world. Reference and manual teaching controllers can produce versioned demonstrations; learned policies arrive in Phase 5.
+Phase 5 frontend for Robotics Lab's robot-learning project. React Three Fiber and Drei render an authored Blender greenhouse and articulated caretaker using actual Three.js WebGPU; Tailwind and shadcn/ui with Base UI provide the interface. Python runs the authoritative MuJoCo world. Reference and manual teaching controllers can produce versioned demonstrations; a separate PyTorch worker trains saved policies for live learned execution.
 
 From the repository root:
 
@@ -28,6 +28,14 @@ The library can prepare 20 verified expert demonstrations, load recorded-state p
 
 Playback uses recorded states and disables live controls; it never re-simulates or sends recorded actions to the robot. The backend separately verifies trajectories by replaying executed actions through MuJoCo. Full local artifacts live under `apps/greenhouse-server/runtime/datasets/v1/`; uploads/exports are limited to 20 MiB, individual episodes to 4 MiB/600 steps, and the store to 200 episodes/256 MiB. `GREENHOUSE_DATASET_DIR` selects another server-side directory. See the [Phase 4 review](../../docs/greenhouse-demo/phase4/README.md) for the workflow, schema, seed rules and current evidence.
 
+## Train and run a learned skill
+
+Prepare reviewed eligible demonstrations, then use **Train policy** in **Teach, train, then watch**. The panel shows persisted progress, fitting loss, complete validation outcomes, corrective sample counts and failures. Defaults are 120 epochs per round and three training-only correction rounds; training is cancellable without blocking the live world.
+
+Choose a saved checkpoint, then **Use selected checkpoint** while ready/paused and **Start collection**. The learned controller and checkpoint ID remain explicit. Learned execution has no reference-controller recovery and cannot be recorded as a Phase 4 demonstration. Validation review plays recorded states independently of live simulation.
+
+The selected local checkpoint delivers on 29/30 validation seeds, 28 clean, compared with 30/30 clean reference runs. Local weights are ignored; a fresh checkout needs data and training. See the [Phase 5 review](../../docs/greenhouse-demo/phase5/README.md) for reproducibility, normalization/loss, remaining failures and screenshots. Reinforcement learning and LangGraph missions remain later phases.
+
 ## Development and contracts
 
 ```sh
@@ -46,12 +54,12 @@ The connection hook owns transport state, an abortable four-second HTTP startup 
 
 ## Browser checks and captures
 
-Playwright uses local Chrome with WebGPU support. It starts the paired development command if the app is not already running, and uses graceful shutdown to stop both services afterward. Twelve checks cover the previous collection/connection/asset/camera/motion/sound cases, plus manual recording, focus/release stopping, source-preserving review, exact recorded playback, expert collection, validation and export/import. Teaching tests save automated attempts; use a separate `GREENHOUSE_DATASET_DIR` for an isolated test service when keeping them out of your normal library. The root test command also validates GLB geometry/pivots/resources and manifest alignment with compiled MuJoCo geometry.
+Playwright uses local Chrome with WebGPU support. It starts the paired development command if the app is not already running, and uses graceful shutdown to stop both services afterward. Fourteen checks cover the previous collection/connection/asset/camera/motion/sound cases, plus manual recording, focus/release stopping, source-preserving review, exact recorded playback, expert collection, validation and export/import, learned checkpoint delivery and active-training responsiveness/cancellation. The two checkpoint-dependent cases explicitly skip without a completed local checkpoint. Teaching tests save automated attempts; use a separate `GREENHOUSE_DATASET_DIR` for an isolated test service when keeping them out of your normal library. The root test command also validates GLB geometry/pivots/resources and manifest alignment with compiled MuJoCo geometry.
 
 ```sh
 GREENHOUSE_CAPTURE=1 pnpm test:e2e:greenhouse
 ```
 
-This additionally writes current captures and portable demonstration examples to `docs/greenhouse-demo/phase4/`. `node scripts/greenhouse-phase4/review.mjs` prepares/reuses the expert set, imports the explicitly excluded automated manual example, validates the library and captures desktop/mobile review views. Prior Phase 3 asset/performance evidence remains archived. See the [Phase 4 review](../../docs/greenhouse-demo/phase4/README.md), [implementation plan](../../docs/greenhouse-demo.md) and [server guide](../greenhouse-server/README.md).
+This additionally writes current captures and portable demonstration examples to `docs/greenhouse-demo/phase5/`. `node scripts/greenhouse-phase4/review.mjs` prepares/reuses the expert set, imports the explicitly excluded automated manual example, validates the library and captures desktop/mobile review views. Prior Phase 3 asset/performance evidence remains archived. See the [Phase 4 review](../../docs/greenhouse-demo/phase4/README.md), [implementation plan](../../docs/greenhouse-demo.md) and [server guide](../greenhouse-server/README.md).
 
 To check the production bundle, start `pnpm -C apps/greenhouse-server start` and `pnpm -C apps/greenhouse-demo preview` in separate terminals, then run `GREENHOUSE_E2E_URL=http://127.0.0.1:4186 pnpm test:e2e:greenhouse`. Setting that URL skips Playwright's automatic development-server startup.

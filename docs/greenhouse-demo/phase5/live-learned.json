@@ -1,0 +1,207 @@
+{
+  "checkpoint_id": "0a17479f7622474c97922b9b0c5bd9b4-r3",
+  "source": "Live learned policy; no scripted recovery",
+  "pause_freezes_tick": true,
+  "controller_stays_learned": true,
+  "final": {
+    "api_version": "1",
+    "session_id": "a9264596-5d76-472d-93ac-6e500476ebae",
+    "generation": 0,
+    "tick": 204,
+    "kind": "snapshot",
+    "seed": 42,
+    "scene": {
+      "mode": "reference_simulation",
+      "simulator_version": "greenhouse-world-v1",
+      "controller": "learned_policy",
+      "status": "complete",
+      "stage": "done",
+      "elapsed_seconds": 10.200000000000001,
+      "delivered": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_actions": 1,
+      "reason": null,
+      "events": [
+        {
+          "tick": 0,
+          "kind": "info",
+          "text": "Ready to collect the seed capsule."
+        },
+        {
+          "tick": 0,
+          "kind": "info",
+          "text": "Learned checkpoint selected."
+        },
+        {
+          "tick": 0,
+          "kind": "info",
+          "text": "Learned policy running."
+        },
+        {
+          "tick": 18,
+          "kind": "info",
+          "text": "Collection paused."
+        },
+        {
+          "tick": 18,
+          "kind": "info",
+          "text": "Learned policy running."
+        },
+        {
+          "tick": 75,
+          "kind": "warning",
+          "text": "Stop moving before closing the gripper."
+        },
+        {
+          "tick": 77,
+          "kind": "success",
+          "text": "Capsule secured in the gripper."
+        },
+        {
+          "tick": 204,
+          "kind": "success",
+          "text": "Seed capsule delivered to the collection tray."
+        }
+      ],
+      "walls": [
+        {
+          "id": "wall-north",
+          "position": {
+            "x": 0,
+            "y": 2.05,
+            "z": 0.12
+          },
+          "half_size": {
+            "x": 3.1,
+            "y": 0.05,
+            "z": 0.12
+          }
+        },
+        {
+          "id": "wall-south",
+          "position": {
+            "x": 0,
+            "y": -2.05,
+            "z": 0.12
+          },
+          "half_size": {
+            "x": 3.1,
+            "y": 0.05,
+            "z": 0.12
+          }
+        },
+        {
+          "id": "wall-east",
+          "position": {
+            "x": 3.05,
+            "y": 0,
+            "z": 0.12
+          },
+          "half_size": {
+            "x": 0.05,
+            "y": 2,
+            "z": 0.12
+          }
+        },
+        {
+          "id": "wall-west",
+          "position": {
+            "x": -3.05,
+            "y": 0,
+            "z": 0.12
+          },
+          "half_size": {
+            "x": 0.05,
+            "y": 2,
+            "z": 0.12
+          }
+        }
+      ],
+      "pots": [
+        {
+          "id": "pot-0",
+          "position": {
+            "x": -2,
+            "y": 1.65,
+            "z": 0.15
+          }
+        },
+        {
+          "id": "pot-1",
+          "position": {
+            "x": -1,
+            "y": 1.65,
+            "z": 0.15
+          }
+        },
+        {
+          "id": "pot-2",
+          "position": {
+            "x": 0,
+            "y": 1.65,
+            "z": 0.15
+          }
+        },
+        {
+          "id": "pot-3",
+          "position": {
+            "x": 1,
+            "y": 1.65,
+            "z": 0.15
+          }
+        },
+        {
+          "id": "pot-4",
+          "position": {
+            "x": 2,
+            "y": 1.65,
+            "z": 0.15
+          }
+        }
+      ],
+      "observation": {
+        "target_forward": 0.33999999999999986,
+        "target_left": 5.551115123125783e-17,
+        "distance": 0.3399999999999999,
+        "bearing": 1.6326809185664073e-16,
+        "speed": 3.281416665821397e-14,
+        "yaw_speed": 4.1141872190830405e-45,
+        "lift_height": 0.05,
+        "holding": false
+      },
+      "robot": {
+        "id": "caretaker",
+        "x": 1.3178126469402516,
+        "y": 0.5384881181970603,
+        "heading": 0.3106494300396887,
+        "holding": false,
+        "lift_height": 0.05,
+        "left_wheel_angle": 18.498737175752577,
+        "right_wheel_angle": 20.88916538327145
+      },
+      "capsule": {
+        "id": "capsule-1",
+        "position": {
+          "x": 1.6415386335822704,
+          "y": 0.6424183138701726,
+          "z": 0.05
+        }
+      },
+      "tray": {
+        "id": "collection-tray",
+        "position": {
+          "x": 1.65,
+          "y": 0.65,
+          "z": 0
+        }
+      }
+    },
+    "recording": false,
+    "last_episode_id": null,
+    "recording_error": null,
+    "checkpoint_id": "0a17479f7622474c97922b9b0c5bd9b4-r3",
+    "controller_error": null
+  },
+  "errors": []
+}

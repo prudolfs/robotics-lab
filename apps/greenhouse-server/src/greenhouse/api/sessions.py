@@ -1,16 +1,20 @@
 """Session ownership and adapters around the independent fixed-step environment."""
 
+from __future__ import annotations
+
 import math
 import secrets
 import time
 from collections import OrderedDict
 from dataclasses import asdict, dataclass, field
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 from uuid import uuid4
 
 from greenhouse.api.contracts import (
     Ack,
     ClientMessage,
+    LiveController,
+    LiveStage,
     Obstacle,
     Rejection,
     Robot,
@@ -22,14 +26,19 @@ from greenhouse.api.contracts import (
     Vector3,
 )
 from greenhouse.datasets.episodes import Recorder
-from greenhouse.datasets.models import ActionData, Controller, ObservationData, Stage, StateData
+from greenhouse.datasets.models import ActionData, ObservationData, StateData
 from greenhouse.datasets.store import DatasetStore
 from greenhouse.simulation.model import CONTROL_DT, POT_X, TRAY, WALLS
 from greenhouse.simulation.reference import Reference
 from greenhouse.simulation.world import Action, State, World
 
+if TYPE_CHECKING:
+    from greenhouse.training.policy import LearnedPolicy
 
-def scene_from_state(state: State | StateData, stage: Stage, controller: Controller) -> Scene:
+
+def scene_from_state(
+    state: State | StateData, stage: LiveStage, controller: LiveController
+) -> Scene:
     target = TRAY if state.holding else state.capsule[:2]
     dx, dy = target[0] - state.x, target[1] - state.y
     c, sine = math.cos(state.heading), math.sin(state.heading)
@@ -102,7 +111,7 @@ class Session:
     reference: Reference = field(default_factory=Reference)
     revision: int = 0
     store: DatasetStore | None = None
-    controller: Controller = "scripted_reference"
+    controller: LiveController = "scripted_reference"
     manual_action: Action = field(default_factory=Action)
     manual_until: float = 0.0
     last_manual: float = -1.0
@@ -110,6 +119,10 @@ class Session:
     recorder: Recorder | None = None
     last_episode_id: str | None = None
     recording_error: str | None = None
+    policy: LearnedPolicy | None = None
+    prepared_policy: tuple[str, LearnedPolicy] | None = None
+    checkpoint_id: str | None = None
+    controller_error: str | None = None
 
     def __post_init__(self) -> None:
         self.world = World(self.seed)
@@ -121,15 +134,20 @@ class Session:
     def advance(self) -> None:
         if self.connected and self.world.status == "running":
             before = ObservationData(**asdict(self.world.observe()))
-            action = (
-                self.reference.action(self.world.observe())
-                if self.controller == "scripted_reference"
-                else self.manual_action
-                if time.monotonic() < self.manual_until
-                else Action()
-            )
+            if self.controller == "learned_policy":
+                if self.policy is None:
+                    raise ValueError("No compatible learned checkpoint is loaded.")
+                action = self.policy.action(self.world.observe())
+            else:
+                action = (
+                    self.reference.action(self.world.observe())
+                    if self.controller == "scripted_reference"
+                    else self.manual_action
+                    if time.monotonic() < self.manual_until
+                    else Action()
+                )
             step = self.world.step(action)
-            if self.controller == "manual":
+            if self.controller != "scripted_reference":
                 self.manual_changed_world = True
             self.manual_action = Action(action.throttle, action.turn, action.lift)
             if self.recorder:
@@ -138,7 +156,7 @@ class Session:
                     action,
                     step,
                     self.world,
-                    self.controller,
+                    "scripted_reference" if self.controller == "scripted_reference" else "manual",
                     self.reference.stage if self.controller == "scripted_reference" else "manual",
                 )
                 if self.world.status in ("complete", "failed"):
@@ -185,12 +203,18 @@ class Session:
             seed=self.seed,
             scene=scene_from_state(
                 state,
-                self.reference.stage if self.controller == "scripted_reference" else "manual",
+                self.reference.stage
+                if self.controller == "scripted_reference"
+                else "learned"
+                if self.controller == "learned_policy"
+                else "manual",
                 self.controller,
             ),
             recording=self.recorder is not None,
             last_episode_id=self.last_episode_id,
             recording_error=self.recording_error,
+            checkpoint_id=self.checkpoint_id,
+            controller_error=self.controller_error,
         )
 
     def snapshot(self) -> Snapshot:
@@ -217,9 +241,29 @@ class Session:
         elif self.last_seen - self.last_command < 0.1:
             reason = "rate_limited"
         elif command.kind == "set_controller":
-            if self.world.status not in ("ready", "paused"):
+            reserved = command.controller == "learned_policy" and 20000 <= self.seed <= 20099
+            if reserved:
+                self.controller_error = "Final test seeds remain reserved until Phase 6."
+                self.revision += 1
+            if (
+                reserved
+                or self.world.status not in ("ready", "paused")
+                or (command.controller == "learned_policy" and self.recorder)
+            ):
                 reason = "invalid_state"
+            elif command.controller == "learned_policy" and (
+                self.prepared_policy is None or self.prepared_policy[0] != command.checkpoint_id
+            ):
+                reason = "incompatible_checkpoint"
             else:
+                self.controller_error = None
+                if command.controller == "learned_policy":
+                    assert self.prepared_policy is not None
+                    self.checkpoint_id, self.policy = self.prepared_policy
+                else:
+                    self.policy = None
+                    self.checkpoint_id = None
+                self.prepared_policy = None
                 changed = self.controller != command.controller
                 self.controller = command.controller
                 self.manual_action = Action()
@@ -237,10 +281,17 @@ class Session:
                     "info",
                     "Manual teaching selected."
                     if self.controller == "manual"
+                    else "Learned checkpoint selected."
+                    if self.controller == "learned_policy"
                     else "Scripted reference selected.",
                 )
         elif command.kind == "record":
-            if self.world.status != "ready" or self.recorder or not self.store:
+            if (
+                self.world.status != "ready"
+                or self.recorder
+                or not self.store
+                or self.controller == "learned_policy"
+            ):
                 reason = "invalid_state"
             else:
                 try:
@@ -270,6 +321,8 @@ class Session:
             if not self.world.start(
                 "Manual teaching running."
                 if self.controller == "manual"
+                else "Learned policy running."
+                if self.controller == "learned_policy"
                 else "Scripted reference controller running."
             ):
                 reason = "invalid_state"

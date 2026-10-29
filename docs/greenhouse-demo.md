@@ -2,7 +2,7 @@
 
 > Proposed implementation plan for the next Robotics Lab project: an expressive robot that learns useful tasks in a simulated greenhouse.
 >
-> Status: Phases 0–4 complete; awaiting user review of [Phase 4 teaching and demonstration datasets](greenhouse-demo/phase4/README.md). Later phases remain unchecked. Stop before starting Phase 5.
+> Status: Phases 0–5 complete; awaiting user review of [Phase 5 learned collection](greenhouse-demo/phase5/README.md). Later phases remain unchecked. Stop before starting Phase 6.
 
 ## Goal and experience
 
@@ -162,16 +162,16 @@ Exit verified: the [Phase 4 review](greenhouse-demo/phase4/README.md) records 20
 
 ### Phase 5 — First learned skill through imitation
 
-- [ ] Implement a small PyTorch behavior-cloning policy with documented inputs, outputs, normalization and loss.
-- [ ] Implement training as a separate worker process with start/cancel/status operations and persisted job results.
-- [ ] Save checkpoints with dataset/configuration identities, validation metrics and compatible simulator versions.
-- [ ] Evaluate complete pickup/delivery episodes on validation scenarios and compare against the reference controller.
-- [ ] Integrate server-side learned policy execution into the interactive simulator with explicit controller/checkpoint selection.
-- [ ] Show training progress, held-out rollout examples and actionable failure categories; distinguish fitting loss from task success.
-- [ ] Collect targeted corrections on training scenarios if errors compound, retrain and record the experiment without using final test scenarios for tuning.
-- [ ] Verify API responsiveness during training, cancellation, failed jobs, incompatible checkpoints and absence of hidden scripted recovery.
+- [x] Implement a small PyTorch behavior-cloning policy with documented inputs, outputs, normalization and loss.
+- [x] Implement training as a separate worker process with start/cancel/status operations and persisted job results.
+- [x] Save checkpoints with dataset/configuration identities, validation metrics and compatible simulator versions.
+- [x] Evaluate complete pickup/delivery episodes on validation scenarios and compare against the reference controller.
+- [x] Integrate server-side learned policy execution into the interactive simulator with explicit controller/checkpoint selection.
+- [x] Show training progress, held-out rollout examples and actionable failure categories; distinguish fitting loss from task success.
+- [x] Collect targeted corrections on training scenarios if errors compound, retrain and record the experiment without using final test scenarios for tuning.
+- [x] Verify API responsiveness during training, cancellation, failed jobs, incompatible checkpoints and absence of hidden scripted recovery.
 
-Exit: a saved learned policy performs the collection task on unfamiliar validation scenarios, with measured successes and limitations. Stop for user review before Phase 6.
+Exit verified: the [Phase 5 review](greenhouse-demo/phase5/README.md) records a saved policy with 29/30 validation deliveries, 28/30 clean, versus 30/30 clean reference runs; separate-process training, targeted training-only corrections, live checkpoint execution and cancellation/responsiveness checks pass. Final-test seeds remain untouched. Stop for user review before Phase 6.
 
 ### Phase 6 — Reinforcement-learning practice and curriculum
 

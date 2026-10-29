@@ -1,10 +1,10 @@
 # Greenhouse server
 
-Project-owned Python service for Greenhouse Caretaker. Phase 2 provides an independent fixed-step MuJoCo world, a scripted collection controller, ephemeral sessions and validated live WebSocket commands. Training jobs and LangGraph missions arrive in later phases.
+Project-owned Python service for Greenhouse Caretaker. Phase 2 provides an independent fixed-step MuJoCo world, a scripted collection controller, ephemeral sessions and validated live WebSocket commands. Phase 5 adds separate-process PyTorch training and saved learned policies; LangGraph missions remain a later phase.
 
 Phase 3 adds Blender-authored presentation in the frontend without changing the simulation or API. The server suite checks the asset manifest against the compiled MuJoCo chassis, wheels, pots, walls and task dimensions. See the [Phase 3 review](../../docs/greenhouse-demo/phase3/README.md).
 
-Phase 4 adds manual control, full-resolution episode recording, a persistent local demonstration library, source-preserving reviews, schema/split/trajectory validation and portable JSON export/import. No model training is implemented yet. See the [Phase 4 review](../../docs/greenhouse-demo/phase4/README.md).
+Phase 4 adds manual control, full-resolution episode recording, a persistent local demonstration library, source-preserving reviews, schema/split/trajectory validation and portable JSON export/import. See the [Phase 4 review](../../docs/greenhouse-demo/phase4/README.md).
 
 From the repository root:
 
@@ -25,7 +25,7 @@ The prefix is `/api/v1/greenhouse`:
 | Route | Behavior |
 | --- | --- |
 | `GET /health` | Status, API version and package version |
-| `GET /capabilities` | Simulation is enabled; training/language missions remain false |
+| `GET /capabilities` | Simulation and training are enabled; language missions remain false |
 | `POST /sessions` | Create a ready seeded world; body `{ "seed": 42 }` |
 | `GET /sessions/{session_id}` | Read the current world, counters and generation |
 | `DELETE /sessions/{session_id}` | Idempotently close the session |
@@ -89,7 +89,15 @@ Default artifacts are `runtime/datasets/v1/<id>.json` with separate `<id>.review
 
 Seeds 0–99 are training, 10000–10029 validation, and 20000–20099 reserved final test. Recording/import refuses final test scenarios; unknown seeds remain unassigned and ineligible. Training readiness requires current configuration, matching seeded action/state trajectories, correct expert/intervention/source and completion labels, a clean successful training episode, usable quality and explicit inclusion. Older Phase 0 feasibility data is incompatible and is not silently converted. Documentation contains a small expert example and an excluded automated manual-input example; they are not claimed as human demonstrations.
 
-Saved datasets persist across restarts; live sessions and an unsaved in-memory recording do not. Keep one API worker and one writer per artifact directory. Large model training, checkpoints, a separate training worker and persistent job orchestration remain later phases. Generated local datasets/experiments belong under ignored `runtime/`; only small schema/review fixtures and evidence are committed in docs.
+Saved datasets persist across restarts; live sessions and an unsaved in-memory recording do not. Keep one API worker and one writer per artifact directory. Phase 5 adds a separate training worker, checkpoints and persisted local jobs; see below. Generated local datasets/experiments belong under ignored `runtime/`; only small schema/review fixtures and evidence are committed in docs.
+
+## Learned policies and training
+
+Phase 5 implements a small CPU PyTorch behavior-cloning policy, training-only corrective labels, complete validation episodes, persisted checkpoints and explicit live learned selection. The selected local checkpoint delivers on 29/30 validation seeds, 28 clean; the reference achieves 30/30 clean. Final-test seeds remain reserved.
+
+The `/training` catalog and `/training/jobs` start/status/cancel routes manage one owned subprocess. `/training/checkpoints/{id}` exposes evaluated metadata and recorded validation states. `set_controller` also accepts `learned_policy` with `checkpoint_id` while ready/paused. Learned execution is separate from the unchanged Phase 4 demonstration schema and cannot be recorded into it. Inference uses no reference recovery.
+
+`GREENHOUSE_TRAINING_DIR` overrides `runtime/training/v1/`. Models are local ignored artifacts, so a fresh checkout must prepare eligible demonstrations and train. Checkpoint activation verifies versions, features, configuration and weights integrity. CPU training is bounded and cancellation/shutdown stops its owned worker. See the [Phase 5 guide](../../docs/greenhouse-demo/phase5/README.md) for commands, model/loss, artifact identities, exact limits, remaining failures and measured evidence.
 
 ## Checks
 

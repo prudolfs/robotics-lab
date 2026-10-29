@@ -7,7 +7,6 @@ from pydantic import BaseModel, ConfigDict, Field, FiniteFloat, TypeAdapter
 from greenhouse.datasets.models import (
     ActionData,
     Bundle,
-    Controller,
     DatasetSummary,
     Entry,
     ExpertRequest,
@@ -16,6 +15,19 @@ from greenhouse.datasets.models import (
     Review,
     ValidationReport,
 )
+from greenhouse.training.models import (
+    CheckpointId,
+    CheckpointInfo,
+    Evaluation,
+    Job,
+    TrainingCatalog,
+    TrainRequest,
+)
+
+LiveController = Literal["scripted_reference", "manual", "learned_policy"]
+LiveStage = Literal[
+    "approach", "grasp", "lift", "deliver", "lower", "release", "done", "manual", "learned"
+]
 
 API_VERSION = "1"
 Seed = Annotated[int, Field(ge=0, le=2_147_483_647)]
@@ -37,7 +49,7 @@ class Capabilities(Contract):
     api_version: Literal["1"] = "1"
     mode: Literal["reference_simulation"] = "reference_simulation"
     simulation: bool = True
-    training: bool = False
+    training: bool = True
     language_missions: bool = False
     heartbeat_hz: int = 1
     max_sessions: int = 16
@@ -92,9 +104,9 @@ class TaskEvent(Contract):
 class Scene(Contract):
     mode: Literal["reference_simulation"]
     simulator_version: str
-    controller: Controller
+    controller: LiveController
     status: Literal["ready", "running", "paused", "complete", "failed"]
-    stage: Literal["approach", "grasp", "lift", "deliver", "lower", "release", "done", "manual"]
+    stage: LiveStage
     elapsed_seconds: FiniteFloat
     delivered: bool
     pickups: Count
@@ -124,6 +136,8 @@ class SessionView(Contract):
     recording: bool = False
     last_episode_id: str | None = None
     recording_error: str | None = None
+    checkpoint_id: CheckpointId | None = None
+    controller_error: str | None = None
 
 
 class Envelope(Contract):
@@ -134,6 +148,12 @@ class Envelope(Contract):
 
 class EpisodeDetail(Contract):
     entry: Entry
+    template: Scene
+
+
+class PolicyDetail(Contract):
+    checkpoint: CheckpointInfo
+    evaluation: Evaluation
     template: Scene
 
 
@@ -151,6 +171,10 @@ class HttpModels(Contract):
     expert_request: ExpertRequest
     import_result: ImportResult
     validation: ValidationReport
+    training_request: TrainRequest
+    training_job: Job
+    training_catalog: TrainingCatalog
+    policy_detail: PolicyDetail
 
 
 class Ping(Envelope):
@@ -171,7 +195,8 @@ class Control(Envelope):
 class SetController(Envelope):
     kind: Literal["set_controller"]
     request_id: RequestId
-    controller: Controller
+    controller: LiveController
+    checkpoint_id: CheckpointId | None = None
 
 
 class Manual(Envelope):
@@ -202,6 +227,8 @@ class Snapshot(ServerEnvelope):
     recording: bool = False
     last_episode_id: str | None = None
     recording_error: str | None = None
+    checkpoint_id: CheckpointId | None = None
+    controller_error: str | None = None
 
 
 class Heartbeat(ServerEnvelope):
@@ -209,7 +236,12 @@ class Heartbeat(ServerEnvelope):
 
 
 Rejection = Literal[
-    "stale_generation", "session_mismatch", "rate_limited", "invalid_state", "storage_error"
+    "stale_generation",
+    "session_mismatch",
+    "rate_limited",
+    "invalid_state",
+    "storage_error",
+    "incompatible_checkpoint",
 ]
 
 

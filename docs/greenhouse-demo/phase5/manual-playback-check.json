@@ -1,0 +1,30 @@
+{
+  "source": "Automated browser input through manual UI; not a human-collected demonstration",
+  "episode_id": "c5a95444fdeb491aae02d2d2ce9e9bba",
+  "sha256": "0545e1e703b2d1db978cca9edddc76abc38af79241fae2f80cf6191d135c1bf2",
+  "source_episode_unchanged": true,
+  "exact_final_pose": {
+    "robot": [
+      -1.0015763107861264,
+      0,
+      0.7069907543729692
+    ],
+    "capsule": [
+      0.06740805361161706,
+      0.049783559538666054,
+      -0.33105969982961736
+    ],
+    "lift": 0.20300000000000087,
+    "leftWheel": -0.689313920445579,
+    "headPan": 0.45,
+    "headPitch": -0.18,
+    "lids": [
+      false,
+      false
+    ],
+    "holding": false
+  },
+  "playback_sends_no_commands": true,
+  "live_tick_frozen": 46,
+  "errors": []
+}

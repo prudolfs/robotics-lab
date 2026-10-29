@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useDemonstrations } from './api/use-demonstrations'
 import { useSession } from './api/use-session'
+import { useTraining } from './api/use-training'
 import { DemonstrationLibrary, PlaybackControls } from './components/demonstration-library'
 import { type CameraMode, GreenhouseScene } from './components/greenhouse-scene'
 import { TeachingControls } from './components/teaching-controls'
+import { TrainingPanel, TrainingPlayback } from './components/training-panel'
 import { Button } from './components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group'
 import { useCaretakerSound } from './components/use-caretaker-sound'
@@ -17,6 +19,7 @@ const stageLabels = {
 	release: 'Releasing into the tray',
 	done: 'Delivery complete',
 	manual: 'Manual teaching',
+	learned: 'Learned policy acting',
 }
 
 export function App() {
@@ -24,9 +27,10 @@ export function App() {
 	const [cameraMode, setCameraMode] = useState<CameraMode>('overview')
 	const connected = connection.status === 'connected'
 	const library = useDemonstrations(connected, connection.session?.last_episode_id)
-	const playback = !!library.selected
+	const training = useTraining(connected)
+	const playback = !!library.selected || !!training.scene
 	const liveScene = connection.session?.scene
-	const scene = library.scene ?? liveScene
+	const scene = library.scene ?? training.scene ?? liveScene
 	const sound = useCaretakerSound(
 		playback ? undefined : liveScene,
 		playback ? -1 : (connection.session?.generation ?? 0),
@@ -43,16 +47,23 @@ export function App() {
 						A small robot learning to lend a hand.
 					</p>
 				</div>
-				<p className="text-muted-foreground text-sm">Robotics Lab · Phase 4</p>
+				<p className="text-muted-foreground text-sm">Robotics Lab · Phase 5</p>
 			</header>
 			<PlaybackControls library={library} />
+			<TrainingPlayback training={training} />
 			<div
 				id="greenhouse-view"
 				className="flex min-h-[580px] flex-col lg:h-[calc(100vh-128px)] lg:flex-row"
 			>
 				<GreenhouseScene
 					scene={scene ?? null}
-					generation={playback ? library.generation : (connection.session?.generation ?? 0)}
+					generation={
+						library.selected
+							? library.generation
+							: training.scene
+								? training.generation
+								: (connection.session?.generation ?? 0)
+					}
 					cameraMode={cameraMode}
 				/>
 				<aside
@@ -89,20 +100,33 @@ export function App() {
 						<ToggleGroup
 							aria-label="Controller mode"
 							variant="outline"
+							size="sm"
+							className="max-w-full flex-wrap"
 							value={[scene?.controller ?? 'scripted_reference']}
 							disabled={disabled || liveScene?.status === 'running' || terminal}
 							onValueChange={(value) => {
-								if (value[0] === 'manual' || value[0] === 'scripted_reference')
+								if (value[0] === 'learned_policy' && training.selectedId)
+									connection.setController('learned_policy', training.selectedId)
+								else if (value[0] === 'manual' || value[0] === 'scripted_reference')
 									connection.setController(value[0])
 							}}
 						>
 							<ToggleGroupItem value="scripted_reference">Reference</ToggleGroupItem>
 							<ToggleGroupItem value="manual">Teach manually</ToggleGroupItem>
+							<ToggleGroupItem
+								value="learned_policy"
+								disabled={!training.detail?.checkpoint.compatible}
+							>
+								Learned
+							</ToggleGroupItem>
 						</ToggleGroup>
 						<p className="text-muted-foreground text-xs">
 							Pause before changing controller. New seeds stay in the training range 0–99.
 						</p>
 					</div>
+					{connection.session?.controller_error && (
+						<p className="text-destructive text-xs">{connection.session.controller_error}</p>
+					)}
 					<div className="flex flex-col gap-3">
 						<Button
 							disabled={disabled || !scene || terminal}
@@ -139,7 +163,9 @@ export function App() {
 						<Button
 							variant="secondary"
 							disabled={
-								disabled || (!connection.session?.recording && liveScene?.status !== 'ready')
+								disabled ||
+								liveScene?.controller === 'learned_policy' ||
+								(!connection.session?.recording && liveScene?.status !== 'ready')
 							}
 							onClick={() =>
 								connection.command(connection.session?.recording ? 'stop_recording' : 'record')
@@ -223,17 +249,30 @@ export function App() {
 							<dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
 								<dt className="text-muted-foreground">Seed</dt>
 								<dd data-testid="session-seed">
-									{library.selected?.entry.episode.seed ?? connection.session?.seed}
+									{library.selected?.entry.episode.seed ??
+										training.rollout?.seed ??
+										connection.session?.seed}
 								</dd>
 								<dt className="text-muted-foreground">
-									{playback ? 'Recording version' : 'Generation'}
+									{training.scene
+										? 'Checkpoint round'
+										: playback
+											? 'Recording version'
+											: 'Generation'}
 								</dt>
 								<dd data-testid="session-generation">
-									{library.selected?.entry.episode.schema_version ?? connection.session?.generation}
+									{training.scene
+										? training.detail?.checkpoint.round
+										: (library.selected?.entry.episode.schema_version ??
+											connection.session?.generation)}
 								</dd>
 								<dt className="text-muted-foreground">Simulation tick</dt>
 								<dd data-testid="simulation-tick">
-									{playback ? library.index : connection.session?.tick}
+									{library.selected
+										? library.index
+										: training.scene
+											? training.index
+											: connection.session?.tick}
 								</dd>
 								<dt className="text-muted-foreground">Elapsed</dt>
 								<dd>{scene.elapsed_seconds.toFixed(1)} s</dd>
@@ -257,9 +296,10 @@ export function App() {
 							? 'Stored-state playback.'
 							: liveScene?.controller === 'manual'
 								? 'Manual teaching controller.'
-								: 'Scripted reference controller.'}{' '}
-						Ideal target sensing and a simplified grasp; learning arrives in later phases. Head
-						gestures and expressions are authored.
+								: liveScene?.controller === 'learned_policy'
+									? `Learned policy controller. Checkpoint ${connection.session?.checkpoint_id}.`
+									: 'Scripted reference controller.'}{' '}
+						Ideal target sensing and a simplified grasp. Head gestures and expressions are authored.
 					</p>
 					<Button
 						variant="ghost"
@@ -270,7 +310,28 @@ export function App() {
 					</Button>
 				</aside>
 			</div>
+			<TrainingPanel
+				training={training}
+				connected={connected}
+				eligible={library.data?.eligible_train ?? 0}
+				canUse={
+					!disabled &&
+					!connection.session?.recording &&
+					(liveScene?.status === 'ready' || liveScene?.status === 'paused')
+				}
+				canReview={liveScene?.status !== 'running' && !connection.session?.recording}
+				onUse={() => {
+					connection.setController('learned_policy', training.selectedId)
+					document.getElementById('greenhouse-view')?.scrollIntoView({ behavior: 'instant' })
+				}}
+				onReplay={(seed) => {
+					if (library.selected) library.close()
+					training.openReplay(seed)
+					document.getElementById('greenhouse-view')?.scrollIntoView({ behavior: 'instant' })
+				}}
+			/>
 			<DemonstrationLibrary
+				onReview={training.closeReplay}
 				library={library}
 				connected={connected}
 				canReview={liveScene?.status !== 'running' && !connection.session?.recording}

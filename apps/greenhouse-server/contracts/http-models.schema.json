@@ -122,12 +122,141 @@
           "type": "integer"
         },
         "training": {
-          "default": false,
+          "default": true,
           "title": "Training",
           "type": "boolean"
         }
       },
       "title": "Capabilities",
+      "type": "object"
+    },
+    "CheckpointInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "architecture": {
+          "title": "Architecture",
+          "type": "string"
+        },
+        "checkpoint_id": {
+          "pattern": "^[a-f0-9]{32}-r[0-3]$",
+          "title": "Checkpoint Id",
+          "type": "string"
+        },
+        "compatible": {
+          "default": true,
+          "title": "Compatible",
+          "type": "boolean"
+        },
+        "configuration": {
+          "$ref": "#/$defs/Configuration"
+        },
+        "correction_samples": {
+          "title": "Correction Samples",
+          "type": "integer"
+        },
+        "correction_seeds": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Correction Seeds",
+          "type": "array"
+        },
+        "correction_sha256": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Correction Sha256",
+          "type": "array"
+        },
+        "dataset_sha256": {
+          "title": "Dataset Sha256",
+          "type": "string"
+        },
+        "episode_ids": {
+          "items": {
+            "pattern": "^[a-f0-9]{32}$",
+            "type": "string"
+          },
+          "title": "Episode Ids",
+          "type": "array"
+        },
+        "episode_sha256": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Episode Sha256",
+          "type": "array"
+        },
+        "evaluation": {
+          "$ref": "#/$defs/EvaluationSummary"
+        },
+        "features": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Features",
+          "type": "array"
+        },
+        "fitting_loss": {
+          "title": "Fitting Loss",
+          "type": "number"
+        },
+        "job_id": {
+          "pattern": "^[a-f0-9]{32}$",
+          "title": "Job Id",
+          "type": "string"
+        },
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "reference": {
+          "$ref": "#/$defs/EvaluationSummary"
+        },
+        "round": {
+          "title": "Round",
+          "type": "integer"
+        },
+        "torch_version": {
+          "title": "Torch Version",
+          "type": "string"
+        },
+        "training_samples": {
+          "title": "Training Samples",
+          "type": "integer"
+        },
+        "training_sha256": {
+          "title": "Training Sha256",
+          "type": "string"
+        },
+        "weights_sha256": {
+          "title": "Weights Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "checkpoint_id",
+        "job_id",
+        "round",
+        "policy_version",
+        "features",
+        "architecture",
+        "torch_version",
+        "weights_sha256",
+        "configuration",
+        "dataset_sha256",
+        "training_sha256",
+        "correction_sha256",
+        "episode_ids",
+        "episode_sha256",
+        "training_samples",
+        "correction_samples",
+        "correction_seeds",
+        "fitting_loss",
+        "evaluation",
+        "reference"
+      ],
+      "title": "CheckpointInfo",
       "type": "object"
     },
     "Configuration": {
@@ -488,6 +617,89 @@
       "title": "EpisodeSummary",
       "type": "object"
     },
+    "Evaluation": {
+      "additionalProperties": false,
+      "properties": {
+        "episodes": {
+          "items": {
+            "$ref": "#/$defs/Rollout"
+          },
+          "maxItems": 30,
+          "title": "Episodes",
+          "type": "array"
+        },
+        "seeds": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Seeds",
+          "type": "array"
+        },
+        "summary": {
+          "$ref": "#/$defs/EvaluationSummary"
+        }
+      },
+      "required": [
+        "seeds",
+        "summary",
+        "episodes"
+      ],
+      "title": "Evaluation",
+      "type": "object"
+    },
+    "EvaluationSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "clean_successes": {
+          "title": "Clean Successes",
+          "type": "integer"
+        },
+        "collisions": {
+          "title": "Collisions",
+          "type": "integer"
+        },
+        "failure_counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Failure Counts",
+          "type": "object"
+        },
+        "final_test_evaluated": {
+          "const": false,
+          "default": false,
+          "title": "Final Test Evaluated",
+          "type": "boolean"
+        },
+        "invalid_actions": {
+          "title": "Invalid Actions",
+          "type": "integer"
+        },
+        "mean_seconds": {
+          "title": "Mean Seconds",
+          "type": "number"
+        },
+        "successes": {
+          "title": "Successes",
+          "type": "integer"
+        },
+        "total": {
+          "default": 30,
+          "title": "Total",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "successes",
+        "clean_successes",
+        "collisions",
+        "invalid_actions",
+        "mean_seconds",
+        "failure_counts"
+      ],
+      "title": "EvaluationSummary",
+      "type": "object"
+    },
     "EventData": {
       "additionalProperties": false,
       "properties": {
@@ -558,6 +770,30 @@
         }
       },
       "title": "ExpertRequest",
+      "type": "object"
+    },
+    "FitPoint": {
+      "additionalProperties": false,
+      "properties": {
+        "epoch": {
+          "title": "Epoch",
+          "type": "integer"
+        },
+        "loss": {
+          "title": "Loss",
+          "type": "number"
+        },
+        "round": {
+          "title": "Round",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "round",
+        "epoch",
+        "loss"
+      ],
+      "title": "FitPoint",
       "type": "object"
     },
     "Frame": {
@@ -692,6 +928,127 @@
       "title": "ImportResult",
       "type": "object"
     },
+    "Job": {
+      "additionalProperties": false,
+      "properties": {
+        "cancel_requested": {
+          "default": false,
+          "title": "Cancel Requested",
+          "type": "boolean"
+        },
+        "checkpoints": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-f0-9]{32}-r[0-3]$",
+            "type": "string"
+          },
+          "title": "Checkpoints",
+          "type": "array"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "elapsed_seconds": {
+          "default": 0.0,
+          "title": "Elapsed Seconds",
+          "type": "number"
+        },
+        "epoch": {
+          "default": 0,
+          "title": "Epoch",
+          "type": "integer"
+        },
+        "fitting_loss": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fitting Loss"
+        },
+        "history": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/FitPoint"
+          },
+          "maxItems": 160,
+          "title": "History",
+          "type": "array"
+        },
+        "job_id": {
+          "pattern": "^[a-f0-9]{32}$",
+          "title": "Job Id",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "peak_worker_rss_mb": {
+          "default": 0.0,
+          "title": "Peak Worker Rss Mb",
+          "type": "number"
+        },
+        "phase": {
+          "enum": [
+            "snapshot",
+            "fitting",
+            "evaluating",
+            "corrections",
+            "finished"
+          ],
+          "title": "Phase",
+          "type": "string"
+        },
+        "request": {
+          "$ref": "#/$defs/TrainRequest"
+        },
+        "round": {
+          "default": 0,
+          "title": "Round",
+          "type": "integer"
+        },
+        "selected_checkpoint": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{32}-r[0-3]$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Selected Checkpoint"
+        },
+        "state": {
+          "enum": [
+            "preparing",
+            "running",
+            "completed",
+            "cancelled",
+            "failed"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id",
+        "state",
+        "phase",
+        "request",
+        "created_at",
+        "message"
+      ],
+      "title": "Job",
+      "type": "object"
+    },
     "ObservationData": {
       "additionalProperties": false,
       "properties": {
@@ -761,6 +1118,44 @@
         "half_size"
       ],
       "title": "Obstacle",
+      "type": "object"
+    },
+    "PolicyDetail": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint": {
+          "$ref": "#/$defs/CheckpointInfo"
+        },
+        "evaluation": {
+          "$ref": "#/$defs/Evaluation"
+        },
+        "template": {
+          "$ref": "#/$defs/Scene"
+        }
+      },
+      "required": [
+        "checkpoint",
+        "evaluation",
+        "template"
+      ],
+      "title": "PolicyDetail",
+      "type": "object"
+    },
+    "PolicyFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "state": {
+          "$ref": "#/$defs/StateData"
+        }
+      },
+      "required": [
+        "state",
+        "action"
+      ],
+      "title": "PolicyFrame",
       "type": "object"
     },
     "Review": {
@@ -841,6 +1236,93 @@
       "title": "Robot",
       "type": "object"
     },
+    "Rollout": {
+      "additionalProperties": false,
+      "properties": {
+        "clean_success": {
+          "title": "Clean Success",
+          "type": "boolean"
+        },
+        "collisions": {
+          "title": "Collisions",
+          "type": "integer"
+        },
+        "failure": {
+          "enum": [
+            "none",
+            "collision",
+            "pickup_not_completed",
+            "invalid_grasp_or_release",
+            "delivery_timeout"
+          ],
+          "title": "Failure",
+          "type": "string"
+        },
+        "final": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StateData"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "frames": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PolicyFrame"
+          },
+          "maxItems": 600,
+          "title": "Frames",
+          "type": "array"
+        },
+        "initial": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StateData"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "invalid_actions": {
+          "title": "Invalid Actions",
+          "type": "integer"
+        },
+        "seconds": {
+          "title": "Seconds",
+          "type": "number"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        },
+        "success": {
+          "title": "Success",
+          "type": "boolean"
+        },
+        "ticks": {
+          "title": "Ticks",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "seed",
+        "success",
+        "clean_success",
+        "ticks",
+        "seconds",
+        "collisions",
+        "invalid_actions",
+        "failure"
+      ],
+      "title": "Rollout",
+      "type": "object"
+    },
     "Scene": {
       "additionalProperties": false,
       "properties": {
@@ -855,7 +1337,8 @@
         "controller": {
           "enum": [
             "scripted_reference",
-            "manual"
+            "manual",
+            "learned_policy"
           ],
           "title": "Controller",
           "type": "string"
@@ -927,7 +1410,8 @@
             "lower",
             "release",
             "done",
-            "manual"
+            "manual",
+            "learned"
           ],
           "title": "Stage",
           "type": "string"
@@ -1003,6 +1487,31 @@
           "default": "1",
           "title": "Api Version",
           "type": "string"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{32}-r[0-3]$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "controller_error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Controller Error"
         },
         "generation": {
           "minimum": 0,
@@ -1236,6 +1745,101 @@
       "title": "TaskEvent",
       "type": "object"
     },
+    "TrainRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "budget_seconds": {
+          "default": 180,
+          "maximum": 600,
+          "minimum": 10,
+          "title": "Budget Seconds",
+          "type": "integer"
+        },
+        "correction_rounds": {
+          "default": 3,
+          "maximum": 3,
+          "minimum": 0,
+          "title": "Correction Rounds",
+          "type": "integer"
+        },
+        "episode_ids": {
+          "anyOf": [
+            {
+              "items": {
+                "pattern": "^[a-f0-9]{32}$",
+                "type": "string"
+              },
+              "maxItems": 100,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Episode Ids"
+        },
+        "epochs": {
+          "default": 120,
+          "maximum": 300,
+          "minimum": 10,
+          "title": "Epochs",
+          "type": "integer"
+        },
+        "random_seed": {
+          "default": 7,
+          "maximum": 2147483647,
+          "minimum": 0,
+          "title": "Random Seed",
+          "type": "integer"
+        }
+      },
+      "title": "TrainRequest",
+      "type": "object"
+    },
+    "TrainingCatalog": {
+      "additionalProperties": false,
+      "properties": {
+        "active_job": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{32}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Active Job"
+        },
+        "artifact_location": {
+          "title": "Artifact Location",
+          "type": "string"
+        },
+        "checkpoints": {
+          "items": {
+            "$ref": "#/$defs/CheckpointInfo"
+          },
+          "title": "Checkpoints",
+          "type": "array"
+        },
+        "jobs": {
+          "items": {
+            "$ref": "#/$defs/Job"
+          },
+          "title": "Jobs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "jobs",
+        "checkpoints",
+        "active_job",
+        "artifact_location"
+      ],
+      "title": "TrainingCatalog",
+      "type": "object"
+    },
     "ValidationReport": {
       "additionalProperties": false,
       "properties": {
@@ -1332,11 +1936,23 @@
     "import_result": {
       "$ref": "#/$defs/ImportResult"
     },
+    "policy_detail": {
+      "$ref": "#/$defs/PolicyDetail"
+    },
     "review": {
       "$ref": "#/$defs/Review"
     },
     "session": {
       "$ref": "#/$defs/SessionView"
+    },
+    "training_catalog": {
+      "$ref": "#/$defs/TrainingCatalog"
+    },
+    "training_job": {
+      "$ref": "#/$defs/Job"
+    },
+    "training_request": {
+      "$ref": "#/$defs/TrainRequest"
     },
     "validation": {
       "$ref": "#/$defs/ValidationReport"
@@ -1353,7 +1969,11 @@
     "review",
     "expert_request",
     "import_result",
-    "validation"
+    "validation",
+    "training_request",
+    "training_job",
+    "training_catalog",
+    "policy_detail"
   ],
   "title": "HttpModels",
   "type": "object"

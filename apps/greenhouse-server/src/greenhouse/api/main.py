@@ -18,8 +18,10 @@ from greenhouse.api.contracts import (
 from greenhouse.api.datasets import router as dataset_router
 from greenhouse.api.sessions import Sessions
 from greenhouse.api.stream import stream_session
+from greenhouse.api.training import router as training_router
 from greenhouse.datasets.store import DatasetStore
 from greenhouse.simulation.model import CONTROL_DT
+from greenhouse.training.manager import TrainingManager
 
 PREFIX = "/api/v1/greenhouse"
 
@@ -28,6 +30,10 @@ PREFIX = "/api/v1/greenhouse"
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     artifact_root = Path(os.environ.get("GREENHOUSE_DATASET_DIR", "runtime/datasets/v1"))
     app.state.datasets = await asyncio.to_thread(lambda: DatasetStore(artifact_root.resolve()))
+    training_root = Path(os.environ.get("GREENHOUSE_TRAINING_DIR", "runtime/training/v1"))
+    app.state.training = await asyncio.to_thread(
+        lambda: TrainingManager(training_root.resolve(), app.state.datasets)
+    )
     app.state.dataset_job = asyncio.Lock()
     registry = Sessions(store=app.state.datasets)
     app.state.sessions = registry
@@ -65,6 +71,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         for task in tasks:
             with contextlib.suppress(asyncio.CancelledError):
                 await task
+        await app.state.training.close()
         for session in registry.items.values():
             if not session.finish_recording("closed"):
                 logging.getLogger(__name__).error(session.recording_error)
@@ -73,6 +80,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="Greenhouse Caretaker API", version=__version__, lifespan=lifespan)
 app.include_router(dataset_router)
+app.include_router(training_router)
 
 
 @app.get(f"{PREFIX}/health", response_model=Health, operation_id="get_health")

@@ -78,10 +78,12 @@ export function DemonstrationLibrary({
 	library,
 	connected,
 	canReview,
+	onReview,
 }: {
 	library: Library
 	connected: boolean
 	canReview: boolean
+	onReview?: () => void
 }) {
 	const [note, setNote] = useState('')
 	const selected = library.selected?.entry
@@ -98,8 +100,7 @@ export function DemonstrationLibrary({
 				<div>
 					<h2 className="font-medium text-xl">Demonstrations</h2>
 					<p className="mt-1 max-w-2xl text-muted-foreground text-sm">
-						Keep the attempts, inspect the actions, and choose what Pip should learn from. Training
-						starts in the next phase.
+						Keep the attempts, inspect the actions, and choose what Pip should learn from.
 					</p>
 				</div>
 				<div className="flex flex-wrap gap-2">
@@ -178,6 +179,7 @@ export function DemonstrationLibrary({
 											variant="outline"
 											disabled={disabled || !canReview}
 											onClick={() => {
+												onReview?.()
 												void library.load(episode.episode_id)
 												document
 													.getElementById('greenhouse-view')

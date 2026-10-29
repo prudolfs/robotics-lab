@@ -17,7 +17,8 @@ export type Kind2 = "start" | "pause" | "new_seed" | "record" | "stop_recording"
 export type RequestId2 = string;
 export type SessionId2 = string;
 export type ApiVersion3 = "1";
-export type Controller = "scripted_reference" | "manual";
+export type CheckpointId = string | null;
+export type Controller = "scripted_reference" | "manual" | "learned_policy";
 export type Generation3 = number;
 export type Kind3 = "set_controller";
 export type RequestId3 = string;
@@ -55,6 +56,7 @@ export interface Control {
 }
 export interface SetController {
   api_version: ApiVersion3;
+  checkpoint_id?: CheckpointId;
   controller: Controller;
   generation: Generation3;
   kind: Kind3;

@@ -1,0 +1,289 @@
+{
+  "job_id": "0a17479f7622474c97922b9b0c5bd9b4",
+  "state": "completed",
+  "phase": "finished",
+  "request": {
+    "epochs": 120,
+    "correction_rounds": 3,
+    "random_seed": 7,
+    "budget_seconds": 180,
+    "episode_ids": null
+  },
+  "created_at": "2026-10-29T10:00:34.143717+00:00",
+  "elapsed_seconds": 34.65635033400031,
+  "round": 3,
+  "epoch": 120,
+  "fitting_loss": 0.04124346270469173,
+  "history": [
+    {
+      "round": 0,
+      "epoch": 1,
+      "loss": 2.6014837275961016
+    },
+    {
+      "round": 0,
+      "epoch": 10,
+      "loss": 0.45189536718049966
+    },
+    {
+      "round": 0,
+      "epoch": 20,
+      "loss": 0.3307593876736369
+    },
+    {
+      "round": 0,
+      "epoch": 30,
+      "loss": 0.2719970866845793
+    },
+    {
+      "round": 0,
+      "epoch": 40,
+      "loss": 0.24338855281468716
+    },
+    {
+      "round": 0,
+      "epoch": 50,
+      "loss": 0.22583665749205167
+    },
+    {
+      "round": 0,
+      "epoch": 60,
+      "loss": 0.20937220560957046
+    },
+    {
+      "round": 0,
+      "epoch": 70,
+      "loss": 0.19700973628415636
+    },
+    {
+      "round": 0,
+      "epoch": 80,
+      "loss": 0.19006326000524032
+    },
+    {
+      "round": 0,
+      "epoch": 90,
+      "loss": 0.18848659074761656
+    },
+    {
+      "round": 0,
+      "epoch": 100,
+      "loss": 0.1808688911914993
+    },
+    {
+      "round": 0,
+      "epoch": 110,
+      "loss": 0.1807672810424656
+    },
+    {
+      "round": 0,
+      "epoch": 120,
+      "loss": 0.1772032017435841
+    },
+    {
+      "round": 1,
+      "epoch": 1,
+      "loss": 0.47832290504632186
+    },
+    {
+      "round": 1,
+      "epoch": 10,
+      "loss": 0.10454616106840979
+    },
+    {
+      "round": 1,
+      "epoch": 20,
+      "loss": 0.08366017589778692
+    },
+    {
+      "round": 1,
+      "epoch": 30,
+      "loss": 0.07084245673478166
+    },
+    {
+      "round": 1,
+      "epoch": 40,
+      "loss": 0.07186924409845083
+    },
+    {
+      "round": 1,
+      "epoch": 50,
+      "loss": 0.06023039303367825
+    },
+    {
+      "round": 1,
+      "epoch": 60,
+      "loss": 0.06303963807320301
+    },
+    {
+      "round": 1,
+      "epoch": 70,
+      "loss": 0.054982575308170877
+    },
+    {
+      "round": 1,
+      "epoch": 80,
+      "loss": 0.05229927229740418
+    },
+    {
+      "round": 1,
+      "epoch": 90,
+      "loss": 0.05767269799486604
+    },
+    {
+      "round": 1,
+      "epoch": 100,
+      "loss": 0.05474470784488443
+    },
+    {
+      "round": 1,
+      "epoch": 110,
+      "loss": 0.04759712123368557
+    },
+    {
+      "round": 1,
+      "epoch": 120,
+      "loss": 0.048291865828868887
+    },
+    {
+      "round": 2,
+      "epoch": 1,
+      "loss": 0.2381323378465785
+    },
+    {
+      "round": 2,
+      "epoch": 10,
+      "loss": 0.07777516388841302
+    },
+    {
+      "round": 2,
+      "epoch": 20,
+      "loss": 0.061511546613745284
+    },
+    {
+      "round": 2,
+      "epoch": 30,
+      "loss": 0.0682087179627683
+    },
+    {
+      "round": 2,
+      "epoch": 40,
+      "loss": 0.04736689159587104
+    },
+    {
+      "round": 2,
+      "epoch": 50,
+      "loss": 0.057134680065812474
+    },
+    {
+      "round": 2,
+      "epoch": 60,
+      "loss": 0.0445648840144896
+    },
+    {
+      "round": 2,
+      "epoch": 70,
+      "loss": 0.045635791299957706
+    },
+    {
+      "round": 2,
+      "epoch": 80,
+      "loss": 0.03955605508787037
+    },
+    {
+      "round": 2,
+      "epoch": 90,
+      "loss": 0.09475695740594356
+    },
+    {
+      "round": 2,
+      "epoch": 100,
+      "loss": 0.03863002510884699
+    },
+    {
+      "round": 2,
+      "epoch": 110,
+      "loss": 0.03842382240580454
+    },
+    {
+      "round": 2,
+      "epoch": 120,
+      "loss": 0.0373921586050998
+    },
+    {
+      "round": 3,
+      "epoch": 1,
+      "loss": 0.40020669080536536
+    },
+    {
+      "round": 3,
+      "epoch": 10,
+      "loss": 0.07992715957860143
+    },
+    {
+      "round": 3,
+      "epoch": 20,
+      "loss": 0.07497990914063948
+    },
+    {
+      "round": 3,
+      "epoch": 30,
+      "loss": 0.06285263601389826
+    },
+    {
+      "round": 3,
+      "epoch": 40,
+      "loss": 0.05729689550014762
+    },
+    {
+      "round": 3,
+      "epoch": 50,
+      "loss": 0.053044435582285616
+    },
+    {
+      "round": 3,
+      "epoch": 60,
+      "loss": 0.053556742639055695
+    },
+    {
+      "round": 3,
+      "epoch": 70,
+      "loss": 0.04775775272726507
+    },
+    {
+      "round": 3,
+      "epoch": 80,
+      "loss": 0.04848319655001345
+    },
+    {
+      "round": 3,
+      "epoch": 90,
+      "loss": 0.08433408412273036
+    },
+    {
+      "round": 3,
+      "epoch": 100,
+      "loss": 0.04111256578073579
+    },
+    {
+      "round": 3,
+      "epoch": 110,
+      "loss": 0.039020797495666094
+    },
+    {
+      "round": 3,
+      "epoch": 120,
+      "loss": 0.04124346270469173
+    }
+  ],
+  "checkpoints": [
+    "0a17479f7622474c97922b9b0c5bd9b4-r0",
+    "0a17479f7622474c97922b9b0c5bd9b4-r1",
+    "0a17479f7622474c97922b9b0c5bd9b4-r2",
+    "0a17479f7622474c97922b9b0c5bd9b4-r3"
+  ],
+  "selected_checkpoint": "0a17479f7622474c97922b9b0c5bd9b4-r3",
+  "message": "Training complete. Selected by clean validation deliveries, then successes, invalid actions and time. Final test untouched.",
+  "cancel_requested": false,
+  "peak_worker_rss_mb": 458.578125
+}

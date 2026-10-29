@@ -90,6 +90,28 @@ async def stream_session(websocket: WebSocket, session_id: str) -> None:
                     )
                 )
                 continue
+            if (
+                command.kind == "set_controller"
+                and command.controller == "learned_policy"
+                and command.session_id == session.session_id
+                and command.generation == session.generation
+                and session.world.status in ("ready", "paused")
+                and not session.recorder
+                and not 20000 <= session.seed <= 20099
+            ):
+                session.prepared_policy = None
+                try:
+                    if not command.checkpoint_id:
+                        raise ValueError(
+                            "Select a saved checkpoint before using the learned controller."
+                        )
+                    policy = await asyncio.to_thread(
+                        websocket.app.state.training.load, command.checkpoint_id
+                    )
+                    session.prepared_policy = (command.checkpoint_id, policy)
+                except (ValueError, OSError, RuntimeError) as error:
+                    session.controller_error = str(error)[:500]
+                    session.revision += 1
             ack = session.execute(command)
             await send(ack)
             # Continuous input must never wait behind the 10 Hz snapshot gate.

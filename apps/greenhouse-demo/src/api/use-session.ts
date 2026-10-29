@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api, type SessionView } from './client'
-import type { ActionData, Controller } from './generated/http'
+import type { ActionData } from './generated/http'
 import type { ClientMessage } from './generated/websocket-client'
 import { encodeCommand, isCurrentMessage, parseServerMessage } from './protocol'
 
@@ -99,6 +99,8 @@ export function useSession() {
 								recording: message.recording,
 								last_episode_id: message.last_episode_id,
 								recording_error: message.recording_error,
+								checkpoint_id: message.checkpoint_id,
+								controller_error: message.controller_error,
 							}
 							current.current = session
 							setState((previous) => ({
@@ -211,7 +213,13 @@ export function useSession() {
 	}, [attempt])
 
 	function sendCommand(
-		payload: { kind: SimulationCommand } | { kind: 'set_controller'; controller: Controller },
+		payload:
+			| { kind: SimulationCommand }
+			| {
+					kind: 'set_controller'
+					controller: SessionView['scene']['controller']
+					checkpoint_id?: string
+			  },
 	) {
 		const view = current.current
 		const socket = socketRef.current
@@ -265,7 +273,8 @@ export function useSession() {
 	return {
 		...state,
 		command: (kind: SimulationCommand) => sendCommand({ kind }),
-		setController: (controller: Controller) => sendCommand({ kind: 'set_controller', controller }),
+		setController: (controller: SessionView['scene']['controller'], checkpoint_id?: string) =>
+			sendCommand({ kind: 'set_controller', controller, checkpoint_id }),
 		manual,
 		reconnect: () => setAttempt((value) => value + 1),
 	}

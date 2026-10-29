@@ -45,7 +45,8 @@
                 "session_mismatch",
                 "rate_limited",
                 "invalid_state",
-                "storage_error"
+                "storage_error",
+                "incompatible_checkpoint"
               ],
               "type": "string"
             },
@@ -303,7 +304,8 @@
         "controller": {
           "enum": [
             "scripted_reference",
-            "manual"
+            "manual",
+            "learned_policy"
           ],
           "title": "Controller",
           "type": "string"
@@ -375,7 +377,8 @@
             "lower",
             "release",
             "done",
-            "manual"
+            "manual",
+            "learned"
           ],
           "title": "Stage",
           "type": "string"
@@ -450,6 +453,31 @@
           "const": "1",
           "title": "Api Version",
           "type": "string"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{32}-r[0-3]$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "controller_error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Controller Error"
         },
         "generation": {
           "minimum": 0,

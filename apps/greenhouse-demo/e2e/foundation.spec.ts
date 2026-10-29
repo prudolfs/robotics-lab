@@ -2,7 +2,7 @@ import { mkdir } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { expect, test } from '@playwright/test'
 
-const capture = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase4/', import.meta.url))
+const capture = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase5/', import.meta.url))
 
 test('connects to Python, renders WebGPU and acknowledges a keyboard reset', async ({ page }) => {
 	const errors: string[] = []

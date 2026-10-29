@@ -8,6 +8,8 @@ export type Mode = "reference_simulation";
 export type SessionId = string;
 export type Tick = number;
 export type ApiVersion1 = "1";
+export type CheckpointId = string | null;
+export type ControllerError = string | null;
 export type Generation1 = number;
 export type Kind1 = "snapshot";
 export type LastEpisodeId = string | null;
@@ -18,7 +20,7 @@ export type X = number;
 export type Y = number;
 export type Z = number;
 export type Collisions = number;
-export type Controller = "scripted_reference" | "manual";
+export type Controller = "scripted_reference" | "manual" | "learned_policy";
 export type Delivered = boolean;
 export type ElapsedSeconds = number;
 export type Kind2 = "info" | "success" | "warning";
@@ -47,7 +49,7 @@ export type RightWheelAngle = number;
 export type X1 = number;
 export type Y1 = number;
 export type SimulatorVersion = string;
-export type Stage = "approach" | "grasp" | "lift" | "deliver" | "lower" | "release" | "done" | "manual";
+export type Stage = "approach" | "grasp" | "lift" | "deliver" | "lower" | "release" | "done" | "manual" | "learned";
 export type Status = "ready" | "running" | "paused" | "complete" | "failed";
 export type Id2 = string;
 export type Walls = Obstacle[];
@@ -66,7 +68,15 @@ export type Command =
 export type Generation3 = number;
 export type Kind4 = "ack";
 export type Reason1 =
-  ("stale_generation" | "session_mismatch" | "rate_limited" | "invalid_state" | "storage_error") | null;
+  | (
+      | "stale_generation"
+      | "session_mismatch"
+      | "rate_limited"
+      | "invalid_state"
+      | "storage_error"
+      | "incompatible_checkpoint"
+    )
+  | null;
 export type RequestId = string;
 export type SessionId3 = string;
 export type Tick4 = number;
@@ -88,6 +98,8 @@ export interface Hello {
 }
 export interface Snapshot {
   api_version: ApiVersion1;
+  checkpoint_id?: CheckpointId;
+  controller_error?: ControllerError;
   generation: Generation1;
   kind: Kind1;
   last_episode_id?: LastEpisodeId;
