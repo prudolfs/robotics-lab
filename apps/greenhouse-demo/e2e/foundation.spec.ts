@@ -15,7 +15,9 @@ test('connects to Python, renders WebGPU and acknowledges a keyboard reset', asy
 	await page.getByRole('button', { name: 'Restart seed' }).focus()
 	await page.keyboard.press('Space')
 	await expect(page.getByTestId('session-generation')).toHaveText('1')
-	await expect(page.getByRole('status')).toHaveText('Scenario reset.')
+	await expect(
+		page.getByRole('complementary', { name: 'Caretaker session' }).getByRole('status'),
+	).toHaveText('Scenario reset.')
 	await expect(page.getByRole('button', { name: 'Restart seed' })).toBeEnabled()
 	await expect(page.getByText('Scripted reference controller.', { exact: false })).toBeVisible()
 	expect(errors).toEqual([])
@@ -56,7 +58,9 @@ test('rejects an incompatible HTTP response using the Pydantic schema', async ({
 	)
 	await page.goto('/')
 	await expect(page.getByTestId('connection-status')).toHaveText('Server unavailable')
-	await expect(page.getByRole('status')).toContainText('incompatible HTTP response')
+	await expect(
+		page.getByRole('complementary', { name: 'Caretaker session' }).getByRole('status'),
+	).toContainText('incompatible HTTP response')
 	await expect(page.getByRole('button', { name: 'Restart seed' })).toBeDisabled()
 })
 

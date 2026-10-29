@@ -2,7 +2,7 @@
 
 > Proposed implementation plan for the next Robotics Lab project: an expressive robot that learns useful tasks in a simulated greenhouse.
 >
-> Status: Phases 0–6 complete; awaiting user review of [Phase 6 PPO practice and comparison](greenhouse-demo/phase6/README.md). Later phases remain unchecked. Stop before starting Phase 7.
+> Status: Phases 0–7 complete; awaiting user review of [Phase 7 LangGraph missions](greenhouse-demo/phase7/README.md). Phase 8 remains unchecked. Stop before starting Phase 8.
 
 ## Goal and experience
 
@@ -188,17 +188,17 @@ Exit verified: the [Phase 6 review](greenhouse-demo/phase6/README.md) records th
 
 ### Phase 7 — LangGraph greenhouse missions
 
-- [ ] Define typed skill contracts for collect/deliver and return-to-dock, including preconditions, completion signals, cancellation and failures.
-- [ ] Identify which skill implementations are learned and which remain scripted; expose this in mission traces.
-- [ ] Build a LangGraph workflow for observe, select task, execute skill, verify outcome and bounded recovery.
-- [ ] Persist mission checkpoints and task state; validate session/generation identity before resuming commands after a reset or reconnect.
-- [ ] Add a small natural-language instruction path using LangChain model/tool integrations, mapping requests to supported mission schemas.
-- [ ] Implement a structured mission selection path that works without an LLM provider; explain unavailable language features clearly.
-- [ ] Support several capsules in one mission using evaluated single-object skills, then return to dock.
-- [ ] Show the current plan, executing skill, progress and recovery reasons; verify completion from simulator state rather than model narration.
-- [ ] Verify interruption, skill failure, repeated no-progress, provider errors and bounded replanning without calling an LLM for every motor action.
+- [x] Define typed skill contracts for collect/deliver and return-to-dock, including preconditions, completion signals, cancellation and failures.
+- [x] Identify which skill implementations are learned and which remain scripted; expose this in mission traces.
+- [x] Build a LangGraph workflow for observe, select task, execute skill, verify outcome and bounded recovery.
+- [x] Persist mission checkpoints and task state; validate session/generation identity before resuming commands after a reset or reconnect.
+- [x] Add a small natural-language instruction path using LangChain model/tool integrations, mapping requests to supported mission schemas.
+- [x] Implement a structured mission selection path that works without an LLM provider; explain unavailable language features clearly.
+- [x] Support several capsules in one mission using evaluated single-object skills, then return to dock.
+- [x] Show the current plan, executing skill, progress and recovery reasons; verify completion from simulator state rather than model narration.
+- [x] Verify interruption, skill failure, repeated no-progress, provider errors and bounded replanning without calling an LLM for every motor action.
 
-Exit: the caretaker completes a multi-step greenhouse routine with visible, persistent orchestration over documented skill implementations. Stop for user review before Phase 8.
+Exit verified: the [Phase 7 review](greenhouse-demo/phase7/README.md) records a browser-verified three-capsule learned mission and scripted return-to-dock in 49.1 simulated seconds with zero collisions/rejected actions. Real LangGraph/SQLite task checkpoints, typed skill contracts, structured provider-free plans, optional LangChain tool drafts, identity-checked pause/resume and bounded failures are implemented. A four-scenario audit completes two missions and safely stops two carrying failures; physical sessions remain ephemeral and old checkpoints cannot command replacement worlds. Stop for user review before Phase 8.
 
 ### Phase 8 — Learning experience, reliability and release
 

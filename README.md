@@ -18,7 +18,7 @@ roadmap. The application plans live in
 [`docs/slam-demo.md`](./docs/slam-demo.md) and
 [`docs/warehouse-demo.md`](./docs/warehouse-demo.md).
 The next project, [Greenhouse Caretaker](./docs/greenhouse-demo.md), now has a
-live Python simulation, an authored Blender greenhouse and manual teaching, demonstration datasets and learned collection and PPO practice/comparison through Phase 6.
+live Python simulation, an authored Blender greenhouse and manual teaching, demonstration datasets and learned collection, PPO practice/comparison and persistent LangGraph missions through Phase 7.
 
 ---
 
@@ -60,18 +60,18 @@ headlessly in Python and is independent of FastAPI and React.
 
 ### [Greenhouse Caretaker](./apps/greenhouse-demo)
 
-A robot-learning project in development. Phase 6 provides a React Three Fiber /
+A robot-learning project in development. Phase 7 provides a React Three Fiber /
 Drei WebGPU scene, Tailwind and shadcn with Base UI, and a project-owned FastAPI
 service running MuJoCo. A scripted reference controller collects a capsule and
 delivers it to a floor-level tray in an authored Blender greenhouse, with pause/resume,
 seeded resets, follow/robot-eye views, reduced-motion expressions and optional sound.
 Manual teaching adds held movement/lift controls, recorded demonstrations,
 source-preserving review, stored-state playback and dataset validation/export/import.
-A separate PyTorch worker trains behavior-cloned policies with training-only corrections; the UI supports saved checkpoints, live learned execution and validation playback. The selected policy delivers on 29/30 validation seeds (28 clean), versus 30/30 clean reference runs. PPO practice adds a staged Gymnasium curriculum and same-seed recorded comparisons. Frozen final test: selected PPO and BC both deliver 93/100, 92 clean; the reference completes 100/100 clean. The UI labels ideal sensing and simplified grasp.
+A separate PyTorch worker trains behavior-cloned policies with training-only corrections; the UI supports saved checkpoints, live learned execution and validation playback. The selected policy delivers on 29/30 validation seeds (28 clean), versus 30/30 clean reference runs. PPO practice adds a staged Gymnasium curriculum and same-seed recorded comparisons. Frozen final test: selected PPO and BC both deliver 93/100, 92 clean; the reference completes 100/100 clean. LangGraph missions compose up to three collections and scripted docking, with persistent traces, identity-checked pause/resume and optional language-to-plan drafts. The UI labels ideal sensing and simplified grasp.
 With uv installed, run `pnpm setup:greenhouse` and `pnpm dev:greenhouse` after the
 normal `pnpm install`. Open `http://127.0.0.1:8086/`. See the
 [server guide](./apps/greenhouse-server/README.md) and
-[Phase 6 review](./docs/greenhouse-demo/phase6/README.md).
+[Phase 7 review](./docs/greenhouse-demo/phase7/README.md).
 
 ### [Robot Simulator](./apps/simulator)
 

@@ -15,6 +15,15 @@ from greenhouse.datasets.models import (
     Review,
     ValidationReport,
 )
+from greenhouse.missions.models import (
+    GraphCheckpoint,
+    InstructionRequest,
+    MissionCatalog,
+    MissionControl,
+    MissionDraft,
+    MissionRequest,
+    MissionView,
+)
 from greenhouse.training.models import (
     CheckpointId,
     CheckpointInfo,
@@ -28,7 +37,17 @@ from greenhouse.training.models import (
 
 LiveController = Literal["scripted_reference", "manual", "learned_policy"]
 LiveStage = Literal[
-    "approach", "grasp", "lift", "deliver", "lower", "release", "done", "manual", "learned"
+    "approach",
+    "grasp",
+    "lift",
+    "deliver",
+    "lower",
+    "release",
+    "done",
+    "manual",
+    "learned",
+    "docking",
+    "aligning",
 ]
 
 API_VERSION = "1"
@@ -52,6 +71,7 @@ class Capabilities(Contract):
     mode: Literal["reference_simulation"] = "reference_simulation"
     simulation: bool = True
     training: bool = True
+    missions: bool = True
     language_missions: bool = False
     heartbeat_hz: int = 1
     max_sessions: int = 16
@@ -121,6 +141,7 @@ class Scene(Contract):
     observation: ObservationData
     robot: Robot
     capsule: SceneObject
+    additional_capsules: list[SceneObject] = []
     tray: SceneObject
 
 
@@ -140,6 +161,7 @@ class SessionView(Contract):
     recording_error: str | None = None
     checkpoint_id: CheckpointId | None = None
     controller_error: str | None = None
+    mission: MissionView | None = None
 
 
 class Envelope(Contract):
@@ -181,6 +203,13 @@ class HttpModels(Contract):
     validation: ValidationReport
     comparison_request: ComparisonRequest
     comparison_detail: ComparisonDetail
+    mission_checkpoint: GraphCheckpoint
+    mission_catalog: MissionCatalog
+    mission_request: MissionRequest
+    mission_control: MissionControl
+    mission_view: MissionView
+    mission_draft: MissionDraft
+    instruction_request: InstructionRequest
     training_request: TrainRequest
     training_job: Job
     training_catalog: TrainingCatalog
@@ -239,6 +268,7 @@ class Snapshot(ServerEnvelope):
     recording_error: str | None = None
     checkpoint_id: CheckpointId | None = None
     controller_error: str | None = None
+    mission: MissionView | None = None
 
 
 class Heartbeat(ServerEnvelope):

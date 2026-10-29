@@ -1,6 +1,6 @@
 # Greenhouse server
 
-Project-owned Python service for Greenhouse Caretaker. Phase 2 provides an independent fixed-step MuJoCo world, a scripted collection controller, ephemeral sessions and validated live WebSocket commands. Phase 5 adds separate-process PyTorch training and saved learned policies. Phase 6 adds Gymnasium/PPO practice, a staged curriculum and sealed evaluation; LangGraph missions remain a later phase.
+Project-owned Python service for Greenhouse Caretaker. Phase 2 provides an independent fixed-step MuJoCo world, a scripted collection controller, ephemeral sessions and validated live WebSocket commands. Phase 5 adds separate-process PyTorch training and saved learned policies. Phase 6 adds Gymnasium/PPO practice, a staged curriculum and sealed evaluation; Phase 7 adds persistent LangGraph missions over identified learned/scripted skills.
 
 Phase 3 adds Blender-authored presentation in the frontend without changing the simulation or API. The server suite checks the asset manifest against the compiled MuJoCo chassis, wheels, pots, walls and task dimensions. See the [Phase 3 review](../../docs/greenhouse-demo/phase3/README.md).
 
@@ -106,6 +106,14 @@ Phase 6 extends training requests with `algorithm: "ppo"`, an explicit BC `paren
 `POST /api/v1/greenhouse/training/compare` accepts two distinct checkpoint IDs and a validation seed 10000–10029. It measures two independent learned runs and a fresh reference from the same initial world, returning recorded states and outcomes for playback. Training and comparison run outside the API event loop with bounded concurrency.
 
 The Gymnasium wrapper leaves the base physics/configuration unchanged and restricts practice to scenario seeds 0–99. Final-test access is confined to the offline sealed evaluation runner. The selected PPO and BC both deliver on 93/100 final-test seeds, 92 clean; the reference achieves 100/100 clean. PPO reduces rejected actions from 917 to 2 without improving completion. These test seeds are now inspected, so future tuning requires a fresh evaluation suite or explicit disclosure of reuse. See the [Phase 6 guide](../../docs/greenhouse-demo/phase6/README.md) for initialization, PPO/reward settings, budgets, candidate regressions, the audited reference-runner correction and complete evidence.
+
+## LangGraph missions
+
+Phase 7 adds typed plans, skill contracts and a real LangGraph workflow over continuous physical execution. Collection uses a selected learned actor or an explicitly selected scripted comparison; heading alignment and return-to-dock are scripted and labeled. One active capsule is materialized at a time, with the others rendered as staged inventory; the robot pose is not reset between objects. Completion is verified from the world, released capsule/tray geometry and dock pose.
+
+`GET/POST /missions`, `GET /missions/{id}`, `POST /missions/{id}/control` and `GET /missions/{id}/checkpoint` provide start, inspection, identity-checked pause/resume/cancel and SQLite graph inspection under the existing API prefix. `POST /missions/draft` optionally uses one LangChain tool call to return a validated proposal without executing it. Structured missions require no provider. Configure `GREENHOUSE_MISSION_MODEL` and server-side `OPENAI_API_KEY` for the optional OpenAI integration; live provider access was not exercised in the implementation checks.
+
+`GREENHOUSE_MISSION_DIR` overrides `runtime/missions/v1/`. JSON task records and SQLite graph checkpoints persist; physical sessions remain ephemeral. Restarted/reset/replaced sessions cannot resume old motor tasks. There is one bounded recovery per mission, 120 ticks for no progress, 3,600 total mission ticks, four active missions, 32 persisted records and a 64 MiB creation-time storage check. No motor tick calls an LLM. See the [Phase 7 guide](../../docs/greenhouse-demo/phase7/README.md) for exact skill preconditions, limitations, reproduction, four-scenario outcomes and browser evidence.
 
 ## Checks
 

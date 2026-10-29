@@ -105,6 +105,11 @@
           "title": "Max Sessions",
           "type": "integer"
         },
+        "missions": {
+          "default": true,
+          "title": "Missions",
+          "type": "boolean"
+        },
         "mode": {
           "const": "reference_simulation",
           "default": "reference_simulation",
@@ -1006,6 +1011,57 @@
       "title": "Frame",
       "type": "object"
     },
+    "GraphCheckpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Checkpoint Id"
+        },
+        "message": {
+          "default": "Graph task checkpoint; physical sessions remain ephemeral and are never replayed automatically.",
+          "title": "Message",
+          "type": "string"
+        },
+        "mission_id": {
+          "pattern": "^[a-f0-9]{32}$",
+          "title": "Mission Id",
+          "type": "string"
+        },
+        "next_nodes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Next Nodes",
+          "type": "array"
+        },
+        "task_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MissionView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "mission_id",
+        "checkpoint_id",
+        "next_nodes",
+        "task_state"
+      ],
+      "title": "GraphCheckpoint",
+      "type": "object"
+    },
     "Health": {
       "additionalProperties": false,
       "properties": {
@@ -1049,6 +1105,22 @@
         "duplicates"
       ],
       "title": "ImportResult",
+      "type": "object"
+    },
+    "InstructionRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "instruction": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Instruction",
+          "type": "string"
+        }
+      },
+      "required": [
+        "instruction"
+      ],
+      "title": "InstructionRequest",
       "type": "object"
     },
     "Job": {
@@ -1185,6 +1257,467 @@
         "message"
       ],
       "title": "Job",
+      "type": "object"
+    },
+    "LanguageStatus": {
+      "additionalProperties": false,
+      "properties": {
+        "available": {
+          "title": "Available",
+          "type": "boolean"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Model"
+        }
+      },
+      "required": [
+        "available",
+        "model",
+        "message"
+      ],
+      "title": "LanguageStatus",
+      "type": "object"
+    },
+    "MissionCapsule": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "position": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Position",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "active",
+            "delivered"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "position",
+        "status"
+      ],
+      "title": "MissionCapsule",
+      "type": "object"
+    },
+    "MissionCatalog": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_location": {
+          "title": "Artifact Location",
+          "type": "string"
+        },
+        "language": {
+          "$ref": "#/$defs/LanguageStatus"
+        },
+        "missions": {
+          "items": {
+            "$ref": "#/$defs/MissionView"
+          },
+          "title": "Missions",
+          "type": "array"
+        },
+        "skills": {
+          "items": {
+            "$ref": "#/$defs/SkillContract"
+          },
+          "title": "Skills",
+          "type": "array"
+        }
+      },
+      "required": [
+        "missions",
+        "skills",
+        "language",
+        "artifact_location"
+      ],
+      "title": "MissionCatalog",
+      "type": "object"
+    },
+    "MissionControl": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "pause",
+            "resume",
+            "cancel"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "session_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "generation",
+        "action"
+      ],
+      "title": "MissionControl",
+      "type": "object"
+    },
+    "MissionDraft": {
+      "additionalProperties": false,
+      "properties": {
+        "intent": {
+          "$ref": "#/$defs/MissionIntent"
+        },
+        "message": {
+          "default": "Review this supported plan, then start it explicitly.",
+          "title": "Message",
+          "type": "string"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "source": {
+          "const": "langchain_tool",
+          "default": "langchain_tool",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "intent",
+        "model"
+      ],
+      "title": "MissionDraft",
+      "type": "object"
+    },
+    "MissionIntent": {
+      "additionalProperties": false,
+      "properties": {
+        "capsule_count": {
+          "default": 3,
+          "maximum": 3,
+          "minimum": 0,
+          "title": "Capsule Count",
+          "type": "integer"
+        },
+        "reason": {
+          "default": "",
+          "maxLength": 240,
+          "title": "Reason",
+          "type": "string"
+        },
+        "task": {
+          "default": "collect_and_dock",
+          "enum": [
+            "collect_and_dock",
+            "return_to_dock",
+            "unsupported"
+          ],
+          "title": "Task",
+          "type": "string"
+        }
+      },
+      "title": "MissionIntent",
+      "type": "object"
+    },
+    "MissionRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{32}-r[0-3]$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "controller": {
+          "default": "learned_policy",
+          "enum": [
+            "learned_policy",
+            "scripted_reference"
+          ],
+          "title": "Controller",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "intent": {
+          "$ref": "#/$defs/MissionIntent",
+          "default": {
+            "capsule_count": 3,
+            "reason": "",
+            "task": "collect_and_dock"
+          }
+        },
+        "session_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "generation"
+      ],
+      "title": "MissionRequest",
+      "type": "object"
+    },
+    "MissionTrace": {
+      "additionalProperties": false,
+      "properties": {
+        "implementation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Implementation"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "node": {
+          "enum": [
+            "observe",
+            "select",
+            "execute",
+            "verify",
+            "recover",
+            "control"
+          ],
+          "title": "Node",
+          "type": "string"
+        },
+        "sequence": {
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "skill": {
+          "anyOf": [
+            {
+              "enum": [
+                "align_target",
+                "collect_deliver",
+                "return_to_dock"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Skill"
+        },
+        "tick": {
+          "title": "Tick",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "sequence",
+        "node",
+        "tick",
+        "message"
+      ],
+      "title": "MissionTrace",
+      "type": "object"
+    },
+    "MissionView": {
+      "additionalProperties": false,
+      "properties": {
+        "capsules": {
+          "items": {
+            "$ref": "#/$defs/MissionCapsule"
+          },
+          "title": "Capsules",
+          "type": "array"
+        },
+        "checkpoint_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Sha256"
+        },
+        "collisions": {
+          "default": 0,
+          "title": "Collisions",
+          "type": "integer"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "current_skill": {
+          "anyOf": [
+            {
+              "enum": [
+                "align_target",
+                "collect_deliver",
+                "return_to_dock"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Current Skill"
+        },
+        "delivered": {
+          "default": 0,
+          "title": "Delivered",
+          "type": "integer"
+        },
+        "docked": {
+          "default": false,
+          "title": "Docked",
+          "type": "boolean"
+        },
+        "implementation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Implementation"
+        },
+        "invalid_actions": {
+          "default": 0,
+          "title": "Invalid Actions",
+          "type": "integer"
+        },
+        "last_world": {
+          "$ref": "#/$defs/StateData"
+        },
+        "max_recoveries": {
+          "const": 1,
+          "default": 1,
+          "title": "Max Recoveries",
+          "type": "integer"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "mission_id": {
+          "pattern": "^[a-f0-9]{32}$",
+          "title": "Mission Id",
+          "type": "string"
+        },
+        "recoveries": {
+          "default": 0,
+          "title": "Recoveries",
+          "type": "integer"
+        },
+        "request": {
+          "$ref": "#/$defs/MissionRequest"
+        },
+        "state": {
+          "enum": [
+            "running",
+            "paused",
+            "completed",
+            "failed",
+            "cancelled",
+            "orphaned"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "total": {
+          "title": "Total",
+          "type": "integer"
+        },
+        "total_ticks": {
+          "default": 0,
+          "title": "Total Ticks",
+          "type": "integer"
+        },
+        "trace": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MissionTrace"
+          },
+          "maxItems": 96,
+          "title": "Trace",
+          "type": "array"
+        }
+      },
+      "required": [
+        "mission_id",
+        "request",
+        "state",
+        "created_at",
+        "total",
+        "message",
+        "capsules",
+        "last_world"
+      ],
+      "title": "MissionView",
       "type": "object"
     },
     "ObservationData": {
@@ -1526,6 +2059,14 @@
     "Scene": {
       "additionalProperties": false,
       "properties": {
+        "additional_capsules": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SceneObject"
+          },
+          "title": "Additional Capsules",
+          "type": "array"
+        },
         "capsule": {
           "$ref": "#/$defs/SceneObject"
         },
@@ -1611,7 +2152,9 @@
             "release",
             "done",
             "manual",
-            "learned"
+            "learned",
+            "docking",
+            "aligning"
           ],
           "title": "Stage",
           "type": "string"
@@ -1730,6 +2273,17 @@
           "default": null,
           "title": "Last Episode Id"
         },
+        "mission": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MissionView"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "recording": {
           "default": false,
           "title": "Recording",
@@ -1774,6 +2328,64 @@
         "scene"
       ],
       "title": "SessionView",
+      "type": "object"
+    },
+    "SkillContract": {
+      "additionalProperties": false,
+      "properties": {
+        "cancellation": {
+          "default": "Pause physical steps; cancel ends the mission without resetting the robot.",
+          "title": "Cancellation",
+          "type": "string"
+        },
+        "completion": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Completion",
+          "type": "array"
+        },
+        "failures": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Failures",
+          "type": "array"
+        },
+        "implementation": {
+          "title": "Implementation",
+          "type": "string"
+        },
+        "max_ticks": {
+          "title": "Max Ticks",
+          "type": "integer"
+        },
+        "name": {
+          "enum": [
+            "align_target",
+            "collect_deliver",
+            "return_to_dock"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "preconditions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Preconditions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "implementation",
+        "preconditions",
+        "completion",
+        "failures",
+        "max_ticks"
+      ],
+      "title": "SkillContract",
       "type": "object"
     },
     "StateData": {
@@ -2172,6 +2784,27 @@
     "import_result": {
       "$ref": "#/$defs/ImportResult"
     },
+    "instruction_request": {
+      "$ref": "#/$defs/InstructionRequest"
+    },
+    "mission_catalog": {
+      "$ref": "#/$defs/MissionCatalog"
+    },
+    "mission_checkpoint": {
+      "$ref": "#/$defs/GraphCheckpoint"
+    },
+    "mission_control": {
+      "$ref": "#/$defs/MissionControl"
+    },
+    "mission_draft": {
+      "$ref": "#/$defs/MissionDraft"
+    },
+    "mission_request": {
+      "$ref": "#/$defs/MissionRequest"
+    },
+    "mission_view": {
+      "$ref": "#/$defs/MissionView"
+    },
     "policy_detail": {
       "$ref": "#/$defs/PolicyDetail"
     },
@@ -2208,6 +2841,13 @@
     "validation",
     "comparison_request",
     "comparison_detail",
+    "mission_checkpoint",
+    "mission_catalog",
+    "mission_request",
+    "mission_control",
+    "mission_view",
+    "mission_draft",
+    "instruction_request",
     "training_request",
     "training_job",
     "training_catalog",

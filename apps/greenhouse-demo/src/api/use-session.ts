@@ -101,6 +101,7 @@ export function useSession() {
 								recording_error: message.recording_error,
 								checkpoint_id: message.checkpoint_id,
 								controller_error: message.controller_error,
+								mission: message.mission,
 							}
 							current.current = session
 							setState((previous) => ({

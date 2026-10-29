@@ -78,7 +78,8 @@ function World({
 			generation === old.generation &&
 			scene.status === 'running' &&
 			old.current.status === 'running' &&
-			scene.robot.holding === old.current.robot.holding
+			scene.robot.holding === old.current.robot.holding &&
+			scene.capsule.id === old.current.capsule.id
 		frame.current = {
 			previous: interpolate ? old.current : scene,
 			current: scene,

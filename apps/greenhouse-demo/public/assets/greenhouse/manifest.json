@@ -195,7 +195,7 @@
       0.48
     ],
     "panelDepth": 0.05,
-    "behavior": "decorative; no docking mission yet"
+    "behavior": "scripted docking pose target; electrical charging not simulated"
   },
   "pivots": {
     "root": "Caretaker_Root",

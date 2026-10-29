@@ -31,7 +31,7 @@
     { "id": "wall-west", "center": [-3.05, 0, 0.12], "halfSize": [0.05, 2, 0.12] }
   ],
   "benches": { "centers": [[-1.5, 1.9, 0.88], [1.5, 1.9, 0.88]], "size": [2.4, 0.24, 0.06], "minimumUnderside": 0.70, "support": "wall mounted, above robot and carried capsule envelope" },
-  "dock": { "pad": [-2.55, -0.85, 0.001], "panel": [-3.025, -0.85, 0.48], "panelDepth": 0.05, "behavior": "decorative; no docking mission yet" },
+  "dock": { "pad": [-2.55, -0.85, 0.001], "panel": [-3.025, -0.85, 0.48], "panelDepth": 0.05, "behavior": "scripted docking pose target; electrical charging not simulated" },
   "pivots": {
     "root": "Caretaker_Root",
     "leftWheel": "Wheel_Left",

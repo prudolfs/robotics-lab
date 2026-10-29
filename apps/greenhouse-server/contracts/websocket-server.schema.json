@@ -87,6 +87,38 @@
       "title": "Ack",
       "type": "object"
     },
+    "EventData": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "info",
+            "success",
+            "warning"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 300,
+          "title": "Text",
+          "type": "string"
+        },
+        "tick": {
+          "maximum": 600,
+          "minimum": 0,
+          "title": "Tick",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tick",
+        "kind",
+        "text"
+      ],
+      "title": "EventData",
+      "type": "object"
+    },
     "Heartbeat": {
       "additionalProperties": false,
       "properties": {
@@ -167,6 +199,341 @@
         "kind"
       ],
       "title": "Hello",
+      "type": "object"
+    },
+    "MissionCapsule": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "position": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Position",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "active",
+            "delivered"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "position",
+        "status"
+      ],
+      "title": "MissionCapsule",
+      "type": "object"
+    },
+    "MissionIntent": {
+      "additionalProperties": false,
+      "properties": {
+        "capsule_count": {
+          "default": 3,
+          "maximum": 3,
+          "minimum": 0,
+          "title": "Capsule Count",
+          "type": "integer"
+        },
+        "reason": {
+          "default": "",
+          "maxLength": 240,
+          "title": "Reason",
+          "type": "string"
+        },
+        "task": {
+          "default": "collect_and_dock",
+          "enum": [
+            "collect_and_dock",
+            "return_to_dock",
+            "unsupported"
+          ],
+          "title": "Task",
+          "type": "string"
+        }
+      },
+      "title": "MissionIntent",
+      "type": "object"
+    },
+    "MissionRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{32}-r[0-3]$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "controller": {
+          "default": "learned_policy",
+          "enum": [
+            "learned_policy",
+            "scripted_reference"
+          ],
+          "title": "Controller",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "intent": {
+          "$ref": "#/$defs/MissionIntent",
+          "default": {
+            "capsule_count": 3,
+            "reason": "",
+            "task": "collect_and_dock"
+          }
+        },
+        "session_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "generation"
+      ],
+      "title": "MissionRequest",
+      "type": "object"
+    },
+    "MissionTrace": {
+      "additionalProperties": false,
+      "properties": {
+        "implementation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Implementation"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "node": {
+          "enum": [
+            "observe",
+            "select",
+            "execute",
+            "verify",
+            "recover",
+            "control"
+          ],
+          "title": "Node",
+          "type": "string"
+        },
+        "sequence": {
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "skill": {
+          "anyOf": [
+            {
+              "enum": [
+                "align_target",
+                "collect_deliver",
+                "return_to_dock"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Skill"
+        },
+        "tick": {
+          "title": "Tick",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "sequence",
+        "node",
+        "tick",
+        "message"
+      ],
+      "title": "MissionTrace",
+      "type": "object"
+    },
+    "MissionView": {
+      "additionalProperties": false,
+      "properties": {
+        "capsules": {
+          "items": {
+            "$ref": "#/$defs/MissionCapsule"
+          },
+          "title": "Capsules",
+          "type": "array"
+        },
+        "checkpoint_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Sha256"
+        },
+        "collisions": {
+          "default": 0,
+          "title": "Collisions",
+          "type": "integer"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "current_skill": {
+          "anyOf": [
+            {
+              "enum": [
+                "align_target",
+                "collect_deliver",
+                "return_to_dock"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Current Skill"
+        },
+        "delivered": {
+          "default": 0,
+          "title": "Delivered",
+          "type": "integer"
+        },
+        "docked": {
+          "default": false,
+          "title": "Docked",
+          "type": "boolean"
+        },
+        "implementation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Implementation"
+        },
+        "invalid_actions": {
+          "default": 0,
+          "title": "Invalid Actions",
+          "type": "integer"
+        },
+        "last_world": {
+          "$ref": "#/$defs/StateData"
+        },
+        "max_recoveries": {
+          "const": 1,
+          "default": 1,
+          "title": "Max Recoveries",
+          "type": "integer"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "mission_id": {
+          "pattern": "^[a-f0-9]{32}$",
+          "title": "Mission Id",
+          "type": "string"
+        },
+        "recoveries": {
+          "default": 0,
+          "title": "Recoveries",
+          "type": "integer"
+        },
+        "request": {
+          "$ref": "#/$defs/MissionRequest"
+        },
+        "state": {
+          "enum": [
+            "running",
+            "paused",
+            "completed",
+            "failed",
+            "cancelled",
+            "orphaned"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "total": {
+          "title": "Total",
+          "type": "integer"
+        },
+        "total_ticks": {
+          "default": 0,
+          "title": "Total Ticks",
+          "type": "integer"
+        },
+        "trace": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MissionTrace"
+          },
+          "maxItems": 96,
+          "title": "Trace",
+          "type": "array"
+        }
+      },
+      "required": [
+        "mission_id",
+        "request",
+        "state",
+        "created_at",
+        "total",
+        "message",
+        "capsules",
+        "last_world"
+      ],
+      "title": "MissionView",
       "type": "object"
     },
     "ObservationData": {
@@ -293,6 +660,14 @@
     "Scene": {
       "additionalProperties": false,
       "properties": {
+        "additional_capsules": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SceneObject"
+          },
+          "title": "Additional Capsules",
+          "type": "array"
+        },
         "capsule": {
           "$ref": "#/$defs/SceneObject"
         },
@@ -378,7 +753,9 @@
             "release",
             "done",
             "manual",
-            "learned"
+            "learned",
+            "docking",
+            "aligning"
           ],
           "title": "Stage",
           "type": "string"
@@ -501,6 +878,17 @@
           "default": null,
           "title": "Last Episode Id"
         },
+        "mission": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MissionView"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "recording": {
           "default": false,
           "title": "Recording",
@@ -547,6 +935,145 @@
         "scene"
       ],
       "title": "Snapshot",
+      "type": "object"
+    },
+    "StateData": {
+      "additionalProperties": false,
+      "properties": {
+        "capsule": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "title": "Capsule",
+          "type": "array"
+        },
+        "collisions": {
+          "minimum": 0,
+          "title": "Collisions",
+          "type": "integer"
+        },
+        "delivered": {
+          "title": "Delivered",
+          "type": "boolean"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/$defs/EventData"
+          },
+          "maxItems": 16,
+          "title": "Events",
+          "type": "array"
+        },
+        "heading": {
+          "title": "Heading",
+          "type": "number"
+        },
+        "holding": {
+          "title": "Holding",
+          "type": "boolean"
+        },
+        "invalid_actions": {
+          "minimum": 0,
+          "title": "Invalid Actions",
+          "type": "integer"
+        },
+        "left_wheel_angle": {
+          "title": "Left Wheel Angle",
+          "type": "number"
+        },
+        "lift_height": {
+          "title": "Lift Height",
+          "type": "number"
+        },
+        "pickups": {
+          "minimum": 0,
+          "title": "Pickups",
+          "type": "integer"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "right_wheel_angle": {
+          "title": "Right Wheel Angle",
+          "type": "number"
+        },
+        "seed": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "speed": {
+          "title": "Speed",
+          "type": "number"
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "running",
+            "paused",
+            "complete",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "tick": {
+          "maximum": 600,
+          "minimum": 0,
+          "title": "Tick",
+          "type": "integer"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        },
+        "yaw_speed": {
+          "title": "Yaw Speed",
+          "type": "number"
+        }
+      },
+      "required": [
+        "version",
+        "seed",
+        "tick",
+        "status",
+        "x",
+        "y",
+        "heading",
+        "speed",
+        "yaw_speed",
+        "lift_height",
+        "left_wheel_angle",
+        "right_wheel_angle",
+        "holding",
+        "capsule",
+        "delivered",
+        "pickups",
+        "collisions",
+        "invalid_actions",
+        "reason",
+        "events"
+      ],
+      "title": "StateData",
       "type": "object"
     },
     "StreamError": {

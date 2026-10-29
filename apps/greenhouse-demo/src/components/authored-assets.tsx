@@ -97,6 +97,9 @@ export function AuthoredAssets({
 			<primitive object={assets.copies[0]} />
 			<primitive object={assets.copies[1]} />
 			<primitive object={assets.copies[2]} />
+			{scene.additional_capsules?.map((item) => (
+				<AdditionalCapsule key={item.id} model={assets.copies[2]} position={item.position} />
+			))}
 			{scene.pots.map((pot, index) => (
 				<Plant
 					key={pot.id}
@@ -112,4 +115,15 @@ export function AuthoredAssets({
 function Plant({ model, x, z }: { model: Group; x: number; z: number }) {
 	const copy = useMemo(() => model.clone(true), [model])
 	return <primitive object={copy} position={[x, 0, z]} dispose={null} />
+}
+
+function AdditionalCapsule({
+	model,
+	position,
+}: {
+	model: Group
+	position: Scene['capsule']['position']
+}) {
+	const copy = useMemo(() => model.clone(true), [model])
+	return <primitive object={copy} position={[position.x, position.z, -position.y]} dispose={null} />
 }

@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useComparison } from './api/use-comparison'
 import { useDemonstrations } from './api/use-demonstrations'
+import { useMissions } from './api/use-missions'
 import { useSession } from './api/use-session'
 import { useTraining } from './api/use-training'
 import { DemonstrationLibrary, PlaybackControls } from './components/demonstration-library'
 import { type CameraMode, GreenhouseScene } from './components/greenhouse-scene'
+import { MissionPanel } from './components/mission-panel'
 import { ComparisonPlayback, PracticePanel } from './components/practice-panel'
 import { TeachingControls } from './components/teaching-controls'
 import { TrainingPanel, TrainingPlayback } from './components/training-panel'
@@ -22,6 +24,8 @@ const stageLabels = {
 	done: 'Delivery complete',
 	manual: 'Manual teaching',
 	learned: 'Learned policy acting',
+	docking: 'Returning to the dock',
+	aligning: 'Scripted heading alignment',
 }
 
 export function App() {
@@ -31,6 +35,8 @@ export function App() {
 	const library = useDemonstrations(connected, connection.session?.last_episode_id)
 	const training = useTraining(connected)
 	const comparison = useComparison()
+	const missions = useMissions(connected, connection.session)
+	const liveMission = connection.session?.mission
 	const playback = !!library.selected || !!training.scene || !!comparison.scene
 	const liveScene = connection.session?.scene
 	const scene = library.scene ?? comparison.scene ?? training.scene ?? liveScene
@@ -50,7 +56,7 @@ export function App() {
 						A small robot learning to lend a hand.
 					</p>
 				</div>
-				<p className="text-muted-foreground text-sm">Robotics Lab · Phase 6</p>
+				<p className="text-muted-foreground text-sm">Robotics Lab · Phase 7</p>
 			</header>
 			<PlaybackControls library={library} />
 			<TrainingPlayback training={training} />
@@ -109,7 +115,7 @@ export function App() {
 							size="sm"
 							className="max-w-full flex-wrap"
 							value={[scene?.controller ?? 'scripted_reference']}
-							disabled={disabled || liveScene?.status === 'running' || terminal}
+							disabled={disabled || !!liveMission || liveScene?.status === 'running' || terminal}
 							onValueChange={(value) => {
 								if (value[0] === 'learned_policy' && training.selectedId)
 									connection.setController('learned_policy', training.selectedId)
@@ -135,18 +141,24 @@ export function App() {
 					)}
 					<div className="flex flex-col gap-3">
 						<Button
-							disabled={disabled || !scene || terminal}
-							onClick={() => connection.command(running ? 'pause' : 'start')}
+							disabled={disabled || missions.busy || !scene || terminal}
+							onClick={() =>
+								liveMission
+									? void missions.control(liveMission.state === 'paused' ? 'resume' : 'pause')
+									: connection.command(running ? 'pause' : 'start')
+							}
 						>
-							{running
-								? 'Pause collection'
-								: scene?.status === 'paused'
-									? 'Resume collection'
-									: scene?.status === 'complete'
-										? 'Collection complete'
-										: scene?.status === 'failed'
-											? 'Collection stopped'
-											: 'Start collection'}
+							{liveMission
+								? `Mission ${liveMission.state}`
+								: running
+									? 'Pause collection'
+									: scene?.status === 'paused'
+										? 'Resume collection'
+										: scene?.status === 'complete'
+											? 'Collection complete'
+											: scene?.status === 'failed'
+												? 'Collection stopped'
+												: 'Start collection'}
 						</Button>
 						<div className="flex flex-wrap gap-2">
 							<Button
@@ -170,6 +182,7 @@ export function App() {
 							variant="secondary"
 							disabled={
 								disabled ||
+								!!liveMission ||
 								liveScene?.controller === 'learned_policy' ||
 								(!connection.session?.recording && liveScene?.status !== 'ready')
 							}
@@ -248,7 +261,9 @@ export function App() {
 									{comparison.scene ? 'Recorded comparison' : stageLabels[scene.stage]}
 								</p>
 								<p data-testid="delivery-count" className="text-muted-foreground text-sm">
-									{scene.delivered ? 1 : 0} / 1 delivered
+									{liveMission && !playback
+										? `${liveMission.delivered}/${liveMission.total} capsules delivered`
+										: `${scene.delivered ? 1 : 0} / 1 delivered`}
 								</p>
 								{scene.reason && <p className="text-destructive text-sm">{scene.reason}</p>}
 							</div>
@@ -304,13 +319,15 @@ export function App() {
 						</>
 					)}
 					<p className="mt-auto text-muted-foreground text-xs leading-relaxed">
-						{playback
-							? 'Stored-state playback.'
-							: liveScene?.controller === 'manual'
-								? 'Manual teaching controller.'
-								: liveScene?.controller === 'learned_policy'
-									? `Learned policy controller. Checkpoint ${connection.session?.checkpoint_id}.`
-									: 'Scripted reference controller.'}{' '}
+						{liveMission && !playback
+							? `Mission skill: ${liveMission.implementation ?? 'observing'}.`
+							: playback
+								? 'Stored-state playback.'
+								: liveScene?.controller === 'manual'
+									? 'Manual teaching controller.'
+									: liveScene?.controller === 'learned_policy'
+										? `Learned policy controller. Checkpoint ${connection.session?.checkpoint_id}.`
+										: 'Scripted reference controller.'}{' '}
 						Ideal target sensing and a simplified grasp. Head gestures and expressions are authored.
 					</p>
 					<Button
@@ -322,11 +339,25 @@ export function App() {
 					</Button>
 				</aside>
 			</div>
+			<MissionPanel
+				missions={missions}
+				session={connection.session}
+				connected={connected}
+				checkpointId={training.selectedId}
+				canStart={
+					!disabled &&
+					!liveMission &&
+					!connection.session?.recording &&
+					liveScene?.status === 'ready' &&
+					connection.session?.tick === 0
+				}
+			/>
 			<PracticePanel
 				training={training}
 				comparison={comparison}
 				connected={connected}
 				canReview={
+					!liveMission &&
 					liveScene?.status !== 'running' &&
 					!connection.session?.recording &&
 					!connection.pending &&
@@ -344,10 +375,13 @@ export function App() {
 				eligible={library.data?.eligible_train ?? 0}
 				canUse={
 					!disabled &&
+					!liveMission &&
 					!connection.session?.recording &&
 					(liveScene?.status === 'ready' || liveScene?.status === 'paused')
 				}
-				canReview={liveScene?.status !== 'running' && !connection.session?.recording}
+				canReview={
+					!liveMission && liveScene?.status !== 'running' && !connection.session?.recording
+				}
 				onUse={() => {
 					connection.setController('learned_policy', training.selectedId)
 					document.getElementById('greenhouse-view')?.scrollIntoView({ behavior: 'instant' })
@@ -366,7 +400,9 @@ export function App() {
 				}}
 				library={library}
 				connected={connected}
-				canReview={liveScene?.status !== 'running' && !connection.session?.recording}
+				canReview={
+					!liveMission && liveScene?.status !== 'running' && !connection.session?.recording
+				}
 			/>
 			<footer className="border-border border-t px-6 py-4 text-muted-foreground text-sm">
 				One caretaker, one greenhouse. Built to learn a useful task, one skill at a time.

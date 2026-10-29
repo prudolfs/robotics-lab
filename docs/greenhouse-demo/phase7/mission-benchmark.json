@@ -1,0 +1,1173 @@
+{
+  "checkpoint_id": "233d6903fb874d658551770f1e5efb60-r2",
+  "checkpoint_sha256": "9d17f6e2f01bda07edcbff534f599015237b3e8832d37cc9f7d6724bc9a9a328",
+  "scenario_seeds": [
+    0,
+    1,
+    2,
+    42
+  ],
+  "capsules_per_mission": 3,
+  "source": "actual LangGraph + MuJoCo, headless accelerated stepping; no LLM provider calls",
+  "final_test_used": false,
+  "wall_seconds": 0.6888130420120433,
+  "versions": {
+    "langgraph": "1.2.18",
+    "langgraph-checkpoint-sqlite": "3.1.2",
+    "langchain": "1.4.7",
+    "mujoco": "3.17.0",
+    "torch": "2.15.0"
+  },
+  "missions": [
+    {
+      "mission_id": "bb9e0e079a664f4481ce4e3a6d22795e",
+      "request": {
+        "session_id": "cee76551-78c5-4af9-b0ec-8c4104760d22",
+        "generation": 0,
+        "intent": {
+          "task": "collect_and_dock",
+          "capsule_count": 3,
+          "reason": ""
+        },
+        "controller": "learned_policy",
+        "checkpoint_id": "233d6903fb874d658551770f1e5efb60-r2"
+      },
+      "state": "completed",
+      "created_at": "2026-10-29T12:26:11.109012+00:00",
+      "current_skill": "return_to_dock",
+      "implementation": "scripted return-to-dock",
+      "delivered": 3,
+      "total": 3,
+      "docked": true,
+      "total_ticks": 952,
+      "recoveries": 0,
+      "max_recoveries": 1,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "message": "All requested deliveries and dock pose verified. Mission complete.",
+      "trace": [
+        {
+          "sequence": 1,
+          "node": "observe",
+          "skill": null,
+          "implementation": null,
+          "tick": 0,
+          "message": "Observed physical counters, capsule inventory and session identity."
+        },
+        {
+          "sequence": 2,
+          "node": "select",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 0,
+          "message": "Selected collect_deliver; 0/3 capsules verified."
+        },
+        {
+          "sequence": 3,
+          "node": "execute",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 4,
+          "message": "Executing collect_deliver: learned checkpoint 233d6903fb874d658551770f1e5efb60-r2."
+        },
+        {
+          "sequence": 4,
+          "node": "verify",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 178,
+          "message": "Verified collect_deliver from physical state, not model narration."
+        },
+        {
+          "sequence": 5,
+          "node": "select",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 178,
+          "message": "Selected align_target; 1/3 capsules verified."
+        },
+        {
+          "sequence": 6,
+          "node": "execute",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 178,
+          "message": "Executing align_target: scripted heading alignment."
+        },
+        {
+          "sequence": 7,
+          "node": "verify",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 228,
+          "message": "Verified align_target from physical state, not model narration."
+        },
+        {
+          "sequence": 8,
+          "node": "select",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 228,
+          "message": "Selected collect_deliver; 1/3 capsules verified."
+        },
+        {
+          "sequence": 9,
+          "node": "execute",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 228,
+          "message": "Executing collect_deliver: learned checkpoint 233d6903fb874d658551770f1e5efb60-r2."
+        },
+        {
+          "sequence": 10,
+          "node": "verify",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 438,
+          "message": "Verified collect_deliver from physical state, not model narration."
+        },
+        {
+          "sequence": 11,
+          "node": "select",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 438,
+          "message": "Selected align_target; 2/3 capsules verified."
+        },
+        {
+          "sequence": 12,
+          "node": "execute",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 438,
+          "message": "Executing align_target: scripted heading alignment."
+        },
+        {
+          "sequence": 13,
+          "node": "verify",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 481,
+          "message": "Verified align_target from physical state, not model narration."
+        },
+        {
+          "sequence": 14,
+          "node": "select",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 481,
+          "message": "Selected collect_deliver; 2/3 capsules verified."
+        },
+        {
+          "sequence": 15,
+          "node": "execute",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 481,
+          "message": "Executing collect_deliver: learned checkpoint 233d6903fb874d658551770f1e5efb60-r2."
+        },
+        {
+          "sequence": 16,
+          "node": "verify",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 682,
+          "message": "Verified collect_deliver from physical state, not model narration."
+        },
+        {
+          "sequence": 17,
+          "node": "select",
+          "skill": "return_to_dock",
+          "implementation": "scripted return-to-dock",
+          "tick": 682,
+          "message": "Selected return_to_dock; 3/3 capsules verified."
+        },
+        {
+          "sequence": 18,
+          "node": "execute",
+          "skill": "return_to_dock",
+          "implementation": "scripted return-to-dock",
+          "tick": 682,
+          "message": "Executing return_to_dock: scripted return-to-dock."
+        },
+        {
+          "sequence": 19,
+          "node": "verify",
+          "skill": "return_to_dock",
+          "implementation": "scripted return-to-dock",
+          "tick": 952,
+          "message": "Verified return_to_dock from physical state, not model narration."
+        },
+        {
+          "sequence": 20,
+          "node": "verify",
+          "skill": "return_to_dock",
+          "implementation": "scripted return-to-dock",
+          "tick": 952,
+          "message": "All requested deliveries and dock pose verified. Mission complete."
+        }
+      ],
+      "capsules": [
+        {
+          "id": "mission-capsule-1",
+          "position": [
+            1.6567220762191548,
+            0.643825842874959,
+            0.05
+          ],
+          "status": "delivered"
+        },
+        {
+          "id": "mission-capsule-2",
+          "position": [
+            1.584167128744481,
+            0.6032524645941976,
+            0.05
+          ],
+          "status": "delivered"
+        },
+        {
+          "id": "mission-capsule-3",
+          "position": [
+            1.6557392516385319,
+            0.6421464936979534,
+            0.05
+          ],
+          "status": "delivered"
+        }
+      ],
+      "last_world": {
+        "version": "greenhouse-world-v1",
+        "seed": 0,
+        "tick": 270,
+        "status": "complete",
+        "x": -2.481629590037549,
+        "y": -0.8256445366141183,
+        "heading": 3.2172888270599787,
+        "speed": 2.120310170614652e-06,
+        "yaw_speed": -0.005357824479509991,
+        "lift_height": 0.05,
+        "left_wheel_angle": 67.6728964214226,
+        "right_wheel_angle": 78.28363994124635,
+        "holding": false,
+        "capsule": [
+          1.6557392516385319,
+          0.6421464936979534,
+          0.049783559539325305
+        ],
+        "delivered": true,
+        "pickups": 1,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "reason": null,
+        "events": [
+          {
+            "tick": 0,
+            "kind": "info",
+            "text": "Ready to collect the seed capsule."
+          },
+          {
+            "tick": 45,
+            "kind": "success",
+            "text": "Capsule secured in the gripper."
+          },
+          {
+            "tick": 174,
+            "kind": "success",
+            "text": "Seed capsule delivered to the collection tray."
+          },
+          {
+            "tick": 50,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          },
+          {
+            "tick": 60,
+            "kind": "success",
+            "text": "Capsule secured in the gripper."
+          },
+          {
+            "tick": 210,
+            "kind": "success",
+            "text": "Seed capsule delivered to the collection tray."
+          },
+          {
+            "tick": 43,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          },
+          {
+            "tick": 58,
+            "kind": "success",
+            "text": "Capsule secured in the gripper."
+          },
+          {
+            "tick": 201,
+            "kind": "success",
+            "text": "Seed capsule delivered to the collection tray."
+          },
+          {
+            "tick": 270,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          }
+        ]
+      },
+      "checkpoint_sha256": "9d17f6e2f01bda07edcbff534f599015237b3e8832d37cc9f7d6724bc9a9a328"
+    },
+    {
+      "mission_id": "aac97f1e7f9f42719b59cbd5ced1357b",
+      "request": {
+        "session_id": "2f3af037-3088-4b3b-96e0-b283ea4a905c",
+        "generation": 0,
+        "intent": {
+          "task": "collect_and_dock",
+          "capsule_count": 3,
+          "reason": ""
+        },
+        "controller": "learned_policy",
+        "checkpoint_id": "233d6903fb874d658551770f1e5efb60-r2"
+      },
+      "state": "failed",
+      "created_at": "2026-10-29T12:26:11.318194+00:00",
+      "current_skill": "collect_deliver",
+      "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+      "delivered": 2,
+      "total": 3,
+      "docked": false,
+      "total_ticks": 699,
+      "recoveries": 0,
+      "max_recoveries": 1,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "message": "Mission stopped: no_progress; no further recovery is allowed.",
+      "trace": [
+        {
+          "sequence": 1,
+          "node": "observe",
+          "skill": null,
+          "implementation": null,
+          "tick": 0,
+          "message": "Observed physical counters, capsule inventory and session identity."
+        },
+        {
+          "sequence": 2,
+          "node": "select",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 0,
+          "message": "Selected align_target; 0/3 capsules verified."
+        },
+        {
+          "sequence": 3,
+          "node": "execute",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 0,
+          "message": "Executing align_target: scripted heading alignment."
+        },
+        {
+          "sequence": 4,
+          "node": "verify",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 8,
+          "message": "Verified align_target from physical state, not model narration."
+        },
+        {
+          "sequence": 5,
+          "node": "select",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 8,
+          "message": "Selected collect_deliver; 0/3 capsules verified."
+        },
+        {
+          "sequence": 6,
+          "node": "execute",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 8,
+          "message": "Executing collect_deliver: learned checkpoint 233d6903fb874d658551770f1e5efb60-r2."
+        },
+        {
+          "sequence": 7,
+          "node": "verify",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 208,
+          "message": "Verified collect_deliver from physical state, not model narration."
+        },
+        {
+          "sequence": 8,
+          "node": "select",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 208,
+          "message": "Selected align_target; 1/3 capsules verified."
+        },
+        {
+          "sequence": 9,
+          "node": "execute",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 208,
+          "message": "Executing align_target: scripted heading alignment."
+        },
+        {
+          "sequence": 10,
+          "node": "verify",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 254,
+          "message": "Verified align_target from physical state, not model narration."
+        },
+        {
+          "sequence": 11,
+          "node": "select",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 254,
+          "message": "Selected collect_deliver; 1/3 capsules verified."
+        },
+        {
+          "sequence": 12,
+          "node": "execute",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 254,
+          "message": "Executing collect_deliver: learned checkpoint 233d6903fb874d658551770f1e5efb60-r2."
+        },
+        {
+          "sequence": 13,
+          "node": "verify",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 465,
+          "message": "Verified collect_deliver from physical state, not model narration."
+        },
+        {
+          "sequence": 14,
+          "node": "select",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 465,
+          "message": "Selected align_target; 2/3 capsules verified."
+        },
+        {
+          "sequence": 15,
+          "node": "execute",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 465,
+          "message": "Executing align_target: scripted heading alignment."
+        },
+        {
+          "sequence": 16,
+          "node": "verify",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 512,
+          "message": "Verified align_target from physical state, not model narration."
+        },
+        {
+          "sequence": 17,
+          "node": "select",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 512,
+          "message": "Selected collect_deliver; 2/3 capsules verified."
+        },
+        {
+          "sequence": 18,
+          "node": "execute",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 512,
+          "message": "Executing collect_deliver: learned checkpoint 233d6903fb874d658551770f1e5efb60-r2."
+        },
+        {
+          "sequence": 19,
+          "node": "verify",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 699,
+          "message": "Skill verification failed: no_progress."
+        },
+        {
+          "sequence": 20,
+          "node": "recover",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 699,
+          "message": "Mission stopped: no_progress; no further recovery is allowed."
+        }
+      ],
+      "capsules": [
+        {
+          "id": "mission-capsule-1",
+          "position": [
+            1.656340003999292,
+            0.6424358602336404,
+            0.05
+          ],
+          "status": "delivered"
+        },
+        {
+          "id": "mission-capsule-2",
+          "position": [
+            1.574288132271448,
+            0.6237862011450752,
+            0.05
+          ],
+          "status": "delivered"
+        },
+        {
+          "id": "mission-capsule-3",
+          "position": [
+            0.38592537388951675,
+            0.19204575851011113,
+            0.2660000000000017
+          ],
+          "status": "active"
+        }
+      ],
+      "last_world": {
+        "version": "greenhouse-world-v1",
+        "seed": 1,
+        "tick": 187,
+        "status": "paused",
+        "x": 0.7013977291005632,
+        "y": 0.3188416302788534,
+        "heading": 3.5237564434165725,
+        "speed": 7.827971876223686e-64,
+        "yaw_speed": -6.89344726336913e-145,
+        "lift_height": 0.2660000000000017,
+        "left_wheel_angle": 34.21031398894265,
+        "right_wheel_angle": 43.62696520611346,
+        "holding": true,
+        "capsule": [
+          0.38592537388951675,
+          0.19204575851011113,
+          0.2660000000000017
+        ],
+        "delivered": false,
+        "pickups": 1,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "reason": null,
+        "events": [
+          {
+            "tick": 0,
+            "kind": "info",
+            "text": "Ready to collect the seed capsule."
+          },
+          {
+            "tick": 8,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          },
+          {
+            "tick": 70,
+            "kind": "success",
+            "text": "Capsule secured in the gripper."
+          },
+          {
+            "tick": 200,
+            "kind": "success",
+            "text": "Seed capsule delivered to the collection tray."
+          },
+          {
+            "tick": 46,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          },
+          {
+            "tick": 60,
+            "kind": "success",
+            "text": "Capsule secured in the gripper."
+          },
+          {
+            "tick": 211,
+            "kind": "success",
+            "text": "Seed capsule delivered to the collection tray."
+          },
+          {
+            "tick": 47,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          },
+          {
+            "tick": 43,
+            "kind": "success",
+            "text": "Capsule secured in the gripper."
+          },
+          {
+            "tick": 187,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          }
+        ]
+      },
+      "checkpoint_sha256": "9d17f6e2f01bda07edcbff534f599015237b3e8832d37cc9f7d6724bc9a9a328"
+    },
+    {
+      "mission_id": "01d41400ee124533841f313d27fa6371",
+      "request": {
+        "session_id": "6b955b11-ccbf-45a9-a0db-93d50d0cf9ff",
+        "generation": 0,
+        "intent": {
+          "task": "collect_and_dock",
+          "capsule_count": 3,
+          "reason": ""
+        },
+        "controller": "learned_policy",
+        "checkpoint_id": "233d6903fb874d658551770f1e5efb60-r2"
+      },
+      "state": "failed",
+      "created_at": "2026-10-29T12:26:11.475111+00:00",
+      "current_skill": "collect_deliver",
+      "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+      "delivered": 1,
+      "total": 3,
+      "docked": false,
+      "total_ticks": 409,
+      "recoveries": 0,
+      "max_recoveries": 1,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "message": "Mission stopped: no_progress; no further recovery is allowed.",
+      "trace": [
+        {
+          "sequence": 1,
+          "node": "observe",
+          "skill": null,
+          "implementation": null,
+          "tick": 0,
+          "message": "Observed physical counters, capsule inventory and session identity."
+        },
+        {
+          "sequence": 2,
+          "node": "select",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 0,
+          "message": "Selected align_target; 0/3 capsules verified."
+        },
+        {
+          "sequence": 3,
+          "node": "execute",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 0,
+          "message": "Executing align_target: scripted heading alignment."
+        },
+        {
+          "sequence": 4,
+          "node": "verify",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 5,
+          "message": "Verified align_target from physical state, not model narration."
+        },
+        {
+          "sequence": 5,
+          "node": "select",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 5,
+          "message": "Selected collect_deliver; 0/3 capsules verified."
+        },
+        {
+          "sequence": 6,
+          "node": "execute",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 5,
+          "message": "Executing collect_deliver: learned checkpoint 233d6903fb874d658551770f1e5efb60-r2."
+        },
+        {
+          "sequence": 7,
+          "node": "verify",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 171,
+          "message": "Verified collect_deliver from physical state, not model narration."
+        },
+        {
+          "sequence": 8,
+          "node": "select",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 171,
+          "message": "Selected align_target; 1/3 capsules verified."
+        },
+        {
+          "sequence": 9,
+          "node": "execute",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 171,
+          "message": "Executing align_target: scripted heading alignment."
+        },
+        {
+          "sequence": 10,
+          "node": "verify",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 217,
+          "message": "Verified align_target from physical state, not model narration."
+        },
+        {
+          "sequence": 11,
+          "node": "select",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 217,
+          "message": "Selected collect_deliver; 1/3 capsules verified."
+        },
+        {
+          "sequence": 12,
+          "node": "execute",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 217,
+          "message": "Executing collect_deliver: learned checkpoint 233d6903fb874d658551770f1e5efb60-r2."
+        },
+        {
+          "sequence": 13,
+          "node": "verify",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 409,
+          "message": "Skill verification failed: no_progress."
+        },
+        {
+          "sequence": 14,
+          "node": "recover",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 409,
+          "message": "Mission stopped: no_progress; no further recovery is allowed."
+        }
+      ],
+      "capsules": [
+        {
+          "id": "mission-capsule-1",
+          "position": [
+            1.655292280102366,
+            0.6423784427973498,
+            0.05
+          ],
+          "status": "delivered"
+        },
+        {
+          "id": "mission-capsule-2",
+          "position": [
+            0.38531229241667614,
+            0.1914093711681081,
+            0.2660000000000017
+          ],
+          "status": "active"
+        },
+        {
+          "id": "mission-capsule-3",
+          "position": [
+            0.0162292031018077,
+            -0.6068788660485741,
+            0.05
+          ],
+          "status": "pending"
+        }
+      ],
+      "last_world": {
+        "version": "greenhouse-world-v1",
+        "seed": 2,
+        "tick": 192,
+        "status": "paused",
+        "x": 0.7004719906645885,
+        "y": 0.3189803890377043,
+        "heading": -2.756970550056212,
+        "speed": 5.932358279361754e-64,
+        "yaw_speed": -3.729792779291287e-146,
+        "lift_height": 0.2660000000000017,
+        "left_wheel_angle": 23.307000238999667,
+        "right_wheel_angle": 17.429627055969153,
+        "holding": true,
+        "capsule": [
+          0.38531229241667614,
+          0.1914093711681081,
+          0.2660000000000017
+        ],
+        "delivered": false,
+        "pickups": 1,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "reason": null,
+        "events": [
+          {
+            "tick": 0,
+            "kind": "info",
+            "text": "Ready to collect the seed capsule."
+          },
+          {
+            "tick": 5,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          },
+          {
+            "tick": 38,
+            "kind": "success",
+            "text": "Capsule secured in the gripper."
+          },
+          {
+            "tick": 166,
+            "kind": "success",
+            "text": "Seed capsule delivered to the collection tray."
+          },
+          {
+            "tick": 46,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          },
+          {
+            "tick": 48,
+            "kind": "success",
+            "text": "Capsule secured in the gripper."
+          },
+          {
+            "tick": 192,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          }
+        ]
+      },
+      "checkpoint_sha256": "9d17f6e2f01bda07edcbff534f599015237b3e8832d37cc9f7d6724bc9a9a328"
+    },
+    {
+      "mission_id": "cd251b29572343d084e627f69209b1f6",
+      "request": {
+        "session_id": "dae7ebca-5bf3-4d8a-a866-8cbd8358d742",
+        "generation": 0,
+        "intent": {
+          "task": "collect_and_dock",
+          "capsule_count": 3,
+          "reason": ""
+        },
+        "controller": "learned_policy",
+        "checkpoint_id": "233d6903fb874d658551770f1e5efb60-r2"
+      },
+      "state": "completed",
+      "created_at": "2026-10-29T12:26:11.570241+00:00",
+      "current_skill": "return_to_dock",
+      "implementation": "scripted return-to-dock",
+      "delivered": 3,
+      "total": 3,
+      "docked": true,
+      "total_ticks": 982,
+      "recoveries": 0,
+      "max_recoveries": 1,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "message": "All requested deliveries and dock pose verified. Mission complete.",
+      "trace": [
+        {
+          "sequence": 1,
+          "node": "observe",
+          "skill": null,
+          "implementation": null,
+          "tick": 0,
+          "message": "Observed physical counters, capsule inventory and session identity."
+        },
+        {
+          "sequence": 2,
+          "node": "select",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 0,
+          "message": "Selected align_target; 0/3 capsules verified."
+        },
+        {
+          "sequence": 3,
+          "node": "execute",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 0,
+          "message": "Executing align_target: scripted heading alignment."
+        },
+        {
+          "sequence": 4,
+          "node": "verify",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 14,
+          "message": "Verified align_target from physical state, not model narration."
+        },
+        {
+          "sequence": 5,
+          "node": "select",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 14,
+          "message": "Selected collect_deliver; 0/3 capsules verified."
+        },
+        {
+          "sequence": 6,
+          "node": "execute",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 14,
+          "message": "Executing collect_deliver: learned checkpoint 233d6903fb874d658551770f1e5efb60-r2."
+        },
+        {
+          "sequence": 7,
+          "node": "verify",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 209,
+          "message": "Verified collect_deliver from physical state, not model narration."
+        },
+        {
+          "sequence": 8,
+          "node": "select",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 209,
+          "message": "Selected align_target; 1/3 capsules verified."
+        },
+        {
+          "sequence": 9,
+          "node": "execute",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 209,
+          "message": "Executing align_target: scripted heading alignment."
+        },
+        {
+          "sequence": 10,
+          "node": "verify",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 259,
+          "message": "Verified align_target from physical state, not model narration."
+        },
+        {
+          "sequence": 11,
+          "node": "select",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 259,
+          "message": "Selected collect_deliver; 1/3 capsules verified."
+        },
+        {
+          "sequence": 12,
+          "node": "execute",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 259,
+          "message": "Executing collect_deliver: learned checkpoint 233d6903fb874d658551770f1e5efb60-r2."
+        },
+        {
+          "sequence": 13,
+          "node": "verify",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 447,
+          "message": "Verified collect_deliver from physical state, not model narration."
+        },
+        {
+          "sequence": 14,
+          "node": "select",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 447,
+          "message": "Selected align_target; 2/3 capsules verified."
+        },
+        {
+          "sequence": 15,
+          "node": "execute",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 447,
+          "message": "Executing align_target: scripted heading alignment."
+        },
+        {
+          "sequence": 16,
+          "node": "verify",
+          "skill": "align_target",
+          "implementation": "scripted heading alignment",
+          "tick": 492,
+          "message": "Verified align_target from physical state, not model narration."
+        },
+        {
+          "sequence": 17,
+          "node": "select",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 492,
+          "message": "Selected collect_deliver; 2/3 capsules verified."
+        },
+        {
+          "sequence": 18,
+          "node": "execute",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 492,
+          "message": "Executing collect_deliver: learned checkpoint 233d6903fb874d658551770f1e5efb60-r2."
+        },
+        {
+          "sequence": 19,
+          "node": "verify",
+          "skill": "collect_deliver",
+          "implementation": "learned checkpoint 233d6903fb874d658551770f1e5efb60-r2",
+          "tick": 717,
+          "message": "Verified collect_deliver from physical state, not model narration."
+        },
+        {
+          "sequence": 20,
+          "node": "select",
+          "skill": "return_to_dock",
+          "implementation": "scripted return-to-dock",
+          "tick": 717,
+          "message": "Selected return_to_dock; 3/3 capsules verified."
+        },
+        {
+          "sequence": 21,
+          "node": "execute",
+          "skill": "return_to_dock",
+          "implementation": "scripted return-to-dock",
+          "tick": 717,
+          "message": "Executing return_to_dock: scripted return-to-dock."
+        },
+        {
+          "sequence": 22,
+          "node": "verify",
+          "skill": "return_to_dock",
+          "implementation": "scripted return-to-dock",
+          "tick": 982,
+          "message": "Verified return_to_dock from physical state, not model narration."
+        },
+        {
+          "sequence": 23,
+          "node": "verify",
+          "skill": "return_to_dock",
+          "implementation": "scripted return-to-dock",
+          "tick": 982,
+          "message": "All requested deliveries and dock pose verified. Mission complete."
+        }
+      ],
+      "capsules": [
+        {
+          "id": "mission-capsule-1",
+          "position": [
+            1.6566562396491942,
+            0.6435208514973679,
+            0.05
+          ],
+          "status": "delivered"
+        },
+        {
+          "id": "mission-capsule-2",
+          "position": [
+            1.5803998811865465,
+            0.6135470877968177,
+            0.05
+          ],
+          "status": "delivered"
+        },
+        {
+          "id": "mission-capsule-3",
+          "position": [
+            1.5922626341821278,
+            0.5940623653055843,
+            0.05
+          ],
+          "status": "delivered"
+        }
+      ],
+      "last_world": {
+        "version": "greenhouse-world-v1",
+        "seed": 42,
+        "tick": 265,
+        "status": "complete",
+        "x": -2.4823767808723667,
+        "y": -0.8271377352751217,
+        "heading": 9.496778728995178,
+        "speed": 2.092335020302015e-06,
+        "yaw_speed": -0.0050962612885006526,
+        "lift_height": 0.05,
+        "left_wheel_angle": 59.00836255552781,
+        "right_wheel_angle": 90.26948284547754,
+        "holding": false,
+        "capsule": [
+          1.5922626341821278,
+          0.5940623653055843,
+          0.0497835595387455
+        ],
+        "delivered": true,
+        "pickups": 1,
+        "collisions": 0,
+        "invalid_actions": 0,
+        "reason": null,
+        "events": [
+          {
+            "tick": 0,
+            "kind": "info",
+            "text": "Ready to collect the seed capsule."
+          },
+          {
+            "tick": 14,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          },
+          {
+            "tick": 66,
+            "kind": "success",
+            "text": "Capsule secured in the gripper."
+          },
+          {
+            "tick": 195,
+            "kind": "success",
+            "text": "Seed capsule delivered to the collection tray."
+          },
+          {
+            "tick": 50,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          },
+          {
+            "tick": 50,
+            "kind": "success",
+            "text": "Capsule secured in the gripper."
+          },
+          {
+            "tick": 188,
+            "kind": "success",
+            "text": "Seed capsule delivered to the collection tray."
+          },
+          {
+            "tick": 45,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          },
+          {
+            "tick": 66,
+            "kind": "success",
+            "text": "Capsule secured in the gripper."
+          },
+          {
+            "tick": 225,
+            "kind": "success",
+            "text": "Seed capsule delivered to the collection tray."
+          },
+          {
+            "tick": 265,
+            "kind": "info",
+            "text": "Mission skill boundary."
+          }
+        ]
+      },
+      "checkpoint_sha256": "9d17f6e2f01bda07edcbff534f599015237b3e8832d37cc9f7d6724bc9a9a328"
+    }
+  ]
+}

@@ -33,6 +33,7 @@ from greenhouse.simulation.reference import Reference
 from greenhouse.simulation.world import Action, State, World
 
 if TYPE_CHECKING:
+    from greenhouse.missions.runtime import MissionRuntime
     from greenhouse.training.policy import LearnedPolicy
 
 
@@ -123,15 +124,19 @@ class Session:
     prepared_policy: tuple[str, LearnedPolicy] | None = None
     checkpoint_id: str | None = None
     controller_error: str | None = None
+    mission: MissionRuntime | None = None
 
     def __post_init__(self) -> None:
         self.world = World(self.seed)
 
     @property
     def tick(self) -> int:
-        return self.world.tick
+        return self.mission.total_ticks if self.mission else self.world.tick
 
     def advance(self) -> None:
+        if self.mission and self.mission.active:
+            self.mission.advance()
+            return
         if self.connected and self.world.status == "running":
             before = ObservationData(**asdict(self.world.observe()))
             if self.controller == "learned_policy":
@@ -186,6 +191,10 @@ class Session:
             return False
 
     def disconnect(self) -> None:
+        if self.mission:
+            self.mission.pause(
+                "Viewer disconnected. Explicit resume requires the same session/generation."
+            )
         self.manual_action = Action()
         self.manual_until = 0
         self.finish_recording("disconnected")
@@ -196,20 +205,56 @@ class Session:
 
     def view(self) -> SessionView:
         state = self.world.state()
+        scene = scene_from_state(
+            state,
+            self.reference.stage
+            if self.controller == "scripted_reference"
+            else "learned"
+            if self.controller == "learned_policy"
+            else "manual",
+            self.controller,
+        )
+        if self.mission:
+            mission = self.mission
+            scene.elapsed_seconds = mission.total_ticks * CONTROL_DT
+            scene.stage = (
+                "docking"
+                if mission.current_skill == "return_to_dock"
+                else "aligning"
+                if mission.current_skill == "align_target"
+                else "learned"
+                if self.controller == "learned_policy"
+                else mission.reference.stage
+            )
+            scene.status = (
+                "complete"
+                if mission.state == "completed"
+                else "failed"
+                if mission.state in ("failed", "orphaned", "cancelled")
+                else "paused"
+                if mission.state == "paused"
+                else "running"
+            )
+            scene.delivered = mission.delivered == len(mission.capsules) and mission.is_docked
+            scene.collisions = mission.collisions
+            scene.invalid_actions = mission.invalid_actions
+            scene.additional_capsules = [
+                SceneObject(
+                    id=item.id,
+                    position=Vector3(x=item.position[0], y=item.position[1], z=item.position[2]),
+                )
+                for i, item in enumerate(mission.view().capsules)
+                if i != mission.prepared_index
+            ]
+            if mission.prepared_index in range(len(mission.capsules)):
+                scene.capsule.id = mission.capsules[mission.prepared_index].id
         return SessionView(
             session_id=self.session_id,
             generation=self.generation,
             tick=self.tick,
             seed=self.seed,
-            scene=scene_from_state(
-                state,
-                self.reference.stage
-                if self.controller == "scripted_reference"
-                else "learned"
-                if self.controller == "learned_policy"
-                else "manual",
-                self.controller,
-            ),
+            scene=scene,
+            mission=self.mission.view() if self.mission else None,
             recording=self.recorder is not None,
             last_episode_id=self.last_episode_id,
             recording_error=self.recording_error,
@@ -229,6 +274,11 @@ class Session:
             reason = "session_mismatch"
         elif command.generation != self.generation:
             reason = "stale_generation"
+        elif self.mission and command.kind not in ("ping", "reset", "new_seed"):
+            if command.kind == "pause" and self.mission.active:
+                self.mission.pause("Mission paused through the session control.")
+            else:
+                reason = "invalid_state"
         elif command.kind == "manual":
             if self.controller != "manual" or self.world.status != "running":
                 reason = "invalid_state"
@@ -243,7 +293,9 @@ class Session:
         elif command.kind == "set_controller":
             reserved = command.controller == "learned_policy" and 20000 <= self.seed <= 20099
             if reserved:
-                self.controller_error = "Final test seeds remain reserved until Phase 6."
+                self.controller_error = (
+                    "Final test scenarios are confined to the sealed offline evaluation."
+                )
                 self.revision += 1
             if (
                 reserved
@@ -332,6 +384,11 @@ class Session:
             self.manual_action = Action()
             self.manual_until = 0
         elif command.kind in ("reset", "new_seed"):
+            if self.mission:
+                self.mission.invalidate(
+                    "Session reset invalidated the previous mission generation."
+                )
+                self.mission = None
             if not self.finish_recording(
                 "terminal" if self.world.status in ("complete", "failed") else "reset"
             ):

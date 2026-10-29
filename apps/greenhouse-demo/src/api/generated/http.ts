@@ -196,6 +196,7 @@ export type Commands = string[];
 export type HeartbeatHz = number;
 export type LanguageMissions = boolean;
 export type MaxSessions = number;
+export type Missions = boolean;
 export type Mode = "reference_simulation";
 export type Simulation = boolean;
 export type SnapshotHz = number;
@@ -220,6 +221,7 @@ export type Id = string;
 export type X1 = number;
 export type Y1 = number;
 export type Z = number;
+export type AdditionalCapsules = SceneObject[];
 export type Collisions2 = number;
 export type Controller1 = "scripted_reference" | "manual" | "learned_policy";
 export type Delivered1 = boolean;
@@ -242,7 +244,18 @@ export type RightWheelAngle1 = number;
 export type X2 = number;
 export type Y2 = number;
 export type SimulatorVersion1 = string;
-export type Stage1 = "approach" | "grasp" | "lift" | "deliver" | "lower" | "release" | "done" | "manual" | "learned";
+export type Stage1 =
+  | "approach"
+  | "grasp"
+  | "lift"
+  | "deliver"
+  | "lower"
+  | "release"
+  | "done"
+  | "manual"
+  | "learned"
+  | "docking"
+  | "aligning";
 export type Status1 = "ready" | "running" | "paused" | "complete" | "failed";
 export type Id2 = string;
 export type Walls = Obstacle[];
@@ -279,9 +292,73 @@ export type ServerVersion = string;
 export type Status2 = "ok";
 export type Duplicates = number;
 export type Imported = number;
+export type Instruction = string;
+export type ArtifactLocation1 = string;
+export type Available = boolean;
+export type Message = string;
+export type Model = string | null;
+export type Id3 = string;
+/**
+ * @minItems 3
+ * @maxItems 3
+ */
+export type Position = [unknown, unknown, unknown];
+export type Status3 = "pending" | "active" | "delivered";
+export type Capsules = MissionCapsule[];
+export type CheckpointSha256 = string | null;
+export type Collisions3 = number;
+export type CreatedAt1 = string;
+export type CurrentSkill = ("align_target" | "collect_deliver" | "return_to_dock") | null;
+export type Delivered2 = number;
+export type Docked = boolean;
+export type Implementation = string | null;
+export type InvalidActions3 = number;
+export type MaxRecoveries = 1;
+export type Message1 = string;
+export type MissionId = string;
+export type Recoveries = number;
+export type CheckpointId1 = string | null;
+export type Controller2 = "learned_policy" | "scripted_reference";
+export type Generation = number;
+export type CapsuleCount = number;
+export type Reason2 = string;
+export type Task = "collect_and_dock" | "return_to_dock" | "unsupported";
+export type SessionId = string;
+export type State = "running" | "paused" | "completed" | "failed" | "cancelled" | "orphaned";
+export type Total = number;
+export type TotalTicks = number;
+export type Implementation1 = string | null;
+export type Message2 = string;
+export type Node = "observe" | "select" | "execute" | "verify" | "recover" | "control";
+export type Sequence = number;
+export type Skill = ("align_target" | "collect_deliver" | "return_to_dock") | null;
+export type Tick4 = number;
+/**
+ * @maxItems 96
+ */
+export type Trace = MissionTrace[];
+export type Missions1 = MissionView[];
+export type Cancellation = string;
+export type Completion = string[];
+export type Failures = string[];
+export type Implementation2 = string;
+export type MaxTicks1 = number;
+export type Name = "align_target" | "collect_deliver" | "return_to_dock";
+export type Preconditions = string[];
+export type Skills = SkillContract[];
+export type CheckpointId2 = string | null;
+export type Message3 = string;
+export type MissionId1 = string;
+export type NextNodes = string[];
+export type Action = "pause" | "resume" | "cancel";
+export type Generation1 = number;
+export type SessionId1 = string;
+export type Message4 = string;
+export type Model1 = string;
+export type Source2 = "langchain_tool";
 export type Algorithm = "bc" | "ppo";
 export type Architecture = string;
-export type CheckpointId1 = string;
+export type CheckpointId3 = string;
 export type Compatible = boolean;
 export type CorrectionSamples = number;
 export type CorrectionSeeds = number[];
@@ -290,12 +367,12 @@ export type DatasetSha256 = string;
 export type EpisodeIds = string[];
 export type EpisodeSha256 = string[];
 export type CleanSuccesses = number;
-export type Collisions3 = number;
+export type Collisions4 = number;
 export type FinalTestEvaluated = false;
-export type InvalidActions3 = number;
+export type InvalidActions4 = number;
 export type MeanSeconds = number;
 export type Successes = number;
-export type Total = number;
+export type Total1 = number;
 export type Features = string[];
 export type FittingLoss = number;
 export type JobId = string;
@@ -314,21 +391,21 @@ export type WeightsSha256 = string;
 export type Episodes2 = Rollout[];
 export type Seeds1 = number[];
 export type ApiVersion2 = "1";
-export type CheckpointId2 = string | null;
+export type CheckpointId4 = string | null;
 export type ControllerError = string | null;
-export type Generation = number;
+export type Generation2 = number;
 export type LastEpisodeId = string | null;
 export type Recording = boolean;
 export type RecordingError = string | null;
 export type Seed7 = number;
-export type SessionId = string;
-export type Tick4 = number;
+export type SessionId2 = string;
+export type Tick5 = number;
 export type ActiveJob = string | null;
-export type ArtifactLocation1 = string;
+export type ArtifactLocation2 = string;
 export type Checkpoints = CheckpointInfo[];
 export type CancelRequested = boolean;
 export type Checkpoints1 = string[];
-export type CreatedAt1 = string;
+export type CreatedAt2 = string;
 export type ElapsedSeconds1 = number;
 export type Epoch = number;
 export type FittingLoss1 = number | null;
@@ -340,7 +417,7 @@ export type Round1 = number;
  */
 export type History = FitPoint[];
 export type JobId1 = string;
-export type Message = string;
+export type Message5 = string;
 export type PeakWorkerRssMb = number;
 export type Phase = "snapshot" | "fitting" | "evaluating" | "corrections" | "practicing" | "finished";
 export type ApproximateKl = number;
@@ -367,7 +444,7 @@ export type PpoSteps = number;
 export type RandomSeed = number;
 export type Round2 = number;
 export type SelectedCheckpoint = string | null;
-export type State = "preparing" | "running" | "completed" | "cancelled" | "failed";
+export type State1 = "preparing" | "running" | "completed" | "cancelled" | "failed";
 export type Jobs = Job[];
 export type Checked = number;
 export type EligibleTrainIds = string[];
@@ -389,6 +466,13 @@ export interface HttpModels {
   expert_request: ExpertRequest;
   health: Health;
   import_result: ImportResult;
+  instruction_request: InstructionRequest;
+  mission_catalog: MissionCatalog;
+  mission_checkpoint: GraphCheckpoint;
+  mission_control: MissionControl;
+  mission_draft: MissionDraft;
+  mission_request: MissionRequest;
+  mission_view: MissionView;
   policy_detail: PolicyDetail;
   review: Review;
   session: SessionView;
@@ -504,6 +588,7 @@ export interface Capabilities {
   heartbeat_hz?: HeartbeatHz;
   language_missions?: LanguageMissions;
   max_sessions?: MaxSessions;
+  missions?: Missions;
   mode?: Mode;
   simulation?: Simulation;
   snapshot_hz?: SnapshotHz;
@@ -537,6 +622,7 @@ export interface PolicyFrame {
   state: StateData;
 }
 export interface Scene {
+  additional_capsules?: AdditionalCapsules;
   capsule: SceneObject;
   collisions: Collisions2;
   controller: Controller1;
@@ -629,6 +715,98 @@ export interface ImportResult {
   duplicates: Duplicates;
   imported: Imported;
 }
+export interface InstructionRequest {
+  instruction: Instruction;
+}
+export interface MissionCatalog {
+  artifact_location: ArtifactLocation1;
+  language: LanguageStatus;
+  missions: Missions1;
+  skills: Skills;
+}
+export interface LanguageStatus {
+  available: Available;
+  message: Message;
+  model: Model;
+}
+export interface MissionView {
+  capsules: Capsules;
+  checkpoint_sha256?: CheckpointSha256;
+  collisions?: Collisions3;
+  created_at: CreatedAt1;
+  current_skill?: CurrentSkill;
+  delivered?: Delivered2;
+  docked?: Docked;
+  implementation?: Implementation;
+  invalid_actions?: InvalidActions3;
+  last_world: StateData;
+  max_recoveries?: MaxRecoveries;
+  message: Message1;
+  mission_id: MissionId;
+  recoveries?: Recoveries;
+  request: MissionRequest;
+  state: State;
+  total: Total;
+  total_ticks?: TotalTicks;
+  trace?: Trace;
+}
+export interface MissionCapsule {
+  id: Id3;
+  position: Position;
+  status: Status3;
+}
+export interface MissionRequest {
+  checkpoint_id?: CheckpointId1;
+  controller?: Controller2;
+  generation: Generation;
+  intent?: MissionIntent;
+  session_id: SessionId;
+}
+export interface MissionIntent {
+  capsule_count?: CapsuleCount;
+  reason?: Reason2;
+  task?: Task;
+}
+export interface MissionTrace {
+  implementation?: Implementation1;
+  message: Message2;
+  node: Node;
+  sequence: Sequence;
+  skill?: Skill;
+  tick: Tick4;
+}
+export interface SkillContract {
+  cancellation?: Cancellation;
+  completion: Completion;
+  failures: Failures;
+  implementation: Implementation2;
+  max_ticks: MaxTicks1;
+  name: Name;
+  preconditions: Preconditions;
+}
+export interface GraphCheckpoint {
+  checkpoint_id: CheckpointId2;
+  message?: Message3;
+  mission_id: MissionId1;
+  next_nodes: NextNodes;
+  task_state: MissionView | null;
+}
+export interface MissionControl {
+  action: Action;
+  generation: Generation1;
+  session_id: SessionId1;
+}
+export interface MissionDraft {
+  intent: MissionIntent1;
+  message?: Message4;
+  model: Model1;
+  source?: Source2;
+}
+export interface MissionIntent1 {
+  capsule_count?: CapsuleCount;
+  reason?: Reason2;
+  task?: Task;
+}
 export interface PolicyDetail {
   checkpoint: CheckpointInfo;
   evaluation: Evaluation;
@@ -637,7 +815,7 @@ export interface PolicyDetail {
 export interface CheckpointInfo {
   algorithm?: Algorithm;
   architecture: Architecture;
-  checkpoint_id: CheckpointId1;
+  checkpoint_id: CheckpointId3;
   compatible?: Compatible;
   configuration: Configuration;
   correction_samples: CorrectionSamples;
@@ -663,13 +841,13 @@ export interface CheckpointInfo {
 }
 export interface EvaluationSummary {
   clean_successes: CleanSuccesses;
-  collisions: Collisions3;
+  collisions: Collisions4;
   failure_counts: FailureCounts;
   final_test_evaluated?: FinalTestEvaluated;
-  invalid_actions: InvalidActions3;
+  invalid_actions: InvalidActions4;
   mean_seconds: MeanSeconds;
   successes: Successes;
-  total?: Total;
+  total?: Total1;
 }
 export interface FailureCounts {
   [k: string]: number;
@@ -681,33 +859,34 @@ export interface Evaluation {
 }
 export interface SessionView {
   api_version?: ApiVersion2;
-  checkpoint_id?: CheckpointId2;
+  checkpoint_id?: CheckpointId4;
   controller_error?: ControllerError;
-  generation: Generation;
+  generation: Generation2;
   last_episode_id?: LastEpisodeId;
+  mission?: MissionView | null;
   recording?: Recording;
   recording_error?: RecordingError;
   scene: Scene;
   seed: Seed7;
-  session_id: SessionId;
-  tick: Tick4;
+  session_id: SessionId2;
+  tick: Tick5;
 }
 export interface TrainingCatalog {
   active_job: ActiveJob;
-  artifact_location: ArtifactLocation1;
+  artifact_location: ArtifactLocation2;
   checkpoints: Checkpoints;
   jobs: Jobs;
 }
 export interface Job {
   cancel_requested?: CancelRequested;
   checkpoints?: Checkpoints1;
-  created_at: CreatedAt1;
+  created_at: CreatedAt2;
   elapsed_seconds?: ElapsedSeconds1;
   epoch?: Epoch;
   fitting_loss?: FittingLoss1;
   history?: History;
   job_id: JobId1;
-  message: Message;
+  message: Message5;
   peak_worker_rss_mb?: PeakWorkerRssMb;
   phase: Phase;
   practice_history?: PracticeHistory;
@@ -715,7 +894,7 @@ export interface Job {
   request: TrainRequest;
   round?: Round2;
   selected_checkpoint?: SelectedCheckpoint;
-  state: State;
+  state: State1;
 }
 export interface FitPoint {
   epoch: Epoch1;

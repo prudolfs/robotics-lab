@@ -81,6 +81,11 @@
             "title": "Max Sessions",
             "type": "integer"
           },
+          "missions": {
+            "default": true,
+            "title": "Missions",
+            "type": "boolean"
+          },
           "mode": {
             "const": "reference_simulation",
             "default": "reference_simulation",
@@ -980,6 +985,57 @@
         "title": "Frame",
         "type": "object"
       },
+      "GraphCheckpoint": {
+        "additionalProperties": false,
+        "properties": {
+          "checkpoint_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checkpoint Id"
+          },
+          "message": {
+            "default": "Graph task checkpoint; physical sessions remain ephemeral and are never replayed automatically.",
+            "title": "Message",
+            "type": "string"
+          },
+          "mission_id": {
+            "pattern": "^[a-f0-9]{32}$",
+            "title": "Mission Id",
+            "type": "string"
+          },
+          "next_nodes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Next Nodes",
+            "type": "array"
+          },
+          "task_state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MissionView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "mission_id",
+          "checkpoint_id",
+          "next_nodes",
+          "task_state"
+        ],
+        "title": "GraphCheckpoint",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1036,6 +1092,22 @@
           "duplicates"
         ],
         "title": "ImportResult",
+        "type": "object"
+      },
+      "InstructionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "instruction": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Instruction",
+            "type": "string"
+          }
+        },
+        "required": [
+          "instruction"
+        ],
+        "title": "InstructionRequest",
         "type": "object"
       },
       "Job": {
@@ -1170,6 +1242,461 @@
           "message"
         ],
         "title": "Job",
+        "type": "object"
+      },
+      "LanguageStatus": {
+        "additionalProperties": false,
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          }
+        },
+        "required": [
+          "available",
+          "model",
+          "message"
+        ],
+        "title": "LanguageStatus",
+        "type": "object"
+      },
+      "MissionCapsule": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "position": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Position",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "active",
+              "delivered"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "position",
+          "status"
+        ],
+        "title": "MissionCapsule",
+        "type": "object"
+      },
+      "MissionCatalog": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_location": {
+            "title": "Artifact Location",
+            "type": "string"
+          },
+          "language": {
+            "$ref": "#/components/schemas/LanguageStatus"
+          },
+          "missions": {
+            "items": {
+              "$ref": "#/components/schemas/MissionView"
+            },
+            "title": "Missions",
+            "type": "array"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillContract"
+            },
+            "title": "Skills",
+            "type": "array"
+          }
+        },
+        "required": [
+          "missions",
+          "skills",
+          "language",
+          "artifact_location"
+        ],
+        "title": "MissionCatalog",
+        "type": "object"
+      },
+      "MissionControl": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "pause",
+              "resume",
+              "cancel"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "generation": {
+            "minimum": 0.0,
+            "title": "Generation",
+            "type": "integer"
+          },
+          "session_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Session Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "generation",
+          "action"
+        ],
+        "title": "MissionControl",
+        "type": "object"
+      },
+      "MissionDraft": {
+        "additionalProperties": false,
+        "properties": {
+          "intent": {
+            "$ref": "#/components/schemas/MissionIntent"
+          },
+          "message": {
+            "default": "Review this supported plan, then start it explicitly.",
+            "title": "Message",
+            "type": "string"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "source": {
+            "const": "langchain_tool",
+            "default": "langchain_tool",
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "intent",
+          "model"
+        ],
+        "title": "MissionDraft",
+        "type": "object"
+      },
+      "MissionIntent": {
+        "additionalProperties": false,
+        "properties": {
+          "capsule_count": {
+            "default": 3,
+            "maximum": 3.0,
+            "minimum": 0.0,
+            "title": "Capsule Count",
+            "type": "integer"
+          },
+          "reason": {
+            "default": "",
+            "maxLength": 240,
+            "title": "Reason",
+            "type": "string"
+          },
+          "task": {
+            "default": "collect_and_dock",
+            "enum": [
+              "collect_and_dock",
+              "return_to_dock",
+              "unsupported"
+            ],
+            "title": "Task",
+            "type": "string"
+          }
+        },
+        "title": "MissionIntent",
+        "type": "object"
+      },
+      "MissionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "checkpoint_id": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{32}-r[0-3]$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checkpoint Id"
+          },
+          "controller": {
+            "default": "learned_policy",
+            "enum": [
+              "learned_policy",
+              "scripted_reference"
+            ],
+            "title": "Controller",
+            "type": "string"
+          },
+          "generation": {
+            "minimum": 0.0,
+            "title": "Generation",
+            "type": "integer"
+          },
+          "intent": {
+            "$ref": "#/components/schemas/MissionIntent",
+            "default": {
+              "capsule_count": 3,
+              "reason": "",
+              "task": "collect_and_dock"
+            }
+          },
+          "session_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Session Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "generation"
+        ],
+        "title": "MissionRequest",
+        "type": "object"
+      },
+      "MissionTrace": {
+        "additionalProperties": false,
+        "properties": {
+          "implementation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Implementation"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "node": {
+            "enum": [
+              "observe",
+              "select",
+              "execute",
+              "verify",
+              "recover",
+              "control"
+            ],
+            "title": "Node",
+            "type": "string"
+          },
+          "sequence": {
+            "title": "Sequence",
+            "type": "integer"
+          },
+          "skill": {
+            "anyOf": [
+              {
+                "enum": [
+                  "align_target",
+                  "collect_deliver",
+                  "return_to_dock"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skill"
+          },
+          "tick": {
+            "title": "Tick",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sequence",
+          "node",
+          "tick",
+          "message"
+        ],
+        "title": "MissionTrace",
+        "type": "object"
+      },
+      "MissionView": {
+        "additionalProperties": false,
+        "properties": {
+          "capsules": {
+            "items": {
+              "$ref": "#/components/schemas/MissionCapsule"
+            },
+            "title": "Capsules",
+            "type": "array"
+          },
+          "checkpoint_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checkpoint Sha256"
+          },
+          "collisions": {
+            "default": 0,
+            "title": "Collisions",
+            "type": "integer"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "current_skill": {
+            "anyOf": [
+              {
+                "enum": [
+                  "align_target",
+                  "collect_deliver",
+                  "return_to_dock"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Skill"
+          },
+          "delivered": {
+            "default": 0,
+            "title": "Delivered",
+            "type": "integer"
+          },
+          "docked": {
+            "default": false,
+            "title": "Docked",
+            "type": "boolean"
+          },
+          "implementation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Implementation"
+          },
+          "invalid_actions": {
+            "default": 0,
+            "title": "Invalid Actions",
+            "type": "integer"
+          },
+          "last_world": {
+            "$ref": "#/components/schemas/StateData"
+          },
+          "max_recoveries": {
+            "const": 1,
+            "default": 1,
+            "title": "Max Recoveries",
+            "type": "integer"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "mission_id": {
+            "pattern": "^[a-f0-9]{32}$",
+            "title": "Mission Id",
+            "type": "string"
+          },
+          "recoveries": {
+            "default": 0,
+            "title": "Recoveries",
+            "type": "integer"
+          },
+          "request": {
+            "$ref": "#/components/schemas/MissionRequest"
+          },
+          "state": {
+            "enum": [
+              "running",
+              "paused",
+              "completed",
+              "failed",
+              "cancelled",
+              "orphaned"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "total_ticks": {
+            "default": 0,
+            "title": "Total Ticks",
+            "type": "integer"
+          },
+          "trace": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MissionTrace"
+            },
+            "maxItems": 96,
+            "title": "Trace",
+            "type": "array"
+          }
+        },
+        "required": [
+          "mission_id",
+          "request",
+          "state",
+          "created_at",
+          "total",
+          "message",
+          "capsules",
+          "last_world"
+        ],
+        "title": "MissionView",
         "type": "object"
       },
       "ObservationData": {
@@ -1509,6 +2036,14 @@
       "Scene": {
         "additionalProperties": false,
         "properties": {
+          "additional_capsules": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SceneObject"
+            },
+            "title": "Additional Capsules",
+            "type": "array"
+          },
           "capsule": {
             "$ref": "#/components/schemas/SceneObject"
           },
@@ -1594,7 +2129,9 @@
               "release",
               "done",
               "manual",
-              "learned"
+              "learned",
+              "docking",
+              "aligning"
             ],
             "title": "Stage",
             "type": "string"
@@ -1710,6 +2247,16 @@
             ],
             "title": "Last Episode Id"
           },
+          "mission": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MissionView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "recording": {
             "default": false,
             "title": "Recording",
@@ -1753,6 +2300,64 @@
           "scene"
         ],
         "title": "SessionView",
+        "type": "object"
+      },
+      "SkillContract": {
+        "additionalProperties": false,
+        "properties": {
+          "cancellation": {
+            "default": "Pause physical steps; cancel ends the mission without resetting the robot.",
+            "title": "Cancellation",
+            "type": "string"
+          },
+          "completion": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Completion",
+            "type": "array"
+          },
+          "failures": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Failures",
+            "type": "array"
+          },
+          "implementation": {
+            "title": "Implementation",
+            "type": "string"
+          },
+          "max_ticks": {
+            "title": "Max Ticks",
+            "type": "integer"
+          },
+          "name": {
+            "enum": [
+              "align_target",
+              "collect_deliver",
+              "return_to_dock"
+            ],
+            "title": "Name",
+            "type": "string"
+          },
+          "preconditions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Preconditions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "implementation",
+          "preconditions",
+          "completion",
+          "failures",
+          "max_ticks"
+        ],
+        "title": "SkillContract",
         "type": "object"
       },
       "StateData": {
@@ -2425,6 +3030,225 @@
           }
         },
         "summary": "Health"
+      }
+    },
+    "/api/v1/greenhouse/missions": {
+      "get": {
+        "operationId": "catalog_api_v1_greenhouse_missions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissionCatalog"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Catalog"
+      },
+      "post": {
+        "operationId": "start_api_v1_greenhouse_missions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MissionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissionView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start"
+      }
+    },
+    "/api/v1/greenhouse/missions/draft": {
+      "post": {
+        "operationId": "draft_api_v1_greenhouse_missions_draft_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstructionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissionDraft"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Draft"
+      }
+    },
+    "/api/v1/greenhouse/missions/{mission_id}": {
+      "get": {
+        "operationId": "get_api_v1_greenhouse_missions__mission_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "mission_id",
+            "required": true,
+            "schema": {
+              "title": "Mission Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissionView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get"
+      }
+    },
+    "/api/v1/greenhouse/missions/{mission_id}/checkpoint": {
+      "get": {
+        "operationId": "checkpoint_api_v1_greenhouse_missions__mission_id__checkpoint_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "mission_id",
+            "required": true,
+            "schema": {
+              "title": "Mission Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphCheckpoint"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Checkpoint"
+      }
+    },
+    "/api/v1/greenhouse/missions/{mission_id}/control": {
+      "post": {
+        "operationId": "control_api_v1_greenhouse_missions__mission_id__control_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "mission_id",
+            "required": true,
+            "schema": {
+              "title": "Mission Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MissionControl"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissionView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Control"
       }
     },
     "/api/v1/greenhouse/sessions": {
