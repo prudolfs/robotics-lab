@@ -2,7 +2,7 @@
 
 > Proposed implementation plan for the next Robotics Lab project: an expressive robot that learns useful tasks in a simulated greenhouse.
 >
-> Status: Phases 0–2 complete; awaiting user review of the [Phase 2 simulation](greenhouse-demo/phase2/README.md). Later phases remain unchecked. Stop before starting Phase 3.
+> Status: Phases 0–3 complete; awaiting user review of the [Phase 3 greenhouse and caretaker](greenhouse-demo/phase3/README.md). Later phases remain unchecked. Stop before starting Phase 4.
 
 ## Goal and experience
 
@@ -137,16 +137,16 @@ Exit verified: the [Phase 2 review](greenhouse-demo/phase2/README.md) records 13
 
 ### Phase 3 — Authored greenhouse and caretaker character
 
-- [ ] Ask the user to open Blender and enable Blender MCP, then verify connectivity before interactive asset work.
-- [ ] Model the greenhouse shell, plants/pots, benches, tray, capsules, charging nook and original caretaker in Blender.
-- [ ] Preserve editable Blender sources and a repeatable export script; export runtime GLBs and a manifest for dimensions, pivots and collision alignment.
-- [ ] Integrate driven wheels, head motion, gripper/lift and carried objects using authoritative simulation state.
-- [ ] Add warm lighting, readable materials and restrained environmental detail consistent with the agreed visual brief.
-- [ ] Add event-driven expressions with reduced-motion support and optional sound controls.
-- [ ] Add robot-eye inspection and review overview/follow/detail screenshots in the browser.
-- [ ] Measure scene performance and loading on the reference setup; correct mesh/physics alignment and resource disposal issues.
+- [x] Ask the user to open Blender and enable Blender MCP, then verify connectivity before interactive asset work.
+- [x] Model the greenhouse shell, plants/pots, benches, tray, capsules, charging nook and original caretaker in Blender.
+- [x] Preserve editable Blender sources and a repeatable export script; export runtime GLBs and a manifest for dimensions, pivots and collision alignment.
+- [x] Integrate driven wheels, head motion, gripper/lift and carried objects using authoritative simulation state.
+- [x] Add warm lighting, readable materials and restrained environmental detail consistent with the agreed visual brief.
+- [x] Add event-driven expressions with reduced-motion support and optional sound controls.
+- [x] Add robot-eye inspection and review overview/follow/detail screenshots in the browser.
+- [x] Measure scene performance and loading on the reference setup; correct mesh/physics alignment and resource disposal issues.
 
-Exit: a visually convincing caretaker completing the reference task in its greenhouse. Stop for user review before Phase 4.
+Exit verified: the [Phase 3 review](greenhouse-demo/phase3/README.md) records the authored Blender kit, live collection, camera/expressions/sound checks, collision alignment, loading and WebGPU measurements. Stop for user review before Phase 4.
 
 ### Phase 4 — Teaching and demonstration datasets
 

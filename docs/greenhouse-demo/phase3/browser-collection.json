@@ -1,0 +1,333 @@
+{
+  "url": "http://127.0.0.1:4186/",
+  "source": "Live Python MuJoCo session; scripted reference controller",
+  "snapshots": 112,
+  "initial": {
+    "api_version": "1",
+    "session_id": "835a30b1-a88f-45c9-8994-edcb8cea8cfd",
+    "generation": 0,
+    "tick": 0,
+    "kind": "snapshot",
+    "seed": 42,
+    "scene": {
+      "mode": "reference_simulation",
+      "simulator_version": "greenhouse-world-v1",
+      "controller": "scripted_reference",
+      "status": "ready",
+      "stage": "approach",
+      "elapsed_seconds": 0,
+      "delivered": false,
+      "pickups": 0,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null,
+      "events": [
+        {
+          "tick": 0,
+          "kind": "info",
+          "text": "Ready to collect the seed capsule."
+        }
+      ],
+      "walls": [
+        {
+          "id": "wall-north",
+          "position": {
+            "x": 0,
+            "y": 2.05,
+            "z": 0.12
+          },
+          "half_size": {
+            "x": 3.1,
+            "y": 0.05,
+            "z": 0.12
+          }
+        },
+        {
+          "id": "wall-south",
+          "position": {
+            "x": 0,
+            "y": -2.05,
+            "z": 0.12
+          },
+          "half_size": {
+            "x": 3.1,
+            "y": 0.05,
+            "z": 0.12
+          }
+        },
+        {
+          "id": "wall-east",
+          "position": {
+            "x": 3.05,
+            "y": 0,
+            "z": 0.12
+          },
+          "half_size": {
+            "x": 0.05,
+            "y": 2,
+            "z": 0.12
+          }
+        },
+        {
+          "id": "wall-west",
+          "position": {
+            "x": -3.05,
+            "y": 0,
+            "z": 0.12
+          },
+          "half_size": {
+            "x": 0.05,
+            "y": 2,
+            "z": 0.12
+          }
+        }
+      ],
+      "pots": [
+        {
+          "id": "pot-0",
+          "position": {
+            "x": -2,
+            "y": 1.65,
+            "z": 0.15
+          }
+        },
+        {
+          "id": "pot-1",
+          "position": {
+            "x": -1,
+            "y": 1.65,
+            "z": 0.15
+          }
+        },
+        {
+          "id": "pot-2",
+          "position": {
+            "x": 0,
+            "y": 1.65,
+            "z": 0.15
+          }
+        },
+        {
+          "id": "pot-3",
+          "position": {
+            "x": 1,
+            "y": 1.65,
+            "z": 0.15
+          }
+        },
+        {
+          "id": "pot-4",
+          "position": {
+            "x": 2,
+            "y": 1.65,
+            "z": 0.15
+          }
+        }
+      ],
+      "robot": {
+        "id": "caretaker",
+        "x": -1.088458561233693,
+        "y": -0.6649849426882662,
+        "heading": -0.4499413632617615,
+        "holding": false,
+        "lift_height": 0.05,
+        "left_wheel_angle": 0,
+        "right_wheel_angle": 0
+      },
+      "capsule": {
+        "id": "capsule-1",
+        "position": {
+          "x": 0.06740805361161706,
+          "y": 0.33105969982961736,
+          "z": 0.05
+        }
+      },
+      "tray": {
+        "id": "collection-tray",
+        "position": {
+          "x": 1.65,
+          "y": 0.65,
+          "z": 0
+        }
+      }
+    }
+  },
+  "final": {
+    "api_version": "1",
+    "session_id": "835a30b1-a88f-45c9-8994-edcb8cea8cfd",
+    "generation": 0,
+    "tick": 218,
+    "kind": "snapshot",
+    "seed": 42,
+    "scene": {
+      "mode": "reference_simulation",
+      "simulator_version": "greenhouse-world-v1",
+      "controller": "scripted_reference",
+      "status": "complete",
+      "stage": "done",
+      "elapsed_seconds": 10.9,
+      "delivered": true,
+      "pickups": 1,
+      "collisions": 0,
+      "invalid_actions": 0,
+      "reason": null,
+      "events": [
+        {
+          "tick": 0,
+          "kind": "info",
+          "text": "Ready to collect the seed capsule."
+        },
+        {
+          "tick": 0,
+          "kind": "info",
+          "text": "Scripted reference controller running."
+        },
+        {
+          "tick": 9,
+          "kind": "info",
+          "text": "Collection paused."
+        },
+        {
+          "tick": 9,
+          "kind": "info",
+          "text": "Scripted reference controller running."
+        },
+        {
+          "tick": 78,
+          "kind": "success",
+          "text": "Capsule secured in the gripper."
+        },
+        {
+          "tick": 218,
+          "kind": "success",
+          "text": "Seed capsule delivered to the collection tray."
+        }
+      ],
+      "walls": [
+        {
+          "id": "wall-north",
+          "position": {
+            "x": 0,
+            "y": 2.05,
+            "z": 0.12
+          },
+          "half_size": {
+            "x": 3.1,
+            "y": 0.05,
+            "z": 0.12
+          }
+        },
+        {
+          "id": "wall-south",
+          "position": {
+            "x": 0,
+            "y": -2.05,
+            "z": 0.12
+          },
+          "half_size": {
+            "x": 3.1,
+            "y": 0.05,
+            "z": 0.12
+          }
+        },
+        {
+          "id": "wall-east",
+          "position": {
+            "x": 3.05,
+            "y": 0,
+            "z": 0.12
+          },
+          "half_size": {
+            "x": 0.05,
+            "y": 2,
+            "z": 0.12
+          }
+        },
+        {
+          "id": "wall-west",
+          "position": {
+            "x": -3.05,
+            "y": 0,
+            "z": 0.12
+          },
+          "half_size": {
+            "x": 0.05,
+            "y": 2,
+            "z": 0.12
+          }
+        }
+      ],
+      "pots": [
+        {
+          "id": "pot-0",
+          "position": {
+            "x": -2,
+            "y": 1.65,
+            "z": 0.15
+          }
+        },
+        {
+          "id": "pot-1",
+          "position": {
+            "x": -1,
+            "y": 1.65,
+            "z": 0.15
+          }
+        },
+        {
+          "id": "pot-2",
+          "position": {
+            "x": 0,
+            "y": 1.65,
+            "z": 0.15
+          }
+        },
+        {
+          "id": "pot-3",
+          "position": {
+            "x": 1,
+            "y": 1.65,
+            "z": 0.15
+          }
+        },
+        {
+          "id": "pot-4",
+          "position": {
+            "x": 2,
+            "y": 1.65,
+            "z": 0.15
+          }
+        }
+      ],
+      "robot": {
+        "id": "caretaker",
+        "x": 1.2840827557932313,
+        "y": 0.5451654731162406,
+        "heading": 0.27902400591746457,
+        "holding": false,
+        "lift_height": 0.05,
+        "left_wheel_angle": 18.287814610311308,
+        "right_wheel_angle": 20.57884862773168
+      },
+      "capsule": {
+        "id": "capsule-1",
+        "position": {
+          "x": 1.6109331544773242,
+          "y": 0.6388074342236927,
+          "z": 0.05
+        }
+      },
+      "tray": {
+        "id": "collection-tray",
+        "position": {
+          "x": 1.65,
+          "y": 0.65,
+          "z": 0
+        }
+      }
+    }
+  },
+  "pause_freezes_tick": true,
+  "follow_camera_selected": true,
+  "page_errors": []
+}

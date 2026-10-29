@@ -1,0 +1,66 @@
+{
+  "blender": "5.2.3 LTS",
+  "manifestHash": "902eb57f9fd97afe1cb766e25b7cbf36acfe7aae94ba45cc520bcaf21b7e65b6",
+  "source": "assets/greenhouse-demo/greenhouse.blend",
+  "bundles": {
+    "environment": {
+      "bytes": 2449832,
+      "meshes": 20,
+      "triangles": 35368,
+      "pivots": [
+        "Greenhouse_Root"
+      ]
+    },
+    "caretaker": {
+      "bytes": 1051888,
+      "meshes": 31,
+      "triangles": 16676,
+      "pivots": [
+        "Caretaker_Root",
+        "Wheel_Left",
+        "Wheel_Right",
+        "Head_Pan",
+        "Head_Pitch",
+        "Eyelid_Left",
+        "Eyelid_Right",
+        "Robot_Eye",
+        "Lift_Carriage",
+        "Jaw_Left",
+        "Jaw_Right",
+        "Status_Light"
+      ]
+    },
+    "capsule": {
+      "bytes": 24072,
+      "meshes": 3,
+      "triangles": 832,
+      "pivots": [
+        "Capsule_Root"
+      ]
+    },
+    "plant-a": {
+      "bytes": 55636,
+      "meshes": 8,
+      "triangles": 1338,
+      "pivots": [
+        "Plant_Root_0"
+      ]
+    },
+    "plant-b": {
+      "bytes": 130136,
+      "meshes": 8,
+      "triangles": 2488,
+      "pivots": [
+        "Plant_Root_1"
+      ]
+    },
+    "plant-c": {
+      "bytes": 119424,
+      "meshes": 8,
+      "triangles": 2666,
+      "pivots": [
+        "Plant_Root_2"
+      ]
+    }
+  }
+}

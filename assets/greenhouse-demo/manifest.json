@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "units": "meters",
+  "coordinates": { "blender": "X,Y,Z-up", "runtime": "X,Z,-Y", "forward": "+X" },
+  "scene": "Greenhouse_Phase3",
+  "world": { "width": 6, "depth": 4, "roofRidge": 2.65, "roofEave": 2.05 },
+  "robot": {
+    "name": "Pip",
+    "chassis": { "center": [0, 0, 0.21], "halfSize": [0.21, 0.18, 0.14] },
+    "wheelRadius": 0.14,
+    "wheelWidth": 0.08,
+    "wheelCenters": [[0, 0.22, 0.14], [0, -0.22, 0.14]],
+    "gripperReach": 0.34,
+    "liftMin": 0.05,
+    "liftMax": 0.28,
+    "openJawOffset": 0.09,
+    "closedJawOffset": 0.0625,
+    "headPanPivot": [0.025, 0, 0.43],
+    "headPitchPivot": [0.035, 0, 0.09],
+    "eyeLocal": [0.15, 0, 0.025],
+    "maxDecorativeHeight": 0.68
+  },
+  "capsule": { "radius": 0.05, "origin": "sphere center" },
+  "tray": { "position": [1.65, 0.65, 0], "width": 0.65, "depth": 0.65, "acceptanceRadius": 0.20 },
+  "pot": { "radius": 0.15, "height": 0.30 },
+  "potPositions": [[-2, 1.65, 0], [-1, 1.65, 0], [0, 1.65, 0], [1, 1.65, 0], [2, 1.65, 0]],
+  "walls": [
+    { "id": "wall-north", "center": [0, 2.05, 0.12], "halfSize": [3.1, 0.05, 0.12] },
+    { "id": "wall-south", "center": [0, -2.05, 0.12], "halfSize": [3.1, 0.05, 0.12] },
+    { "id": "wall-east", "center": [3.05, 0, 0.12], "halfSize": [0.05, 2, 0.12] },
+    { "id": "wall-west", "center": [-3.05, 0, 0.12], "halfSize": [0.05, 2, 0.12] }
+  ],
+  "benches": { "centers": [[-1.5, 1.9, 0.88], [1.5, 1.9, 0.88]], "size": [2.4, 0.24, 0.06], "minimumUnderside": 0.70, "support": "wall mounted, above robot and carried capsule envelope" },
+  "dock": { "pad": [-2.55, -0.85, 0.001], "panel": [-3.025, -0.85, 0.48], "panelDepth": 0.05, "behavior": "decorative; no docking mission yet" },
+  "pivots": {
+    "root": "Caretaker_Root",
+    "leftWheel": "Wheel_Left",
+    "rightWheel": "Wheel_Right",
+    "headPan": "Head_Pan",
+    "headPitch": "Head_Pitch",
+    "eye": "Robot_Eye",
+    "lift": "Lift_Carriage",
+    "leftJaw": "Jaw_Left",
+    "rightJaw": "Jaw_Right",
+    "status": "Status_Light",
+    "lids": ["Eyelid_Left", "Eyelid_Right"]
+  },
+  "assets": {
+    "environment": "/assets/greenhouse/environment.glb",
+    "caretaker": "/assets/greenhouse/caretaker.glb",
+    "capsule": "/assets/greenhouse/capsule.glb",
+    "plants": ["/assets/greenhouse/plant-a.glb", "/assets/greenhouse/plant-b.glb", "/assets/greenhouse/plant-c.glb"]
+  },
+  "limits": { "totalBytes": 8000000, "totalTriangles": 120000, "drawCalls": 200, "referenceP95FrameMs": 33.4 }
+}

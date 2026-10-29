@@ -3,6 +3,7 @@ import { useSession } from './api/use-session'
 import { type CameraMode, GreenhouseScene } from './components/greenhouse-scene'
 import { Button } from './components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from './components/ui/toggle-group'
+import { useCaretakerSound } from './components/use-caretaker-sound'
 
 const stageLabels = {
 	approach: 'Approaching the capsule',
@@ -19,6 +20,7 @@ export function App() {
 	const [cameraMode, setCameraMode] = useState<CameraMode>('overview')
 	const connected = connection.status === 'connected'
 	const scene = connection.session?.scene
+	const sound = useCaretakerSound(scene, connection.session?.generation ?? 0)
 	const running = scene?.status === 'running'
 	const terminal = scene?.status === 'complete' || scene?.status === 'failed'
 	const disabled = !connected || connection.pending
@@ -31,7 +33,7 @@ export function App() {
 						A small robot learning to lend a hand.
 					</p>
 				</div>
-				<p className="text-muted-foreground text-sm">Robotics Lab · Phase 2</p>
+				<p className="text-muted-foreground text-sm">Robotics Lab · Phase 3</p>
 			</header>
 			<div
 				className="flex min-h-[580px] flex-1 flex-col lg:flex-row"
@@ -110,12 +112,27 @@ export function App() {
 							variant="outline"
 							value={[cameraMode]}
 							onValueChange={(value) => {
-								if (value[0] === 'overview' || value[0] === 'follow') setCameraMode(value[0])
+								if (value[0] === 'overview' || value[0] === 'follow' || value[0] === 'eye')
+									setCameraMode(value[0])
 							}}
 						>
 							<ToggleGroupItem value="overview">Overview</ToggleGroupItem>
 							<ToggleGroupItem value="follow">Follow</ToggleGroupItem>
+							<ToggleGroupItem value="eye">Robot eye</ToggleGroupItem>
 						</ToggleGroup>
+						{cameraMode === 'eye' && (
+							<p className="text-muted-foreground text-xs">
+								Inspection from Pip’s head. This is not a vision sensor used by the controller.
+							</p>
+						)}
+						<Button
+							variant="ghost"
+							aria-pressed={sound.enabled}
+							onClick={() => void sound.toggle()}
+						>
+							{sound.enabled ? 'Sound on' : 'Sound off'}
+						</Button>
+						{sound.error && <p className="text-muted-foreground text-xs">{sound.error}</p>}
 					</div>
 					{scene && (
 						<>
@@ -165,7 +182,7 @@ export function App() {
 					)}
 					<p className="mt-auto text-muted-foreground text-xs leading-relaxed">
 						Scripted reference controller. Ideal target sensing and a simplified grasp; learning
-						arrives in later phases.
+						arrives in later phases. Head gestures and expressions are authored.
 					</p>
 					<Button
 						variant="ghost"

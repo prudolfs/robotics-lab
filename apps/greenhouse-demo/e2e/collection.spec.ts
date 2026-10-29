@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test'
 import type { ServerMessage } from '../src/api/generated/websocket-server'
 
 type Snapshot = Extract<ServerMessage, { kind: 'snapshot' }>
-const output = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase2/', import.meta.url))
+const output = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase3/', import.meta.url))
 
 test('runs a live collection with pause, lift, follow view and valid delivery', async ({
 	page,

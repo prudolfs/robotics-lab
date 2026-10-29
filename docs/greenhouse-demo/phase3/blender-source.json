@@ -1,0 +1,12 @@
+{
+  "sourceScenes": [
+    "Greenhouse_Phase3"
+  ],
+  "sourceObjectCount": 114,
+  "activeScenePreserved": "Scene",
+  "activeSceneObjects": [
+    "Camera",
+    "Cube",
+    "Light"
+  ]
+}

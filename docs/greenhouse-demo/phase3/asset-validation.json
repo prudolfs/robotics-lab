@@ -1,0 +1,36 @@
+{
+  "bundles": {
+    "environment": {
+      "bytes": 2449832,
+      "meshes": 20,
+      "triangles": 35368
+    },
+    "caretaker": {
+      "bytes": 1051888,
+      "meshes": 31,
+      "triangles": 16676
+    },
+    "capsule": {
+      "bytes": 24072,
+      "meshes": 3,
+      "triangles": 832
+    },
+    "plant-a": {
+      "bytes": 55636,
+      "meshes": 8,
+      "triangles": 1338
+    },
+    "plant-b": {
+      "bytes": 130136,
+      "meshes": 8,
+      "triangles": 2488
+    },
+    "plant-c": {
+      "bytes": 119424,
+      "meshes": 8,
+      "triangles": 2666
+    }
+  },
+  "totalBytes": 3830988,
+  "totalTriangles": 59368
+}

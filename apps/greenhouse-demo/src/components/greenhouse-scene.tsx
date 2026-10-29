@@ -1,45 +1,59 @@
 import { OrbitControls } from '@react-three/drei/webgpu'
 import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { Component, type ReactNode, useEffect, useRef, useState } from 'react'
-import type { Group } from 'three'
+import {
+	Component,
+	type ReactNode,
+	Suspense,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from 'react'
+import type { PerspectiveCamera } from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three/addons/controls/OrbitControls.js'
 import { MathUtils, Vector3, WebGPURenderer } from 'three/webgpu'
 import type { Scene } from '../api/client'
+import { AuthoredAssets, type CaretakerRig } from './authored-assets'
 
 type RendererStatus = 'loading' | 'webgpu' | 'unsupported' | 'error'
-export type CameraMode = 'overview' | 'follow'
+export type CameraMode = 'overview' | 'follow' | 'eye'
 
-function Box({
-	position,
-	size,
-	color,
-}: {
-	position: [number, number, number]
-	size: [number, number, number]
-	color: string
-}) {
-	return (
-		<mesh position={position} castShadow receiveShadow>
-			<boxGeometry args={size} />
-			<meshStandardMaterial color={color} roughness={0.85} />
-		</mesh>
-	)
+// Bounded, read-only presentation diagnostics for reproducible browser reviews.
+declare global {
+	interface Window {
+		__greenhouseReview?: {
+			frameMs: number[]
+			drawCalls: number
+			triangles: number
+			memory: { geometries: number; textures: number; total: number }
+			pose?: {
+				robot: number[]
+				capsule: number[]
+				lift: number
+				leftWheel: number
+				headPan: number
+				headPitch: number
+				lids: boolean[]
+				holding: boolean
+			}
+		}
+	}
 }
 
 function World({
 	scene,
 	generation,
 	cameraMode,
+	onReady,
 }: {
 	scene: Scene
 	generation: number
 	cameraMode: CameraMode
+	onReady: () => void
 }) {
-	const robot = useRef<Group>(null)
-	const capsule = useRef<Group>(null)
-	const gripper = useRef<Group>(null)
-	const leftWheel = useRef<Group>(null)
-	const rightWheel = useRef<Group>(null)
+	const rig = useRef<CaretakerRig | null>(null)
+	const expression = useRef({ stage: scene.stage, at: performance.now() })
+	const eyeTarget = useRef(new Vector3())
 	const frame = useRef({ previous: scene, current: scene, generation, received: performance.now() })
 	const camera = useThree((state) => state.camera)
 	const size = useThree((state) => state.size)
@@ -48,9 +62,17 @@ function World({
 	const cameraPosition = useRef(new Vector3())
 	const reduced = useRef(false)
 	useEffect(() => {
-		reduced.current = matchMedia('(prefers-reduced-motion: reduce)').matches
+		const preference = matchMedia('(prefers-reduced-motion: reduce)')
+		const update = () => {
+			reduced.current = preference.matches
+		}
+		update()
+		preference.addEventListener('change', update)
+		return () => preference.removeEventListener('change', update)
 	}, [])
 	useEffect(() => {
+		if (expression.current.stage !== scene.stage)
+			expression.current = { stage: scene.stage, at: performance.now() }
 		const old = frame.current
 		const interpolate =
 			generation === old.generation &&
@@ -74,6 +96,10 @@ function World({
 		)
 		const scale = Math.max(1, Math.sqrt(1.3 / (size.width / size.height)))
 		camera.position.set(5.5 * scale, 5 * scale, 6.1 * scale)
+		const perspective = camera as PerspectiveCamera
+		perspective.near = cameraMode === 'eye' ? 0.015 : 0.1
+		perspective.fov = cameraMode === 'eye' ? 68 : 44
+		perspective.updateProjectionMatrix()
 		controls?.target.copy(target.current)
 		camera.lookAt(target.current)
 		controls?.update()
@@ -93,22 +119,74 @@ function World({
 				Math.cos(b.robot.heading - a.robot.heading),
 			) *
 				alpha
-		robot.current?.position.set(x, 0, -y)
-		robot.current?.rotation.set(0, heading, 0)
-		capsule.current?.position.set(
-			mix(a.capsule.position.x, b.capsule.position.x),
-			mix(a.capsule.position.z, b.capsule.position.z),
-			-mix(a.capsule.position.y, b.capsule.position.y),
-		)
-		if (gripper.current) gripper.current.position.y = mix(a.robot.lift_height, b.robot.lift_height)
-		if (leftWheel.current)
-			leftWheel.current.rotation.z = -mix(a.robot.left_wheel_angle, b.robot.left_wheel_angle)
-		if (rightWheel.current)
-			rightWheel.current.rotation.z = -mix(a.robot.right_wheel_angle, b.robot.right_wheel_angle)
+		const character = rig.current
+		if (character) {
+			character.root.position.set(x, 0, -y)
+			character.root.rotation.set(0, heading, 0)
+			character.capsule.position.set(
+				mix(a.capsule.position.x, b.capsule.position.x),
+				mix(a.capsule.position.z, b.capsule.position.z),
+				-mix(a.capsule.position.y, b.capsule.position.y),
+			)
+			character.lift.position.y = mix(a.robot.lift_height, b.robot.lift_height)
+			character.leftWheel.rotation.z = -mix(a.robot.left_wheel_angle, b.robot.left_wheel_angle)
+			character.rightWheel.rotation.z = -mix(a.robot.right_wheel_angle, b.robot.right_wheel_angle)
+			character.leftJaw.position.z = -(b.robot.holding ? 0.0625 : 0.09)
+			character.rightJaw.position.z = b.robot.holding ? 0.0625 : 0.09
+			// Presentation only: attention, blink and completion nod never feed physics.
+			const tx = b.robot.holding ? b.tray.position.x : b.capsule.position.x
+			const ty = b.robot.holding ? b.tray.position.y : b.capsule.position.y
+			const bearing = Math.atan2(ty - y, tx - x) - heading
+			const elapsed = (performance.now() - expression.current.at) / 1000
+			const nod =
+				(b.stage === 'lift' || b.stage === 'done') && elapsed < 0.65
+					? Math.sin((elapsed / 0.65) * Math.PI * 2) * 0.13
+					: 0
+			character.headPan.rotation.y = reduced.current
+				? 0
+				: MathUtils.clamp(Math.atan2(Math.sin(bearing), Math.cos(bearing)), -0.45, 0.45)
+			character.headPitch.rotation.z = reduced.current ? 0 : -0.18 + nod
+			const blinkPhase = (performance.now() / 1000) % 5.3
+			const blink =
+				reduced.current || blinkPhase > 0.22 ? 0 : Math.sin((blinkPhase / 0.22) * Math.PI)
+			for (const lid of character.lids) {
+				lid.visible = blink > 0.02
+				lid.scale.y = Math.max(0.001, blink)
+			}
+			const color =
+				b.status === 'failed'
+					? '#d67958'
+					: b.status === 'paused'
+						? '#8eafc6'
+						: b.status === 'ready'
+							? '#d8b46a'
+							: '#b4dea2'
+			character.lamp.color.set(color)
+			character.lamp.emissive.set(color)
+			character.lamp.emissiveIntensity = 0.6
+			if (window.__greenhouseReview)
+				window.__greenhouseReview.pose = {
+					robot: character.root.position.toArray(),
+					capsule: character.capsule.position.toArray(),
+					lift: character.lift.position.y,
+					leftWheel: character.leftWheel.rotation.z,
+					headPan: character.headPan.rotation.y,
+					headPitch: character.headPitch.rotation.z,
+					lids: character.lids.map((lid) => lid.visible),
+					holding: b.robot.holding,
+				}
+			if (cameraMode === 'eye') {
+				character.root.updateWorldMatrix(true, true)
+				character.eye.getWorldPosition(camera.position)
+				eyeTarget.current.set(1.5, -0.12, 0)
+				character.eye.localToWorld(eyeTarget.current)
+				camera.lookAt(eyeTarget.current)
+			}
+		}
 		if (cameraMode === 'follow') {
 			const ease = reduced.current ? 1 : 1 - Math.exp(-delta * 7)
 			target.current.set(x, 0.3, -y)
-			cameraPosition.current.set(x + 2.4, 2.8, -y + 3.0)
+			cameraPosition.current.set(x + 1.35, 1.25, -y + 1.65)
 			camera.position.lerp(cameraPosition.current, ease)
 			controls?.target.lerp(target.current, ease)
 			camera.lookAt(controls?.target ?? target.current)
@@ -117,91 +195,21 @@ function World({
 	})
 	return (
 		<>
-			<color attach="background" args={['#d6dfcc']} />
-			<ambientLight intensity={1.6} />
+			<color attach="background" args={['#d8e0d1']} />
+			<hemisphereLight args={['#fff0d0', '#617565', 2]} />
 			<directionalLight
 				castShadow
 				position={[-3, 7, 4]}
-				intensity={3}
-				shadow-mapSize={[1024, 1024]}
+				color="#fff1d5"
+				shadow-camera-left={-4}
+				shadow-camera-right={4}
+				shadow-camera-top={4}
+				shadow-camera-bottom={-4}
+				shadow-normalBias={0.008}
+				intensity={2.5}
+				shadow-mapSize={[2048, 2048]}
 			/>
-			<Box position={[0, -0.1, 0]} size={[6.3, 0.15, 4.3]} color="#9ca98c" />
-			<Box position={[0, -0.005, 0]} size={[6, 0.01, 4]} color="#c6c6a8" />
-			{scene.walls.map((wall) => (
-				<Box
-					key={wall.id}
-					position={[wall.position.x, wall.position.z, -wall.position.y]}
-					size={[wall.half_size.x * 2, wall.half_size.z * 2, wall.half_size.y * 2]}
-					color="#71816b"
-				/>
-			))}
-			{[-2.9, 0, 2.9].map((x) => (
-				<group key={x}>
-					<Box position={[x, 1.1, -1.96]} size={[0.05, 2.2, 0.05]} color="#708071" />
-					<Box position={[x, 2.35, -0.95]} size={[0.05, 0.05, 2.8]} color="#708071" />
-				</group>
-			))}
-			{scene.pots.map((pot) => (
-				<group key={pot.id} position={[pot.position.x, 0, -pot.position.y]}>
-					<mesh castShadow position={[0, 0.15, 0]}>
-						<cylinderGeometry args={[0.15, 0.11, 0.3, 16]} />
-						<meshStandardMaterial color="#9a7756" />
-					</mesh>
-					<mesh castShadow position={[0, 0.4, 0]} scale={[1, 1.4, 1]}>
-						<icosahedronGeometry args={[0.16, 1]} />
-						<meshStandardMaterial color="#618353" />
-					</mesh>
-				</group>
-			))}
-			<mesh
-				position={[scene.tray.position.x, 0.001, -scene.tray.position.y]}
-				rotation={[-Math.PI / 2, 0, 0]}
-				receiveShadow
-			>
-				<planeGeometry args={[0.65, 0.65]} />
-				<meshStandardMaterial color="#728a63" roughness={0.85} />
-			</mesh>
-			<Box position={[-1.75, 0.02, 0.75]} size={[0.75, 0.04, 0.65]} color="#738374" />
-			<group ref={robot}>
-				<Box position={[0, 0.21, 0]} size={[0.42, 0.28, 0.36]} color="#e7dfb2" />
-				{[-0.22, 0.22].map((z) => (
-					<group key={z} ref={z < 0 ? leftWheel : rightWheel} position={[0, 0.14, z]}>
-						<mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
-							<cylinderGeometry args={[0.14, 0.14, 0.08, 20]} />
-							<meshStandardMaterial color="#374b42" />
-						</mesh>
-						<Box
-							position={[0, 0, z < 0 ? -0.041 : 0.041]}
-							size={[0.19, 0.025, 0.009]}
-							color="#8fa38e"
-						/>
-					</group>
-				))}
-				<Box position={[0.03, 0.43, 0]} size={[0.06, 0.2, 0.06]} color="#647764" />
-				<Box position={[0.08, 0.56, 0]} size={[0.17, 0.15, 0.38]} color="#e7dfb2" />
-				{[-0.11, 0.11].map((z) => (
-					<mesh key={z} position={[0.17, 0.56, z]} rotation={[0, 0, -Math.PI / 2]}>
-						<cylinderGeometry args={[0.055, 0.055, 0.035, 20]} />
-						<meshStandardMaterial color="#344942" />
-					</mesh>
-				))}
-				<group ref={gripper}>
-					{[-1, 1].map((side) => (
-						<Box
-							key={side}
-							position={[0.28, 0, side * (scene.robot.holding ? 0.0625 : 0.09)]}
-							size={[0.22, 0.025, 0.025]}
-							color="#657963"
-						/>
-					))}
-				</group>
-			</group>
-			<group ref={capsule}>
-				<mesh castShadow>
-					<sphereGeometry args={[0.05, 16, 12]} />
-					<meshStandardMaterial color="#d2943e" />
-				</mesh>
-			</group>
+			<AuthoredAssets scene={scene} rigRef={rig} onReady={onReady} />
 			<OrbitControls
 				makeDefault
 				enabled={cameraMode === 'overview'}
@@ -214,12 +222,46 @@ function World({
 
 function ReportBackend({ onStatus }: { onStatus: (status: RendererStatus) => void }) {
 	const renderer = useThree((state) => state.renderer as WebGPURenderer)
+	const world = useThree((state) => state.scene)
+	useFrame((_, delta) => {
+		const review = window.__greenhouseReview
+		if (!review) return
+		review.frameMs.push(delta * 1000)
+		if (review.frameMs.length > 600) review.frameMs.shift()
+	})
 	useEffect(() => {
+		const previous = world.onAfterRender
+		world.onAfterRender = (...args) => {
+			previous.apply(world, args)
+			const review = window.__greenhouseReview
+			if (!review) return
+			review.drawCalls = renderer.info.render.drawCalls
+			review.triangles = renderer.info.render.triangles
+			review.memory = {
+				geometries: renderer.info.memory.geometries,
+				textures: renderer.info.memory.textures,
+				total: renderer.info.memory.total,
+			}
+		}
+		return () => {
+			world.onAfterRender = previous
+		}
+	}, [renderer, world])
+	useEffect(() => {
+		window.__greenhouseReview = {
+			frameMs: [],
+			drawCalls: 0,
+			triangles: 0,
+			memory: { geometries: 0, textures: 0, total: 0 },
+		}
 		onStatus(
 			(renderer.backend as { isWebGPUBackend?: boolean }).isWebGPUBackend
 				? 'webgpu'
 				: 'unsupported',
 		)
+		return () => {
+			delete window.__greenhouseReview
+		}
 	}, [renderer, onStatus])
 	return null
 }
@@ -249,6 +291,8 @@ export function GreenhouseScene({
 	generation: number
 	cameraMode: CameraMode
 }) {
+	const [assetsReady, setAssetsReady] = useState(false)
+	const ready = useCallback(() => setAssetsReady(true), [])
 	const [status, setStatus] = useState<RendererStatus>('loading')
 	const [capable, setCapable] = useState(false)
 	useEffect(() => {
@@ -276,7 +320,9 @@ export function GreenhouseScene({
 				className="absolute top-4 left-5 z-10 rounded-md bg-background/90 px-3 py-2 text-muted-foreground text-xs"
 			>
 				{status === 'webgpu'
-					? 'WebGPU active'
+					? assetsReady
+						? 'WebGPU active'
+						: 'Loading greenhouse assets…'
 					: status === 'unsupported'
 						? 'WebGPU is unavailable'
 						: status === 'error'
@@ -301,7 +347,14 @@ export function GreenhouseScene({
 						}}
 					>
 						<ReportBackend onStatus={setStatus} />
-						<World scene={scene} generation={generation} cameraMode={cameraMode} />
+						<Suspense fallback={null}>
+							<World
+								scene={scene}
+								generation={generation}
+								cameraMode={cameraMode}
+								onReady={ready}
+							/>
+						</Suspense>
 					</Canvas>
 				</Boundary>
 			)}

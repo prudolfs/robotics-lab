@@ -2,6 +2,8 @@
 
 Project-owned Python service for Greenhouse Caretaker. Phase 2 provides an independent fixed-step MuJoCo world, a scripted collection controller, ephemeral sessions and validated live WebSocket commands. Training jobs and LangGraph missions arrive in later phases.
 
+Phase 3 adds Blender-authored presentation in the frontend without changing the simulation or API. The server suite checks the asset manifest against the compiled MuJoCo chassis, wheels, pots, walls and task dimensions. See the [Phase 3 review](../../docs/greenhouse-demo/phase3/README.md).
+
 From the repository root:
 
 ```sh
