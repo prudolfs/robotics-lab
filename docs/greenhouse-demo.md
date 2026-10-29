@@ -2,7 +2,7 @@
 
 > Proposed implementation plan for the next Robotics Lab project: an expressive robot that learns useful tasks in a simulated greenhouse.
 >
-> Status: Phases 0–7 complete; awaiting user review of [Phase 7 LangGraph missions](greenhouse-demo/phase7/README.md). Phase 8 remains unchecked. Stop before starting Phase 8.
+> Status: Phases 0–7 complete. The current [workspace update](greenhouse-demo/updates/2026-10-29-workspace.md) follows Phase 7; [between-phase updates](greenhouse-demo/updates/README.md) track this work separately. Phase 8 remains unchecked. Stop before starting Phase 8.
 
 ## Goal and experience
 

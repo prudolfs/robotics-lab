@@ -315,7 +315,10 @@ export function GreenhouseScene({
 		}
 	}, [])
 	return (
-		<section aria-label="Greenhouse simulation" className="relative min-h-[420px] flex-1 bg-muted">
+		<section
+			aria-label="Greenhouse simulation"
+			className="relative min-h-0 min-w-0 flex-1 bg-muted"
+		>
 			<p
 				data-testid="renderer-status"
 				className="absolute top-4 left-5 z-10 rounded-md bg-background/90 px-3 py-2 text-muted-foreground text-xs"

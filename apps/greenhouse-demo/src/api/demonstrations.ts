@@ -20,8 +20,8 @@ export const demonstrations = {
 	list(signal?: AbortSignal) {
 		return request('/dataset', { signal }, dataset)
 	},
-	get(id: string) {
-		return request(`/episodes/${encodeURIComponent(id)}`, {}, detail)
+	get(id: string, signal?: AbortSignal) {
+		return request(`/episodes/${encodeURIComponent(id)}`, { signal }, detail)
 	},
 	review(id: string, body: Review) {
 		return request(`/episodes/${encodeURIComponent(id)}/review`, json(body, 'PATCH'), detail)

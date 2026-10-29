@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { expect, test } from '@playwright/test'
 import type { HttpModels } from '../src/api/generated/http'
 import type { ServerMessage } from '../src/api/generated/websocket-server'
+import { openPanel, selectChoice } from './workspace-helpers'
 
 const output = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase5/', import.meta.url))
 type Snapshot = Extract<ServerMessage, { kind: 'snapshot' }>
@@ -32,13 +33,17 @@ test('runs the saved learned checkpoint live with pause/resume and no reference 
 	)
 	await page.goto('/')
 	await expect(page.getByTestId('renderer-status')).toHaveText('WebGPU active')
-	await page.getByLabel('Saved checkpoint', { exact: true }).selectOption(selected)
+	await openPanel(page, 'Train')
+	await selectChoice(page, 'Saved checkpoint', selected)
 	await page.getByRole('button', { name: 'Use selected checkpoint', exact: true }).click()
+	await openPanel(page, 'Watch')
 	await expect(page.getByText('Learned policy controller.', { exact: false })).toBeVisible()
 	await expect.poll(() => frames.at(-1)?.checkpoint_id).toBe(selected)
+	await openPanel(page, 'Teach')
 	await expect(
 		page.getByRole('button', { name: 'Record demonstration', exact: true }),
 	).toBeDisabled()
+	await openPanel(page, 'Watch')
 	const activation = frames.length
 	await page.getByRole('button', { name: 'Start collection', exact: true }).click()
 	await expect.poll(() => frames.at(-1)?.tick ?? 0).toBeGreaterThan(10)
@@ -100,7 +105,8 @@ test('reviews a held-out rollout and keeps API and live simulation responsive du
 	if (!sample?.frames?.length || !sample.final) throw new Error('Missing saved validation rollout')
 	await page.goto('/')
 	await expect(page.getByTestId('renderer-status')).toHaveText('WebGPU active')
-	await page.getByLabel('Saved checkpoint', { exact: true }).selectOption(selected)
+	await openPanel(page, 'Train')
+	await selectChoice(page, 'Saved checkpoint', selected)
 	await page.getByRole('button', { name: 'Review validation seed 10000', exact: true }).click()
 	await expect(page.getByRole('region', { name: 'Validation rollout playback' })).toBeVisible()
 	await page.getByLabel('Validation position', { exact: true }).press('End')

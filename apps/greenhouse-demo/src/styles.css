@@ -47,3 +47,44 @@ button:disabled {
 		transition: none;
 	}
 }
+
+:root {
+	--popover: #20342b;
+	--popover-foreground: #eef1df;
+	--card: #1d3028;
+	--card-foreground: #eef1df;
+	--input: #405449;
+	--accent: #344e40;
+	--accent-foreground: #eef1df;
+	--chart-1: #bedb9d;
+	--chart-2: #8abca5;
+	--chart-3: #d6b96d;
+	--chart-4: #8ab6c3;
+	--chart-5: #bf9dc7;
+}
+@theme inline {
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-input: var(--input);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+}
+html,
+body,
+#root {
+	height: 100%;
+	overflow: hidden;
+}
+.workspace-shell [data-slot="scroll-area-viewport"] {
+	overscroll-behavior: contain;
+}
+.workspace-shell [data-slot="tabs-content"][hidden] {
+	display: none;
+}

@@ -1,6 +1,6 @@
 # Greenhouse Caretaker
 
-Phase 7 frontend for Robotics Lab's robot-learning project. React Three Fiber and Drei render an authored Blender greenhouse and articulated caretaker using actual Three.js WebGPU; Tailwind and shadcn/ui with Base UI provide the interface. Python runs the authoritative MuJoCo world. Reference and manual teaching controllers can produce versioned demonstrations; a separate PyTorch worker trains saved policies for live learned execution.
+Greenhouse workspace for Robotics Lab's robot-learning project through Phase 7. React Three Fiber and Drei render an authored Blender greenhouse and articulated caretaker using actual Three.js WebGPU; Tailwind and shadcn/ui with Base UI provide the interface. Python runs the authoritative MuJoCo world. Reference and manual teaching controllers can produce versioned demonstrations; a separate PyTorch worker trains saved policies for live learned execution.
 
 From the repository root:
 
@@ -18,9 +18,15 @@ The app connects automatically and creates a ready seed-42 world. **Start collec
 
 The scene loads six local GLBs: the cutaway greenhouse, Pip caretaker, capsule and three plant variants. **Robot eye** adds inspection from the articulated head mount; it is not controller perception. Head attention/nods, blinking and status lighting are authored. System reduced-motion changes disable decorative head/blink motion and camera easing. **Sound off/on** controls local pickup/delivery cues and defaults off. Asset loading and failure are visible without disabling server reconnection controls. Blender is needed only to rebuild the assets; see the [editable kit guide](../../assets/greenhouse-demo/README.md).
 
+## Workspace updates
+
+The viewport stays visible beside a tabbed, resizable inspector: **Watch**, **Teach**, **Train**, **Compare**, and **Missions**. On mobile it becomes a vertical split. Use Cmd+P / Ctrl+P to search panels and actions; Cmd/Ctrl+1–5 opens the tabs. Split sizes and checkpoint selection persist locally. Watch contains controller selection; Teach contains recording and the dataset library; Train contains the shared saved-checkpoint selector.
+
+Zustand owns workspace selections and exclusive playback; TanStack Query caches REST data while the WebSocket continues to stream live simulation state. Tables support sorting, filtering and pagination. Selects use shadcn/Base UI, and the training loss chart uses shadcn/Recharts. See the [between-phase update log](../../docs/greenhouse-demo/updates/README.md) for decisions, controls and verification.
+
 ## Teach and review
 
-Choose **Teach manually** while ready/paused, then **Record demonstration** from a reset world. Hold the movement/lift buttons or focus the teaching panel and use W/S, A/D, Q/E, with G/R for close/open. Key release, focus loss and hiding the page clear input; a 250 ms server lease also prevents stale movement. The panel shows measured speed, target range/bearing, lift and holding state. Pause before switching controllers; executed reference/manual transitions are marked as interventions.
+Choose **Teach manually** in Watch while ready/paused, then open Teach and choose **Record demonstration** from a reset world. Hold the movement/lift buttons or focus the teaching panel and use W/S, A/D, Q/E, with G/R for close/open. Key release, focus loss and hiding the page clear input; a 250 ms server lease also prevents stale movement. The panel shows measured speed, target range/bearing, lift and holding state. Pause before switching controllers; executed reference/manual transitions are marked as interventions.
 
 Recording captures all executed 20 Hz control steps, before/after observations, actions, physical states, events, both simulated/wall timing, configuration and task outcome. Stop/save retains partial attempts; delivery/failure saves automatically. Reset/disconnect seals the old recording. Live demonstrations start unreviewed and excluded. New random seeds stay within training seeds 0–99.
 
@@ -70,7 +76,7 @@ The connection hook owns transport state, an abortable four-second HTTP startup 
 
 ## Browser checks and captures
 
-Playwright uses local Chrome with WebGPU support. It starts the paired development command if the app is not already running, and uses graceful shutdown to stop both services afterward. Seventeen checks cover the previous collection/connection/asset/camera/motion/sound cases, plus manual recording, focus/release stopping, source-preserving review, exact recorded playback, expert collection, validation and export/import, learned checkpoint delivery and active-training responsiveness/cancellation, and same-scenario BC/PPO/reference playback with no live commands, persistent three-object missions and reconnect invalidation. Checkpoint-dependent learned collection, comparison and mission cases explicitly skip when their local artifacts are unavailable. Teaching tests save automated attempts; use a separate `GREENHOUSE_DATASET_DIR` for an isolated test service when keeping them out of your normal library. The root test command also validates GLB geometry/pivots/resources and manifest alignment with compiled MuJoCo geometry.
+Playwright uses local Chrome with WebGPU support. It starts the paired development command if the app is not already running, and uses graceful shutdown to stop both services afterward. Browser checks cover the previous collection/connection/asset/camera/motion/sound cases, plus manual recording, focus/release stopping, source-preserving review, exact recorded playback, expert collection, validation and export/import, learned checkpoint delivery and active-training responsiveness/cancellation, and same-scenario BC/PPO/reference playback with no live commands, persistent three-object missions and reconnect invalidation. Checkpoint-dependent learned collection, comparison and mission cases explicitly skip when their local artifacts are unavailable. Teaching tests save automated attempts; use a separate `GREENHOUSE_DATASET_DIR` for an isolated test service when keeping them out of your normal library. The root test command also validates GLB geometry/pivots/resources and manifest alignment with compiled MuJoCo geometry.
 
 ```sh
 GREENHOUSE_CAPTURE=1 pnpm test:e2e:greenhouse

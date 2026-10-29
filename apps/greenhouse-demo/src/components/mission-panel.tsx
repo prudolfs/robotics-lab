@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import type { SessionView } from '../api/client'
 import type { MissionState } from '../api/use-missions'
+import { ChoiceOption, ChoiceSelect } from './choice-select'
 import { Button } from './ui/button'
 import { Field, FieldGroup, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
-import { NativeSelect, NativeSelectOption } from './ui/native-select'
 
 export function MissionPanel({
 	missions,
@@ -34,68 +34,65 @@ export function MissionPanel({
 	return (
 		<section
 			aria-label="Greenhouse missions"
-			className="flex flex-col gap-5 border-border border-t px-6 py-7"
+			className="flex flex-col gap-5 border-border border-t p-4"
 		>
 			<div>
-				<h2 className="font-medium text-xl">Give Pip a greenhouse routine</h2>
+				<h2 className="font-medium text-lg">Give Pip a greenhouse routine</h2>
 				<p className="mt-1 max-w-3xl text-muted-foreground text-sm">
 					Collect up to three capsules, verify each delivery, then return to the dock. LangGraph
 					chooses skills; the selected actor drives collection. Alignment and docking are scripted.
 				</p>
 			</div>
-			<FieldGroup className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			<FieldGroup className="grid grid-cols-1 gap-4">
 				<Field>
 					<FieldLabel htmlFor="mission-count">Mission plan</FieldLabel>
-					<NativeSelect
+					<ChoiceSelect
 						id="mission-count"
 						value={count}
-						onChange={(event) => setCount(Number(event.target.value))}
+						onValueChange={(value) => setCount(Number(value))}
 					>
 						{[0, 1, 2, 3].map((value) => (
-							<NativeSelectOption key={value} value={value}>
+							<ChoiceOption key={value} value={value}>
 								{value === 0
 									? 'Return to dock only'
 									: `Collect ${value} capsule${value > 1 ? 's' : ''}, then dock`}
-							</NativeSelectOption>
+							</ChoiceOption>
 						))}
-					</NativeSelect>
+					</ChoiceSelect>
 				</Field>
 				<Field>
 					<FieldLabel htmlFor="mission-controller">Collection skill</FieldLabel>
-					<NativeSelect
+					<ChoiceSelect
 						id="mission-controller"
 						value={controller}
-						onChange={(event) => setController(event.target.value as typeof controller)}
+						onValueChange={(value) => setController(value as typeof controller)}
 					>
-						<NativeSelectOption value="learned_policy">
-							Learned · selected checkpoint
-						</NativeSelectOption>
-						<NativeSelectOption value="scripted_reference">
+						<ChoiceOption value="learned_policy">Learned · selected checkpoint</ChoiceOption>
+						<ChoiceOption value="scripted_reference">
 							Scripted reference · explicit comparison
-						</NativeSelectOption>
-					</NativeSelect>
+						</ChoiceOption>
+					</ChoiceSelect>
 				</Field>
 				<Field>
 					<FieldLabel htmlFor="mission-history">Mission history</FieldLabel>
-					<NativeSelect
+					<ChoiceSelect
 						id="mission-history"
 						value={current?.mission_id ?? ''}
-						onChange={(event) => missions.choose(event.target.value)}
+						onValueChange={missions.choose}
 					>
-						<NativeSelectOption value="">No saved missions yet</NativeSelectOption>
+						<ChoiceOption value="">No saved missions yet</ChoiceOption>
 						{missions.data?.missions.map((item) => (
-							<NativeSelectOption key={item.mission_id} value={item.mission_id}>
+							<ChoiceOption key={item.mission_id} value={item.mission_id}>
 								{item.mission_id.slice(0, 8)} · {item.state} · {item.delivered}/{item.total}
-							</NativeSelectOption>
+							</ChoiceOption>
 						))}
-					</NativeSelect>
+					</ChoiceSelect>
 				</Field>
 			</FieldGroup>
 			<p className="break-all text-muted-foreground text-xs">
-				Collection checkpoint:{' '}
-				{checkpointId || 'Select a saved checkpoint in the training panel below.'} Reset to a fresh
-				world to start a routine. Pending and delivered capsules are staged inventory; one active
-				capsule uses the evaluated physics at a time.
+				Collection checkpoint: {checkpointId || 'Select a saved checkpoint in Train.'} Reset to a
+				fresh world to start a routine. Pending and delivered capsules are staged inventory; one
+				active capsule uses the evaluated physics at a time.
 			</p>
 			<div className="flex flex-wrap gap-2">
 				<Button
@@ -163,7 +160,7 @@ export function MissionPanel({
 					)}
 					<ol
 						aria-label="Mission trace"
-						className="grid max-h-72 gap-2 overflow-y-auto text-sm sm:grid-cols-2"
+						className="grid max-h-72 grid-cols-1 gap-2 overflow-y-auto text-sm"
 					>
 						{(current.trace ?? []).map((item) => (
 							<li key={item.sequence} className="border-border border-l-2 pl-3">

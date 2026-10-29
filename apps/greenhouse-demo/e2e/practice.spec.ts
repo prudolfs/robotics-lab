@@ -2,6 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { expect, test } from '@playwright/test'
 import type { HttpModels } from '../src/api/generated/http'
+import { openPanel, selectChoice } from './workspace-helpers'
 
 const output = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase6/', import.meta.url))
 
@@ -28,8 +29,9 @@ test('compares BC and PPO on one seed with exact recorded states and no live act
 	await page.goto('/')
 	await expect(page.getByTestId('renderer-status')).toHaveText('WebGPU active')
 	await expect(page.getByRole('button', { name: 'Start collection', exact: true })).toBeEnabled()
-	await page.getByLabel('Comparison policy A', { exact: true }).selectOption(parent.checkpoint_id)
-	await page.getByLabel('Comparison policy B', { exact: true }).selectOption(ppo.checkpoint_id)
+	await openPanel(page, 'Compare')
+	await selectChoice(page, 'Comparison policy A', parent.checkpoint_id)
+	await selectChoice(page, 'Comparison policy B', ppo.checkpoint_id)
 	await page.getByLabel('Comparison seed (10000–10029)').fill('10006')
 	const reply = page.waitForResponse(
 		(response) =>

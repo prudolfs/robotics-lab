@@ -1,6 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useRef, useState } from 'react'
+import { useWorkspace } from '../state/workspace'
 import { model, request, type SessionView } from './client'
 import type { HttpModels } from './generated/http'
+import { keys } from './query'
 
 type Catalog = HttpModels['mission_catalog']
 type Mission = HttpModels['mission_view']
@@ -12,8 +15,17 @@ const draftModel = model<Draft>('MissionDraft')
 const checkpointModel = model<Checkpoint>('GraphCheckpoint')
 
 export function useMissions(connected: boolean, session: SessionView | null) {
-	const [data, setData] = useState<Catalog | null>(null)
-	const [choice, setChoice] = useState('')
+	const client = useQueryClient()
+	const choice = useWorkspace((state) => state.missionId)
+	const setChoice = useWorkspace.getState().chooseMission
+	const catalog = useQuery({
+		queryKey: keys.missions,
+		queryFn: ({ signal }) => request('/missions', { signal }, catalogModel),
+		enabled: connected,
+		refetchInterval:
+			session?.mission?.state === 'running' || session?.mission?.state === 'paused' ? 1000 : 5000,
+	})
+	const data = catalog.data ?? null
 	const [draft, setDraft] = useState<Draft | null>(null)
 	const [checkpoint, setCheckpoint] = useState<Checkpoint | null>(null)
 	const [busy, setBusy] = useState(false)
@@ -29,29 +41,7 @@ export function useMissions(connected: boolean, session: SessionView | null) {
 			operation.current?.abort()
 		}
 	}, [])
-	const refresh = useCallback(async (signal?: AbortSignal) => {
-		const result = await request('/missions', { signal }, catalogModel)
-		if (mounted.current && !signal?.aborted) setData(result)
-	}, [])
-	useEffect(() => {
-		if (!connected) return
-		const abort = new AbortController()
-		let timer: ReturnType<typeof setTimeout> | undefined
-		async function poll() {
-			try {
-				await refresh(abort.signal)
-			} catch (reason) {
-				if (!abort.signal.aborted)
-					setMessage(reason instanceof Error ? reason.message : 'Mission status unavailable.')
-			}
-			if (!abort.signal.aborted) timer = setTimeout(() => void poll(), 1000)
-		}
-		void poll()
-		return () => {
-			abort.abort()
-			clearTimeout(timer)
-		}
-	}, [connected, refresh])
+	const refresh = () => client.invalidateQueries({ queryKey: keys.missions })
 	const selected = choice
 		? session?.mission?.mission_id === choice
 			? session.mission
@@ -65,7 +55,7 @@ export function useMissions(connected: boolean, session: SessionView | null) {
 		try {
 			const text = await task(abort.signal)
 			if (mounted.current) setMessage(text)
-			await refresh(abort.signal)
+			await refresh()
 		} catch (reason) {
 			if (mounted.current && !abort.signal.aborted)
 				setMessage(reason instanceof Error ? reason.message : 'Mission operation failed.')
@@ -80,7 +70,7 @@ export function useMissions(connected: boolean, session: SessionView | null) {
 		draft,
 		checkpoint,
 		busy,
-		message,
+		message: catalog.error?.message ?? message,
 		choose(id: string) {
 			setChoice(id)
 			setCheckpoint(null)
@@ -116,11 +106,11 @@ export function useMissions(connected: boolean, session: SessionView | null) {
 				return 'Mission started. Outcomes are verified from simulation state.'
 			})
 		},
-		control(action: 'pause' | 'resume' | 'cancel') {
+		control(action: 'pause' | 'resume' | 'cancel', missionId = selected?.mission_id) {
 			return run(async (signal) => {
-				if (!selected || !session) throw new Error('Select a current mission.')
+				if (!missionId || !session) throw new Error('Select a current mission.')
 				await request(
-					`/missions/${selected.mission_id}/control`,
+					`/missions/${missionId}/control`,
 					{
 						method: 'POST',
 						signal,
@@ -161,7 +151,12 @@ export function useMissions(connected: boolean, session: SessionView | null) {
 					{ signal },
 					checkpointModel,
 				)
-				if (mounted.current) setCheckpoint(result)
+				if (
+					mounted.current &&
+					(!useWorkspace.getState().missionId ||
+						useWorkspace.getState().missionId === selected.mission_id)
+				)
+					setCheckpoint(result)
 				return 'Persistent graph checkpoint loaded. This does not resume physical actions.'
 			})
 		},

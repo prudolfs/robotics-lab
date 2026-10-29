@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useMemo } from 'react'
 import type { ComparisonState } from '../api/use-comparison'
 import type { TrainingState } from '../api/use-training'
+import { useWorkspace } from '../state/workspace'
+import { ChoiceOption, ChoiceSelect } from './choice-select'
+import { DataGrid, type GridColumn } from './data-grid'
 import { Button } from './ui/button'
 import { Field, FieldGroup, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
-import { NativeSelect, NativeSelectOption } from './ui/native-select'
 
 export function PracticePanel({
 	training,
@@ -19,9 +21,12 @@ export function PracticePanel({
 	canReview: boolean
 	onCompare: (seed: number, checkpoints: string[]) => void
 }) {
-	const [first, setFirst] = useState('')
-	const [second, setSecond] = useState('')
-	const [seed, setSeed] = useState(10000)
+	const first = useWorkspace((state) => state.comparisonA)
+	const setFirst = (id: string) => useWorkspace.getState().compareWith('a', id)
+	const second = useWorkspace((state) => state.comparisonB)
+	const setSecond = (id: string) => useWorkspace.getState().compareWith('b', id)
+	const seed = useWorkspace((state) => state.comparisonSeed)
+	const setSeed = useWorkspace.getState().setComparisonSeed
 	const checkpoints = training.data?.checkpoints.filter((item) => item.compatible) ?? []
 	const parent =
 		checkpoints.find((item) => item.algorithm === 'bc' && item.round === 3) ??
@@ -43,11 +48,11 @@ export function PracticePanel({
 	return (
 		<section
 			aria-label="Reinforcement learning and comparison"
-			className="flex flex-col gap-5 border-border border-t px-6 py-7"
+			className="flex flex-col gap-5 border-border border-t p-4"
 		>
 			<div className="flex flex-wrap items-start justify-between gap-4">
 				<div>
-					<h2 className="font-medium text-xl">Practice, then compare</h2>
+					<h2 className="font-medium text-lg">Practice, then compare</h2>
 					<p className="mt-1 max-w-2xl text-muted-foreground text-sm">
 						PPO practices from an imitation checkpoint. Compare complete episodes; keep the
 						imitation policy when practice regresses.
@@ -71,7 +76,7 @@ export function PracticePanel({
 				</Button>
 			</div>
 			<p className="text-muted-foreground text-xs">
-				Select a BC checkpoint below to initialize practice. One CPU worker, 36,864 steps, 240 s
+				Select a BC checkpoint in Train to initialize practice. One CPU worker, 36,864 steps, 240 s
 				budget. Near pickup → full placement → peripheral pots. Final-test scenarios are reserved
 				for the sealed evaluation command.
 			</p>
@@ -104,26 +109,22 @@ export function PracticePanel({
 					)}
 				</div>
 			)}
-			<FieldGroup className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			<FieldGroup className="grid grid-cols-1 gap-4">
 				{[
 					{ label: 'Comparison policy A', value: a, set: setFirst },
 					{ label: 'Comparison policy B', value: b, set: setSecond },
 				].map(({ label, value, set }) => (
 					<Field key={label}>
 						<FieldLabel htmlFor={label.replaceAll(' ', '-')}>{label}</FieldLabel>
-						<NativeSelect
-							id={label.replaceAll(' ', '-')}
-							value={value}
-							onChange={(event) => set(event.target.value)}
-						>
-							<NativeSelectOption value="">Choose checkpoint</NativeSelectOption>
+						<ChoiceSelect id={label.replaceAll(' ', '-')} value={value} onValueChange={set}>
+							<ChoiceOption value="">Choose checkpoint</ChoiceOption>
 							{checkpoints.map((item) => (
-								<NativeSelectOption key={item.checkpoint_id} value={item.checkpoint_id}>
+								<ChoiceOption key={item.checkpoint_id} value={item.checkpoint_id}>
 									{item.algorithm?.toUpperCase()} {item.checkpoint_id.slice(0, 8)} r{item.round} ·{' '}
 									{item.evaluation.clean_successes}/30 clean
-								</NativeSelectOption>
+								</ChoiceOption>
 							))}
-						</NativeSelect>
+						</ChoiceSelect>
 					</Field>
 				))}
 				<Field>
@@ -164,56 +165,7 @@ export function PracticePanel({
 					{comparison.error}
 				</p>
 			)}
-			{comparison.data && (
-				<div className="overflow-x-auto">
-					<table className="w-full text-left text-sm">
-						<caption className="pb-3 text-left">
-							Same-scenario outcomes · seed {comparison.data.seed}
-						</caption>
-						<thead>
-							<tr>
-								{['Controller', 'Outcome', 'Seconds', 'Collisions', 'Invalid', 'Playback'].map(
-									(label) => (
-										<th key={label} className="px-2 py-2">
-											{label}
-										</th>
-									),
-								)}
-							</tr>
-						</thead>
-						<tbody>
-							{comparison.data.entries.map((entry, index) => (
-								<tr key={entry.label} className="border-border border-t">
-									<td className="px-2 py-3">{entry.label}</td>
-									<td className="px-2 py-3">
-										{entry.rollout.success
-											? entry.rollout.clean_success
-												? 'Clean delivery'
-												: 'Delivered with rejected actions'
-											: entry.rollout.failure.replaceAll('_', ' ')}
-									</td>
-									<td className="px-2 py-3">{entry.rollout.seconds.toFixed(2)}</td>
-									<td className="px-2 py-3">{entry.rollout.collisions}</td>
-									<td className="px-2 py-3">{entry.rollout.invalid_actions}</td>
-									<td className="px-2 py-3">
-										<Button
-											size="sm"
-											variant="outline"
-											disabled={!canReview}
-											onClick={() => {
-												training.closeReplay()
-												comparison.choose(index)
-											}}
-										>
-											Watch {index + 1}
-										</Button>
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-				</div>
-			)}
+			{comparison.data && <ComparisonGrid comparison={comparison} canReview={canReview} />}
 		</section>
 	)
 }
@@ -254,3 +206,77 @@ export function ComparisonPlayback({ comparison }: { comparison: ComparisonState
 		</section>
 	)
 }
+
+function ComparisonGrid({
+	comparison,
+	canReview,
+}: {
+	comparison: ComparisonState
+	canReview: boolean
+}) {
+	type Entry = NonNullable<ComparisonState['data']>['entries'][number]
+	const entries = comparison.data?.entries ?? emptyComparisons
+	const columns = useMemo<GridColumn<Entry>[]>(
+		() => [
+			{
+				id: 'controller',
+				header: 'Controller',
+				value: (item) => item.label,
+				cell: (item) => item.label,
+			},
+			{
+				id: 'outcome',
+				header: 'Outcome',
+				value: (item) => item.rollout.failure,
+				cell: (item) =>
+					item.rollout.success
+						? item.rollout.clean_success
+							? 'Clean delivery'
+							: 'Delivered with rejected actions'
+						: item.rollout.failure.replaceAll('_', ' '),
+			},
+			{
+				id: 'seconds',
+				header: 'Seconds',
+				value: (item) => item.rollout.seconds,
+				cell: (item) => item.rollout.seconds.toFixed(2),
+			},
+			{
+				id: 'invalid',
+				header: 'Invalid',
+				value: (item) => item.rollout.invalid_actions,
+				cell: (item) => item.rollout.invalid_actions,
+			},
+			{
+				id: 'watch',
+				header: 'Playback',
+				value: () => '',
+				sort: false,
+				cell: (item) => (
+					<Button
+						size="sm"
+						variant="outline"
+						disabled={!canReview}
+						onClick={() => comparison.choose(entries.indexOf(item))}
+					>
+						Watch {entries.indexOf(item) + 1}
+					</Button>
+				),
+			},
+		],
+		[canReview, comparison.choose, entries],
+	)
+	return (
+		<div>
+			<p className="mb-3 text-sm">Same-scenario outcomes · seed {comparison.data?.seed}</p>
+			<DataGrid
+				data={entries}
+				columns={columns}
+				label="comparison outcomes"
+				rowId={(item) => item.label}
+				search={false}
+			/>
+		</div>
+	)
+}
+const emptyComparisons: NonNullable<ComparisonState['data']>['entries'] = []

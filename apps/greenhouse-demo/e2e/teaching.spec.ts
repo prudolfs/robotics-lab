@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { expect, test } from '@playwright/test'
 import type { HttpModels } from '../src/api/generated/http'
 import type { ServerMessage } from '../src/api/generated/websocket-server'
+import { openPanel } from './workspace-helpers'
 
 const output = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase5/', import.meta.url))
 type Snapshot = Extract<ServerMessage, { kind: 'snapshot' }>
@@ -29,6 +30,7 @@ test('records manual input, stops safely, preserves review provenance and plays 
 	await expect(page.getByTestId('renderer-status')).toHaveText('WebGPU active')
 	await page.getByRole('button', { name: 'Teach manually', exact: true }).click()
 	await expect(page.getByText('Manual teaching controller.', { exact: false })).toBeVisible()
+	await openPanel(page, 'Teach')
 	await page.getByRole('button', { name: 'Record demonstration', exact: true }).click()
 	await expect(page.getByTestId('recording-status')).toHaveText(
 		'Recording every executed control step.',
@@ -69,6 +71,7 @@ test('records manual input, stops safely, preserves review provenance and plays 
 	expect(before.entry.episode.frames.some((frame) => (frame.action.lift ?? 0) > 0)).toBe(true)
 	expect(before.entry.episode.frames.some((frame) => (frame.action.throttle ?? 0) > 0)).toBe(true)
 	expect(before.entry.episode.frames.at(-1)?.action.throttle).toBe(0)
+	await page.getByLabel('Search demonstrations', { exact: true }).fill(id ?? '')
 	await page
 		.getByTestId(`episode-${id}`)
 		.getByRole('button', { name: 'Review seed 42', exact: true })
@@ -132,10 +135,12 @@ test('records manual input, stops safely, preserves review provenance and plays 
 
 test('collects expert demonstrations, validates splits and roundtrips the portable export', async ({
 	page,
+	request,
 }) => {
 	test.setTimeout(45000)
 	await page.goto('/')
 	await expect(page.getByTestId('connection-status')).toHaveText('Connected')
+	await openPanel(page, 'Teach')
 	await page.getByRole('button', { name: 'Collect 20 expert demos', exact: true }).click()
 	await expect(page.getByTestId('dataset-message')).toContainText(
 		'Expert set ready: training seeds',
@@ -149,7 +154,15 @@ test('collects expert demonstrations, validates splits and roundtrips the portab
 		'Ready for the first training run',
 		{ timeout: 15000 },
 	)
-	await page.getByRole('button', { name: 'Review seed 0', exact: true }).last().click()
+	const dataset = (await (
+		await request.get('/api/v1/greenhouse/dataset')
+	).json()) as HttpModels['dataset']
+	const expert = dataset.episodes.find(
+		(item) => item.seed === 0 && item.source === 'scripted_expert',
+	)
+	if (!expert) throw new Error('Missing expert seed 0')
+	await page.getByLabel('Search demonstrations', { exact: true }).fill(expert.episode_id)
+	await page.getByRole('button', { name: 'Review seed 0', exact: true }).first().click()
 	await expect(page.getByRole('region', { name: 'Recorded episode playback' })).toBeVisible()
 	await expect(page.getByRole('button', { name: 'Mark usable', exact: true })).toBeEnabled()
 	await page.getByRole('button', { name: 'Exclude episode', exact: true }).click()

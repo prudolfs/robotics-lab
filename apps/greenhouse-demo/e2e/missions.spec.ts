@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { expect, test } from '@playwright/test'
 import type { HttpModels } from '../src/api/generated/http'
 import type { ServerMessage } from '../src/api/generated/websocket-server'
+import { openPanel, selectChoice } from './workspace-helpers'
 
 const output = fileURLToPath(new URL('../../../docs/greenhouse-demo/phase7/', import.meta.url))
 
@@ -29,7 +30,9 @@ test('runs a three-capsule learned mission, pauses, verifies docking and inspect
 	await page.goto('/')
 	await expect(page.getByTestId('renderer-status')).toHaveText('WebGPU active')
 	const panel = page.getByRole('region', { name: 'Greenhouse missions', exact: true })
-	await page.getByLabel('Saved checkpoint', { exact: true }).selectOption(selected)
+	await openPanel(page, 'Train')
+	await selectChoice(page, 'Saved checkpoint', selected)
+	await openPanel(page, 'Missions')
 	await expect(panel.getByRole('button', { name: 'Start mission', exact: true })).toBeEnabled()
 	await panel.getByRole('button', { name: 'Start mission', exact: true }).click()
 	await expect(panel.getByTestId('mission-status')).toContainText('Mission running')
@@ -97,12 +100,15 @@ test('starts a structured dock-only mission without a provider and rejects stale
 	await page.goto('/')
 	await expect(page.getByTestId('renderer-status')).toHaveText('WebGPU active')
 	const panel = page.getByRole('region', { name: 'Greenhouse missions', exact: true })
-	await page.getByLabel('Mission plan', { exact: true }).selectOption('0')
+	await openPanel(page, 'Missions')
+	await selectChoice(page, 'Mission plan', '0')
 	await panel.getByRole('button', { name: 'Start mission', exact: true }).click()
 	await expect(panel.getByTestId('mission-status')).toContainText('Mission running')
 	await panel.getByRole('button', { name: 'Pause mission', exact: true }).click()
 	await expect(panel.getByTestId('mission-status')).toContainText('Mission paused')
+	await openPanel(page, 'Watch')
 	await page.getByRole('button', { name: 'Reconnect', exact: true }).click()
+	await openPanel(page, 'Missions')
 	await expect(page.getByRole('button', { name: 'Start collection', exact: true })).toBeEnabled()
 	await expect(panel.getByRole('button', { name: /^(Pause|Resume) mission$/ })).toBeDisabled()
 	await expect(

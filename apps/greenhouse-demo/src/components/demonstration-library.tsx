@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { DemonstrationLibrary as Library } from '../api/use-demonstrations'
+import { DataGrid, type GridColumn } from './data-grid'
 import { Button } from './ui/button'
 import { Field, FieldGroup, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
@@ -94,11 +95,11 @@ export function DemonstrationLibrary({
 	return (
 		<section
 			aria-label="Demonstration library"
-			className="flex flex-col gap-5 border-border border-t px-6 py-7"
+			className="flex flex-col gap-5 border-border border-t p-4"
 		>
 			<div className="flex flex-wrap items-start justify-between gap-4">
 				<div>
-					<h2 className="font-medium text-xl">Demonstrations</h2>
+					<h2 className="font-medium text-lg">Demonstrations</h2>
 					<p className="mt-1 max-w-2xl text-muted-foreground text-sm">
 						Keep the attempts, inspect the actions, and choose what Pip should learn from.
 					</p>
@@ -136,69 +137,13 @@ export function DemonstrationLibrary({
 					Pause collection and finish recording before loading a saved demonstration.
 				</p>
 			)}
-			<div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(240px,1fr)]">
-				<div className="max-h-80 overflow-auto rounded-lg border border-border">
-					<table className="w-full text-left text-sm">
-						<caption className="sr-only">Recorded demonstrations and their review state</caption>
-						<thead className="sticky top-0 bg-background">
-							<tr className="border-border border-b">
-								<th className="p-3">Seed / source</th>
-								<th className="p-3">Outcome / split</th>
-								<th className="p-3">Review</th>
-								<th className="p-3">
-									<span className="sr-only">Load</span>
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							{library.data?.episodes.map((episode) => (
-								<tr
-									key={episode.episode_id}
-									data-testid={`episode-${episode.episode_id}`}
-									className="border-border border-b last:border-0"
-								>
-									<td className="p-3">
-										{episode.seed} · {episode.source.replaceAll('_', ' ')}
-										<p className="text-muted-foreground text-xs">
-											{episode.steps} steps · {episode.interventions} interventions
-										</p>
-									</td>
-									<td className="p-3">
-										{episode.outcome}
-										<p className="text-muted-foreground text-xs">{episode.split}</p>
-									</td>
-									<td className="p-3">
-										{(episode.review.label ?? 'unreviewed').replaceAll('_', ' ')}
-										<p className="text-muted-foreground text-xs">
-											{episode.review.excluded ? 'Excluded' : 'Included'}
-										</p>
-									</td>
-									<td className="p-3">
-										<Button
-											size="sm"
-											variant="outline"
-											disabled={disabled || !canReview}
-											onClick={() => {
-												onReview?.()
-												void library.load(episode.episode_id)
-												document
-													.getElementById('greenhouse-view')
-													?.scrollIntoView({ behavior: 'instant' })
-											}}
-										>
-											Review seed {episode.seed}
-										</Button>
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-					{!library.data?.episodes.length && (
-						<p className="p-4 text-muted-foreground text-sm">
-							No demonstrations yet. Record a live attempt or collect the scripted expert batch.
-						</p>
-					)}
-				</div>
+			<div className="grid grid-cols-1 gap-6">
+				<EpisodeGrid
+					library={library}
+					disabled={disabled}
+					canReview={canReview}
+					onReview={onReview}
+				/>
 				<FieldGroup>
 					<Field>
 						<FieldLabel htmlFor="dataset-import">
@@ -323,3 +268,89 @@ export function DemonstrationLibrary({
 		</section>
 	)
 }
+
+function EpisodeGrid({
+	library,
+	disabled,
+	canReview,
+	onReview,
+}: {
+	library: Library
+	disabled: boolean
+	canReview: boolean
+	onReview?: () => void
+}) {
+	type Entry = NonNullable<Library['data']>['episodes'][number]
+	const columns = useMemo<GridColumn<Entry>[]>(
+		() => [
+			{
+				id: 'seed',
+				header: 'Seed / source',
+				value: (item) => `${item.seed} ${item.source} ${item.episode_id}`,
+				cell: (item) => (
+					<>
+						{item.seed} · {item.source.replaceAll('_', ' ')}
+						<p className="text-muted-foreground text-xs">
+							{item.steps} steps · {item.interventions} interventions
+						</p>
+					</>
+				),
+			},
+			{
+				id: 'outcome',
+				header: 'Outcome',
+				value: (item) => `${item.outcome} ${item.split}`,
+				cell: (item) => (
+					<>
+						{item.outcome}
+						<p className="text-muted-foreground text-xs">{item.split}</p>
+					</>
+				),
+			},
+			{
+				id: 'review',
+				header: 'Review',
+				value: (item) => item.review.label ?? 'unreviewed',
+				cell: (item) => (
+					<>
+						{(item.review.label ?? 'unreviewed').replaceAll('_', ' ')}
+						<p className="text-muted-foreground text-xs">
+							{item.review.excluded ? 'Excluded' : 'Included'}
+						</p>
+					</>
+				),
+			},
+			{
+				id: 'actions',
+				header: 'Open',
+				value: () => '',
+				sort: false,
+				cell: (item) => (
+					<Button
+						size="sm"
+						variant="outline"
+						disabled={disabled || !canReview}
+						onClick={() => {
+							onReview?.()
+							void library.load(item.episode_id)
+						}}
+					>
+						Review seed {item.seed}
+					</Button>
+				),
+			},
+		],
+		[disabled, canReview, library.load, onReview],
+	)
+	return (
+		<DataGrid
+			data={library.data?.episodes ?? emptyEpisodes}
+			columns={columns}
+			label="demonstrations"
+			rowId={(item) => item.episode_id}
+			rowTestId={(item) => `episode-${item.episode_id}`}
+			selectedId={library.selected?.entry.episode.episode_id}
+		/>
+	)
+}
+const emptyEpisodes: NonNullable<Library['data']>['episodes'] = []

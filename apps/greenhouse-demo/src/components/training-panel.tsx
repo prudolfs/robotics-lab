@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { TrainingState } from '../api/use-training'
+import { ChoiceOption, ChoiceSelect } from './choice-select'
+import { DataGrid, type GridColumn } from './data-grid'
+import { LearningChart } from './learning-chart'
 import { Button } from './ui/button'
 import { Field, FieldGroup, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
-import { NativeSelect, NativeSelectOption } from './ui/native-select'
 
 export function TrainingPlayback({ training }: { training: TrainingState }) {
 	if (!training.rollout || !training.scene) return null
@@ -81,18 +83,14 @@ export function TrainingPanel({
 	const candidates = (training.data?.checkpoints ?? [])
 		.filter((item) => item.job_id === (checkpoint?.job_id ?? job?.job_id))
 		.sort((a, b) => a.round - b.round)
-	const history = job?.history ?? []
-	const maxLoss = Math.max(0.1, ...history.map((point) => point.loss))
-	const totalEpochs = (job?.request.epochs ?? 120) * ((job?.request.correction_rounds ?? 3) + 1)
-	const groups = [0, 1, 2, 3].map((round) => history.filter((point) => point.round === round))
 	return (
 		<section
 			aria-label="Imitation learning"
-			className="flex flex-col gap-5 border-border border-t px-6 py-7"
+			className="flex flex-col gap-5 border-border border-t p-4"
 		>
 			<div className="flex flex-wrap justify-between gap-4">
 				<div>
-					<h2 className="font-medium text-xl">Teach, train, then watch</h2>
+					<h2 className="font-medium text-lg">Teach, train, then watch</h2>
 					<p className="mt-1 max-w-2xl text-muted-foreground text-sm">
 						Clone reviewed demonstrations, measure whole-task performance, and inspect where the
 						learned policy struggles.
@@ -121,7 +119,7 @@ export function TrainingPanel({
 					</Button>
 				</div>
 			</div>
-			<FieldGroup className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+			<FieldGroup className="grid grid-cols-1 gap-4">
 				<Field>
 					<FieldLabel htmlFor="training-epochs">Epochs per round (10–300)</FieldLabel>
 					<Input
@@ -146,17 +144,17 @@ export function TrainingPanel({
 						disabled={disabled || !!training.active}
 					/>
 				</Field>
-				<Field className="sm:col-span-2">
+				<Field className="">
 					<FieldLabel htmlFor="policy-checkpoint">Saved checkpoint</FieldLabel>
-					<NativeSelect
+					<ChoiceSelect
 						id="policy-checkpoint"
 						value={training.selectedId}
-						onChange={(event) => training.choose(event.target.value)}
+						onValueChange={training.choose}
 						disabled={disabled || !training.data?.checkpoints.length}
 					>
-						<NativeSelectOption value="">No evaluated checkpoint yet</NativeSelectOption>
+						<ChoiceOption value="">No evaluated checkpoint yet</ChoiceOption>
 						{training.data?.checkpoints.map((item) => (
-							<NativeSelectOption
+							<ChoiceOption
 								key={item.checkpoint_id}
 								value={item.checkpoint_id}
 								disabled={!item.compatible}
@@ -164,9 +162,9 @@ export function TrainingPanel({
 								{item.algorithm?.toUpperCase()} {item.job_id.slice(0, 8)} · round {item.round} ·{' '}
 								{item.evaluation.clean_successes}
 								/30 clean{item.compatible ? '' : ' · incompatible'}
-							</NativeSelectOption>
+							</ChoiceOption>
 						))}
-					</NativeSelect>
+					</ChoiceSelect>
 				</Field>
 			</FieldGroup>
 			<p className="text-muted-foreground text-xs">
@@ -178,7 +176,7 @@ export function TrainingPanel({
 				{training.message}
 			</p>
 			{job && (
-				<div className="grid gap-5 lg:grid-cols-2">
+				<div className="grid grid-cols-1 gap-5">
 					<div className="flex flex-col gap-2">
 						<p data-testid="training-status" className="font-medium text-sm">
 							Imitation fit: {job.state} · {job.phase} · round {job.round} · epoch {job.epoch}
@@ -194,45 +192,7 @@ export function TrainingPanel({
 							episodes. Validation selects checkpoints; final-test seeds remain reserved.
 						</p>
 					</div>
-					<figure className="min-w-0">
-						<svg
-							viewBox="0 0 480 130"
-							role="img"
-							aria-labelledby="loss-title"
-							className="h-32 w-full"
-						>
-							<title id="loss-title">
-								Supervised fitting loss by epoch, separated by correction round
-							</title>
-							<path d="M30 8V108H470" fill="none" stroke="currentColor" opacity="0.3" />
-							{groups.map(
-								(points, round) =>
-									points.length > 0 && (
-										<polyline
-											key={points[0].round}
-											points={points
-												.map(
-													(point) =>
-														`${30 + ((round * (job.request.epochs ?? 120) + point.epoch) / totalEpochs) * 430},${105 - (point.loss / maxLoss) * 92}`,
-												)
-												.join(' ')}
-											fill="none"
-											stroke="var(--primary)"
-											strokeWidth="2"
-										/>
-									),
-							)}
-							<text x="30" y="125" fill="currentColor" fontSize="10">
-								Epochs across rounds
-							</text>
-							<text x="32" y="10" fill="currentColor" fontSize="10">
-								Loss
-							</text>
-						</svg>
-						<figcaption className="text-muted-foreground text-xs">
-							Each round adds data; compare task outcomes alongside the loss curve.
-						</figcaption>
-					</figure>
+					<LearningChart job={job} />
 				</div>
 			)}
 			{checkpoint && (
@@ -260,37 +220,7 @@ export function TrainingPanel({
 						{checkpoint.correction_samples} corrective inherited labels). Artifact identity{' '}
 						{checkpoint.training_sha256.slice(0, 12)}…
 					</p>
-					<div className="overflow-auto">
-						<table className="w-full text-left text-sm">
-							<caption className="sr-only">Evaluated checkpoint rounds</caption>
-							<thead>
-								<tr className="border-border border-b">
-									<th className="p-2">Round</th>
-									<th className="p-2">
-										{checkpoint.algorithm === 'ppo' ? 'Practice steps' : 'Fitting loss'}
-									</th>
-									<th className="p-2">Delivered</th>
-									<th className="p-2">Clean</th>
-									<th className="p-2">Invalid</th>
-								</tr>
-							</thead>
-							<tbody>
-								{candidates.map((item) => (
-									<tr key={item.checkpoint_id}>
-										<td className="p-2">{item.round}</td>
-										<td className="p-2">
-											{item.algorithm === 'ppo'
-												? item.practice_steps
-												: item.fitting_loss.toFixed(4)}
-										</td>
-										<td className="p-2">{item.evaluation.successes}/30</td>
-										<td className="p-2">{item.evaluation.clean_successes}/30</td>
-										<td className="p-2">{item.evaluation.invalid_actions}</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					</div>
+					<CandidateGrid candidates={candidates} selectedId={training.selectedId} />
 					<p className="text-muted-foreground text-sm">
 						Outcomes:{' '}
 						{Object.entries(checkpoint.evaluation.failure_counts)
@@ -320,5 +250,57 @@ export function TrainingPanel({
 				</>
 			)}
 		</section>
+	)
+}
+
+function CandidateGrid({
+	candidates,
+	selectedId,
+}: {
+	candidates: NonNullable<TrainingState['data']>['checkpoints']
+	selectedId: string
+}) {
+	type Candidate = (typeof candidates)[number]
+	const columns = useMemo<GridColumn<Candidate>[]>(
+		() => [
+			{ id: 'round', header: 'Round', value: (item) => item.round, cell: (item) => item.round },
+			{
+				id: 'fit',
+				header: 'Fit / steps',
+				value: (item) =>
+					item.algorithm === 'ppo' ? (item.practice_steps ?? 0) : item.fitting_loss,
+				cell: (item) =>
+					item.algorithm === 'ppo' ? item.practice_steps : item.fitting_loss.toFixed(4),
+			},
+			{
+				id: 'delivered',
+				header: 'Delivered',
+				value: (item) => item.evaluation.successes,
+				cell: (item) => `${item.evaluation.successes}/30`,
+			},
+			{
+				id: 'clean',
+				header: 'Clean',
+				value: (item) => item.evaluation.clean_successes,
+				cell: (item) => `${item.evaluation.clean_successes}/30`,
+			},
+			{
+				id: 'invalid',
+				header: 'Invalid',
+				value: (item) => item.evaluation.invalid_actions,
+				cell: (item) => item.evaluation.invalid_actions,
+			},
+		],
+		[],
+	)
+	return (
+		<DataGrid
+			data={candidates}
+			columns={columns}
+			label="checkpoint rounds"
+			rowId={(item) => item.checkpoint_id}
+			selectedId={selectedId}
+			search={false}
+		/>
 	)
 }

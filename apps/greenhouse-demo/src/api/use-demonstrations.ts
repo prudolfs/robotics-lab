@@ -1,115 +1,70 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-	type Dataset,
-	demonstrations,
-	type EpisodeDetail,
-	type Review,
-	recordedScene,
-	type ValidationReport,
-} from './demonstrations'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useMemo, useState } from 'react'
+import { useWorkspace } from '../state/workspace'
+import { demonstrations, type Review, recordedScene, type ValidationReport } from './demonstrations'
+import { keys } from './query'
 
 export function useDemonstrations(connected: boolean, lastEpisode: string | null | undefined) {
-	const [data, setData] = useState<Dataset | null>(null)
-	const [selected, setSelected] = useState<EpisodeDetail | null>(null)
-	const [busy, setBusy] = useState(false)
-	const [message, setMessage] = useState('Connect to the server to inspect demonstrations.')
+	const client = useQueryClient()
+	const replay = useWorkspace((state) => state.replay)
+	const index = useWorkspace((state) => state.frame)
+	const playing = useWorkspace((state) => state.playing)
+	const generation = useWorkspace((state) => state.viewGeneration)
+	const selected = replay.kind === 'episode' ? replay.detail : null
+	const [message, setMessage] = useState('Demonstrations are stored locally on the Python server.')
 	const [validation, setValidation] = useState<ValidationReport | null>(null)
-	const [index, setIndex] = useState(0)
-	const [playing, setPlaying] = useState(false)
-	const [generation, setGeneration] = useState(100000)
-	const mounted = useRef(false)
+	const query = useQuery({
+		queryKey: keys.dataset,
+		queryFn: ({ signal }) => demonstrations.list(signal),
+		enabled: connected,
+	})
 	useEffect(() => {
-		mounted.current = true
-		return () => {
-			mounted.current = false
-		}
-	}, [])
-	const refresh = useCallback(async (signal?: AbortSignal) => {
-		const result = await demonstrations.list(signal)
-		if (mounted.current && !signal?.aborted) setData(result)
-	}, [])
-	// Each saved recording refreshes the library, including automatic terminal saves.
-	// biome-ignore lint/correctness/useExhaustiveDependencies: lastEpisode signals a newly persisted artifact.
-	useEffect(() => {
-		if (!connected) return
-		const abort = new AbortController()
-		void refresh(abort.signal)
-			.then(() => {
-				if (!abort.signal.aborted)
-					setMessage('Demonstrations are stored locally on the Python server.')
-			})
-			.catch((error: Error) => {
-				if (!abort.signal.aborted) setMessage(error.message)
-			})
-		return () => abort.abort()
-	}, [connected, lastEpisode, refresh])
-	async function run(operation: () => Promise<string>) {
-		if (busy) return
-		setBusy(true)
-		try {
-			const text = await operation()
-			if (mounted.current) setMessage(text)
-		} catch (error) {
-			if (mounted.current)
-				setMessage(error instanceof Error ? error.message : 'The dataset operation failed.')
-		} finally {
-			if (mounted.current) setBusy(false)
-		}
-	}
-	useEffect(() => {
-		if (!selected || !playing) return
-		const timer = setInterval(
-			() => setIndex((value) => Math.min(value + 1, selected.entry.episode.frames.length)),
-			selected.entry.episode.configuration.control_dt * 1000,
-		)
-		return () => clearInterval(timer)
-	}, [selected, playing])
-	useEffect(() => {
-		if (selected && index >= selected.entry.episode.frames.length) setPlaying(false)
-	}, [selected, index])
+		if (connected && lastEpisode) void client.invalidateQueries({ queryKey: keys.dataset })
+	}, [client, connected, lastEpisode])
+	const refresh = () => client.invalidateQueries({ queryKey: keys.dataset })
+	const operation = useMutation({
+		mutationFn: (task: () => Promise<string>) => task(),
+		onSuccess: async (text) => {
+			setMessage(text)
+			await refresh()
+		},
+		onError: (reason) => setMessage(reason.message),
+	})
+	const run = (task: () => Promise<string>) => operation.mutateAsync(task).catch(() => {})
 	const scene = useMemo(
 		() => (selected ? recordedScene(selected, index, playing) : null),
 		[selected, index, playing],
 	)
 	return {
-		data,
+		data: query.data ?? null,
 		selected,
-		busy,
-		message,
+		busy: operation.isPending,
+		message: query.error?.message ?? message,
 		validation,
 		index,
 		playing,
 		generation,
 		scene,
-		load: (id: string) =>
-			run(async () => {
-				const result = await demonstrations.get(id)
-				setSelected(result)
-				setIndex(0)
-				setPlaying(false)
-				setGeneration((value) => value + 1)
-				return 'Stored-state playback loaded. Live control is disabled while reviewing.'
-			}),
+		load: (id: string) => {
+			const ticket = useWorkspace.getState().beginReplay()
+			return run(async () => {
+				const detail = await client.fetchQuery({
+					queryKey: keys.episode(id),
+					queryFn: ({ signal }) => demonstrations.get(id, signal),
+				})
+				return useWorkspace.getState().finishReplay(ticket, { kind: 'episode', detail })
+					? 'Stored-state playback loaded. Live control is disabled while reviewing.'
+					: 'Earlier playback request discarded.'
+			})
+		},
 		close: () => {
-			setSelected(null)
-			setPlaying(false)
+			if (useWorkspace.getState().replay.kind === 'episode') useWorkspace.getState().returnLive()
 			setMessage('Returned to live control.')
 		},
-		seek: (value: number) => {
-			setPlaying(false)
-			setIndex(value)
-			setGeneration((number) => number + 1)
-		},
-		toggle: () => {
-			if (selected && index >= selected.entry.episode.frames.length) {
-				setIndex(0)
-				setGeneration((value) => value + 1)
-			}
-			setPlaying((value) => !value)
-		},
+		seek: useWorkspace.getState().seek,
+		toggle: useWorkspace.getState().togglePlayback,
 		refresh: () =>
 			run(async () => {
-				await refresh()
 				setValidation(null)
 				return 'Demonstration library refreshed.'
 			}),
@@ -117,17 +72,19 @@ export function useDemonstrations(connected: boolean, lastEpisode: string | null
 			run(async () => {
 				setMessage('Collecting 20 scripted expert episodes…')
 				const result = await demonstrations.experts()
-				setData(result)
+				client.setQueryData(keys.dataset, result)
 				setValidation(null)
 				return 'Expert set ready: training seeds 0–19. Existing episodes and reviews were preserved.'
 			}),
 		review: (review: Review) =>
 			run(async () => {
 				if (!selected) return ''
-				const result = await demonstrations.review(selected.entry.episode.episode_id, review)
-				setSelected(result)
-				await refresh()
+				const id = selected.entry.episode.episode_id
+				const result = await demonstrations.review(id, review)
+				client.setQueryData(keys.episode(id), result)
+				useWorkspace.getState().updateEpisode(id, result)
 				setValidation(null)
+				await client.invalidateQueries({ queryKey: keys.training })
 				return 'Review saved separately. The source episode is unchanged.'
 			}),
 		validate: () =>
@@ -141,8 +98,8 @@ export function useDemonstrations(connected: boolean, lastEpisode: string | null
 		import: (file: File) =>
 			run(async () => {
 				const result = await demonstrations.import(file)
-				await refresh()
 				setValidation(null)
+				await client.invalidateQueries({ queryKey: keys.training })
 				return `Imported ${result.imported}; ${result.duplicates} identical episodes already existed. Existing reviews were preserved.`
 			}),
 		download: (id?: string) =>
@@ -152,5 +109,4 @@ export function useDemonstrations(connected: boolean, lastEpisode: string | null
 			}),
 	}
 }
-
 export type DemonstrationLibrary = ReturnType<typeof useDemonstrations>
