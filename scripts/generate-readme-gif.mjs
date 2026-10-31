@@ -298,7 +298,26 @@ try {
 	])
 	const localMedia = resolve(root, 'apps/greenhouse-demo/media')
 	await mkdir(localMedia, { recursive: true })
+	const localVideo = resolve(temporary, 'greenhouse-preview.mp4')
+	run('ffmpeg', [
+		'-hide_banner',
+		'-loglevel',
+		'error',
+		'-y',
+		'-i',
+		localPreview,
+		'-vf',
+		'fps=30,format=yuv420p',
+		'-c:v',
+		'libx264',
+		'-crf',
+		'18',
+		'-movflags',
+		'+faststart',
+		localVideo,
+	])
 	await rename(localPreview, resolve(localMedia, 'preview.gif'))
+	await rename(localVideo, resolve(localMedia, 'preview.mp4'))
 	await writeFile(
 		resolve(localMedia, 'preview.json'),
 		`${JSON.stringify(
@@ -309,6 +328,7 @@ try {
 				frames: count,
 				fps,
 				width,
+				video: { file: 'preview.mp4', source: 'preview.gif', fps: 30 },
 			},
 			null,
 			2,

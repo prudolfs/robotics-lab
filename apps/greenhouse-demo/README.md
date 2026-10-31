@@ -2,7 +2,7 @@
 
 ![Pip collecting a capsule in the greenhouse](media/preview.gif)
 
-The short preview uses the same eight Greenhouse frames as the global showcase: live scripted-reference collection. [The separate comparison video](media/learning-comparison.mp4) shows recorded BC/PPO/reference validation rollouts and learned failures.
+The short GIF and [MP4 preview](media/preview.mp4) show the same 7.2-second live scripted-reference collection sequence, using the eight Greenhouse frames from the global showcase.
 
 Greenhouse workspace for Robotics Lab's robot-learning project through Phase 8. React Three Fiber and Drei render an authored Blender greenhouse and articulated caretaker using actual Three.js WebGPU; Tailwind and shadcn/ui with Base UI provide the interface. Python runs the authoritative MuJoCo world. Reference and manual teaching controllers can produce versioned demonstrations; a separate PyTorch worker trains saved policies for live learned execution.
 
@@ -94,7 +94,7 @@ To check the production bundle, start `pnpm -C apps/greenhouse-server start` and
 
 Phase 8 is complete. The [release review](../../docs/greenhouse-demo/phase8/README.md) records clean-checkout setup, a fresh training run, service/resource limits and verification. That fresh run achieved 27/30 clean validation deliveries and a successful live seed-42 collection; the historical selected BC actor's 29/30 result and frozen BC/PPO test results remain separate experiments. No new final-test performance is claimed.
 
-Five [square screenshots for a later post](screenshots/README.md) show the workspace, live learned carrying, training, validation failure comparison and mission progress. Regenerate the screenshots and MP4 using:
+Five [square screenshots for a later post](screenshots/README.md) show the workspace, live learned carrying, training, validation failure comparison and mission progress. Regenerate the screenshots using:
 
 ```sh
 pnpm dev:greenhouse
@@ -102,4 +102,6 @@ pnpm dev:greenhouse
 pnpm screenshots:greenhouse
 ```
 
-Regenerate the short GIF with `pnpm readme:gif`; it shares the global showcase frames. `GREENHOUSE_URL` overrides the frontend URL. Local Chrome/WebGPU and ffmpeg are required. This captures existing policies without retraining them. The app continues to require its Python server: the checked-in GIF/video are viewable offline, but an offline application mode is not included.
+Regenerate the preview GIF and MP4 with `pnpm readme:gif`; both share the global showcase frames. `GREENHOUSE_URL` overrides the frontend URL. Local Chrome/WebGPU and ffmpeg are required. This captures existing policies without retraining them. The app continues to require its Python server: the checked-in GIF/video are viewable offline, but an offline application mode is not included.
+
+For X, use the [1080 × 1080 square video](media/x-preview.mp4): a fresh seed-42 scripted-reference collection, switching from overview to follow view and ending at delivery. With the app running, regenerate it using `pnpm video:greenhouse:x`. It exports H.264 at 30 fps with fast-start playback, matching the Warehouse post format. [Capture metadata](media/x-preview.json) records the source and timing.

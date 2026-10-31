@@ -4,5 +4,10 @@
   "firstGlobalFrame": 32,
   "frames": 8,
   "fps": 1.1111111111111112,
-  "width": 1200
+  "width": 1200,
+  "video": {
+    "file": "preview.mp4",
+    "source": "preview.gif",
+    "fps": 30
+  }
 }

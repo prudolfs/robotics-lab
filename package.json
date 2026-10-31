@@ -35,6 +35,7 @@
 		"build:slam": "pnpm -C apps/slam-demo build",
 		"test:e2e:slam": "pnpm -C apps/slam-demo test:e2e",
 		"screenshots:greenhouse": "node scripts/capture-greenhouse-demo.mjs",
+		"video:greenhouse:x": "node scripts/capture-greenhouse-x.mjs",
 		"verify:greenhouse": "node scripts/greenhouse-release/smoke.mjs"
 	},
 	"devDependencies": {

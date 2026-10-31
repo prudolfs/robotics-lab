@@ -181,9 +181,9 @@ optional output path.
 
 Greenhouse's five [1080 × 1080 screenshots](apps/greenhouse-demo/screenshots/README.md),
 [preview GIF](apps/greenhouse-demo/media/preview.gif) and
-[comparison MP4](apps/greenhouse-demo/media/learning-comparison.mp4) are ready for
-later posts. Its video explicitly shows recorded BC/PPO/reference validation
-rollouts; the live learned and mission screenshots are captured separately.
+[preview MP4](apps/greenhouse-demo/media/preview.mp4) are ready for
+later posts. Both previews show the same 7.2-second live scripted-reference
+collection sequence; the learned and mission screenshots are captured separately.
 
 ## Next possibilities
 

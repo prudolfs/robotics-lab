@@ -1,0 +1,18 @@
+{
+  "file": "x-preview.mp4",
+  "source": "Live scripted-reference collection through public controls; overview then follow camera, ending at delivery. Captured frames played at 6 fps.",
+  "controller": "scripted_reference",
+  "seed": 42,
+  "viewport": {
+    "width": 1080,
+    "height": 1080
+  },
+  "frames": 59,
+  "captureFps": 6,
+  "outputFps": 30,
+  "durationSeconds": 9.833333333333334,
+  "delivered": true,
+  "collisions": 0,
+  "invalidActions": 0,
+  "errors": []
+}
