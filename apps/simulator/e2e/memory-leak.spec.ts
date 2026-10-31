@@ -104,17 +104,16 @@ async function driveBurst(page: Page, key: 'w' | 's' | 'a' | 'd', ms: number) {
 /** Place a goal through a world-space click, then clear it through the Nav
  *  tab's `Clear goals` button — the same public affordance a user uses. */
 async function placeAndClearGoal(sim: Simulator, page: Page, goal: WorldPos) {
+	await page.getByTestId('pause-resume-button').click()
+	await expect(page.getByTestId('pause-resume-button')).toHaveText('Resume')
 	await sim.placeGoal(goal, { hudCollision: 'nudge', fallback: { x: 0, y: 0 } })
-	// The robot starts driving toward the goal. Clearing immediately exercises
-	// the cancel path and returns autonomy to manual, exactly the create /
-	// remove cycle the doc asks for.
+	// Freeze motion while exercising cancellation so arrival cannot disable
+	// Clear goals between Playwright's actionability check and its click.
 	await activateTab(page, 'nav')
-	const clear = page.getByTestId('clear-goals-button')
-	// Clear may be briefly disabled if the robot already reached the goal and
-	// the queue emptied on its own; click only when enabled.
-	await expect.poll(async () => await clear.isEnabled(), { timeout: 5_000 }).toBe(true)
-	await clear.click()
+	await page.getByTestId('clear-goals-button').click()
 	await expect(page.getByTestId('goal-count')).toHaveText('0')
+	await page.getByTestId('pause-resume-button').click()
+	await expect(page.getByTestId('pause-resume-button')).toHaveText('Pause')
 }
 
 test.describe('Phase 8 — Memory leak test', () => {

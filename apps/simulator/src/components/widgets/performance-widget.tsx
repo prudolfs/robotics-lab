@@ -8,9 +8,9 @@
 //
 // These are all observed values already in the store (`fps`, `simTime`,
 // `stepCount`). The widget derives the runs-per-second ratios from the
-// observed deltas it sees between renders, kept in refs.
+// observed deltas sampled every 500 ms.
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { WidgetCard } from '@/components/widgets/widget-card'
 import { FIXED_DT } from '@/sim/loop'
 import { useSimulatorStore, type WidgetId } from '@/store'
@@ -24,26 +24,33 @@ export function PerformanceWidget() {
 	const stepCount = useSimulatorStore((s) => s.stepCount)
 	const running = useSimulatorStore((s) => s.running)
 
-	// Rolling sim-steps-per-second (number of fixed steps observed per real
-	// second) and sim/real ratio (sim seconds gained per real second).
-	const lastRef = useRef<{ t: number; steps: number; sim: number } | null>(null)
-	const [simFps, setSimFps] = useState(0)
-	const [simRealRatio, setSimRealRatio] = useState(0)
-	const [frameMs, setFrameMs] = useState(0)
-
+	// Sample throughput on a timer. Deriving React state in an effect on every
+	// simulation frame schedules another render for every store publication.
+	const [{ simFps, simRealRatio, frameMs }, setThroughput] = useState({
+		simFps: 0,
+		simRealRatio: 0,
+		frameMs: 0,
+	})
 	useEffect(() => {
-		const now = performance.now()
-		const last = lastRef.current
-		if (last != null) {
-			const dt = now - last.t
-			if (dt > 0) {
-				setSimFps((stepCount - last.steps) / (dt / 1000))
-				setSimRealRatio((simTime - last.sim) / (dt / 1000))
-				setFrameMs(dt)
+		const initial = useSimulatorStore.getState()
+		let last = { t: performance.now(), steps: initial.stepCount, sim: initial.simTime }
+		const timer = window.setInterval(() => {
+			const now = performance.now()
+			const current = useSimulatorStore.getState()
+			const elapsed = now - last.t
+			const steps = current.stepCount - last.steps
+			const simElapsed = current.simTime - last.sim
+			if (elapsed > 0) {
+				setThroughput({
+					simFps: Math.max(0, steps) / (elapsed / 1000),
+					simRealRatio: Math.max(0, simElapsed) / (elapsed / 1000),
+					frameMs: current.fps > 0 ? 1000 / current.fps : 0,
+				})
 			}
-		}
-		lastRef.current = { t: now, steps: stepCount, sim: simTime }
-	}, [stepCount, simTime])
+			last = { t: now, steps: current.stepCount, sim: current.simTime }
+		}, 500)
+		return () => window.clearInterval(timer)
+	}, [])
 
 	const stepLoad = simFps * FIXED_DT // sim-seconds produced per real second target
 	const targetSimFps = 1 / FIXED_DT

@@ -66,6 +66,9 @@ test.describe('Phase 3 — Navigation', () => {
 		test.setTimeout(150_000) // multi-goal autonomy run + slow-run headroom
 		const sim = await launchSimulatorForWorld(page)
 
+		await page.getByTestId('pause-resume-button').click()
+		await expect(page.getByTestId('pause-resume-button')).toHaveText('Resume')
+
 		// Queue two distinct floor points: the second must not start until the
 		// first is reached.
 		await sim.queueGoal(CLEAR_GOAL)
@@ -75,6 +78,9 @@ test.describe('Phase 3 — Navigation', () => {
 		// Capture the first active goal (head of the queue)...
 		const g0text = (await page.getByTestId('active-goal').textContent()) ?? ''
 		expect(g0text, `first active goal not parseable: ${g0text}`).not.toBe('—')
+
+		await page.getByTestId('pause-resume-button').click()
+		await expect(page.getByTestId('pause-resume-button')).toHaveText('Pause')
 
 		// ...wait for the head to be reached (queued count drops to 1)...
 		await expect

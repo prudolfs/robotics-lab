@@ -576,3 +576,11 @@ Phases 7–13 harden the suite for long-term maintenance.
 Phase 14 opens the door to agent-driven regression testing.
 
 Everything else should be covered by deterministic unit tests.
+
+## GitHub Actions and local Laya
+
+The E2E workflow runs only `apps/simulator`; it has no Laya dependency. Keep live model evaluations local. Warehouse unit tests and its mocked browser scenarios can exercise Laya transport and failure behavior without downloading or serving model weights. To run the live model comparison, start the local Laya server and run `node scripts/warehouse-phase4/compare.mjs` separately.
+
+The workflow uploads both hidden Playwright output folders (`e2e/.report` and `e2e/.results`) with `include-hidden-files: true`, retaining screenshots, traces and metrics for diagnosing failures.
+
+Goal queue and cancellation scenarios pause through the public toolbar while staging their assertions, then resume; a slow browser must not let arrival drain the queue before the test clicks Clear goals or queues a second destination. The console guard attaches to every page, including pages created after the first test in a worker. Performance throughput is sampled on a 500 ms timer instead of scheduling React state updates from every simulation-frame effect.

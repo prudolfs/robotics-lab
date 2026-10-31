@@ -37,11 +37,11 @@ import type { ConsoleMessage, Page } from '@playwright/test'
  */
 
 const failures: string[] = []
-let listenerInstalled = false
+const guardedPages = new WeakSet<Page>()
 
 function installListeners(page: Page) {
-	if (listenerInstalled) return
-	listenerInstalled = true
+	if (guardedPages.has(page)) return
+	guardedPages.add(page)
 
 	page.on('console', (msg: ConsoleMessage) => {
 		if (msg.type() === 'error') {
